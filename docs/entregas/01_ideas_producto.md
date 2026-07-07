@@ -34,7 +34,7 @@ Se plantearon cinco propuestas orientadas a resolver problemas a gran escala med
 
 El tutor valoró positivamente la ambición intelectual, la orientación a problemas relevantes y el encaje conceptual con datos, modelado y automatización, pero señaló que la entrega estaba "todavía bastante verde" para el criterio del TFM. Sus indicaciones clave:
 
-> «El siguiente paso es **reducir radicalmente el alcance** para que sea viable en seis meses y **evitar combinar demasiadas tecnologías y capas institucionales**. La línea que hoy veo mejor alineada con los criterios del proyecto es **el extractor de datos científicos, o una versión muy reducida de monitorización/forecasting con datos accesibles**; las demás podrían mantenerse como alternativas solo si evolucionan hacia un problema más acotado, con datos accesibles y una contribución clara de Data Science.»
+> «Para alinearlas mejor con el criterio del TFM, el siguiente paso es **reducir radicalmente el alcance** para que sea viable en seis meses y **evitar combinar demasiadas tecnologías y capas institucionales**. La línea que hoy veo mejor alineada con los criterios del proyecto es **el extractor de datos científicos, o una versión muy reducida de monitorización/forecasting con datos accesibles**; las demás podrían mantenerse como alternativas solo si evolucionan hacia un problema más acotado, con datos accesibles y una contribución clara de Data Science.»
 
 Criterios extraídos del feedback:
 1. Alcance radicalmente reducido — viable en seis meses
@@ -62,6 +62,6 @@ Siguiendo la línea de **monitorización/forecasting con datos accesibles** aval
 | Datos accesibles | API INE pública, sin registro ni API key, verificada en vivo |
 | Contribución clara de DS | ETL reproducible + índice derivado + EDA + modelo predictivo |
 
-**Alternativa de reserva:** el extractor de datos científicos (Idea 4), segunda línea avalada por el tutor, se mantiene como plan B si la fuente principal fallara — riesgo muy bajo dado el carácter estatutario del INE.
+**Alternativa de reserva:** el extractor de datos científicos (Idea 4), también avalada por el tutor en su feedback, se mantiene como plan B si la fuente principal fallara — riesgo muy bajo dado el carácter estatutario del INE.
 
 El desarrollo completo de la idea seleccionada (datos necesarios, fuentes, privacidad y viabilidad) se encuentra en la [Entrega 2](02_datos_necesarios.md).

@@ -22,7 +22,7 @@
 | IPC general CCAA | Deflactor regional para valores reales | CCAA × mes → media anual | Tabla 76136 |
 | Salario bruto anual | Media y percentiles por CCAA | CCAA × año | Tabla 28191 |
 
-**Profundidad histórica necesaria:** 2007–2025 (cubre ciclo completo crisis + recuperación + pico actual)  
+**Profundidad histórica necesaria:** 2007–2025 para IPV e IPC (ciclo completo crisis + recuperación + pico actual); los salarios (EES) empiezan en 2008, por lo que el índice de asequibilidad combinado cubre 2008–2024/25 — recorte asumido y sin impacto en el análisis del ciclo  
 **Volumen aproximado:** ~1.800 series brutas descargadas (120 IPV anual + 240 IPV trimestral + 1.120 IPC + 324 salarios), de las que se filtran las relevantes → ~3.300 filas procesadas. Volumen ligero, manejable íntegramente en pandas.  
 **Datos esenciales:** IPV anual + salarios  
 **Datos deseables:** IPV trimestral + IPC para ajuste inflación
@@ -37,7 +37,7 @@
 |---|---|
 | URL API | `https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{id}` |
 | Acceso | Público, sin registro, sin API key |
-| Formato | JSON-STAT (lista de series con array `Data`) |
+| Formato | JSON (formato Tempus del INE: lista de series, cada una con array `Data` de pares año/valor) |
 | Descarga | Vía HTTP GET; parámetro `nult=N` para últimos N periodos |
 | Disponibilidad histórica | IPV desde 2007; IPC desde 1961; salarios desde 2008 |
 | Estabilidad | INE es organismo estatutario; URLs y esquema estables >10 años |
@@ -57,14 +57,22 @@ Tabla 76136 → 1.120 series OK, IPC por CCAA (se usan las 20 de índice general
 Tabla 28191 → 324 series OK, salario medio nacional 29.540 € (2024)
 ```
 
+**Riesgos detectados en la fuente:**
+- Cambio de esquema o de IDs de tabla en la API del INE (histórico muy estable, pero sin garantía) → mitigable congelando snapshots CSV en `data/processed/`
+- Servicio wstempus sin SLA ni límites de descarga documentados → descargas espaciadas con reintentos en el cliente
+- Retraso estructural de publicación de la EES (~1,5 años: salario 2024 publicado en 2026) → el último año del índice siempre irá con desfase (ver tabla de riesgos en §5)
+- Cobertura incompleta de Ceuta y Melilla en salarios y en desagregaciones del IPV → análisis restringido a las 17 CCAA
+
 ---
 
 ## 4. Privacidad y Protección de Datos
 
 - **Datos personales:** Ninguno. Todas las series son estadísticas agregadas publicadas por el INE.
-- **Anonimización:** No requerida.
+- **Anonimización:** No requerida — la agregación por CCAA la hace de origen el propio INE.
+- **Uso académico:** Seguro. Datos oficiales agregados bajo la licencia de reutilización del INE, aptos para un proyecto académico en un repositorio público de GitHub.
 - **RGPD:** Sin implicaciones. Los datos son de uso libre (licencia INE reutilización).
-- **Riesgo ético:** Nulo. No hay datos de individuos.
+- **Riesgo ético / legal:** Nulo. No hay datos de individuos ni categorías sensibles.
+- **Datos evitados por privacidad:** Se descartó deliberadamente trabajar con microdatos (microdatos de la EES o transacciones inmobiliarias individuales del Colegio de Registradores), que darían más granularidad pero introducirían riesgo de reidentificación; el proyecto usa exclusivamente agregados por CCAA.
 
 ---
 
@@ -82,6 +90,10 @@ Tabla 28191 → 324 series OK, salario medio nacional 29.540 € (2024)
 | Salarios no anualizados al mismo año que IPV | Media | Interpolación lineal o inner join restrictivo |
 | IPV base 2015=100 no comparable directamente con salarios | Baja | Índice normalizado sobre año base común |
 | Desfase temporal de salarios (encuesta llega a 2024; IPV a 2025) | Media | Último año con ratio parcial o fuente alternativa: Agencia Tributaria IRPF (rendimientos trabajo por CCAA) |
+
+**¿Es desarrollable de forma realista durante el curso?** Sí: el volumen es pequeño (~3.300 filas procesadas, manejable íntegramente en pandas), el pipeline reutiliza el patrón del ejercicio EPA del propio máster (misma API INE, mismo esquema JSON) y el MVP — ETL + notebook de análisis + regresión inicial — se descompone en hitos alcanzables entrega a entrega.
+
+**Parte más arriesgada ahora mismo:** el acoplamiento temporal de las fuentes — los salarios llegan hasta 2024 con ~1,5 años de retraso estructural mientras el IPV ya publica 2025, así que el último año del índice siempre será provisional. Riesgo secundario: la capa de modelado trabaja con pocas observaciones (17 CCAA × ~17 años), lo que limita la complejidad del modelo a regresiones simples — asumido en el diseño del MVP.
 
 ### Alternativas de datos
 - **Ministerio de Vivienda:** Precios de transacción por m² por provincia (más granular que IPV)
