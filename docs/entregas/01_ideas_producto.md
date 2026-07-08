@@ -52,7 +52,7 @@ Siguiendo la línea de **monitorización/forecasting con datos accesibles** aval
 
 **Problema:** el precio de la vivienda en España crece muy por encima de los salarios, con divergencias marcadas entre comunidades autónomas, y no existe una herramienta pública que integre precio de vivienda, salarios e inflación en un único índice de asequibilidad regional actualizable.
 
-**Enfoque:** pipeline ETL sobre la API pública del INE (IPV, salarios e IPC por CCAA) que construye un índice de asequibilidad (ratio precio/salario) por comunidad autónoma para la serie 2007–2025, con análisis exploratorio, visualizaciones comparativas e inicio de modelado predictivo.
+**Enfoque:** pipeline ETL sobre datos públicos (INE: IPV, salarios, IPC; Banco de España: Euríbor) que construye un índice de asequibilidad (ratio precio/salario) por comunidad autónoma, modelos de forecasting del IPV trimestral con escenarios, y una capa RAG+LLM que fundamenta las conclusiones en informes públicos (BdE, INE) — los drivers estructurales sin serie temporal (suelo, fiscalidad, demanda extranjera) entran por la vía documental.
 
 **Por qué cumple los criterios del tutor:**
 | Criterio | Cumplimiento |
