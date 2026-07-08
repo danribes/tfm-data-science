@@ -2,7 +2,7 @@
 
 Repositorio del **Trabajo de Fin de Máster** (Evolve — Máster en Data Science). Pipeline ETL + análisis de asequibilidad de vivienda por comunidad autónoma.
 
-**Entregas del curso:** [docs/entregas/](docs/entregas/) — [01 Ideas de producto](docs/entregas/01_ideas_producto.md) · [02 Selección de idea y datos necesarios](docs/entregas/02_datos_necesarios.md)
+**Entregas del curso:** [docs/entregas/](docs/entregas/) — [01 Ideas de producto](docs/entregas/01_ideas_producto.md) · [02 Selección de idea y datos necesarios](docs/entregas/02_datos_necesarios.md) · [03 Modelo de datos y capa gold](docs/entregas/03_modelo_datos.md)
 
 **Fuente:** API pública del INE (sin autenticación)  
 **Periodo:** 2007–2025  
