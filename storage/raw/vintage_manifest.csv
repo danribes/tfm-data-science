@@ -26,3 +26,11 @@
 "ine_salarios_series_meta","https://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/28191","2026-07-18T09:06:04",3590
 "ine_ipc_series_meta","https://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/76136","2026-07-18T09:07:38",1066
 "ine_ipc_series_meta","https://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/76136","2026-07-18T09:08:22",286
+"weo_GGX_NGDP","https://www.imf.org/external/datamapper/api/v1/GGX_NGDP","2026-07-18T09:50:44",50
+"weo_GGR_NGDP","https://www.imf.org/external/datamapper/api/v1/GGR_NGDP","2026-07-18T09:50:44",50
+"weo_GGXCNL_NGDP","https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP","2026-07-18T09:50:45",122834
+"weo_GGXWDG_NGDP","https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP","2026-07-18T09:50:45",114506
+"weo_exp","https://www.imf.org/external/datamapper/api/v1/exp","2026-07-18T09:51:25",230883
+"weo_rev","https://www.imf.org/external/datamapper/api/v1/rev","2026-07-18T09:51:25",230202
+"weo_GGXCNL_NGDP","https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP","2026-07-18T09:51:26",122834
+"weo_GGXWDG_NGDP","https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP","2026-07-18T09:51:27",114506
