@@ -92,6 +92,31 @@
 | España por CCAA | INE Estadística de Migraciones + padrón | ✅ (pipeline vivienda) |
 | Estrés de servicios | outcomes ya mapeados (SILC vivienda, listas de espera nacionales — heterogéneo) | parcial |
 
+## 3-bis. Características absorbidas de los planes A (UE) y B (GLOBAL) — el integral como SUPERSET
+
+*Añadido 2026-07-18 a petición del autor: el integral contiene ahora TODO el pool de bases de datos y toda la maquinaria metodológica; los planes A/B/C quedan como VISTAS (subconjuntos ejecutables) de este programa.*
+
+### Del plan GLOBAL (B) — diseño por niveles y salvaguardas globales
+1. **Geografía en 4 tiers** (antes solo en B): **Tier A** sanidad global (GHED ~195, EXTRAÍDO ✅) · **Tier B** educación global (UNESCO UIS gasto → WB HLO, ~140, TRANSVERSAL — HLO no es panel; sin interpolación) · **Tier C** funciones COFOG mundo (FMI GFS ~60–90 reporters + clasificación económica) · **Tier D** UE fino (Eurostat, EXTRAÍDO ✅) como contraste con **outcome emparejado** (esperanza de vida; concordancia Spearman + IC bootstrap, SIN gate pass/fail).
+2. **Estratificación por renta en TODO** (grupos BM por año, los países migran de grupo): funnels, calibración conformal, SHAP y chequeos de residuales POR GRUPO; pooled solo como sensibilidad. Nunca Noruega-vs-Chad.
+3. **Procedencia del dato como primera clase**: covariable de capacidad estadística (SPI empalmado con SCI, nivel país, vintage declarado; excluida de features en la spec del chequeo para evitar circularidad); **flag de procedencia del outcome** (registro vital vs imputado OMS/IGME) en el coverage map + spec de robustez sin país-años imputados.
+4. **Coverage map como entregable** (`coverage_map.parquet`: país×año×variable×procedencia) — el mapa de agujeros se publica, no se esconde.
+5. **Reglas de exclusión por norma, no ad-hoc**: población <300k, proxy de conflicto (WDI), <8 años de datos → anexo de excluidos. Petro-estados = análogos globales de Irlanda (denominador); Irlanda/Luxemburgo → GNI\*/GNI (conector T1.2.5 del plan A).
+6. **Conformal robusto para paneles cortos**: block-conformal a nivel PAÍS (intercambiabilidad de países, no de filas), features móviles calculadas DENTRO de cada fold (sin fuga temporal), n efectivo por país (~3–5) declarado, nivel 90%.
+7. **ACs de cobertura con fallback declarado**: GHED público ≥170 países ≥15 años; **GHED-HK capital = AC separada (≥60 países ≥8 años)** — si no llega, RQ4 se declara sobre la submuestra real (espejo del "reporters" GFS); UIS→HLO ≥130 países, ≥2 puntos temporales solo para afirmaciones de tendencia.
+8. **Cadencia PISA irregular** (2022 gap COVID, 4-anual post-2025): solo años-ola, nunca outcomes interpolados en la calibración conformal.
+9. **Dedup OCDE↔Eurostat**: Eurostat canónico para miembros UE; OCDE solo no-UE (evita duplicar país-años — la OCDE copia Eurostat).
+
+### Del plan UE (A) — bolt-ons verificados y features de composición
+10. **Módulos bolt-on opcionales** (códigos corregidos por verificación adversarial + Perplexity): **Justicia/CEPEJ** (presupuesto judicial → disposition time/clearance; gasto **GF0303** tribunales, NO GF0301=policía; CEPEJ máquina-legible 2010–2022 + estudio Scoreboard anual-de-base-bienal 2012→) · **Focalización de transferencias** (`ilc_li10` pre-transferencias SIN pensiones vs `ilc_li02` post — EXTRAÍDOS ✅; familia = GF1004) · **Contratación pública** como feature transversal (opentender single-bidding + CRI Fazekas; estado post-eForms disputado → fallback TED API v3 directo, verificada) · **Reciclaje** GF0501→`cei_wm011` (EXTRAÍDO ✅).
+11. **Anexo "considerado y rechazado"** (oro de defensa): GF05→emisiones, I+D→patentes, cultura, defensa-outcome, DESI-módulo, green tagging, GTED, SOEs-como-módulo-outcome, absorción NGEU; ALMP aparcado (gasto POR PARADO, dataset en redisstat DG EMPL).
+12. **Features de personal** (RQ4): D1 por función (EXTRAÍDO ✅) + WWBI empleo/masa/prima (EXTRAÍDO ✅) — masa salarial = plantilla × salario medio.
+13. **Multiverso de especificaciones** con 3 definiciones de gasto (%PIB, per-cápita PPS, **%GNI\* para IE/LU**) × sets de controles × retardos × tratamiento de renta; estabilidad Spearman.
+14. **Métrica pre-registrada**: MAE sobre folds LOCO; el GBM se adopta solo si bate al mejor baseline (OLS/GAM); si no, el capítulo lo declara.
+
+### Pool único de bases de datos (consolidado)
+El inventario completo vive en [data_landscape.md](data_landscape.md) (~125 fuentes) y los esquemas en [data_dictionary_master.md](data_dictionary_master.md); el subconjunto de extracción en [data_dictionary_vivienda.md](data_dictionary_vivienda.md). **Estado 2026-07-18: 28 datasets procesados + 4 gold** (incl. GHED 195 países, GMD siglo XX 202 países, WEO 151–229, Eurostat completo, INE nuevo, WWBI, DESA, ODA, JST). Pendientes con ruta: GFS-COFOG global (MCP), UIS+HLO, SPI, PISA, CEPEJ, GNI\*, liquidaciones CCAA, DAC CRS, cohesiondata, BOS, GRD, SIPRI, Euríbor (ECB).
+
 ## 4. Árbol de tareas por fases (con puertas)
 
 **F0 — TFM (S1–S10, YA planificado).** = [plan UE](PLAN_public_money_outcomes.md) o [plan GLOBAL](PLAN_public_money_outcomes_GLOBAL.md) + bolt-ons opcionales. Produce: la maquinaria completa (conectores, gold, GBM+conformal, funnel, app) y la respuesta europea/global a "¿quién gasta mejor?" en 2–3 funciones. **Todo lo posterior REUTILIZA esta maquinaria.**
