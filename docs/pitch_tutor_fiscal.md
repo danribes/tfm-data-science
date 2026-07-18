@@ -27,14 +27,14 @@ Gradient boosting prediciendo el resultado (p. ej. mortalidad tratable) a partir
 
 **Muestra de lo que ya sale de estos datos (2023, %PIB):** en vivienda, Italia gasta 4,4 (artefacto *superbonus* — caso de outlier documentado), la UE 1,2 y **España 0,5**; en inversión pública, Estonia 6,5, la UE 3,6 y **España 3,0**. Francia es el mayor gastador corriente (~53). La dimensión inversión/corriente sale directamente del dataset — nadie la explota con ML a nivel función.
 
-## Dos variantes — te pido criterio
+## Tres variantes — te pido criterio
 
-| | **A — UE (33 países)** | **B — Global (~180 países)** |
-|---|---|---|
-| Fortaleza | composición inversión/corriente en TODAS las funciones; datos homogéneos | muestra estadística muy superior para ML; encaje total con mi perfil HEOR (sanidad global) |
-| Debilidad | N=33 justo para ML (mitigado y declarado) | por función solo ~60–90 países; calidad de dato heterogénea (estratifico por renta, controlo capacidad estadística) |
+| | **A — UE (33 países)** | **B — Global (~180 países)** | **C — Vivienda como caso de consecuencias** |
+|---|---|---|---|
+| Fortaleza | composición inversión/corriente en TODAS las funciones; datos homogéneos | muestra estadística muy superior para ML; encaje con mi perfil HEOR (sanidad global) | **pivote mínimo**: conserva el proyecto de vivienda que avalaste y le añade la capa fiscal (cuánto/cómo se gasta en vivienda, qué rendimiento obtiene cada país/CCAA) y el amplificador migratorio |
+| Debilidad | N=33 justo para ML (mitigado y declarado) | por función solo ~60–90 países; calidad heterogénea (estratifico por renta) | alcance temático más estrecho (una función como hilo conductor) |
 
-Ambas comparten método, calendario y salvaguardas; tengo el plan de trabajo completo de las dos (tareas, semanas, riesgos, criterios de aceptación) por si quieres verlo.
+Las tres comparten método, calendario y salvaguardas; tengo el plan de trabajo completo de cada una (tareas, semanas, riesgos, criterios de aceptación) por si quieres verlos. Si tuviera que elegir yo, C es la de menor riesgo y mayor continuidad con lo ya entregado.
 
 ## Calendario (10 semanas, deadline 30-sep)
 

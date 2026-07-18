@@ -113,6 +113,45 @@
 | **VIIRS / DMSP night-time lights** | luminosidad nocturna por satélite — proxy de actividad/infraestructura (Henderson et al.); procesable con CNN | mundial, DMSP 1992–2013 + VIIRS 2012→ | descarga abierta (NOAA/EOG) — el hueco DL honesto del tier global |
 | *Tooling NLP (no es base de datos):* MarIA / RoBERTa-BNE | transformers en español preentrenados (BNE) para el extractor BOE (clasificación + NER) | — | HuggingFace, abiertos |
 
+## 3-quinquies. Fuentes para el análisis de vivienda (Variante C)
+
+*Añadido 2026-07-18 para [PLAN_vivienda_consecuencias](PLAN_vivienda_consecuencias.md). Las marcadas ✅ ya están verificadas (pipeline del TFM, comprobaciones 2026-07-07, o esta sesión).*
+
+### Núcleo España (ya en el pipeline del TFM)
+| Fuente | Serie | Estado |
+|---|---|---|
+| INE wstempus | IPV anual 49300 + trimestral 76201; IPC 76136 (solo "Índice general" — bug conocido); salarios EES 28191 | ✅ pipeline operativo |
+| Banco de España | Euríbor 12m (`ti_1_7.csv`, diario 1999→) | ✅ verificado |
+| MITMA | precio suelo urbano (36400500, provincial 2004→); ICSC costes de construcción | ✅ verificado (XLS legado, parser xlrd) |
+| Registradores ERI | % compraventas por extranjeros | ⚠️ WAF + PDF; driver V2 descartable |
+
+### Gasto público en vivienda (la capa fiscal de la Variante C)
+| Fuente | Serie | Estado |
+|---|---|---|
+| Eurostat `gov_10a_exp` | GF06 (L1, 1995→) y **GF0601+GF1006** (L2, 2001→) × na_item (capital vs corriente) | ✅ verificado en vivo (ES 0,5 vs UE 1,2 %PIB 2023; IT 4,4 superbonus) |
+| INE COFOG + IGAE subsectores | gasto vivienda España/CCAA | ✅ verificados |
+| Liquidaciones CCAA (Hacienda) | función vivienda por comunidad, ~2002→ online | página confirmada |
+| BOE | Ley 12/2023, zonas tensionadas, planes estatales, PGE "Acceso vivienda" (3.476 M€ 2023 extraído) | ✅ verificado en vivo |
+| MIVAU (Min. Vivienda) | Observatorio de Vivienda y Suelo; **SERPAVI** (índice de precios de alquiler); registro de zonas tensionadas | público |
+
+### Comparables internacionales (outcomes + precios)
+| Fuente | Serie | Nota |
+|---|---|---|
+| **EU-SILC** `ilc_lvho07a` / `ilc_lvho05a` | sobrecarga de coste (>40% renta) / hacinamiento — los OUTCOMES de B2 | API sin clave, 2003→ |
+| **OECD Affordable Housing Database** | stock de vivienda social, instrumentos de política, indicadores de asequibilidad por país | descarga abierta — el comparador de POLÍTICA de vivienda |
+| **OECD Analytical House Prices** | **price-to-income y price-to-rent** por país, trimestral, décadas | API — el gemelo internacional del ratio de asequibilidad del TFM |
+| **BIS Residential Property Prices** | precios de vivienda, ~60 países, series largas (algunas desde 1970) | descarga abierta |
+| Eurostat `prc_hpi_q` | índice de precios de vivienda UE (respaldo del IPV con menos detalle) | API; ya identificado como backup en Entrega 3 |
+| EMF Hypostat | mercados hipotecarios europeos, anuario | PDF/tablas gratuitas |
+| Portales privados (Idealista/Fotocasa) | precios de oferta, alquiler | NO oficiales; API restringida — solo contexto, nunca núcleo |
+
+### Demografía/demanda (amplificador B4)
+| Fuente | Serie | Nota |
+|---|---|---|
+| INE Estadística de Migraciones + padrón | flujos y stock por CCAA | ✅ (pipeline) |
+| INE Censo 2021 + Encuesta Continua de Hogares | hogares, tenencia, tamaño | API/descarga |
+| Eurostat `migr_imm/emi` + UN DESA | flujos/stock por país (tier UE) | §3-quater |
+
 ## 4. Subnacional (la mayor laguna del listado inicial)
 
 | Base | Contenido | Cobertura | Fuente |

@@ -146,5 +146,24 @@
 
 **Negativo asentado (repetirlo):** nada de LSTM/TFT sobre paneles macro anuales — 25 puntos autocorrelacionados por país es indefendible; explicar POR QUÉ vale más nota que forzarlo.
 
+### 6.3 Arquitectura del extractor BOE: cascada de 4 capas (LLM ≠ ML/DL — cada uno en su sitio)
+
+**Regla: nunca usar ML para lo que un parser hace mejor, ni un LLM para lo que un modelo pequeño hace más barato.**
+
+```
+API sumarios → C0 parser determinista (metadatos, tablas, importes)
+    → C1 triaje por título (clasificador rápido TF-IDF+logística, 2,9M títulos en minutos)
+        → C2 fine-tuning MarIA/RoBERTa-BNE (clasificación doc/artículo + NER importes↔organismos↔funciones)
+            → C3 LLM: SOLO (a) generar etiquetas de entrenamiento para C2 (weak supervision,
+               3–5k docs anotados por LLM + muestra verificada a mano → destilación) y
+               (b) residuo de casos difíciles con baja confianza (~1–5%)
+→ salida: fecha | id | instrumento | organismo | función | importe | enlace | confianza
+```
+
+- **C0 ya está probado en vivo** (esta sesión): las tablas del PGE y de las leyes CCAA se extraen con regex/XML sin ML — determinista, gratis, reproducible. ~70% del valor.
+- **C2 es el "hueco DL honesto" nº1** (§6.2): pesos fijos → inferencia determinista, evaluación P/R/F1 sobre held-out etiquetado a mano, coste de céntimos sobre todo el corpus. Componente de nivel tesis.
+- **C3 nunca como extractor masivo:** ~850k docs ≈ 1,7B tokens → miles de € y semanas de API, salida estocástica, versiones de modelo que cambian debajo — indefendible en el anexo de reproducibilidad. "Transformer ajustado, F1=0,94 en held-out" se defiende solo; "prompteamos una API" invita a la pregunta que no se puede responder.
+- Cada capa medida, cada traspaso registrado, flags de confianza nunca imputados en silencio.
+
 ## 7. Qué hacer AHORA
 Nada de esto cambia el TFM: **F0 = plan UE o GLOBAL, gate del tutor en S1.** Este documento es el mapa del programa completo — útil para (a) el capítulo de "líneas futuras" de la memoria, (b) decidir el siguiente proyecto post-defensa, (c) demostrar al tribunal que el recorte de alcance fue una decisión informada, no una carencia.
