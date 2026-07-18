@@ -171,6 +171,77 @@ def scenario(path: ScenarioPath):
     raise model_missing("scenario engine")
 
 
+@lru_cache(maxsize=1)
+def projections() -> pd.DataFrame:
+    return pd.read_csv(GOLD_DIR / "gold_projections.csv")
+
+
+@lru_cache(maxsize=1)
+def proj_params() -> dict:
+    import json
+    f = MODELS_DIR / "projection_params.json"
+    if not f.exists():
+        raise model_missing("projection_params.json")
+    return json.loads(f.read_text())
+
+
+@app.get("/project/{module}")
+def project(
+    module: str,
+    geo: str = Query("ES"),
+    variant: str = Query("BSL", description="BSL|LFRT|LMRT|HMIGR|LMIGR|NMIGR|all"),
+    to_year: int = Query(2060, ge=2030, le=2070),
+    gdp_growth: float = Query(0.012, ge=-0.02, le=0.05, description="crecimiento anual real PIB pc"),
+    unemployment_delta: float = Query(0.0, ge=-10, le=10, description="Δpp de paro vs base (sensibilidad)"),
+):
+    """Proyección 2023→2070 del gasto en pensiones/sanidad (%PIB), anclada en
+    EUROPOP2023 (todas las variantes demográficas y migratorias) y en las
+    elasticidades entrenadas sobre el panel UE con TODOS los drivers del modelo:
+    share65 (proyectado), PIB pc (palanca de escenario), paro (sensibilidad),
+    obesidad (mantenida). Banda = ±1,64σ del ajuste histórico (90%). NO es una
+    predicción causal: es proyección condicionada a la senda declarada."""
+    if module not in ("pensions", "health"):
+        raise HTTPException(404, "Módulos proyectables: pensions, health")
+    pars = proj_params()[module]
+    geo = geo.upper()
+    base = pars["base"].get(geo)
+    if not base:
+        raise HTTPException(404, f"Sin valores base para {geo}. Disponibles: {sorted(pars['base'])}")
+    pj = projections()
+    variants = ["BSL", "LFRT", "LMRT", "HMIGR", "LMIGR", "NMIGR"] if variant == "all" else [variant.upper()]
+    b = dict(zip(pars["drivers"], pars["beta"]))
+    y0, s0 = base["year"], base[pars["y"]]
+    sh0 = base["pop65_share"]
+    out = {"module": module, "geo": geo, "base_year": y0, "base_value_pct_gdp": round(s0, 2),
+           "elasticities": {k: round(v, 3) for k, v in b.items()},
+           "assumptions": {"gdp_growth": gdp_growth, "unemployment_delta": unemployment_delta,
+                           "obesity": "constante", "nota": "proyección condicionada, no causal"},
+           "paths": []}
+    import math
+    for var in variants:
+        sub = pj.query("geo==@geo and variant==@var and year>=@y0 and year<=@to_year").sort_values("year")
+        if sub.empty:
+            continue
+        sh_base_proj = float(sub.iloc[0]["share65"])
+        pts = []
+        for _, r in sub.iterrows():
+            t = int(r["year"]) - y0
+            ratio65 = (float(r["share65"]) / sh_base_proj)
+            log_mult = b.get("l_pop65_share", 0) * math.log(max(ratio65, 1e-9))
+            log_mult += b.get("l_gdp_pc_pps", 0) * math.log((1 + gdp_growth) ** t)
+            log_mult += b.get("unemployment", 0) * unemployment_delta
+            val = s0 * math.exp(log_mult)
+            band = 1.64 * pars["sigma"]
+            pts.append({"year": int(r["year"]), "value": round(val, 2),
+                        "lo": round(val * math.exp(-band), 2), "hi": round(val * math.exp(band), 2),
+                        "share65": round(float(r["share65"]), 1),
+                        "net_migration": float(r["net_migration"]) if pd.notna(r["net_migration"]) else None})
+        out["paths"].append({"variant": var, "points": pts})
+    if not out["paths"]:
+        raise HTTPException(404, f"Variante '{variant}' sin datos para {geo}")
+    return out
+
+
 @app.get("/shap/{module}")
 def shap_curves(module: str):
     """Curvas de umbral SHAP (op. 3). Se sirven pre-computadas desde el notebook."""

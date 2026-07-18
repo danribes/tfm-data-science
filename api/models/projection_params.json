@@ -1,0 +1,486 @@
+{
+ "pensions": {
+  "drivers": [
+   "l_pop65_share",
+   "l_gdp_pc_pps",
+   "unemployment"
+  ],
+  "beta": [
+   0.9116988598115113,
+   -0.3159085455910769,
+   0.009364402854657783
+  ],
+  "se": [
+   0.09254373090112457,
+   0.046491883593645776,
+   0.002180428438049614
+  ],
+  "sigma": 0.09263745762957581,
+  "n": 473,
+  "countries": 29,
+  "y": "pensions_oldage",
+  "base": {
+   "AT": {
+    "year": 2024,
+    "pensions_oldage": 14.3,
+    "pop65_share": 19.840567763068105,
+    "gdp_pc_pps": 47527.9,
+    "unemployment": 5.2
+   },
+   "BE": {
+    "year": 2024,
+    "pensions_oldage": 10.2,
+    "pop65_share": 19.945957957860376,
+    "gdp_pc_pps": 46587.9,
+    "unemployment": 5.7
+   },
+   "BG": {
+    "year": 2024,
+    "pensions_oldage": 9.4,
+    "pop65_share": 23.751664150433456,
+    "gdp_pc_pps": 26324.3,
+    "unemployment": 4.2
+   },
+   "CY": {
+    "year": 2024,
+    "pensions_oldage": 7.7,
+    "pop65_share": 17.74753845596643,
+    "gdp_pc_pps": 39456.4,
+    "unemployment": 4.8
+   },
+   "CZ": {
+    "year": 2024,
+    "pensions_oldage": 8.0,
+    "pop65_share": 20.52484483588221,
+    "gdp_pc_pps": 36255.5,
+    "unemployment": 2.6
+   },
+   "DE": {
+    "year": 2024,
+    "pensions_oldage": 9.9,
+    "pop65_share": 22.417306020193024,
+    "gdp_pc_pps": 46387.1,
+    "unemployment": 3.5
+   },
+   "DK": {
+    "year": 2024,
+    "pensions_oldage": 7.2,
+    "pop65_share": 20.65765077083678,
+    "gdp_pc_pps": 51785.4,
+    "unemployment": 6.2
+   },
+   "EE": {
+    "year": 2024,
+    "pensions_oldage": 8.1,
+    "pop65_share": 20.47455166157824,
+    "gdp_pc_pps": 31555.4,
+    "unemployment": 7.6
+   },
+   "EL": {
+    "year": 2024,
+    "pensions_oldage": 11.8,
+    "pop65_share": 23.374529335863844,
+    "gdp_pc_pps": 27373.2,
+    "unemployment": 10.1
+   },
+   "ES": {
+    "year": 2024,
+    "pensions_oldage": 10.4,
+    "pop65_share": 20.4204654101594,
+    "gdp_pc_pps": 36413.1,
+    "unemployment": 11.4
+   },
+   "FI": {
+    "year": 2024,
+    "pensions_oldage": 15.5,
+    "pop65_share": 23.365646231493304,
+    "gdp_pc_pps": 40871.6,
+    "unemployment": 8.4
+   },
+   "FR": {
+    "year": 2024,
+    "pensions_oldage": 13.4,
+    "pop65_share": 21.51933157090585,
+    "gdp_pc_pps": 39294.2,
+    "unemployment": 7.4
+   },
+   "HR": {
+    "year": 2024,
+    "pensions_oldage": 8.2,
+    "pop65_share": 23.01935775215065,
+    "gdp_pc_pps": 31053.1,
+    "unemployment": 5.0
+   },
+   "HU": {
+    "year": 2024,
+    "pensions_oldage": 6.9,
+    "pop65_share": 20.69401344465465,
+    "gdp_pc_pps": 30445.5,
+    "unemployment": 4.5
+   },
+   "IE": {
+    "year": 2024,
+    "pensions_oldage": 2.9,
+    "pop65_share": 15.458862364927956,
+    "gdp_pc_pps": 88342.7,
+    "unemployment": 4.3
+   },
+   "IS": {
+    "year": 2024,
+    "pensions_oldage": 2.8,
+    "pop65_share": 15.581110992342929,
+    "gdp_pc_pps": 52398.9,
+    "unemployment": 3.6
+   },
+   "IT": {
+    "year": 2024,
+    "pensions_oldage": 13.9,
+    "pop65_share": 24.34532228681681,
+    "gdp_pc_pps": 39068.5,
+    "unemployment": 6.5
+   },
+   "LT": {
+    "year": 2024,
+    "pensions_oldage": 6.9,
+    "pop65_share": 20.339784142921545,
+    "gdp_pc_pps": 34935.9,
+    "unemployment": 7.1
+   },
+   "LU": {
+    "year": 2025,
+    "pensions_oldage": 10.8,
+    "pop65_share": 15.233594291856129,
+    "gdp_pc_pps": 99621.3,
+    "unemployment": 6.5
+   },
+   "LV": {
+    "year": 2024,
+    "pensions_oldage": 8.1,
+    "pop65_share": 21.403936494417312,
+    "gdp_pc_pps": 27536.5,
+    "unemployment": 6.9
+   },
+   "MT": {
+    "year": 2024,
+    "pensions_oldage": 5.9,
+    "pop65_share": 18.352521905498868,
+    "gdp_pc_pps": 43924.4,
+    "unemployment": 3.2
+   },
+   "NL": {
+    "year": 2024,
+    "pensions_oldage": 6.1,
+    "pop65_share": 20.4940081732416,
+    "gdp_pc_pps": 53149.4,
+    "unemployment": 3.7
+   },
+   "NO": {
+    "year": 2024,
+    "pensions_oldage": 8.1,
+    "pop65_share": 18.669010845188904,
+    "gdp_pc_pps": 66273.8,
+    "unemployment": 4.0
+   },
+   "PL": {
+    "year": 2024,
+    "pensions_oldage": 10.8,
+    "pop65_share": 20.47916535252889,
+    "gdp_pc_pps": 31463.0,
+    "unemployment": 2.9
+   },
+   "PT": {
+    "year": 2024,
+    "pensions_oldage": 10.8,
+    "pop65_share": 24.103769213605688,
+    "gdp_pc_pps": 32937.1,
+    "unemployment": 6.5
+   },
+   "RO": {
+    "year": 2024,
+    "pensions_oldage": 9.8,
+    "pop65_share": 20.018438631108644,
+    "gdp_pc_pps": 30769.5,
+    "unemployment": 5.4
+   },
+   "SE": {
+    "year": 2024,
+    "pensions_oldage": 11.0,
+    "pop65_share": 20.610428246349144,
+    "gdp_pc_pps": 44772.2,
+    "unemployment": 8.4
+   },
+   "SI": {
+    "year": 2024,
+    "pensions_oldage": 10.3,
+    "pop65_share": 21.77604076180737,
+    "gdp_pc_pps": 36118.5,
+    "unemployment": 3.7
+   },
+   "SK": {
+    "year": 2024,
+    "pensions_oldage": 9.2,
+    "pop65_share": 18.35001724523461,
+    "gdp_pc_pps": 29808.2,
+    "unemployment": 5.3
+   }
+  }
+ },
+ "health": {
+  "drivers": [
+   "l_pop65_share",
+   "l_gdp_pc_pps",
+   "unemployment",
+   "obesity"
+  ],
+  "beta": [
+   0.3247147413003305,
+   -0.018497376917825468,
+   -0.0022167123786749187,
+   0.0028421550331863424
+  ],
+  "se": [
+   0.11627448673338603,
+   0.06302047601042901,
+   0.002724451445912626,
+   0.005098864455189111
+  ],
+  "sigma": 0.10847528342115333,
+  "n": 443,
+  "countries": 29,
+  "y": "te_gf07",
+  "base": {
+   "AT": {
+    "year": 2023,
+    "te_gf07": 9.0,
+    "pop65_share": 19.55790875378318,
+    "gdp_pc_pps": 46391.9,
+    "unemployment": 5.1,
+    "obesity": 16.273256
+   },
+   "BE": {
+    "year": 2023,
+    "te_gf07": 7.8,
+    "pop65_share": 19.679197356404725,
+    "gdp_pc_pps": 45367.3,
+    "unemployment": 5.5,
+    "obesity": 20.525372
+   },
+   "BG": {
+    "year": 2023,
+    "te_gf07": 5.4,
+    "pop65_share": 23.50265443079791,
+    "gdp_pc_pps": 24254.4,
+    "unemployment": 4.3,
+    "obesity": 20.126501
+   },
+   "CY": {
+    "year": 2023,
+    "te_gf07": 6.0,
+    "pop65_share": 17.329129982172283,
+    "gdp_pc_pps": 37400.0,
+    "unemployment": 5.8,
+    "obesity": 21.579561
+   },
+   "CZ": {
+    "year": 2023,
+    "te_gf07": 8.8,
+    "pop65_share": 20.391069836894456,
+    "gdp_pc_pps": 34973.9,
+    "unemployment": 2.6,
+    "obesity": 25.946587
+   },
+   "DE": {
+    "year": 2023,
+    "te_gf07": 7.4,
+    "pop65_share": 22.245593673543272,
+    "gdp_pc_pps": 45138.1,
+    "unemployment": 3.1,
+    "obesity": 20.610812
+   },
+   "DK": {
+    "year": 2023,
+    "te_gf07": 8.3,
+    "pop65_share": 20.451706774067727,
+    "gdp_pc_pps": 48240.3,
+    "unemployment": 5.1,
+    "obesity": 14.142042
+   },
+   "EE": {
+    "year": 2023,
+    "te_gf07": 6.2,
+    "pop65_share": 20.2398593145538,
+    "gdp_pc_pps": 30611.0,
+    "unemployment": 6.4,
+    "obesity": 20.382191
+   },
+   "EL": {
+    "year": 2023,
+    "te_gf07": 5.9,
+    "pop65_share": 23.04193823647829,
+    "gdp_pc_pps": 26263.1,
+    "unemployment": 11.1,
+    "obesity": 27.196178
+   },
+   "ES": {
+    "year": 2023,
+    "te_gf07": 6.6,
+    "pop65_share": 20.14703809751995,
+    "gdp_pc_pps": 34768.5,
+    "unemployment": 12.2,
+    "obesity": 15.700071
+   },
+   "FI": {
+    "year": 2023,
+    "te_gf07": 7.6,
+    "pop65_share": 23.265959377926198,
+    "gdp_pc_pps": 39690.3,
+    "unemployment": 7.2,
+    "obesity": 23.714811
+   },
+   "FR": {
+    "year": 2023,
+    "te_gf07": 8.8,
+    "pop65_share": 21.129701989873343,
+    "gdp_pc_pps": 38055.1,
+    "unemployment": 7.3,
+    "obesity": 11.339488
+   },
+   "HR": {
+    "year": 2023,
+    "te_gf07": 7.7,
+    "pop65_share": 22.74025200382041,
+    "gdp_pc_pps": 29847.3,
+    "unemployment": 6.1,
+    "obesity": 30.115309
+   },
+   "HU": {
+    "year": 2023,
+    "te_gf07": 4.7,
+    "pop65_share": 20.537339329048777,
+    "gdp_pc_pps": 28968.6,
+    "unemployment": 4.1,
+    "obesity": 30.871662
+   },
+   "IE": {
+    "year": 2023,
+    "te_gf07": 5.4,
+    "pop65_share": 15.186018122337636,
+    "gdp_pc_pps": 82972.1,
+    "unemployment": 4.3,
+    "obesity": 27.641788
+   },
+   "IS": {
+    "year": 2023,
+    "te_gf07": 8.1,
+    "pop65_share": 15.033087647450213,
+    "gdp_pc_pps": 52215.5,
+    "unemployment": 3.5,
+    "obesity": 21.879153
+   },
+   "IT": {
+    "year": 2023,
+    "te_gf07": 6.5,
+    "pop65_share": 24.037236952986973,
+    "gdp_pc_pps": 37697.0,
+    "unemployment": 7.7,
+    "obesity": 14.172997
+   },
+   "LT": {
+    "year": 2023,
+    "te_gf07": 5.2,
+    "pop65_share": 20.00735664945565,
+    "gdp_pc_pps": 32931.3,
+    "unemployment": 6.9,
+    "obesity": 21.417402
+   },
+   "LU": {
+    "year": 2023,
+    "te_gf07": 5.4,
+    "pop65_share": 14.863599012725311,
+    "gdp_pc_pps": 95129.1,
+    "unemployment": 5.2,
+    "obesity": 18.928736
+   },
+   "LV": {
+    "year": 2023,
+    "te_gf07": 5.4,
+    "pop65_share": 20.9595729087466,
+    "gdp_pc_pps": 26755.5,
+    "unemployment": 6.5,
+    "obesity": 22.263537
+   },
+   "MT": {
+    "year": 2023,
+    "te_gf07": 5.0,
+    "pop65_share": 18.58681194204973,
+    "gdp_pc_pps": 41860.0,
+    "unemployment": 3.5,
+    "obesity": 30.652386
+   },
+   "NL": {
+    "year": 2023,
+    "te_gf07": 7.1,
+    "pop65_share": 20.218450195440635,
+    "gdp_pc_pps": 50216.4,
+    "unemployment": 3.6,
+    "obesity": 14.581171
+   },
+   "NO": {
+    "year": 2023,
+    "te_gf07": 7.0,
+    "pop65_share": 18.4271078217754,
+    "gdp_pc_pps": 67311.7,
+    "unemployment": 3.6,
+    "obesity": 19.857676
+   },
+   "PL": {
+    "year": 2023,
+    "te_gf07": 5.7,
+    "pop65_share": 19.8915451751626,
+    "gdp_pc_pps": 29519.6,
+    "unemployment": 2.8,
+    "obesity": 21.776077
+   },
+   "PT": {
+    "year": 2023,
+    "te_gf07": 6.7,
+    "pop65_share": 23.87557752627959,
+    "gdp_pc_pps": 31107.5,
+    "unemployment": 6.5,
+    "obesity": 18.177851
+   },
+   "RO": {
+    "year": 2023,
+    "te_gf07": 4.8,
+    "pop65_share": 19.70759415736196,
+    "gdp_pc_pps": 28715.8,
+    "unemployment": 5.6,
+    "obesity": 31.546676
+   },
+   "SE": {
+    "year": 2023,
+    "te_gf07": 7.4,
+    "pop65_share": 20.407029150441247,
+    "gdp_pc_pps": 42508.5,
+    "unemployment": 7.7,
+    "obesity": 17.238802
+   },
+   "SI": {
+    "year": 2023,
+    "te_gf07": 7.3,
+    "pop65_share": 21.43193202366399,
+    "gdp_pc_pps": 35072.8,
+    "unemployment": 3.7,
+    "obesity": 19.303507
+   },
+   "SK": {
+    "year": 2023,
+    "te_gf07": 6.6,
+    "pop65_share": 17.850527336468225,
+    "gdp_pc_pps": 28487.6,
+    "unemployment": 5.8,
+    "obesity": 25.602496
+   }
+  }
+ }
+}
