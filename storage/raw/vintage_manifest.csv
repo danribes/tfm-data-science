@@ -34,3 +34,7 @@
 "weo_rev","https://www.imf.org/external/datamapper/api/v1/rev","2026-07-18T09:51:25",230202
 "weo_GGXCNL_NGDP","https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP","2026-07-18T09:51:26",122834
 "weo_GGXWDG_NGDP","https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP","2026-07-18T09:51:27",114506
+"unemployment_eu","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_a","2026-07-18T13:29:46",13467
+"interest_paid","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-18T13:29:47",17491
+"population_broad_age","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjanbroad","2026-07-18T13:29:48",83847
+"pensions_oldage","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp","2026-07-18T13:32:36",16189

@@ -57,6 +57,9 @@ def build_panel() -> pd.DataFrame:
         ("gdp_pc_pps", "gdp_pc_pps"), ("population", "population"), ("life_expectancy_e0", "e0"),
         ("immigration", "immigration"), ("emigration", "emigration"),
         ("social_protection_exp", "socprot_exp"), ("recycling_rate", "recycling"),
+        # cierre de huecos F2.0 (2026-07-18)
+        ("unemployment_eu", "unemployment"), ("interest_paid", "interest"),
+        ("pensions_oldage", "pensions_oldage"),
     ]
     for name, vn in simple:
         df = p(name)
@@ -78,6 +81,19 @@ def build_panel() -> pd.DataFrame:
     for code, vn in wmap.items():
         sub = ww.query("indicator==@code")
         rows.append(sub.assign(variable=vn)[["geo", "year", "variable", "value"]])
+
+    # fuentes iso3 en formato largo (variable ya nombrada): confusores GHO + WDI extras
+    for name in ("gho_confounders", "wdi_extras"):
+        df = p(name)
+        df["geo"] = df["iso3"].map(ISO3_TO_2)
+        rows.append(df.dropna(subset=["geo"])[["geo", "year", "variable", "value"]])
+
+    # estructura de edad: share ≥65 desde demo_pjanbroad
+    br = p("population_broad_age")
+    piv = br.pivot_table(index=["geo", "time"], columns="age", values="value").reset_index()
+    piv["pop65_share"] = piv["Y_GE65"] / (piv["Y_LT15"] + piv["Y15-64"] + piv["Y_GE65"]) * 100
+    rows.append(piv.rename(columns={"time": "year"}).assign(variable="pop65_share")
+                [["geo", "year", "variable", "pop65_share"]].rename(columns={"pop65_share": "value"}))
 
     panel = pd.concat(rows, ignore_index=True)
     panel["year"] = panel["year"].astype(int)
