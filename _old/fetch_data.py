@@ -25,15 +25,15 @@ from pathlib import Path
 # Allow running from project root without installing the package
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.client import fetch_and_save, load_cached
-from src.cleaning import (
+from evo_final_work._old.src.client import fetch_and_save, load_cached
+from evo_final_work._old.src.cleaning import (
     build_asequibilidad,
     parse_ipc_ccaa,
     parse_ipv_anual,
     parse_ipv_trimestral,
     parse_salario_ccaa,
 )
-from src.config import DATA_PROCESSED, RAW_FILES, TABLES
+from evo_final_work._old.src.config import DATA_PROCESSED, RAW_FILES, TABLES
 
 
 def main(nult: int | None, cache: bool) -> None:
@@ -90,7 +90,7 @@ def main(nult: int | None, cache: bool) -> None:
         "asequibilidad": asequibilidad,
     }
 
-    from src.config import PROCESSED_FILES
+    from evo_final_work._old.src.config import PROCESSED_FILES
     for name, df in saves.items():
         path = PROCESSED_FILES[name]
         df.to_csv(path, index=False, encoding="utf-8")

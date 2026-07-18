@@ -7,7 +7,7 @@ from pathlib import Path
 
 import requests
 
-from src.config import INE_BASE_URL
+from evo_final_work._old.src.config import INE_BASE_URL
 
 _SESSION = requests.Session()
 _SESSION.headers.update({"Accept": "application/json", "User-Agent": "ine-vivienda/1.0"})
