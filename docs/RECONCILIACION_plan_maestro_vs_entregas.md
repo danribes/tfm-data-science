@@ -26,6 +26,7 @@
 ### 3.1 Identidad del proyecto (LA gorda)
 Las entregas comprometen UNA idea principal: **índice de asequibilidad de vivienda por CCAA** ("a partir de esta entrega deberéis trabajar sobre una única idea principal, que será la base de vuestro proyecto final"). El repo raíz hoy es el atlas fiscal (PLAN_MAESTRO), con el proyecto vivienda original relegado a `_old/`. Si el tutor abre el repo tal cual, ve un proyecto distinto del avalado → percepción de incumplimiento del contrato, justo su queja central.
 **Acción:** antes de compartir el repo con el tutor, o (a) se obtiene el aval del pivote (F0.1) y se reescriben las entregas (F0.2), o (b) se restaura el proyecto vivienda como raíz visible y el atlas fiscal se presenta como rama/carpeta de exploración. Ninguna entrega nueva debe salir con esta ambigüedad abierta.
+**→ RESUELTO (2026-07-18):** decisión del autor: raíz = programa. La transición se explica de frente en [entregas/04_transicion_proyecto.md](entregas/04_transicion_proyecto.md) (respuesta al feedback + qué se conserva de vivienda + validación pendiente §6) y el [README](../README.md) la señala desde la portada.
 
 ### 3.2 IDs de tablas INE muertos en las entregas
 Entregas 2 y 3 citan IPV tablas **49300 (anual) y 76201 (trimestral)** — el INE las renumeró y hoy dan 404; las vivas son **80271 (anual) y 80270 (trimestral)** (verificado en el barrido de esquemas; el pipeline nuevo ya usa 80270). Las verificaciones "en vivo 2026-07-07" de la Entrega 2 quedaron obsoletas en días — exactamente el riesgo "cambio de IDs de tabla" que la propia entrega declaró.
@@ -44,6 +45,7 @@ Entregas 2 y 3 citan IPV tablas **49300 (anual) y 76201 (trimestral)** — el IN
 ### 3.4 Métrica de asequibilidad — petición del tutor sin recoger aún en el plan
 El tutor (dos veces): IPV÷salario = indicador aproximado; complementar con medida de **esfuerzo real de compra** (€/m², renta disponible, entrada, cuota hipotecaria). La Entrega 2 ya tenía los ganchos (BdE "esfuerzo hipotecario (ratio cuota/renta)" como alternativa; MITMA €/m² de suelo como driver; Euríbor ya extraído). PLAN_MAESTRO no lo incorpora explícitamente.
 **Acción:** añadir al plan (F1.3 / vista C) un indicador complementario: cuota hipotecaria teórica (precio medio × LTV 80% × Euríbor+diferencial, a 25 años) / salario medio CCAA — calculable con datos ya extraídos o de ruta conocida (BdE, MITMA, Registradores precio/m²). Presentar SIEMPRE el ratio como aproximado, como pide el tutor.
+**→ RESUELTO (2026-07-18):** incorporado como [PLAN_MAESTRO §7](PLAN_MAESTRO.md) (los tres puntos del feedback, con la cuota teórica especificada).
 
 ### 3.5 Ficheros que no deben viajar al remoto
 `exercises/` contiene enunciados y trabajos de OTROS módulos (estadística, Fabric, DL) — no es desarrollo de este proyecto y no debe publicarse en el repo entregable → añadido a `.gitignore` (se conserva en local).

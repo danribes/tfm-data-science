@@ -161,3 +161,13 @@ El tema es relevante (pregunta social de primer orden, datos abiertos, método m
 
 ### 6.3 Veredicto
 **Relevante y original: sí. Defendible: solo con (a) el recorte del alcance TFM, (b) la reformulación no normativa del Bloque D, (c) los límites de causalidad en primera plana.** Con esas tres correcciones — ya incorporadas en este documento — es un TFM fuerte con continuación natural de programa de investigación.
+
+---
+
+## 7. Incorporación del feedback del tutor (12-jul-2026)
+
+*Fuente: [comentarios privados en Classroom](entregas/feedback_tutor_2026-07-12.md); transición documentada en [entregas/04_transicion_proyecto.md](entregas/04_transicion_proyecto.md).*
+
+1. **Repositorio como entregable ("formato de entrega = contrato").** Este repositorio público es la entrega; toda modificación de alcance se documenta en `docs/entregas/` de forma incremental, sin borrar entregas anteriores.
+2. **Asequibilidad de vivienda — indicador complementario (vista C / F4.1).** El ratio IPV/salario indexado se presenta SIEMPRE como indicador aproximado de evolución relativa. Se añade una **cuota hipotecaria teórica** por CCAA: precio medio de transacción (€/m² MITMA/Registradores × superficie tipo) × LTV 80 % financiado a 25 años al Euríbor 12m + diferencial, expresada como % del salario medio CCAA (esfuerzo de compra). Insumos: Euríbor ✅ extraído, IPV ✅, salarios ✅, €/m² con ruta identificada (E2 §3). El dato de esfuerzo del BdE (ratio cuota/renta) sirve de validación externa del indicador propio.
+3. **MVP primero.** El núcleo TFM (atlas B + rendimiento A1 + forecasting CCAA) va antes que cualquier extensión; RAG/LLM, DL adicional (más allá del comparador avalado) y fases F5–F9 son explícitamente extensiones que no bloquean el núcleo. El calendario F0 con buffer (§4) implementa esta prioridad.
