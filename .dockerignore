@@ -1,0 +1,6 @@
+.git
+_old/
+storage/raw/
+storage/processed/
+connectors/__pycache__/
+docs/

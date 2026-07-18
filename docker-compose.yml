@@ -1,0 +1,18 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8010:8000"
+    environment:
+      - GOLD_DIR=/app/data/gold
+    volumes:
+      # artefactos de modelo montados: entrenar en notebooks → soltar aquí sin rebuild
+      - ./api/models:/app/models
+
+  # web: React (Vite) o Streamlit — se añade cuando exista el primer modelo
+  # web:
+  #   build: ./web
+  #   ports: ["8080:80"]
+  #   depends_on: [api]
