@@ -5,7 +5,7 @@ Autor: Daniel Ribes ([danribes@gmail.com](mailto:danribes@gmail.com))
 
 ¿Qué obtiene cada país (y cada comunidad autónoma) a cambio de su gasto público? Este proyecto construye un **atlas de la evolución del gasto público en los siglos XX–XXI** (deuda, sanidad, pensiones, vivienda, salarios públicos, protección social…), un **modelo de rendimiento ajustado con incertidumbre** (GBM + intervalos conformales, nunca una "liga" de países) y un **simulador de escenarios fiscales** que proyecta consecuencias sin prescribir políticas.
 
-El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolucionó hacia este programa más ambicioso. La transición completa, y cómo responde al feedback del tutor, está documentada en **[docs/entregas/04_transicion_proyecto.md](docs/entregas/04_transicion_proyecto.md)** — el análisis de vivienda sigue vivo dentro del programa como vista propia, con su pipeline ya construido.
+El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolucionó hacia este programa más ambicioso. La transición completa, y cómo responde al feedback del tutor, está documentada en **[docs/entregas/anexo_transicion_proyecto.md](docs/entregas/anexo_transicion_proyecto.md)** — el análisis de vivienda sigue vivo dentro del programa como vista propia, con su pipeline ya construido.
 
 ## Documentos principales
 
@@ -13,7 +13,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 |---|---|
 | [docs/PLAN_MAESTRO.md](docs/PLAN_MAESTRO.md) | Documento canónico: 20 preguntas de investigación, método, capa ML/DL, fases F0–F9, crítica y riesgos |
 | [docs/PLAN_MAESTRO_deck.pptx](docs/PLAN_MAESTRO_deck.pptx) | El plan en formato presentación |
-| [docs/entregas/](docs/entregas/) | Entregas incrementales del curso (01 ideas · 02 datos · 03 modelo de datos · 04 transición) + feedback del tutor |
+| [docs/entregas/](docs/entregas/) | Entregas incrementales del curso (01 ideas · 02 datos · 03 modelo de datos · anexo transición) + feedback del tutor |
 | [docs/data_landscape.md](docs/data_landscape.md) | Inventario completo de fuentes de datos |
 | [docs/data_dictionary_master.md](docs/data_dictionary_master.md) · [data_dictionary_vivienda.md](docs/data_dictionary_vivienda.md) | Diccionarios de datos (programa fiscal y vista vivienda) |
 | [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas ↔ enunciados |

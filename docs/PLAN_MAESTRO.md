@@ -166,7 +166,7 @@ El tema es relevante (pregunta social de primer orden, datos abiertos, método m
 
 ## 7. Incorporación del feedback del tutor (12-jul-2026)
 
-*Fuente: [comentarios privados en Classroom](entregas/feedback_tutor_2026-07-12.md); transición documentada en [entregas/04_transicion_proyecto.md](entregas/04_transicion_proyecto.md).*
+*Fuente: [comentarios privados en Classroom](entregas/feedback_tutor_2026-07-12.md); transición documentada en [entregas/anexo_transicion_proyecto.md](entregas/anexo_transicion_proyecto.md).*
 
 1. **Repositorio como entregable ("formato de entrega = contrato").** Este repositorio público es la entrega; toda modificación de alcance se documenta en `docs/entregas/` de forma incremental, sin borrar entregas anteriores.
 2. **Asequibilidad de vivienda — indicador complementario (vista C / F4.1).** El ratio IPV/salario indexado se presenta SIEMPRE como indicador aproximado de evolución relativa. Se añade una **cuota hipotecaria teórica** por CCAA: precio medio de transacción (€/m² MITMA/Registradores × superficie tipo) × LTV 80 % financiado a 25 años al Euríbor 12m + diferencial, expresada como % del salario medio CCAA (esfuerzo de compra). Insumos: Euríbor ✅ extraído, IPV ✅, salarios ✅, €/m² con ruta identificada (E2 §3). El dato de esfuerzo del BdE (ratio cuota/renta) sirve de validación externa del indicador propio.
