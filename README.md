@@ -42,4 +42,4 @@ _old/          # proyecto vivienda original completo (trazabilidad; ver entrega 
 
 ## Estado actual (2026-07-18)
 
-Extracción del pool de datos ≈ completa (32 processed, 5 gold, fuentes UE + globales + histórico 1870–2023), motor de proyección 2023–2070 (pensiones y sanidad × 6 variantes demográficas), esqueleto de API. Siguientes hitos: figuras del atlas de evolución (F2.1), modelo de rendimiento ajustado (F3.1) y forecasting CCAA (F4.1) — calendario en el [PLAN_MAESTRO](docs/PLAN_MAESTRO.md) §4.
+Extracción del pool de datos ≈ completa (32 processed, 6 gold, fuentes UE + globales + histórico 1870–2023), motor de proyección 2023–2070 (pensiones y sanidad × 6 variantes demográficas), esqueleto de API, tests del contrato gold (`tests/`). **EDA de vivienda ejecutado** ([hallazgos y decisiones de especificación](docs/eda_vivienda.md), figuras en `docs/figures/eda/`). Siguientes hitos: baselines + backtesting de T1 (F4.1), figuras del atlas (F2.1) y modelo de rendimiento ajustado (F3.1) — calendario en el [PLAN_MAESTRO](docs/PLAN_MAESTRO.md) §4.
