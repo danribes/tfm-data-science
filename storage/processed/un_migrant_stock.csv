@@ -1,0 +1,2281 @@
+destination,year,migrant_stock
+World,1990,153916063.0
+World,1995,163176002.0
+World,2000,174566152.0
+World,2005,192788721.0
+World,2010,221020392.0
+World,2015,250042020.0
+World,2020,275284032.0
+World,2024,304021813.0
+Sub-Saharan Africa,1990,13802710.0
+Sub-Saharan Africa,1995,14578211.0
+Sub-Saharan Africa,2000,13518102.0
+Sub-Saharan Africa,2005,14849146.0
+Sub-Saharan Africa,2010,15787016.0
+Sub-Saharan Africa,2015,20399360.0
+Sub-Saharan Africa,2020,22040895.0
+Sub-Saharan Africa,2024,24306400.0
+Northern Africa and Western Asia,1990,16863681.0
+Northern Africa and Western Asia,1995,18573252.0
+Northern Africa and Western Asia,2000,20033534.0
+Northern Africa and Western Asia,2005,23016410.0
+Northern Africa and Western Asia,2010,32028416.0
+Northern Africa and Western Asia,2015,44083778.0
+Northern Africa and Western Asia,2020,48992329.0
+Northern Africa and Western Asia,2024,54085710.0
+Central and Southern Asia,1990,25456471.0
+Central and Southern Asia,1995,20140424.0
+Central and Southern Asia,2000,18979217.0
+Central and Southern Asia,2005,17615413.0
+Central and Southern Asia,2010,18225935.0
+Central and Southern Asia,2015,17681574.0
+Central and Southern Asia,2020,17736883.0
+Central and Southern Asia,2024,20369652.0
+Eastern and South-Eastern Asia,1990,6755128.0
+Eastern and South-Eastern Asia,1995,8203094.0
+Eastern and South-Eastern Asia,2000,10530525.0
+Eastern and South-Eastern Asia,2005,12702261.0
+Eastern and South-Eastern Asia,2010,16051107.0
+Eastern and South-Eastern Asia,2015,18869062.0
+Eastern and South-Eastern Asia,2020,21161853.0
+Eastern and South-Eastern Asia,2024,22588980.0
+Latin America and the Caribbean,1990,7253323.0
+Latin America and the Caribbean,1995,6728705.0
+Latin America and the Caribbean,2000,6589509.0
+Latin America and the Caribbean,2005,7111817.0
+Latin America and the Caribbean,2010,8275866.0
+Latin America and the Caribbean,2015,9109959.0
+Latin America and the Caribbean,2020,14287765.0
+Latin America and the Caribbean,2024,17510527.0
+Oceania (excluding Australia and New Zealand),1990,258678.0
+Oceania (excluding Australia and New Zealand),1995,280580.0
+Oceania (excluding Australia and New Zealand),2000,296618.0
+Oceania (excluding Australia and New Zealand),2005,306039.0
+Oceania (excluding Australia and New Zealand),2010,298175.0
+Oceania (excluding Australia and New Zealand),2015,302810.0
+Oceania (excluding Australia and New Zealand),2020,313069.0
+Oceania (excluding Australia and New Zealand),2024,321771.0
+Australia/New Zealand,1990,4517870.0
+Australia/New Zealand,1995,4810557.0
+Australia/New Zealand,2000,5075813.0
+Australia/New Zealand,2005,5735938.0
+Australia/New Zealand,2010,6836784.0
+Australia/New Zealand,2015,7865257.0
+Australia/New Zealand,2020,8948750.0
+Australia/New Zealand,2024,9579393.0
+Europe and Northern America,1990,79008202.0
+Europe and Northern America,1995,89861179.0
+Europe and Northern America,2000,99542834.0
+Europe and Northern America,2005,111451697.0
+Europe and Northern America,2010,123517093.0
+Europe and Northern America,2015,131730220.0
+Europe and Northern America,2020,141802488.0
+Europe and Northern America,2024,155259380.0
+More developed regions,1990,84576547.0
+More developed regions,1995,96002830.0
+More developed regions,2000,106270516.0
+More developed regions,2005,119164163.0
+More developed regions,2010,132515657.0
+More developed regions,2015,142172964.0
+More developed regions,2020,154040280.0
+More developed regions,2024,168248302.0
+Less developed regions,1990,69339516.0
+Less developed regions,1995,67173172.0
+Less developed regions,2000,68295636.0
+Less developed regions,2005,73624558.0
+Less developed regions,2010,88504735.0
+Less developed regions,2015,107869056.0
+Less developed regions,2020,121243752.0
+Less developed regions,2024,135773511.0
+Least developed countries,1990,11422703.0
+Least developed countries,1995,12034741.0
+Least developed countries,2000,10421623.0
+Least developed countries,2005,10101907.0
+Least developed countries,2010,10060920.0
+Least developed countries,2015,12993561.0
+Least developed countries,2020,15973234.0
+Least developed countries,2024,19619461.0
+"Less developed regions, excluding least developed countries",1990,57916813.0
+"Less developed regions, excluding least developed countries",1995,55138431.0
+"Less developed regions, excluding least developed countries",2000,57874013.0
+"Less developed regions, excluding least developed countries",2005,63522651.0
+"Less developed regions, excluding least developed countries",2010,78443815.0
+"Less developed regions, excluding least developed countries",2015,94875495.0
+"Less developed regions, excluding least developed countries",2020,105270518.0
+"Less developed regions, excluding least developed countries",2024,116154050.0
+"Less developed regions, excluding China",1990,66331223.0
+"Less developed regions, excluding China",1995,63647155.0
+"Less developed regions, excluding China",2000,64214442.0
+"Less developed regions, excluding China",2005,69222288.0
+"Less developed regions, excluding China",2010,83808625.0
+"Less developed regions, excluding China",2015,102589546.0
+"Less developed regions, excluding China",2020,115407463.0
+"Less developed regions, excluding China",2024,129508188.0
+Land-locked Developing Countries (LLDC),1990,14076862.0
+Land-locked Developing Countries (LLDC),1995,11932094.0
+Land-locked Developing Countries (LLDC),2000,10884070.0
+Land-locked Developing Countries (LLDC),2005,10682465.0
+Land-locked Developing Countries (LLDC),2010,9776704.0
+Land-locked Developing Countries (LLDC),2015,11758049.0
+Land-locked Developing Countries (LLDC),2020,13062602.0
+Land-locked Developing Countries (LLDC),2024,14973951.0
+Small Island Developing States (SIDS),1990,2208579.0
+Small Island Developing States (SIDS),1995,2621962.0
+Small Island Developing States (SIDS),2000,3082560.0
+Small Island Developing States (SIDS),2005,3341149.0
+Small Island Developing States (SIDS),2010,4039607.0
+Small Island Developing States (SIDS),2015,4603415.0
+Small Island Developing States (SIDS),2020,4807366.0
+Small Island Developing States (SIDS),2024,5308114.0
+High-and-upper-middle-income countries,1990,106669906.0
+High-and-upper-middle-income countries,1995,119813451.0
+High-and-upper-middle-income countries,2000,133558378.0
+High-and-upper-middle-income countries,2005,152602542.0
+High-and-upper-middle-income countries,2010,177327524.0
+High-and-upper-middle-income countries,2015,202226089.0
+High-and-upper-middle-income countries,2020,224031424.0
+High-and-upper-middle-income countries,2024,246110417.0
+Low-and-Lower-middle-income countries,1990,46128434.0
+Low-and-Lower-middle-income countries,1995,42239497.0
+Low-and-Lower-middle-income countries,2000,39880176.0
+Low-and-Lower-middle-income countries,2005,38984860.0
+Low-and-Lower-middle-income countries,2010,42209231.0
+Low-and-Lower-middle-income countries,2015,46273405.0
+Low-and-Lower-middle-income countries,2020,49787870.0
+Low-and-Lower-middle-income countries,2024,56502698.0
+High-income countries,1990,76960458.0
+High-income countries,1995,90343963.0
+High-income countries,2000,103962143.0
+High-income countries,2005,121605675.0
+High-income countries,2010,143669847.0
+High-income countries,2015,165526009.0
+High-income countries,2020,181860213.0
+High-income countries,2024,199081732.0
+Low-and-middle-income countries,1990,75837882.0
+Low-and-middle-income countries,1995,71708985.0
+Low-and-middle-income countries,2000,69476411.0
+Low-and-middle-income countries,2005,69981727.0
+Low-and-middle-income countries,2010,75866908.0
+Low-and-middle-income countries,2015,82973485.0
+Low-and-middle-income countries,2020,91959081.0
+Low-and-middle-income countries,2024,103531383.0
+Middle-income countries,1990,67107616.0
+Middle-income countries,1995,63470877.0
+Middle-income countries,2000,62638038.0
+Middle-income countries,2005,62931098.0
+Middle-income countries,2010,67880999.0
+Middle-income countries,2015,73463803.0
+Middle-income countries,2020,80298012.0
+Middle-income countries,2024,89147766.0
+Upper-middle-income countries,1990,29709448.0
+Upper-middle-income countries,1995,29469488.0
+Upper-middle-income countries,2000,29596235.0
+Upper-middle-income countries,2005,30996867.0
+Upper-middle-income countries,2010,33657677.0
+Upper-middle-income countries,2015,36700080.0
+Upper-middle-income countries,2020,42171211.0
+Upper-middle-income countries,2024,47028685.0
+Lower-middle-income countries,1990,37398168.0
+Lower-middle-income countries,1995,34001389.0
+Lower-middle-income countries,2000,33041803.0
+Lower-middle-income countries,2005,31934231.0
+Lower-middle-income countries,2010,34223322.0
+Lower-middle-income countries,2015,36763723.0
+Lower-middle-income countries,2020,38126801.0
+Lower-middle-income countries,2024,42119081.0
+Low-income countries,1990,8730266.0
+Low-income countries,1995,8238108.0
+Low-income countries,2000,6838373.0
+Low-income countries,2005,7050629.0
+Low-income countries,2010,7985909.0
+Low-income countries,2015,9509682.0
+Low-income countries,2020,11661069.0
+Low-income countries,2024,14383617.0
+No income group available,1990,1051779.0
+No income group available,1995,1048488.0
+No income group available,2000,1044410.0
+No income group available,2005,1112254.0
+No income group available,2010,1388695.0
+No income group available,2015,1451570.0
+No income group available,2020,1374532.0
+No income group available,2024,1319088.0
+AFRICA,1990,16176915.0
+AFRICA,1995,16653698.0
+AFRICA,2000,15413140.0
+AFRICA,2005,16602802.0
+AFRICA,2010,17752216.0
+AFRICA,2015,22683929.0
+AFRICA,2020,25267356.0
+AFRICA,2024,29180440.0
+Eastern Africa,1990,6347780.0
+Eastern Africa,1995,5361041.0
+Eastern Africa,2000,5239557.0
+Eastern Africa,2005,5141624.0
+Eastern Africa,2010,4424112.0
+Eastern Africa,2015,6304660.0
+Eastern Africa,2020,7528179.0
+Eastern Africa,2024,8302733.0
+Burundi,1990,333110.0
+Burundi,1995,254853.0
+Burundi,2000,125628.0
+Burundi,2005,192774.0
+Burundi,2010,247321.0
+Burundi,2015,298299.0
+Burundi,2020,344767.0
+Burundi,2024,387101.0
+Comoros,1990,14079.0
+Comoros,1995,13939.0
+Comoros,2000,13799.0
+Comoros,2005,13209.0
+Comoros,2010,12618.0
+Comoros,2015,12555.0
+Comoros,2020,12496.0
+Comoros,2024,12449.0
+Djibouti,1990,122221.0
+Djibouti,1995,99774.0
+Djibouti,2000,100507.0
+Djibouti,2005,92110.0
+Djibouti,2010,102307.0
+Djibouti,2015,112351.0
+Djibouti,2020,119738.0
+Djibouti,2024,125996.0
+Eritrea,1990,11848.0
+Eritrea,1995,12400.0
+Eritrea,2000,12952.0
+Eritrea,2005,15905.0
+Eritrea,2010,15813.0
+Eritrea,2015,15941.0
+Eritrea,2020,13934.0
+Eritrea,2024,12512.0
+Ethiopia,1990,875325.0
+Ethiopia,1995,478712.0
+Ethiopia,2000,311441.0
+Ethiopia,2005,170773.0
+Ethiopia,2010,227078.0
+Ethiopia,2015,797374.0
+Ethiopia,2020,875170.0
+Ethiopia,2024,1168455.0
+Kenya,1990,298089.0
+Kenya,1995,618745.0
+Kenya,2000,707852.0
+Kenya,2005,773354.0
+Kenya,2010,954925.0
+Kenya,2015,1126886.0
+Kenya,2020,1050147.0
+Kenya,2024,992536.0
+Madagascar,1990,23917.0
+Madagascar,1995,21177.0
+Madagascar,2000,23541.0
+Madagascar,2005,26058.0
+Madagascar,2010,28905.0
+Madagascar,2015,32075.0
+Madagascar,2020,35563.0
+Madagascar,2024,38625.0
+Malawi,1990,1127724.0
+Malawi,1995,241624.0
+Malawi,2000,232620.0
+Malawi,2005,221661.0
+Malawi,2010,217722.0
+Malawi,2015,197328.0
+Malawi,2020,191362.0
+Malawi,2024,186719.0
+Mauritius,1990,3613.0
+Mauritius,1995,7493.0
+Mauritius,2000,15543.0
+Mauritius,2005,19647.0
+Mauritius,2010,24836.0
+Mauritius,2015,28585.0
+Mauritius,2020,28893.0
+Mauritius,2024,29142.0
+Mayotte,1990,15229.0
+Mayotte,1995,26316.0
+Mayotte,2000,45474.0
+Mayotte,2005,63176.0
+Mayotte,2010,72757.0
+Mayotte,2015,81386.0
+Mayotte,2020,111540.0
+Mayotte,2024,143528.0
+Mozambique,1990,122332.0
+Mozambique,1995,168256.0
+Mozambique,2000,195702.0
+Mozambique,2005,268694.0
+Mozambique,2010,306471.0
+Mozambique,2015,321794.0
+Mozambique,2020,338850.0
+Mozambique,2024,353143.0
+Réunion,1990,57210.0
+Réunion,1995,77159.0
+Réunion,2000,100678.0
+Réunion,2005,115076.0
+Réunion,2010,123029.0
+Réunion,2015,127209.0
+Réunion,2020,131769.0
+Réunion,2024,135534.0
+Rwanda,1990,160024.0
+Rwanda,1995,215735.0
+Rwanda,2000,347076.0
+Rwanda,2005,423187.0
+Rwanda,2010,426901.0
+Rwanda,2015,514647.0
+Rwanda,2020,513907.0
+Rwanda,2024,513316.0
+Seychelles,1990,3721.0
+Seychelles,1995,5148.0
+Seychelles,2000,6574.0
+Seychelles,2005,8997.0
+Seychelles,2010,11420.0
+Seychelles,2015,12791.0
+Seychelles,2020,13050.0
+Seychelles,2024,13261.0
+Somalia,1990,478294.0
+Somalia,1995,19527.0
+Somalia,2000,20097.0
+Somalia,2005,20768.0
+Somalia,2010,48106.0
+Somalia,2015,40990.0
+Somalia,2020,58590.0
+Somalia,2024,77972.0
+South Sudan,1990,652365.0
+South Sudan,1995,652365.0
+South Sudan,2000,652365.0
+South Sudan,2005,652365.0
+South Sudan,2010,230732.0
+South Sudan,2015,844112.0
+South Sudan,2020,882252.0
+South Sudan,2024,914001.0
+Uganda,1990,560570.0
+Uganda,1995,666211.0
+Uganda,2000,624296.0
+Uganda,2005,637596.0
+Uganda,2010,515055.0
+Uganda,2015,823181.0
+Uganda,2020,1776038.0
+Uganda,2024,2057759.0
+United Republic of Tanzania,1990,574025.0
+United Republic of Tanzania,1995,1106043.0
+United Republic of Tanzania,2000,949600.0
+United Republic of Tanzania,2005,771153.0
+United Republic of Tanzania,2010,309847.0
+United Republic of Tanzania,2015,384567.0
+United Republic of Tanzania,2020,426017.0
+United Republic of Tanzania,2024,462371.0
+Zambia,1990,279463.0
+Zambia,1995,244338.0
+Zambia,2000,343703.0
+Zambia,2005,252895.0
+Zambia,2010,149962.0
+Zambia,2015,132107.0
+Zambia,2020,187955.0
+Zambia,2024,249205.0
+Zimbabwe,1990,634621.0
+Zimbabwe,1995,431226.0
+Zimbabwe,2000,410109.0
+Zimbabwe,2005,402226.0
+Zimbabwe,2010,398307.0
+Zimbabwe,2015,400482.0
+Zimbabwe,2020,416141.0
+Zimbabwe,2024,429108.0
+Middle Africa,1990,1461155.0
+Middle Africa,1995,2662490.0
+Middle Africa,2000,1775284.0
+Middle Africa,2005,1961951.0
+Middle Africa,2010,2436802.0
+Middle Africa,2015,3479911.0
+Middle Africa,2020,3861568.0
+Middle Africa,2024,4854994.0
+Angola,1990,33517.0
+Angola,1995,39813.0
+Angola,2000,46108.0
+Angola,2005,62331.0
+Angola,2010,336367.0
+Angola,2015,632178.0
+Angola,2020,656434.0
+Angola,2024,676507.0
+Cameroon,1990,265967.0
+Cameroon,1995,244791.0
+Cameroon,2000,227242.0
+Cameroon,2005,265503.0
+Cameroon,2010,291474.0
+Cameroon,2015,508346.0
+Cameroon,2020,579209.0
+Cameroon,2024,642948.0
+Central African Republic,1990,67234.0
+Central African Republic,1995,99712.0
+Central African Republic,2000,123529.0
+Central African Republic,2005,96409.0
+Central African Republic,2010,94685.0
+Central African Republic,2015,81568.0
+Central African Republic,2020,88546.0
+Central African Republic,2024,94556.0
+Chad,1990,74342.0
+Chad,1995,89584.0
+Chad,2000,104825.0
+Chad,2005,352130.0
+Chad,2010,417034.0
+Chad,2015,466968.0
+Chad,2020,547494.0
+Chad,2024,1269673.0
+Congo,1990,129391.0
+Congo,1995,191635.0
+Congo,2000,305880.0
+Congo,2005,318724.0
+Congo,2010,425173.0
+Congo,2015,390142.0
+Congo,2020,387606.0
+Congo,2024,385589.0
+Democratic Republic of the Congo,1990,754194.0
+Democratic Republic of the Congo,1995,1816963.0
+Democratic Republic of the Congo,2000,744387.0
+Democratic Republic of the Congo,2005,623009.0
+Democratic Republic of the Congo,2010,589882.0
+Democratic Republic of the Congo,2015,810018.0
+Democratic Republic of the Congo,2020,952871.0
+Democratic Republic of the Congo,2024,1085090.0
+Equatorial Guinea,1990,2740.0
+Equatorial Guinea,1995,3629.0
+Equatorial Guinea,2000,4517.0
+Equatorial Guinea,2005,6588.0
+Equatorial Guinea,2010,8658.0
+Equatorial Guinea,2015,209611.0
+Equatorial Guinea,2020,230618.0
+Equatorial Guinea,2024,248930.0
+Gabon,1990,128188.0
+Gabon,1995,171427.0
+Gabon,2000,214431.0
+Gabon,2005,233824.0
+Gabon,2010,270829.0
+Gabon,2015,378686.0
+Gabon,2020,416651.0
+Gabon,2024,449746.0
+Sao Tome and Principe,1990,5582.0
+Sao Tome and Principe,1995,4936.0
+Sao Tome and Principe,2000,4365.0
+Sao Tome and Principe,2005,3433.0
+Sao Tome and Principe,2010,2700.0
+Sao Tome and Principe,2015,2394.0
+Sao Tome and Principe,2020,2139.0
+Sao Tome and Principe,2024,1955.0
+Northern Africa,1990,2374205.0
+Northern Africa,1995,2075487.0
+Northern Africa,2000,1895038.0
+Northern Africa,2005,1753656.0
+Northern Africa,2010,1965200.0
+Northern Africa,2015,2284569.0
+Northern Africa,2020,3226461.0
+Northern Africa,2024,4874040.0
+Algeria,1990,273954.0
+Algeria,1995,262032.0
+Algeria,2000,250110.0
+Algeria,2005,197728.0
+Algeria,2010,217268.0
+Algeria,2015,239473.0
+Algeria,2020,250378.0
+Algeria,2024,259458.0
+Egypt,1990,144713.0
+Egypt,1995,160802.0
+Egypt,2000,179364.0
+Egypt,2005,288944.0
+Egypt,2010,323177.0
+Egypt,2015,499292.0
+Egypt,2020,602472.0
+Egypt,2024,1139820.0
+Libya,1990,457075.0
+Libya,1995,508041.0
+Libya,2000,567436.0
+Libya,2005,625412.0
+Libya,2010,687192.0
+Libya,2015,771146.0
+Libya,2020,826537.0
+Libya,2024,897751.0
+Morocco,1990,54895.0
+Morocco,1995,50360.0
+Morocco,2000,53034.0
+Morocco,2005,56222.0
+Morocco,2010,71189.0
+Morocco,2015,92424.0
+Morocco,2020,102358.0
+Morocco,2024,111069.0
+Sudan,1990,1402896.0
+Sudan,1995,1053396.0
+Sudan,2000,805086.0
+Sudan,2005,546419.0
+Sudan,2010,618709.0
+Sudan,2015,620523.0
+Sudan,2020,1379147.0
+Sudan,2024,2397113.0
+Tunisia,1990,37984.0
+Tunisia,1995,37867.0
+Tunisia,2000,36719.0
+Tunisia,2005,35040.0
+Tunisia,2010,43172.0
+Tunisia,2015,56532.0
+Tunisia,2020,60145.0
+Tunisia,2024,63201.0
+Western Sahara,1990,2688.0
+Western Sahara,1995,2989.0
+Western Sahara,2000,3289.0
+Western Sahara,2005,3891.0
+Western Sahara,2010,4493.0
+Western Sahara,2015,5179.0
+Western Sahara,2020,5424.0
+Western Sahara,2024,5628.0
+Southern Africa,1990,1517089.0
+Southern Africa,1995,1204498.0
+Southern Africa,2000,1248435.0
+Southern Africa,2005,1745545.0
+Southern Africa,2010,2512206.0
+Southern Africa,2015,3408739.0
+Southern Africa,2020,2903653.0
+Southern Africa,2024,2911844.0
+Botswana,1990,27510.0
+Botswana,1995,40168.0
+Botswana,2000,74934.0
+Botswana,2005,84661.0
+Botswana,2010,94863.0
+Botswana,2015,103053.0
+Botswana,2020,110268.0
+Botswana,2024,116402.0
+Eswatini,1990,74991.0
+Eswatini,1995,35157.0
+Eswatini,2000,34084.0
+Eswatini,2005,33392.0
+Eswatini,2010,32637.0
+Eswatini,2015,32352.0
+Eswatini,2020,32858.0
+Eswatini,2024,33268.0
+Lesotho,1990,8240.0
+Lesotho,1995,7204.0
+Lesotho,2000,6167.0
+Lesotho,2005,6290.0
+Lesotho,2010,6414.0
+Lesotho,2015,9152.0
+Lesotho,2020,12060.0
+Lesotho,2024,15039.0
+Namibia,1990,120641.0
+Namibia,1995,115372.0
+Namibia,2000,135547.0
+Namibia,2005,107347.0
+Namibia,2010,103826.0
+Namibia,2015,101618.0
+Namibia,2020,109391.0
+Namibia,2024,116035.0
+South Africa,1990,1285707.0
+South Africa,1995,1006597.0
+South Africa,2000,997703.0
+South Africa,2005,1513855.0
+South Africa,2010,2274466.0
+South Africa,2015,3162564.0
+South Africa,2020,2639076.0
+South Africa,2024,2631100.0
+Western Africa,1990,4476686.0
+Western Africa,1995,5350182.0
+Western Africa,2000,5254826.0
+Western Africa,2005,6000026.0
+Western Africa,2010,6413896.0
+Western Africa,2015,7206050.0
+Western Africa,2020,7747495.0
+Western Africa,2024,8236829.0
+Benin,1990,76751.0
+Benin,1995,105703.0
+Benin,2000,134655.0
+Benin,2005,248320.0
+Benin,2010,309225.0
+Benin,2015,366284.0
+Benin,2020,394276.0
+Benin,2024,418202.0
+Burkina Faso,1990,349652.0
+Burkina Faso,1995,464104.0
+Burkina Faso,2000,520363.0
+Burkina Faso,2005,597658.0
+Burkina Faso,2010,674438.0
+Burkina Faso,2015,704676.0
+Burkina Faso,2020,723989.0
+Burkina Faso,2024,739820.0
+Cabo Verde,1990,8931.0
+Cabo Verde,1995,9979.0
+Cabo Verde,2000,11027.0
+Cabo Verde,2005,12700.0
+Cabo Verde,2010,14373.0
+Cabo Verde,2015,14924.0
+Cabo Verde,2020,15788.0
+Cabo Verde,2024,16515.0
+Côte d'Ivoire,1990,1822374.0
+Côte d'Ivoire,1995,1992981.0
+Côte d'Ivoire,2000,2157339.0
+Côte d'Ivoire,2005,2308068.0
+Côte d'Ivoire,2010,2458796.0
+Côte d'Ivoire,2015,2609525.0
+Côte d'Ivoire,2020,2760255.0
+Côte d'Ivoire,2024,2880839.0
+Gambia,1990,118123.0
+Gambia,1995,150890.0
+Gambia,2000,182514.0
+Gambia,2005,181839.0
+Gambia,2010,185837.0
+Gambia,2015,192540.0
+Gambia,2020,215659.0
+Gambia,2024,236137.0
+Ghana,1990,164851.0
+Ghana,1995,252879.0
+Ghana,2000,191601.0
+Ghana,2005,309932.0
+Ghana,2010,337766.0
+Ghana,2015,414744.0
+Ghana,2020,476412.0
+Ghana,2024,532286.0
+Guinea,1990,403621.0
+Guinea,1995,774505.0
+Guinea,2000,560075.0
+Guinea,2005,233419.0
+Guinea,2010,178762.0
+Guinea,2015,126657.0
+Guinea,2020,121437.0
+Guinea,2024,117416.0
+Guinea-Bissau,1990,15368.0
+Guinea-Bissau,1995,27961.0
+Guinea-Bissau,2000,20450.0
+Guinea-Bissau,2005,20902.0
+Guinea-Bissau,2010,21391.0
+Guinea-Bissau,2015,22333.0
+Guinea-Bissau,2020,17945.0
+Guinea-Bissau,2024,15064.0
+Liberia,1990,94964.0
+Liberia,1995,208563.0
+Liberia,2000,151868.0
+Liberia,2005,87217.0
+Liberia,2010,99165.0
+Liberia,2015,112111.0
+Liberia,2020,87947.0
+Liberia,2024,72423.0
+Mali,1990,160736.0
+Mali,1995,176187.0
+Mali,2000,189475.0
+Mali,2005,258630.0
+Mali,2010,341078.0
+Mali,2015,420504.0
+Mali,2020,485829.0
+Mali,2024,545323.0
+Mauritania,1990,111650.0
+Mauritania,1995,89562.0
+Mauritania,2000,57366.0
+Mauritania,2005,58211.0
+Mauritania,2010,84920.0
+Mauritania,2015,166552.0
+Mauritania,2020,182286.0
+Mauritania,2024,195937.0
+Niger,1990,115464.0
+Niger,1995,145999.0
+Niger,2000,122260.0
+Niger,2005,124509.0
+Niger,2010,126482.0
+Niger,2015,252998.0
+Niger,2020,348056.0
+Niger,2024,449236.0
+Nigeria,1990,456621.0
+Nigeria,1995,462999.0
+Nigeria,2000,487882.0
+Nigeria,2005,969714.0
+Nigeria,2010,990494.0
+Nigeria,2015,1199115.0
+Nigeria,2020,1308568.0
+Nigeria,2024,1403281.0
+Saint Helena,1990,178.0
+Saint Helena,1995,117.0
+Saint Helena,2000,108.0
+Saint Helena,2005,163.0
+Saint Helena,2010,248.0
+Saint Helena,2015,377.0
+Saint Helena,2020,437.0
+Saint Helena,2024,492.0
+Senegal,1990,270410.0
+Senegal,1995,287654.0
+Senegal,2000,231901.0
+Senegal,2005,238298.0
+Senegal,2010,256092.0
+Senegal,2015,266496.0
+Senegal,2020,274929.0
+Senegal,2024,281867.0
+Sierra Leone,1990,222148.0
+Sierra Leone,1995,98516.0
+Sierra Leone,2000,97974.0
+Sierra Leone,2005,146227.0
+Sierra Leone,2010,79265.0
+Sierra Leone,2015,58830.0
+Sierra Leone,2020,53746.0
+Sierra Leone,2024,49997.0
+Togo,1990,84844.0
+Togo,1995,101583.0
+Togo,2000,137968.0
+Togo,2005,204219.0
+Togo,2010,255564.0
+Togo,2015,277384.0
+Togo,2020,279936.0
+Togo,2024,281994.0
+ASIA,1990,46701075.0
+ASIA,1995,44841283.0
+ASIA,2000,47648238.0
+ASIA,2005,51580428.0
+ASIA,2010,64340258.0
+ASIA,2015,78349845.0
+ASIA,2020,84664604.0
+ASIA,2024,92170302.0
+Central Asia,1990,6300541.0
+Central Asia,1995,4912782.0
+Central Asia,2000,4048262.0
+Central Asia,2005,3978487.0
+Central Asia,2010,3786871.0
+Central Asia,2015,3766652.0
+Central Asia,2020,3822237.0
+Central Asia,2024,3910116.0
+Kazakhstan,1990,3289058.0
+Kazakhstan,1995,2259955.0
+Kazakhstan,2000,1733374.0
+Kazakhstan,2005,1845637.0
+Kazakhstan,2010,1856870.0
+Kazakhstan,2015,1919920.0
+Kazakhstan,2020,1990268.0
+Kazakhstan,2024,2089797.0
+Kyrgyzstan,1990,623083.0
+Kyrgyzstan,1995,518338.0
+Kyrgyzstan,2000,389824.0
+Kyrgyzstan,2005,309399.0
+Kyrgyzstan,2010,232065.0
+Kyrgyzstan,2015,204382.0
+Kyrgyzstan,2020,199011.0
+Kyrgyzstan,2024,194816.0
+Tajikistan,1990,428900.0
+Tajikistan,1995,348347.0
+Tajikistan,2000,299499.0
+Tajikistan,2005,280466.0
+Tajikistan,2010,279808.0
+Tajikistan,2015,275101.0
+Tajikistan,2020,276031.0
+Tajikistan,2024,276777.0
+Turkmenistan,1990,306500.0
+Turkmenistan,1995,273565.0
+Turkmenistan,2000,219067.0
+Turkmenistan,2005,213053.0
+Turkmenistan,2010,197979.0
+Turkmenistan,2015,196376.0
+Turkmenistan,2020,194920.0
+Turkmenistan,2024,193763.0
+Uzbekistan,1990,1653000.0
+Uzbekistan,1995,1512577.0
+Uzbekistan,2000,1406498.0
+Uzbekistan,2005,1329932.0
+Uzbekistan,2010,1220149.0
+Uzbekistan,2015,1170873.0
+Uzbekistan,2020,1162007.0
+Uzbekistan,2024,1154963.0
+Eastern Asia,1990,4118088.0
+Eastern Asia,1995,4952397.0
+Eastern Asia,2000,5921878.0
+Eastern Asia,2005,6662116.0
+Eastern Asia,2010,7484060.0
+Eastern Asia,2015,9237513.0
+Eastern Asia,2020,10919614.0
+Eastern Asia,2024,11559387.0
+China,1990,518395.0
+China,1995,610608.0
+China,2000,720915.0
+China,2005,853360.0
+China,2010,1010008.0
+China,2015,1196007.0
+China,2020,1415116.0
+China,2024,1638718.0
+"China, Hong Kong SAR",1990,2218473.0
+"China, Hong Kong SAR",1995,2443798.0
+"China, Hong Kong SAR",2000,2669122.0
+"China, Hong Kong SAR",2005,2721235.0
+"China, Hong Kong SAR",2010,2779950.0
+"China, Hong Kong SAR",2015,2841113.0
+"China, Hong Kong SAR",2020,2962492.0
+"China, Hong Kong SAR",2024,3063318.0
+"China, Macao SAR",1990,205047.0
+"China, Macao SAR",1995,224929.0
+"China, Macao SAR",2000,240791.0
+"China, Macao SAR",2005,279308.0
+"China, Macao SAR",2010,318506.0
+"China, Macao SAR",2015,376066.0
+"China, Macao SAR",2020,403490.0
+"China, Macao SAR",2024,426862.0
+"China, Taiwan Province of China",1990,66378.0
+"China, Taiwan Province of China",1995,246682.0
+"China, Taiwan Province of China",2000,450366.0
+"China, Taiwan Province of China",2005,548367.0
+"China, Taiwan Province of China",2010,587646.0
+"China, Taiwan Province of China",2015,866324.0
+"China, Taiwan Province of China",2020,1055191.0
+"China, Taiwan Province of China",2024,1136425.0
+Dem. People's Republic of Korea,1990,34103.0
+Dem. People's Republic of Korea,1995,35143.0
+Dem. People's Republic of Korea,2000,36183.0
+Dem. People's Republic of Korea,2005,40097.0
+Dem. People's Republic of Korea,2010,44010.0
+Dem. People's Republic of Korea,2015,48458.0
+Dem. People's Republic of Korea,2020,49549.0
+Dem. People's Republic of Korea,2024,50439.0
+Japan,1990,1050475.0
+Japan,1995,1331094.0
+Japan,2000,1651869.0
+Japan,2005,1976528.0
+Japan,2010,2161780.0
+Japan,2015,2577487.0
+Japan,2020,3289042.0
+Japan,2024,3409529.0
+Mongolia,1990,6718.0
+Mongolia,1995,7424.0
+Mongolia,2000,8206.0
+Mongolia,2005,11477.0
+Mongolia,2010,16062.0
+Mongolia,2015,19886.0
+Mongolia,2020,21345.0
+Mongolia,2024,22589.0
+Republic of Korea,1990,18499.0
+Republic of Korea,1995,52719.0
+Republic of Korea,2000,144426.0
+Republic of Korea,2005,231744.0
+Republic of Korea,2010,566098.0
+Republic of Korea,2015,1312172.0
+Republic of Korea,2020,1723389.0
+Republic of Korea,2024,1811507.0
+Southern Asia,1990,19155930.0
+Southern Asia,1995,15227642.0
+Southern Asia,2000,14930955.0
+Southern Asia,2005,13636926.0
+Southern Asia,2010,14439064.0
+Southern Asia,2015,13914922.0
+Southern Asia,2020,13914646.0
+Southern Asia,2024,16459536.0
+Afghanistan,1990,57686.0
+Afghanistan,1995,71522.0
+Afghanistan,2000,75917.0
+Afghanistan,2005,87314.0
+Afghanistan,2010,102276.0
+Afghanistan,2015,339432.0
+Afghanistan,2020,144098.0
+Afghanistan,2024,98110.0
+Bangladesh,1990,881617.0
+Bangladesh,1995,934735.0
+Bangladesh,2000,987853.0
+Bangladesh,2005,1062270.0
+Bangladesh,2010,1345546.0
+Bangladesh,2015,1422179.0
+Bangladesh,2020,2115408.0
+Bangladesh,2024,2906338.0
+Bhutan,1990,23807.0
+Bhutan,1995,27972.0
+Bhutan,2000,32137.0
+Bhutan,2005,40279.0
+Bhutan,2010,48420.0
+Bhutan,2015,51106.0
+Bhutan,2020,53612.0
+Bhutan,2024,55705.0
+India,1990,7212791.0
+India,1995,6836861.0
+India,2000,6391543.0
+India,2005,5954999.0
+India,2010,5601237.0
+India,2015,5252296.0
+India,2020,4929816.0
+India,2024,4796255.0
+Iran (Islamic Republic of),1990,4291601.0
+Iran (Islamic Republic of),1995,2937668.0
+Iran (Islamic Republic of),2000,2476469.0
+Iran (Islamic Republic of),2005,2552206.0
+Iran (Islamic Republic of),2010,2722397.0
+Iran (Islamic Republic of),2015,2729939.0
+Iran (Islamic Republic of),2020,2797235.0
+Iran (Islamic Republic of),2024,3840654.0
+Maldives,1990,8689.0
+Maldives,1995,18510.0
+Maldives,2000,27092.0
+Maldives,2005,45045.0
+Maldives,2010,54659.0
+Maldives,2015,64273.0
+Maldives,2020,70079.0
+Maldives,2024,75099.0
+Nepal,1990,429974.0
+Nepal,1995,690225.0
+Nepal,2000,717900.0
+Nepal,2005,680729.0
+Nepal,2010,581889.0
+Nepal,2015,509471.0
+Nepal,2020,487564.0
+Nepal,2024,470719.0
+Pakistan,1990,6208204.0
+Pakistan,1995,3669308.0
+Pakistan,2000,4181912.0
+Pakistan,2005,3174558.0
+Pakistan,2010,3943681.0
+Pakistan,2015,3506520.0
+Pakistan,2020,3276580.0
+Pakistan,2024,4175958.0
+Sri Lanka,1990,41561.0
+Sri Lanka,1995,40841.0
+Sri Lanka,2000,40132.0
+Sri Lanka,2005,39526.0
+Sri Lanka,2010,38959.0
+Sri Lanka,2015,39706.0
+Sri Lanka,2020,40254.0
+Sri Lanka,2024,40698.0
+South-Eastern Asia,1990,2637040.0
+South-Eastern Asia,1995,3250697.0
+South-Eastern Asia,2000,4608647.0
+South-Eastern Asia,2005,6040145.0
+South-Eastern Asia,2010,8567047.0
+South-Eastern Asia,2015,9631549.0
+South-Eastern Asia,2020,10242239.0
+South-Eastern Asia,2024,11029593.0
+Brunei Darussalam,1990,73200.0
+Brunei Darussalam,1995,84748.0
+Brunei Darussalam,2000,96296.0
+Brunei Darussalam,2005,98441.0
+Brunei Darussalam,2010,100587.0
+Brunei Darussalam,2015,102733.0
+Brunei Darussalam,2020,111959.0
+Brunei Darussalam,2024,119933.0
+Cambodia,1990,38375.0
+Cambodia,1995,92230.0
+Cambodia,2000,146085.0
+Cambodia,2005,114096.0
+Cambodia,2010,82028.0
+Cambodia,2015,73962.0
+Cambodia,2020,79341.0
+Cambodia,2024,83925.0
+Indonesia,1990,92058.0
+Indonesia,1995,114419.0
+Indonesia,2000,287645.0
+Indonesia,2005,87508.0
+Indonesia,2010,113288.0
+Indonesia,2015,192119.0
+Indonesia,2020,306702.0
+Indonesia,2024,445726.0
+Lao People's Democratic Republic,1990,22866.0
+Lao People's Democratic Republic,1995,23526.0
+Lao People's Democratic Republic,2000,21948.0
+Lao People's Democratic Republic,2005,20371.0
+Lao People's Democratic Republic,2010,32955.0
+Lao People's Democratic Republic,2015,45538.0
+Lao People's Democratic Republic,2020,48731.0
+Lao People's Democratic Republic,2024,51446.0
+Malaysia,1990,1027572.0
+Malaysia,1995,1312828.0
+Malaysia,2000,1613819.0
+Malaysia,2005,2174308.0
+Malaysia,2010,3086876.0
+Malaysia,2015,3513497.0
+Malaysia,2020,3718696.0
+Malaysia,2024,3806514.0
+Myanmar,1990,133545.0
+Myanmar,1995,113663.0
+Myanmar,2000,98011.0
+Myanmar,2005,83025.0
+Myanmar,2010,76414.0
+Myanmar,2015,73309.0
+Myanmar,2020,76446.0
+Myanmar,2024,79052.0
+Philippines,1990,134600.0
+Philippines,1995,145980.0
+Philippines,2000,157361.0
+Philippines,2005,168741.0
+Philippines,2010,178147.0
+Philippines,2015,131897.0
+Philippines,2020,87212.0
+Philippines,2024,87212.0
+Singapore,1990,729377.0
+Singapore,1995,993616.0
+Singapore,2000,1319433.0
+Singapore,2005,1494527.0
+Singapore,2010,2160350.0
+Singapore,2015,2535340.0
+Singapore,2020,2589107.0
+Singapore,2024,2841665.0
+Thailand,1990,287933.0
+Thailand,1995,271568.0
+Thailand,2000,771234.0
+Thailand,2005,1705845.0
+Thailand,2010,2640454.0
+Thailand,2015,2853248.0
+Thailand,2020,3015007.0
+Thailand,2024,3179399.0
+Timor-Leste,1990,8954.0
+Timor-Leste,1995,9743.0
+Timor-Leste,2000,10602.0
+Timor-Leste,2005,11286.0
+Timor-Leste,2010,11540.0
+Timor-Leste,2015,8520.0
+Timor-Leste,2020,8399.0
+Timor-Leste,2024,8303.0
+Viet Nam,1990,88560.0
+Viet Nam,1995,88376.0
+Viet Nam,2000,86213.0
+Viet Nam,2005,81997.0
+Viet Nam,2010,84408.0
+Viet Nam,2015,101386.0
+Viet Nam,2020,200639.0
+Viet Nam,2024,326418.0
+Western Asia,1990,14489476.0
+Western Asia,1995,16497765.0
+Western Asia,2000,18138496.0
+Western Asia,2005,21262754.0
+Western Asia,2010,30063216.0
+Western Asia,2015,41799209.0
+Western Asia,2020,45765868.0
+Western Asia,2024,49211670.0
+Armenia,1990,433541.0
+Armenia,1995,622042.0
+Armenia,2000,588242.0
+Armenia,2005,476812.0
+Armenia,2010,210873.0
+Armenia,2015,190896.0
+Armenia,2020,207139.0
+Armenia,2024,274645.0
+Azerbaijan,1990,402177.0
+Azerbaijan,1995,588812.0
+Azerbaijan,2000,523518.0
+Azerbaijan,2005,301922.0
+Azerbaijan,2010,251417.0
+Azerbaijan,2015,224337.0
+Azerbaijan,2020,198894.0
+Azerbaijan,2024,218460.0
+Bahrain,1990,176972.0
+Bahrain,1995,213818.0
+Bahrain,2000,238924.0
+Bahrain,2005,387591.0
+Bahrain,2010,643007.0
+Bahrain,2015,721540.0
+Bahrain,2020,785983.0
+Bahrain,2024,840202.0
+Cyprus,1990,43805.0
+Cyprus,1995,61941.0
+Cyprus,2000,80076.0
+Cyprus,2005,122849.0
+Cyprus,2010,188472.0
+Cyprus,2015,176693.0
+Cyprus,2020,190366.0
+Cyprus,2024,202062.0
+Georgia,1990,304470.0
+Georgia,1995,152235.0
+Georgia,2000,76117.0
+Georgia,2005,71296.0
+Georgia,2010,73078.0
+Georgia,2015,76685.0
+Georgia,2020,79368.0
+Georgia,2024,81582.0
+Iraq,1990,83638.0
+Iraq,1995,199460.0
+Iraq,2000,210525.0
+Iraq,2005,134863.0
+Iraq,2010,120466.0
+Iraq,2015,359352.0
+Iraq,2020,365766.0
+Iraq,2024,370980.0
+Israel,1990,1622505.0
+Israel,1995,1781111.0
+Israel,2000,1838155.0
+Israel,2005,1881017.0
+Israel,2010,1953214.0
+Israel,2015,2019891.0
+Israel,2020,2068830.0
+Israel,2024,2091569.0
+Jordan,1990,1131529.0
+Jordan,1995,1511664.0
+Jordan,2000,1834160.0
+Jordan,2005,2229368.0
+Jordan,2010,3723368.0
+Jordan,2015,4386976.0
+Jordan,2020,4940142.0
+Jordan,2024,5280168.0
+Kuwait,1990,1056143.0
+Kuwait,1995,935152.0
+Kuwait,2000,1116932.0
+Kuwait,2005,1353949.0
+Kuwait,2010,1871827.0
+Kuwait,2015,2610785.0
+Kuwait,2020,3030731.0
+Kuwait,2024,3323191.0
+Lebanon,1990,424488.0
+Lebanon,1995,466437.0
+Lebanon,2000,514836.0
+Lebanon,2005,553850.0
+Lebanon,2010,625884.0
+Lebanon,2015,1763717.0
+Lebanon,2020,1586346.0
+Lebanon,2024,1422583.0
+Oman,1990,526784.0
+Oman,1995,538639.0
+Oman,2000,550760.0
+Oman,2005,608416.0
+Oman,2010,803387.0
+Oman,2015,1827972.0
+Oman,2020,1766142.0
+Oman,2024,2283366.0
+Qatar,1990,215508.0
+Qatar,1995,307661.0
+Qatar,2000,439215.0
+Qatar,2005,643000.0
+Qatar,2010,1409000.0
+Qatar,2015,2090000.0
+Qatar,2020,2182000.0
+Qatar,2024,2337000.0
+Saudi Arabia,1990,4484868.0
+Saudi Arabia,1995,4853489.0
+Saudi Arabia,2000,5219382.0
+Saudi Arabia,2005,6605114.0
+Saudi Arabia,2010,8976961.0
+Saudi Arabia,2015,13251622.0
+Saudi Arabia,2020,13071258.0
+Saudi Arabia,2024,13683841.0
+State of Palestine,1990,288332.0
+State of Palestine,1995,281767.0
+State of Palestine,2000,275202.0
+State of Palestine,2005,274520.0
+State of Palestine,2010,273840.0
+State of Palestine,2015,273163.0
+State of Palestine,2020,272784.0
+State of Palestine,2024,272481.0
+Syrian Arab Republic,1990,714140.0
+Syrian Arab Republic,1995,830610.0
+Syrian Arab Republic,2000,834916.0
+Syrian Arab Republic,2005,882398.0
+Syrian Arab Republic,2010,1783595.0
+Syrian Arab Republic,2015,835716.0
+Syrian Arab Republic,2020,868711.0
+Syrian Arab Republic,2024,896042.0
+Türkiye,1990,1159415.0
+Türkiye,1995,1220898.0
+Türkiye,2000,1279019.0
+Türkiye,2005,1345188.0
+Türkiye,2010,1420433.0
+Türkiye,2015,3750982.0
+Türkiye,2020,6580295.0
+Türkiye,2024,7083501.0
+United Arab Emirates,1990,1302298.0
+United Arab Emirates,1995,1795514.0
+United Arab Emirates,2000,2373577.0
+United Arab Emirates,2005,3218730.0
+United Arab Emirates,2010,5446000.0
+United Arab Emirates,2015,6859000.0
+United Arab Emirates,2020,7184000.0
+United Arab Emirates,2024,8157000.0
+Yemen,1990,118863.0
+Yemen,1995,136515.0
+Yemen,2000,144940.0
+Yemen,2005,171871.0
+Yemen,2010,288394.0
+Yemen,2015,379882.0
+Yemen,2020,387113.0
+Yemen,2024,392997.0
+EUROPE,1990,51464935.0
+EUROPE,1995,56456601.0
+EUROPE,2000,59184839.0
+EUROPE,2005,65793082.0
+EUROPE,2010,72509226.0
+EUROPE,2015,75711153.0
+EUROPE,2020,82971932.0
+EUROPE,2024,94051503.0
+Eastern Europe,1990,22316123.0
+Eastern Europe,1995,21705675.0
+Eastern Europe,2000,20853646.0
+Eastern Europe,2005,20092493.0
+Eastern Europe,2010,19389898.0
+Eastern Europe,2015,17559211.0
+Eastern Europe,2020,16162524.0
+Eastern Europe,2024,18646093.0
+Belarus,1990,1248977.0
+Belarus,1995,1186282.0
+Belarus,2000,1123586.0
+Belarus,2005,1106982.0
+Belarus,2010,1090378.0
+Belarus,2015,1082905.0
+Belarus,2020,1067090.0
+Belarus,2024,1054604.0
+Bulgaria,1990,21510.0
+Bulgaria,1995,32435.0
+Bulgaria,2000,43360.0
+Bulgaria,2005,61074.0
+Bulgaria,2010,76287.0
+Bulgaria,2015,123803.0
+Bulgaria,2020,184363.0
+Bulgaria,2024,299100.0
+Czechia,1990,442428.0
+Czechia,1995,531039.0
+Czechia,2000,639018.0
+Czechia,2005,670689.0
+Czechia,2010,692197.0
+Czechia,2015,688047.0
+Czechia,2020,680221.0
+Czechia,2024,1025199.0
+Hungary,1990,347510.0
+Hungary,1995,322234.0
+Hungary,2000,296957.0
+Hungary,2005,366787.0
+Hungary,2010,436616.0
+Hungary,2015,475508.0
+Hungary,2020,584567.0
+Hungary,2024,689565.0
+Poland,1990,1127393.0
+Poland,1995,963028.0
+Poland,2000,822627.0
+Poland,2005,724887.0
+Poland,2010,649114.0
+Poland,2015,683663.0
+Poland,2020,738099.0
+Poland,2024,1739901.0
+Republic of Moldova*,1990,533397.0
+Republic of Moldova*,1995,365099.0
+Republic of Moldova*,2000,250134.0
+Republic of Moldova*,2005,174263.0
+Republic of Moldova*,2010,132386.0
+Republic of Moldova*,2015,101730.0
+Republic of Moldova*,2020,77291.0
+Republic of Moldova*,2024,188207.0
+Romania,1990,135745.0
+Romania,1995,134970.0
+Romania,2000,134204.0
+Romania,2005,139430.0
+Romania,2010,148107.0
+Romania,2015,212560.0
+Romania,2020,338734.0
+Romania,2024,655579.0
+Russian Federation,1990,11524948.0
+Russian Federation,1995,11928927.0
+Russian Federation,2000,11900297.0
+Russian Federation,2005,11667588.0
+Russian Federation,2010,11199727.0
+Russian Federation,2015,9098229.0
+Russian Federation,2020,7297611.0
+Russian Federation,2024,7605774.0
+Slovakia,1990,41295.0
+Slovakia,1995,69323.0
+Slovakia,2000,116376.0
+Slovakia,2005,130491.0
+Slovakia,2010,146319.0
+Slovakia,2015,177624.0
+Slovakia,2020,197161.0
+Slovakia,2024,323991.0
+Ukraine*,1990,6892920.0
+Ukraine*,1995,6172338.0
+Ukraine*,2000,5527087.0
+Ukraine*,2005,5050302.0
+Ukraine*,2010,4818767.0
+Ukraine*,2015,4915142.0
+Ukraine*,2020,4997387.0
+Ukraine*,2024,5064173.0
+Northern Europe,1990,6656282.0
+Northern Europe,1995,7237021.0
+Northern Europe,2000,7963939.0
+Northern Europe,2005,9668148.0
+Northern Europe,2010,11953254.0
+Northern Europe,2015,13955273.0
+Northern Europe,2020,16246850.0
+Northern Europe,2024,18543047.0
+Channel Islands*,1990,61660.0
+Channel Islands*,1995,60519.0
+Channel Islands*,2000,64301.0
+Channel Islands*,2005,70941.0
+Channel Islands*,2010,77581.0
+Channel Islands*,2015,82307.0
+Channel Islands*,2020,84087.0
+Channel Islands*,2024,85539.0
+Denmark*,1990,235918.0
+Denmark*,1995,298278.0
+Denmark*,2000,372128.0
+Denmark*,2005,423167.0
+Denmark*,2010,509751.0
+Denmark*,2015,616741.0
+Denmark*,2020,718856.0
+Denmark*,2024,847475.0
+Estonia,1990,381997.0
+Estonia,1995,315755.0
+Estonia,2000,249512.0
+Estonia,2005,233701.0
+Estonia,2010,217890.0
+Estonia,2015,194664.0
+Estonia,2020,199277.0
+Estonia,2024,203046.0
+Faroe Islands*,1990,4285.0
+Faroe Islands*,1995,2900.0
+Faroe Islands*,2000,3593.0
+Faroe Islands*,2005,4583.0
+Faroe Islands*,2010,5096.0
+Faroe Islands*,2015,5485.0
+Faroe Islands*,2020,6812.0
+Faroe Islands*,2024,8101.0
+Finland*,1990,63255.0
+Finland*,1995,99729.0
+Finland*,2000,136203.0
+Finland*,2005,192169.0
+Finland*,2010,228481.0
+Finland*,2015,314856.0
+Finland*,2020,386052.0
+Finland*,2024,514432.0
+Iceland,1990,9584.0
+Iceland,1995,12738.0
+Iceland,2000,15892.0
+Iceland,2005,25492.0
+Iceland,2010,35091.0
+Iceland,2015,39072.0
+Iceland,2020,65424.0
+Iceland,2024,98818.0
+Ireland,1990,227783.0
+Ireland,1995,247379.0
+Ireland,2000,376321.0
+Ireland,2005,620579.0
+Ireland,2010,751381.0
+Ireland,2015,802470.0
+Ireland,2020,951686.0
+Ireland,2024,1216237.0
+Isle of Man*,1990,34769.0
+Isle of Man*,1995,36886.0
+Isle of Man*,2000,39002.0
+Isle of Man*,2005,41475.0
+Isle of Man*,2010,43447.0
+Isle of Man*,2015,42238.0
+Isle of Man*,2020,43040.0
+Isle of Man*,2024,43693.0
+Latvia,1990,646007.0
+Latvia,1995,538093.0
+Latvia,2000,430178.0
+Latvia,2005,376725.0
+Latvia,2010,313786.0
+Latvia,2015,265418.0
+Latvia,2020,239422.0
+Latvia,2024,220471.0
+Lithuania,1990,349258.0
+Lithuania,1995,273587.0
+Lithuania,2000,214311.0
+Lithuania,2005,201209.0
+Lithuania,2010,160772.0
+Lithuania,2015,136021.0
+Lithuania,2020,145184.0
+Lithuania,2024,175194.0
+Norway*,1990,192587.0
+Norway*,1995,233302.0
+Norway*,2000,292440.0
+Norway*,2005,361144.0
+Norway*,2010,524601.0
+Norway*,2015,746375.0
+Norway*,2020,852238.0
+Norway*,2024,1012404.0
+Sweden,1990,784283.0
+Sweden,1995,944802.0
+Sweden,2000,1022156.0
+Sweden,2005,1126971.0
+Sweden,2010,1372074.0
+Sweden,2015,1638195.0
+Sweden,2020,2033902.0
+Sweden,2024,2272158.0
+United Kingdom*,1990,3664896.0
+United Kingdom*,1995,4173053.0
+United Kingdom*,2000,4747902.0
+United Kingdom*,2005,5989992.0
+United Kingdom*,2010,7713303.0
+United Kingdom*,2015,9071431.0
+United Kingdom*,2020,10520870.0
+United Kingdom*,2024,11845479.0
+Southern Europe,1990,5472616.0
+Southern Europe,1995,7250345.0
+Southern Europe,2000,8585552.0
+Southern Europe,2005,11897749.0
+Southern Europe,2010,15213351.0
+Southern Europe,2015,15507903.0
+Southern Europe,2020,17716268.0
+Southern Europe,2024,20119984.0
+Albania,1990,66013.0
+Albania,1995,71354.0
+Albania,2000,76695.0
+Albania,2005,64739.0
+Albania,2010,52784.0
+Albania,2015,52031.0
+Albania,2020,48810.0
+Albania,2024,46377.0
+Andorra,1990,38891.0
+Andorra,1995,44206.0
+Andorra,2000,42147.0
+Andorra,2005,50298.0
+Andorra,2010,52053.0
+Andorra,2015,42264.0
+Andorra,2020,45574.0
+Andorra,2024,48408.0
+Bosnia and Herzegovina,1990,56000.0
+Bosnia and Herzegovina,1995,69476.0
+Bosnia and Herzegovina,2000,82952.0
+Bosnia and Herzegovina,2005,47287.0
+Bosnia and Herzegovina,2010,38945.0
+Bosnia and Herzegovina,2015,38597.0
+Bosnia and Herzegovina,2020,36042.0
+Bosnia and Herzegovina,2024,34120.0
+Croatia,1990,475438.0
+Croatia,1995,674085.0
+Croatia,2000,585298.0
+Croatia,2005,579273.0
+Croatia,2010,573248.0
+Croatia,2015,561093.0
+Croatia,2020,528056.0
+Croatia,2024,527831.0
+Gibraltar*,1990,8709.0
+Gibraltar*,1995,8381.0
+Gibraltar*,2000,8054.0
+Gibraltar*,2005,9211.0
+Gibraltar*,2010,10369.0
+Gibraltar*,2015,11065.0
+Gibraltar*,2020,11190.0
+Gibraltar*,2024,11291.0
+Greece,1990,618139.0
+Greece,1995,857850.0
+Greece,2000,1111665.0
+Greece,2005,1190707.0
+Greece,2010,1321149.0
+Greece,2015,1242924.0
+Greece,2020,1340456.0
+Greece,2024,1423964.0
+Holy See*,1990,726.0
+Holy See*,1995,705.0
+Holy See*,2000,691.0
+Holy See*,2005,659.0
+Holy See*,2010,621.0
+Holy See*,2015,572.0
+Holy See*,2020,528.0
+Holy See*,2024,496.0
+Italy,1990,1529367.0
+Italy,1995,1810642.0
+Italy,2000,2143259.0
+Italy,2005,3285903.0
+Italy,2010,4719233.0
+Italy,2015,5506199.0
+Italy,2020,6223851.0
+Italy,2024,6553671.0
+Malta,1990,15077.0
+Malta,1995,17740.0
+Malta,2000,21521.0
+Malta,2005,24560.0
+Malta,2010,33008.0
+Malta,2015,52642.0
+Malta,2020,114760.0
+Malta,2024,199466.0
+Montenegro,1990,73743.0
+Montenegro,1995,73743.0
+Montenegro,2000,73743.0
+Montenegro,2005,73743.0
+Montenegro,2010,78512.0
+Montenegro,2015,71719.0
+Montenegro,2020,70999.0
+Montenegro,2024,92237.0
+North Macedonia,1990,95142.0
+North Macedonia,1995,109343.0
+North Macedonia,2000,125665.0
+North Macedonia,2005,127667.0
+North Macedonia,2010,129701.0
+North Macedonia,2015,130730.0
+North Macedonia,2020,131311.0
+North Macedonia,2024,150902.0
+Portugal,1990,435782.0
+Portugal,1995,532822.0
+Portugal,2000,651472.0
+Portugal,2005,771184.0
+Portugal,2010,762825.0
+Portugal,2015,864814.0
+Portugal,2020,1001963.0
+Portugal,2024,1127184.0
+San Marino,1990,3310.0
+San Marino,1995,3659.0
+San Marino,2000,4045.0
+San Marino,2005,4218.0
+San Marino,2010,4880.0
+San Marino,2015,5195.0
+San Marino,2020,5543.0
+San Marino,2024,5838.0
+Serbia*,1990,1064614.0
+Serbia*,1995,1543744.0
+Serbia*,2000,1419951.0
+Serbia*,2005,1078633.0
+Serbia*,2010,901044.0
+Serbia*,2015,797595.0
+Serbia*,2020,733091.0
+Serbia*,2024,712550.0
+Slovenia,1990,178077.0
+Slovenia,1995,174419.0
+Slovenia,2000,214508.0
+Slovenia,2005,217218.0
+Slovenia,2010,253786.0
+Slovenia,2015,237616.0
+Slovenia,2020,277964.0
+Slovenia,2024,315122.0
+Spain*,1990,813588.0
+Spain*,1995,1258176.0
+Spain*,2000,2023886.0
+Spain*,2005,4372449.0
+Spain*,2010,6281193.0
+Spain*,2015,5892847.0
+Spain*,2020,7146130.0
+Spain*,2024,8870527.0
+Western Europe,1990,17019914.0
+Western Europe,1995,20263560.0
+Western Europe,2000,21781702.0
+Western Europe,2005,24134692.0
+Western Europe,2010,25952723.0
+Western Europe,2015,28688766.0
+Western Europe,2020,32846290.0
+Western Europe,2024,36742379.0
+Austria,1990,633753.0
+Austria,1995,764758.0
+Austria,2000,920045.0
+Austria,2005,1174101.0
+Austria,2010,1285706.0
+Austria,2015,1540486.0
+Austria,2020,1781046.0
+Austria,2024,2327064.0
+Belgium,1990,944340.0
+Belgium,1995,1003834.0
+Belgium,2000,1076676.0
+Belgium,2005,1243352.0
+Belgium,2010,1567639.0
+Belgium,2015,1814949.0
+Belgium,2020,2046975.0
+Belgium,2024,2349032.0
+France*,1990,5890023.0
+France*,1995,5936326.0
+France*,2000,6141350.0
+France*,2005,6839877.0
+France*,2010,7322210.0
+France*,2015,7978076.0
+France*,2020,8610719.0
+France*,2024,9186757.0
+Germany,1990,6960112.0
+Germany,1995,9637208.0
+Germany,2000,10397459.0
+Germany,2005,11210590.0
+Germany,2010,11665950.0
+Germany,2015,12646813.0
+Germany,2020,15021300.0
+Germany,2024,16750084.0
+Liechtenstein,1990,10906.0
+Liechtenstein,1995,13311.0
+Liechtenstein,2000,15483.0
+Liechtenstein,2005,18898.0
+Liechtenstein,2010,22342.0
+Liechtenstein,2015,23799.0
+Liechtenstein,2020,25877.0
+Liechtenstein,2024,27669.0
+Luxembourg,1990,113795.0
+Luxembourg,1995,126106.0
+Luxembourg,2000,139750.0
+Luxembourg,2005,150618.0
+Luxembourg,2010,163142.0
+Luxembourg,2015,248888.0
+Luxembourg,2020,298062.0
+Luxembourg,2024,344309.0
+Monaco,1990,20359.0
+Monaco,1995,21060.0
+Monaco,2000,21787.0
+Monaco,2005,21312.0
+Monaco,2010,21132.0
+Monaco,2015,25983.0
+Monaco,2020,26601.0
+Monaco,2024,27106.0
+Netherlands*,1990,1194306.0
+Netherlands*,1995,1397371.0
+Netherlands*,2000,1584638.0
+Netherlands*,2005,1735632.0
+Netherlands*,2010,1850649.0
+Netherlands*,2015,2024059.0
+Netherlands*,2020,2425521.0
+Netherlands*,2024,2956518.0
+Switzerland,1990,1252320.0
+Switzerland,1995,1363586.0
+Switzerland,2000,1484514.0
+Switzerland,2005,1740312.0
+Switzerland,2010,2053953.0
+Switzerland,2015,2385713.0
+Switzerland,2020,2610189.0
+Switzerland,2024,2773840.0
+LATIN AMERICA AND THE CARIBBEAN,1990,7253323.0
+LATIN AMERICA AND THE CARIBBEAN,1995,6728705.0
+LATIN AMERICA AND THE CARIBBEAN,2000,6589509.0
+LATIN AMERICA AND THE CARIBBEAN,2005,7111817.0
+LATIN AMERICA AND THE CARIBBEAN,2010,8275866.0
+LATIN AMERICA AND THE CARIBBEAN,2015,9109959.0
+LATIN AMERICA AND THE CARIBBEAN,2020,14287765.0
+LATIN AMERICA AND THE CARIBBEAN,2024,17510527.0
+Caribbean,1990,1098014.0
+Caribbean,1995,1186981.0
+Caribbean,2000,1283729.0
+Caribbean,2005,1321462.0
+Caribbean,2010,1338511.0
+Caribbean,2015,1501120.0
+Caribbean,2020,1605381.0
+Caribbean,2024,1811926.0
+Anguilla*,1990,2570.0
+Anguilla*,1995,3317.0
+Anguilla*,2000,4063.0
+Anguilla*,2005,4684.0
+Anguilla*,2010,5103.0
+Anguilla*,2015,5471.0
+Anguilla*,2020,5715.0
+Anguilla*,2024,5918.0
+Antigua and Barbuda,1990,12029.0
+Antigua and Barbuda,1995,17550.0
+Antigua and Barbuda,2000,23071.0
+Antigua and Barbuda,2005,24741.0
+Antigua and Barbuda,2010,26412.0
+Antigua and Barbuda,2015,28082.0
+Antigua and Barbuda,2020,29386.0
+Antigua and Barbuda,2024,30473.0
+Aruba*,1990,14444.0
+Aruba*,1995,22274.0
+Aruba*,2000,30104.0
+Aruba*,2005,32540.0
+Aruba*,2010,34328.0
+Aruba*,2015,36114.0
+Aruba*,2020,53593.0
+Aruba*,2024,73494.0
+Bahamas,1990,26855.0
+Bahamas,1995,31654.0
+Bahamas,2000,36454.0
+Bahamas,2005,45531.0
+Bahamas,2010,54745.0
+Bahamas,2015,59241.0
+Bahamas,2020,63583.0
+Bahamas,2024,67285.0
+Barbados,1990,24024.0
+Barbados,1995,26224.0
+Barbados,2000,28424.0
+Barbados,2005,30624.0
+Barbados,2010,32825.0
+Barbados,2015,34475.0
+Barbados,2020,34869.0
+Barbados,2024,35187.0
+"Bonaire, Sint Eustatius and Saba*",1990,12930.0
+"Bonaire, Sint Eustatius and Saba*",1995,13508.0
+"Bonaire, Sint Eustatius and Saba*",2000,14233.0
+"Bonaire, Sint Eustatius and Saba*",2005,16980.0
+"Bonaire, Sint Eustatius and Saba*",2010,20559.0
+"Bonaire, Sint Eustatius and Saba*",2015,24610.0
+"Bonaire, Sint Eustatius and Saba*",2020,26454.0
+"Bonaire, Sint Eustatius and Saba*",2024,30676.0
+British Virgin Islands*,1990,8035.0
+British Virgin Islands*,1995,10046.0
+British Virgin Islands*,2000,12958.0
+British Virgin Islands*,2005,15016.0
+British Virgin Islands*,2010,17076.0
+British Virgin Islands*,2015,19535.0
+British Virgin Islands*,2020,22164.0
+British Virgin Islands*,2024,24520.0
+Cayman Islands*,1990,9315.0
+Cayman Islands*,1995,12666.0
+Cayman Islands*,2000,19176.0
+Cayman Islands*,2005,20679.0
+Cayman Islands*,2010,24062.0
+Cayman Islands*,2015,26193.0
+Cayman Islands*,2020,29242.0
+Cayman Islands*,2024,31935.0
+Cuba,1990,34555.0
+Cuba,1995,26187.0
+Cuba,2000,18545.0
+Cuba,2005,11693.0
+Cuba,2010,7373.0
+Cuba,2015,4649.0
+Cuba,2020,3024.0
+Cuba,2024,2144.0
+Curaçao*,1990,43150.0
+Curaçao*,1995,43150.0
+Curaçao*,2000,43150.0
+Curaçao*,2005,43150.0
+Curaçao*,2010,34630.0
+Curaçao*,2015,37611.0
+Curaçao*,2020,57210.0
+Curaçao*,2024,80020.0
+Dominica,1990,2519.0
+Dominica,1995,3121.0
+Dominica,2000,3723.0
+Dominica,2005,4744.0
+Dominica,2010,8110.0
+Dominica,2015,8093.0
+Dominica,2020,8284.0
+Dominica,2024,8440.0
+Dominican Republic,1990,291151.0
+Dominican Republic,1995,323381.0
+Dominican Republic,2000,355611.0
+Dominican Republic,2005,375417.0
+Dominican Republic,2010,395479.0
+Dominican Republic,2015,549289.0
+Dominican Republic,2020,603794.0
+Dominican Republic,2024,738667.0
+Grenada,1990,4263.0
+Grenada,1995,5544.0
+Grenada,2000,6825.0
+Grenada,2005,6902.0
+Grenada,2010,6980.0
+Grenada,2015,7057.0
+Grenada,2020,7213.0
+Grenada,2024,7340.0
+Guadeloupe*,1990,65944.0
+Guadeloupe*,1995,74566.0
+Guadeloupe*,2000,83188.0
+Guadeloupe*,2005,89065.0
+Guadeloupe*,2010,94942.0
+Guadeloupe*,2015,90956.0
+Guadeloupe*,2020,90206.0
+Guadeloupe*,2024,89610.0
+Haiti,1990,19084.0
+Haiti,1995,18129.0
+Haiti,2000,17222.0
+Haiti,2005,16360.0
+Haiti,2010,17182.0
+Haiti,2015,18047.0
+Haiti,2020,18884.0
+Haiti,2024,19581.0
+Jamaica,1990,20475.0
+Jamaica,1995,22713.0
+Jamaica,2000,24952.0
+Jamaica,2005,24284.0
+Jamaica,2010,23677.0
+Jamaica,2015,23165.0
+Jamaica,2020,23629.0
+Jamaica,2024,24007.0
+Martinique*,1990,38705.0
+Martinique*,1995,46599.0
+Martinique*,2000,54492.0
+Martinique*,2005,57034.0
+Martinique*,2010,59575.0
+Martinique*,2015,69174.0
+Martinique*,2020,68624.0
+Martinique*,2024,68187.0
+Montserrat*,1990,2013.0
+Montserrat*,1995,1612.0
+Montserrat*,2000,1211.0
+Montserrat*,2005,1244.0
+Montserrat*,2010,1291.0
+Montserrat*,2015,1351.0
+Montserrat*,2020,1379.0
+Montserrat*,2024,1402.0
+Puerto Rico*,1990,321909.0
+Puerto Rico*,1995,338067.0
+Puerto Rico*,2000,355038.0
+Puerto Rico*,2005,352144.0
+Puerto Rico*,2010,304969.0
+Puerto Rico*,2015,280494.0
+Puerto Rico*,2020,247132.0
+Puerto Rico*,2024,223323.0
+Saint Kitts and Nevis,1990,3210.0
+Saint Kitts and Nevis,1995,4248.0
+Saint Kitts and Nevis,2000,5871.0
+Saint Kitts and Nevis,2005,6682.0
+Saint Kitts and Nevis,2010,7245.0
+Saint Kitts and Nevis,2015,7443.0
+Saint Kitts and Nevis,2020,7725.0
+Saint Kitts and Nevis,2024,7958.0
+Saint Lucia,1990,5305.0
+Saint Lucia,1995,7155.0
+Saint Lucia,2000,9871.0
+Saint Lucia,2005,9839.0
+Saint Lucia,2010,9050.0
+Saint Lucia,2015,8673.0
+Saint Lucia,2020,8338.0
+Saint Lucia,2024,8079.0
+Saint Vincent and the Grenadines,1990,3970.0
+Saint Vincent and the Grenadines,1995,4135.0
+Saint Vincent and the Grenadines,2000,4307.0
+Saint Vincent and the Grenadines,2005,4436.0
+Saint Vincent and the Grenadines,2010,4569.0
+Saint Vincent and the Grenadines,2015,4637.0
+Saint Vincent and the Grenadines,2020,4738.0
+Saint Vincent and the Grenadines,2024,4820.0
+Sint Maarten (Dutch part)*,1990,23861.0
+Sint Maarten (Dutch part)*,1995,23861.0
+Sint Maarten (Dutch part)*,2000,23861.0
+Sint Maarten (Dutch part)*,2005,13099.0
+Sint Maarten (Dutch part)*,2010,26203.0
+Sint Maarten (Dutch part)*,2015,27295.0
+Sint Maarten (Dutch part)*,2020,28845.0
+Sint Maarten (Dutch part)*,2024,30148.0
+Trinidad and Tobago,1990,50666.0
+Trinidad and Tobago,1995,45994.0
+Trinidad and Tobago,2000,41753.0
+Trinidad and Tobago,2005,44812.0
+Trinidad and Tobago,2010,48226.0
+Trinidad and Tobago,2015,50021.0
+Trinidad and Tobago,2020,78849.0
+Trinidad and Tobago,2024,113478.0
+Turks and Caicos Islands*,1990,5062.0
+Turks and Caicos Islands*,1995,7039.0
+Turks and Caicos Islands*,2000,9015.0
+Turks and Caicos Islands*,2005,13115.0
+Turks and Caicos Islands*,2010,17216.0
+Turks and Caicos Islands*,2015,22723.0
+Turks and Caicos Islands*,2020,25748.0
+Turks and Caicos Islands*,2024,28455.0
+United States Virgin Islands*,1990,51970.0
+United States Virgin Islands*,1995,54241.0
+United States Virgin Islands*,2000,56611.0
+United States Virgin Islands*,2005,56647.0
+United States Virgin Islands*,2010,56684.0
+United States Virgin Islands*,2015,56721.0
+United States Virgin Islands*,2020,56753.0
+United States Virgin Islands*,2024,56779.0
+Central America,1990,1835750.0
+Central America,1995,1298418.0
+Central America,2000,1095698.0
+Central America,2005,1367196.0
+Central America,2010,1738911.0
+Central America,2015,1935255.0
+Central America,2020,2439531.0
+Central America,2024,3120680.0
+Belize,1990,30404.0
+Belize,1995,33446.0
+Belize,2000,36488.0
+Belize,2005,41438.0
+Belize,2010,46390.0
+Belize,2015,54615.0
+Belize,2020,62043.0
+Belize,2024,68706.0
+Costa Rica,1990,417628.0
+Costa Rica,1995,364287.0
+Costa Rica,2000,310946.0
+Costa Rica,2005,358398.0
+Costa Rica,2010,405779.0
+Costa Rica,2015,411697.0
+Costa Rica,2020,520729.0
+Costa Rica,2024,628404.0
+El Salvador,1990,47360.0
+El Salvador,1995,39537.0
+El Salvador,2000,31713.0
+El Salvador,2005,36029.0
+El Salvador,2010,40342.0
+El Salvador,2015,42059.0
+El Salvador,2020,42767.0
+El Salvador,2024,43342.0
+Guatemala,1990,264257.0
+Guatemala,1995,156188.0
+Guatemala,2000,48119.0
+Guatemala,2005,57214.0
+Guatemala,2010,66386.0
+Guatemala,2015,74852.0
+Guatemala,2020,84311.0
+Guatemala,2024,92732.0
+Honduras,1990,270423.0
+Honduras,1995,149442.0
+Honduras,2000,28461.0
+Honduras,2005,27934.0
+Honduras,2010,27288.0
+Honduras,2015,38330.0
+Honduras,2020,39195.0
+Honduras,2024,39901.0
+Mexico,1990,701513.0
+Mexico,1995,458051.0
+Mexico,2000,526172.0
+Mexico,2005,701803.0
+Mexico,2010,957593.0
+Mexico,2015,1088731.0
+Mexico,2020,1335154.0
+Mexico,2024,1726089.0
+Nicaragua,1990,41421.0
+Nicaragua,1995,26619.0
+Nicaragua,2000,30389.0
+Nicaragua,2005,34919.0
+Nicaragua,2010,37345.0
+Nicaragua,2015,40261.0
+Nicaragua,2020,42167.0
+Nicaragua,2024,43757.0
+Panama,1990,62744.0
+Panama,1995,70848.0
+Panama,2000,83410.0
+Panama,2005,109461.0
+Panama,2010,157788.0
+Panama,2015,184710.0
+Panama,2020,313165.0
+Panama,2024,477749.0
+South America,1990,4319559.0
+South America,1995,4243306.0
+South America,2000,4210082.0
+South America,2005,4423159.0
+South America,2010,5198444.0
+South America,2015,5673584.0
+South America,2020,10242853.0
+South America,2024,12577921.0
+Argentina,1990,1647935.0
+Argentina,1995,1589660.0
+Argentina,2000,1543851.0
+Argentina,2005,1641560.0
+Argentina,2010,1799680.0
+Argentina,2015,1856613.0
+Argentina,2020,1912294.0
+Argentina,2024,1958039.0
+Bolivia (Plurinational State of),1990,73758.0
+Bolivia (Plurinational State of),1995,83598.0
+Bolivia (Plurinational State of),2000,92658.0
+Bolivia (Plurinational State of),2005,107745.0
+Bolivia (Plurinational State of),2010,122846.0
+Bolivia (Plurinational State of),2015,143008.0
+Bolivia (Plurinational State of),2020,164121.0
+Bolivia (Plurinational State of),2024,183234.0
+Brazil,1990,803218.0
+Brazil,1995,732622.0
+Brazil,2000,687362.0
+Brazil,2005,641029.0
+Brazil,2010,596859.0
+Brazil,2015,646540.0
+Brazil,2020,1048866.0
+Brazil,2024,1406299.0
+Chile,1990,100133.0
+Chile,1995,125754.0
+Chile,2000,166608.0
+Chile,2005,241522.0
+Chile,2010,361531.0
+Chile,2015,598039.0
+Chile,2020,1476240.0
+Chile,2024,1538324.0
+Colombia,1990,100672.0
+Colombia,1995,109550.0
+Colombia,2000,109863.0
+Colombia,2005,110495.0
+Colombia,2010,126424.0
+Colombia,2015,145504.0
+Colombia,2020,1932807.0
+Colombia,2024,3063518.0
+Ecuador,1990,139204.0
+Ecuador,1995,145626.0
+Ecuador,2000,150585.0
+Ecuador,2005,144415.0
+Ecuador,2010,358874.0
+Ecuador,2015,332142.0
+Ecuador,2020,721560.0
+Ecuador,2024,747749.0
+Falkland Islands (Malvinas)*,1990,855.0
+Falkland Islands (Malvinas)*,1995,868.0
+Falkland Islands (Malvinas)*,2000,1067.0
+Falkland Islands (Malvinas)*,2005,1166.0
+Falkland Islands (Malvinas)*,2010,1436.0
+Falkland Islands (Malvinas)*,2015,1571.0
+Falkland Islands (Malvinas)*,2020,1957.0
+Falkland Islands (Malvinas)*,2024,2333.0
+French Guiana*,1990,63612.0
+French Guiana*,1995,70131.0
+French Guiana*,2000,76649.0
+French Guiana*,2005,86468.0
+French Guiana*,2010,96288.0
+French Guiana*,2015,106108.0
+French Guiana*,2020,119249.0
+French Guiana*,2024,130924.0
+Guyana,1990,4095.0
+Guyana,1995,6352.0
+Guyana,2000,8610.0
+Guyana,2005,10868.0
+Guyana,2010,8182.0
+Guyana,2015,8661.0
+Guyana,2020,31169.0
+Guyana,2024,54175.0
+Paraguay,1990,195884.0
+Paraguay,1995,186570.0
+Paraguay,2000,176608.0
+Paraguay,2005,168243.0
+Paraguay,2010,160299.0
+Paraguay,2015,156462.0
+Paraguay,2020,169567.0
+Paraguay,2024,180837.0
+Peru,1990,48985.0
+Peru,1995,56831.0
+Peru,2000,66103.0
+Peru,2005,77195.0
+Peru,2010,102662.0
+Peru,2015,152562.0
+Peru,2020,1184762.0
+Peru,2024,1837219.0
+Suriname,1990,18083.0
+Suriname,1995,22320.0
+Suriname,2000,27506.0
+Suriname,2005,33662.0
+Suriname,2010,39713.0
+Suriname,2015,43127.0
+Suriname,2020,47801.0
+Suriname,2024,51902.0
+Uruguay,1990,98116.0
+Uruguay,1995,93428.0
+Uruguay,2000,88874.0
+Uruguay,2005,82317.0
+Uruguay,2010,76303.0
+Uruguay,2015,78799.0
+Uruguay,2020,108267.0
+Uruguay,2024,160064.0
+Venezuela (Bolivarian Republic of),1990,1025009.0
+Venezuela (Bolivarian Republic of),1995,1019996.0
+Venezuela (Bolivarian Republic of),2000,1013738.0
+Venezuela (Bolivarian Republic of),2005,1076474.0
+Venezuela (Bolivarian Republic of),2010,1347347.0
+Venezuela (Bolivarian Republic of),2015,1404448.0
+Venezuela (Bolivarian Republic of),2020,1324193.0
+Venezuela (Bolivarian Republic of),2024,1263304.0
+NORTHERN AMERICA,1990,27543267.0
+NORTHERN AMERICA,1995,33404578.0
+NORTHERN AMERICA,2000,40357995.0
+NORTHERN AMERICA,2005,45658615.0
+NORTHERN AMERICA,2010,51007867.0
+NORTHERN AMERICA,2015,56019067.0
+NORTHERN AMERICA,2020,58830556.0
+NORTHERN AMERICA,2024,61207877.0
+Bermuda*,1990,15683.0
+Bermuda*,1995,16676.0
+Bermuda*,2000,17684.0
+Bermuda*,2005,18108.0
+Bermuda*,2010,18547.0
+Bermuda*,2015,19212.0
+Bermuda*,2020,19739.0
+Bermuda*,2024,20171.0
+Canada,1990,4251056.0
+Canada,1995,4853738.0
+Canada,2000,5525404.0
+Canada,2005,6086976.0
+Canada,2010,7035001.0
+Canada,2015,8049874.0
+Canada,2020,8332892.0
+Canada,2024,8805839.0
+Greenland*,1990,9282.0
+Greenland*,1995,7121.0
+Greenland*,2000,6601.0
+Greenland*,2005,6556.0
+Greenland*,2010,6091.0
+Greenland*,2015,6009.0
+Greenland*,2020,5899.0
+Greenland*,2024,5812.0
+Saint Pierre and Miquelon*,1990,1099.0
+Saint Pierre and Miquelon*,1995,1320.0
+Saint Pierre and Miquelon*,2000,1458.0
+Saint Pierre and Miquelon*,2005,1147.0
+Saint Pierre and Miquelon*,2010,1017.0
+Saint Pierre and Miquelon*,2015,986.0
+Saint Pierre and Miquelon*,2020,998.0
+Saint Pierre and Miquelon*,2024,1008.0
+United States of America*,1990,23266147.0
+United States of America*,1995,28525723.0
+United States of America*,2000,34806848.0
+United States of America*,2005,39545828.0
+United States of America*,2010,43947211.0
+United States of America*,2015,47942986.0
+United States of America*,2020,50471028.0
+United States of America*,2024,52375047.0
+OCEANIA,1990,4776548.0
+OCEANIA,1995,5091137.0
+OCEANIA,2000,5372431.0
+OCEANIA,2005,6041977.0
+OCEANIA,2010,7134959.0
+OCEANIA,2015,8168067.0
+OCEANIA,2020,9261819.0
+OCEANIA,2024,9901164.0
+Australia/New Zealand,1990,4517870.0
+Australia/New Zealand,1995,4810557.0
+Australia/New Zealand,2000,5075813.0
+Australia/New Zealand,2005,5735938.0
+Australia/New Zealand,2010,6836784.0
+Australia/New Zealand,2015,7865257.0
+Australia/New Zealand,2020,8948750.0
+Australia/New Zealand,2024,9579393.0
+Australia*,1990,3991501.0
+Australia*,1995,4215646.0
+Australia*,2000,4389847.0
+Australia*,2005,4880921.0
+Australia*,2010,5879802.0
+Australia*,2015,6733056.0
+Australia*,2020,7604850.0
+Australia*,2024,8111404.0
+New Zealand*,1990,526369.0
+New Zealand*,1995,594911.0
+New Zealand*,2000,685966.0
+New Zealand*,2005,855017.0
+New Zealand*,2010,956982.0
+New Zealand*,2015,1132201.0
+New Zealand*,2020,1343900.0
+New Zealand*,2024,1467989.0
+Melanesia,1990,91200.0
+Melanesia,1995,96828.0
+Melanesia,2000,95281.0
+Melanesia,2005,103881.0
+Melanesia,2010,110691.0
+Melanesia,2015,119343.0
+Melanesia,2020,124073.0
+Melanesia,2024,128055.0
+Fiji,1990,13283.0
+Fiji,1995,13001.0
+Fiji,2000,12719.0
+Fiji,2005,12434.0
+Fiji,2010,13357.0
+Fiji,2015,13751.0
+Fiji,2020,14087.0
+Fiji,2024,14362.0
+New Caledonia*,1990,37673.0
+New Caledonia*,1995,43662.0
+New Caledonia*,2000,49651.0
+New Caledonia*,2005,55405.0
+New Caledonia*,2010,61158.0
+New Caledonia*,2015,68881.0
+New Caledonia*,2020,73141.0
+New Caledonia*,2024,76738.0
+Papua New Guinea,1990,33710.0
+Papua New Guinea,1995,33526.0
+Papua New Guinea,2000,26304.0
+Papua New Guinea,2005,29971.0
+Papua New Guinea,2010,30425.0
+Papua New Guinea,2015,30940.0
+Papua New Guinea,2020,31068.0
+Papua New Guinea,2024,31171.0
+Solomon Islands,1990,4226.0
+Solomon Islands,1995,4178.0
+Solomon Islands,2000,3981.0
+Solomon Islands,2005,3271.0
+Solomon Islands,2010,2760.0
+Solomon Islands,2015,2585.0
+Solomon Islands,2020,2520.0
+Solomon Islands,2024,2469.0
+Vanuatu,1990,2308.0
+Vanuatu,1995,2461.0
+Vanuatu,2000,2626.0
+Vanuatu,2005,2800.0
+Vanuatu,2010,2991.0
+Vanuatu,2015,3186.0
+Vanuatu,2020,3257.0
+Vanuatu,2024,3315.0
+Micronesia,1990,108969.0
+Micronesia,1995,118687.0
+Micronesia,2000,130186.0
+Micronesia,2005,128390.0
+Micronesia,2010,114743.0
+Micronesia,2015,113466.0
+Micronesia,2020,118860.0
+Micronesia,2024,123424.0
+Guam*,1990,69755.0
+Guam*,1995,71912.0
+Guam*,2000,74070.0
+Guam*,2005,74743.0
+Guam*,2010,75416.0
+Guam*,2015,76089.0
+Guam*,2020,80472.0
+Guam*,2024,84159.0
+Kiribati,1990,2162.0
+Kiribati,1995,2223.0
+Kiribati,2000,2283.0
+Kiribati,2005,2487.0
+Kiribati,2010,2868.0
+Kiribati,2015,2919.0
+Kiribati,2020,3126.0
+Kiribati,2024,3302.0
+Marshall Islands,1990,1158.0
+Marshall Islands,1995,1480.0
+Marshall Islands,2000,1891.0
+Marshall Islands,2005,2417.0
+Marshall Islands,2010,3089.0
+Marshall Islands,2015,3284.0
+Marshall Islands,2020,3298.0
+Marshall Islands,2024,3309.0
+Micronesia (Fed. States of),1990,3685.0
+Micronesia (Fed. States of),1995,3342.0
+Micronesia (Fed. States of),2000,3116.0
+Micronesia (Fed. States of),2005,2905.0
+Micronesia (Fed. States of),2010,2806.0
+Micronesia (Fed. States of),2015,2756.0
+Micronesia (Fed. States of),2020,2832.0
+Micronesia (Fed. States of),2024,2894.0
+Nauru,1990,2815.0
+Nauru,1995,2605.0
+Nauru,2000,2394.0
+Nauru,2005,2253.0
+Nauru,2010,906.0
+Nauru,2015,1833.0
+Nauru,2020,2201.0
+Nauru,2024,2548.0
+Northern Mariana Islands*,1990,26593.0
+Northern Mariana Islands*,1995,32376.0
+Northern Mariana Islands*,2000,40122.0
+Northern Mariana Islands*,2005,37542.0
+Northern Mariana Islands*,2010,24168.0
+Northern Mariana Islands*,2015,21648.0
+Northern Mariana Islands*,2020,21843.0
+Northern Mariana Islands*,2024,22000.0
+Palau,1990,2801.0
+Palau,1995,4749.0
+Palau,2000,6310.0
+Palau,2005,6043.0
+Palau,2010,5490.0
+Palau,2015,4937.0
+Palau,2020,5088.0
+Palau,2024,5212.0
+Polynesia*,1990,58509.0
+Polynesia*,1995,65065.0
+Polynesia*,2000,71151.0
+Polynesia*,2005,73768.0
+Polynesia*,2010,72741.0
+Polynesia*,2015,70001.0
+Polynesia*,2020,70136.0
+Polynesia*,2024,70292.0
+American Samoa*,1990,21283.0
+American Samoa*,1995,23098.0
+American Samoa*,2000,24912.0
+American Samoa*,2005,24233.0
+American Samoa*,2010,23555.0
+American Samoa*,2015,23513.0
+American Samoa*,2020,23608.0
+American Samoa*,2024,23684.0
+Cook Islands*,1990,2587.0
+Cook Islands*,1995,2686.0
+Cook Islands*,2000,2785.0
+Cook Islands*,2005,3277.0
+Cook Islands*,2010,3769.0
+Cook Islands*,2015,4168.0
+Cook Islands*,2020,4579.0
+Cook Islands*,2024,4937.0
+French Polynesia*,1990,25830.0
+French Polynesia*,1995,28360.0
+French Polynesia*,2000,30329.0
+French Polynesia*,2005,32286.0
+French Polynesia*,2010,31640.0
+French Polynesia*,2015,30058.0
+French Polynesia*,2020,30081.0
+French Polynesia*,2024,30099.0
+Niue*,1990,461.0
+Niue*,1995,480.0
+Niue*,2000,498.0
+Niue*,2005,522.0
+Niue*,2010,589.0
+Niue*,2015,588.0
+Niue*,2020,588.0
+Niue*,2024,588.0
+Samoa,1990,3357.0
+Samoa,1995,4694.0
+Samoa,2000,5998.0
+Samoa,2005,5746.0
+Samoa,2010,5122.0
+Samoa,2015,4255.0
+Samoa,2020,4021.0
+Samoa,2024,3843.0
+Tokelau*,1990,360.0
+Tokelau*,1995,506.0
+Tokelau*,2000,712.0
+Tokelau*,2005,1003.0
+Tokelau*,2010,1128.0
+Tokelau*,2015,1185.0
+Tokelau*,2020,1238.0
+Tokelau*,2024,1282.0
+Tonga,1990,2911.0
+Tonga,1995,3274.0
+Tonga,2000,3684.0
+Tonga,2005,4301.0
+Tonga,2010,4607.0
+Tonga,2015,3954.0
+Tonga,2020,3742.0
+Tonga,2024,3581.0
+Tuvalu,1990,318.0
+Tuvalu,1995,263.0
+Tuvalu,2000,218.0
+Tuvalu,2005,209.0
+Tuvalu,2010,220.0
+Tuvalu,2015,230.0
+Tuvalu,2020,239.0
+Tuvalu,2024,246.0
+Wallis and Futuna Islands*,1990,1402.0
+Wallis and Futuna Islands*,1995,1704.0
+Wallis and Futuna Islands*,2000,2015.0
+Wallis and Futuna Islands*,2005,2191.0
+Wallis and Futuna Islands*,2010,2111.0
+Wallis and Futuna Islands*,2015,2050.0
+Wallis and Futuna Islands*,2020,2040.0
+Wallis and Futuna Islands*,2024,2032.0

@@ -1,5 +1,9 @@
 # PLAN INTEGRAL — "¿Qué país gasta mejor el dinero público?"
 
+> **Decisión del autor (2026-07-18): el programa integral es el MARCO del trabajo, y la [Variante C (vivienda como consecuencias)](PLAN_vivienda_consecuencias.md) actúa como su ANÁLISIS COMPLEMENTARIO** — el caso donde la cadena gasto→rendimiento→consecuencias se demuestra de punta a punta. Para el TFM sigue rigiendo el gate del tutor (S1); ante el tribunal, la Variante C es el núcleo demostrable y el integral su marco y líneas futuras.
+>
+> **Estado de datos (2026-07-18):** extraídos y testeados — Eurostat completo (gasto×función×tipo, ingresos, deuda, SILC, migración UE, HPI, controles), WEO totales globales (151-229 países), **GHED sanidad global (195 países)**, UN DESA stock migrante (284 destinos, 1990-2024), ODA recibida, JST histórico 1870-2020, INE España (IPV/IPC/salarios, tablas nuevas), WWBI. Gold: panel UE anual + CCAA trimestral. Deferred con ruta: GRD, WB BOS, SIPRI, GMD, GFS-COFOG global (vía MCP), liquidaciones CCAA, DAC CRS microdatos, cohesiondata, Euríbor (ECB SDW).
+
 *Programa de investigación completo. v1, 2026-07-17. Este documento define el objetivo MÁXIMO en los términos del autor, mapea TODAS las bases de datos disponibles (verificadas donde se indica) y descompone el trabajo en fases. **Advertencia de honestidad:** esto es un programa de 12–24 meses, no un TFM de 10 semanas — el tutor vetó el "fiscal integral" y tres rondas de consejo multi-modelo lo confirmaron. El TFM ([plan UE](PLAN_public_money_outcomes.md) / [plan GLOBAL](PLAN_public_money_outcomes_GLOBAL.md)) es la **Fase 1** de este programa; el resto es hoja de ruta post-TFM. Cada fase tiene entidad propia y produce resultados publicables.*
 
 ---
