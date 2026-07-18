@@ -41,6 +41,7 @@ Entregas 2 y 3 citan IPV tablas **49300 (anual) y 76201 (trimestral)** — el IN
 | gold: `gold_asequibilidad_ccaa.csv`, `gold_panel_trimestral.csv`, `gold_corpus_manifest.csv` | gold: `gold_panel_anual`, `gold_panel_wide`, `gold_ccaa_trimestral`, `gold_century_fiscal` |
 "Formato de entrega = contrato": o el repo converge a lo documentado o la documentación se actualiza a lo construido (el enunciado permite estructura propia justificada). Lo indefendible es el desajuste silencioso.
 **Acción (mínimo coste):** en F0.2 re-documentar `storage/` y `connectors/` (mejores que lo prometido: tests + raw inmutable) y construir el `gold_asequibilidad_ccaa` anual que falta (289 filas, construible hoy según la propia Entrega 3 §9).
+**→ RESUELTO (2026-07-18):** estructura real re-documentada en el [anexo §4](entregas/anexo_transicion_proyecto.md); `gold_asequibilidad_ccaa.csv` construido (306 filas, 2008–2024); `tests/test_gold.py` con 12 tests del contrato gold — que además destaparon y blindaron un tercer bug de parseo (regex en el split del IPV; cobertura del ratio 8→18 territorios).
 
 ### 3.4 Métrica de asequibilidad — petición del tutor sin recoger aún en el plan
 El tutor (dos veces): IPV÷salario = indicador aproximado; complementar con medida de **esfuerzo real de compra** (€/m², renta disponible, entrada, cuota hipotecaria). La Entrega 2 ya tenía los ganchos (BdE "esfuerzo hipotecario (ratio cuota/renta)" como alternativa; MITMA €/m² de suelo como driver; Euríbor ya extraído). PLAN_MAESTRO no lo incorpora explícitamente.

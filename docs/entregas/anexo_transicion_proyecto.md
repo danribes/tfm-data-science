@@ -30,6 +30,8 @@ La ampliación no es un cambio de tema sino de zoom: el análisis de vivienda **
 | Corpus RAG (BdE, INE) | Extensión post-núcleo, como pedía el MVP de la E2 y refuerza el feedback |
 | Código y documentos originales | ✅ Íntegros en `_old/` (trazabilidad completa; nada se ha borrado) |
 
+**Corrección adicional (2026-07-18), detectada al montar la batería de tests:** el parseo de nombres de serie del IPV usaba `str.split(". ")`, que pandas interpreta como expresión regular con patrones multi-carácter — el punto casaba cualquier carácter y las CCAA con nombre compuesto ("Balears, Illes", "Madrid, Comunidad de"…) se partían mal, dejando el ratio de asequibilidad calculado solo en 8 de los 18 territorios. Corregido (`regex=False` + filtro de tipos válidos) y blindado con tests de regresión en `tests/test_gold.py`: cobertura actual del ratio, 18 de 18 territorios (Ceuta y Melilla fuera por diseño, sin salario EES). El dataset anual `gold_asequibilidad_ccaa.csv` (306 filas = 17 CCAA + Nacional × 2008–2024) comprometido en la Entrega 3 §4.1 queda construido.
+
 **Corrección técnica sobrevenida:** el INE renumeró las tablas del IPV citadas en las entregas 2–3 — la 49300 (anual) y la 76201 (trimestral) ya no existen; las vivas son **80271** y **80270**. Es exactamente el riesgo "cambio de IDs de tabla en la API del INE" declarado en la Entrega 2 §3; la mitigación prevista (cliente parametrizado + snapshots en processed) funcionó y el pipeline actual usa los IDs nuevos.
 
 ## 4. Estructura real vs estructura documentada en la Entrega 3

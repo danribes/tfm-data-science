@@ -132,8 +132,12 @@ Q = {19: 1, 20: 2, 21: 3, 22: 4}
 
 def build_ccaa() -> pd.DataFrame:
     ipv = p("ine_ipv_q")
-    parts = ipv["nombre"].str.split(". ", n=2, expand=True)
+    # regex=False: con pat multi-carácter pandas interpreta ". " como regex y
+    # "." casa cualquier carácter → "Vivienda nueva" partía en "Viviend|nueva"
+    # y las CCAA con coma ("Balears, Illes") en el separador equivocado
+    parts = ipv["nombre"].str.split(". ", n=2, expand=True, regex=False)
     ipv["ccaa"], ipv["tipo"] = parts[0].str.strip(), parts[1].str.strip()
+    ipv = ipv[ipv["tipo"].isin(["General", "Vivienda nueva", "Vivienda segunda mano"])]
     ipv["quarter"] = ipv["periodo"].map(Q)
     ipv = ipv.dropna(subset=["quarter", "valor"])
     ipv_w = ipv.pivot_table(index=["ccaa", "anyo", "quarter"], columns="tipo", values="valor").reset_index()
@@ -173,17 +177,63 @@ def build_ccaa() -> pd.DataFrame:
     return df
 
 
-def smoke(panel: pd.DataFrame, wide: pd.DataFrame, ccaa: pd.DataFrame) -> None:
+def build_asequibilidad_anual(ccaa_q: pd.DataFrame) -> pd.DataFrame:
+    """gold_asequibilidad_ccaa (Entrega 3 §4.1): una fila = una CCAA en un año.
+
+    IPV anual = media de los 4 trimestres (derivado del panel trimestral; la
+    tabla anual 80271 del INE queda como verificación cruzada). Solo entran
+    años con salario OBSERVADO (tope EES: 2024) y años con los 4 trimestres.
+    ratio_real = ratio de asequibilidad deflactado por el IPC (base 2015=100).
+    """
+    q = ccaa_q[ccaa_q["salario_flag"] == "observado"].copy()
+    full = q.groupby(["ccaa", "anyo"])["quarter"].transform("nunique") == 4
+    q = q[full]
+    a = q.groupby(["ccaa", "anyo"], as_index=False).agg(
+        ipv_indice=("ipv", "mean"),
+        ipv_nueva=("ipv_nueva", "mean"),
+        ipv_segunda=("ipv_segunda", "mean"),
+        salario_medio=("salario_anual", "first"),
+        ipc_medio=("ipc", "mean"),
+        ipv_idx15=("ipv_idx15", "mean"),
+        salario_idx=("salario_idx15", "first"),
+    )
+    ipc_base = a[a.anyo == 2015].set_index("ccaa")["ipc_medio"]
+    a["ipc_idx15"] = a["ipc_medio"] / a["ccaa"].map(ipc_base) * 100
+    a["ratio_asequibilidad"] = a["ipv_idx15"] / a["salario_idx"]
+    a["ratio_real"] = a["ratio_asequibilidad"] / (a["ipc_idx15"] / 100)
+    assert a.duplicated(subset=["ccaa", "anyo"]).sum() == 0, "PK duplicada en gold anual"
+    return a
+
+
+def smoke(panel: pd.DataFrame, wide: pd.DataFrame, ccaa: pd.DataFrame, anual: pd.DataFrame) -> None:
     es = wide.query("geo=='ES' and year==2023")
     assert len(es) == 1 and abs(float(es["te_gf06"].iloc[0]) - 0.5) < 0.2, "ancla ES GF06"
     assert 35 < float(es["revenue"].iloc[0]) < 48, f"ingresos ES 2023: {es['revenue'].iloc[0]}"
-    n_ccaa = ccaa["ccaa"].nunique()
-    assert n_ccaa >= 18, f"CCAA insuficientes: {n_ccaa}"
+    # el conjunto EXACTO de territorios, no un conteo: un conteo >= N pasó en
+    # v1 con nombres truncados por el bug de regex en el split del IPV
+    esperado_min = {"Nacional", "Andalucía", "Aragón", "Asturias, Principado de",
+                    "Balears, Illes", "Canarias", "Cantabria", "Castilla y León",
+                    "Castilla - La Mancha", "Cataluña", "Comunitat Valenciana",
+                    "Extremadura", "Galicia", "Madrid, Comunidad de",
+                    "Murcia, Región de", "Navarra, Comunidad Foral de",
+                    "País Vasco", "Rioja, La"}
+    faltan = esperado_min - set(ccaa["ccaa"].unique())
+    assert not faltan, f"territorios ausentes en gold CCAA: {faltan}"
+    # cobertura sobre los 18 territorios esperados: Ceuta y Melilla quedan
+    # fuera del ratio POR DISEÑO (sin salario EES; Entrega 3 §7.5)
+    en_ambito = ccaa[ccaa["ccaa"].isin(esperado_min)]
+    cob = en_ambito.query("anyo==2024")["ratio_asequibilidad"].notna().mean()
+    assert cob == 1.0, f"cobertura del ratio 2024 en las 17 CCAA + Nacional: {cob:.0%}"
     r = ccaa.query("ccaa=='Nacional' and anyo==2024")["ratio_asequibilidad"].mean()
     assert 1.0 < r < 2.0, f"ratio asequibilidad nacional 2024 raro: {r}"
+    assert 250 <= len(anual) <= 340, f"gold anual: {len(anual)} filas (esperadas ~289+Nacional)"
+    assert anual["ratio_asequibilidad"].notna().all(), "ratios nulos en gold anual"
+    ra = anual.query("ccaa=='Nacional' and anyo==2024")["ratio_asequibilidad"].iloc[0]
+    assert abs(ra - r) < 0.05, f"anual vs media trimestral divergen: {ra:.3f} vs {r:.3f}"
     print(f"SMOKE GOLD OK — panel {len(panel)} filas ({panel.geo.nunique()} geos, "
-          f"{panel.variable.nunique()} vars), wide {wide.shape}, ccaa {len(ccaa)} filas ({n_ccaa} territorios); "
-          f"ratio ES nacional 2024={r:.2f}")
+          f"{panel.variable.nunique()} vars), wide {wide.shape}, ccaa {len(ccaa)} filas "
+          f"({ccaa['ccaa'].nunique()} territorios, cobertura ratio 2024 {cob:.0%}); "
+          f"anual {len(anual)} filas; ratio ES nacional 2024={r:.2f}")
 
 
 if __name__ == "__main__":
@@ -192,8 +242,11 @@ if __name__ == "__main__":
     panel = build_panel()
     wide = build_panel_wide(panel)
     ccaa = build_ccaa()
-    smoke(panel, wide, ccaa)
+    anual = build_asequibilidad_anual(ccaa)
+    smoke(panel, wide, ccaa, anual)
     panel.to_csv(GOLD / "gold_panel_anual.csv", index=False)
     wide.to_csv(GOLD / "gold_panel_wide.csv", index=False)
     ccaa.to_csv(GOLD / "gold_ccaa_trimestral.csv", index=False)
-    print("→ storage/gold/: gold_panel_anual.csv, gold_panel_wide.csv, gold_ccaa_trimestral.csv")
+    anual.to_csv(GOLD / "gold_asequibilidad_ccaa.csv", index=False)
+    print("→ storage/gold/: gold_panel_anual.csv, gold_panel_wide.csv, "
+          "gold_ccaa_trimestral.csv, gold_asequibilidad_ccaa.csv")
