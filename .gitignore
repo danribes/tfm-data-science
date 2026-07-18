@@ -1,1 +1,3 @@
 exercises/
+__pycache__/
+*.pyc
