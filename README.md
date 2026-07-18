@@ -42,4 +42,11 @@ _old/          # proyecto vivienda original completo (trazabilidad; ver entrega 
 
 ## Estado actual (2026-07-18)
 
-Extracción del pool de datos ≈ completa (32 processed, 6 gold, fuentes UE + globales + histórico 1870–2023), motor de proyección 2023–2070 (pensiones y sanidad × 6 variantes demográficas), esqueleto de API, tests del contrato gold (`tests/`). **EDA de vivienda ejecutado** ([hallazgos y decisiones de especificación](docs/eda_vivienda.md), figuras en `docs/figures/eda/`). Siguientes hitos: baselines + backtesting de T1 (F4.1), figuras del atlas (F2.1) y modelo de rendimiento ajustado (F3.1) — calendario en el [PLAN_MAESTRO](docs/PLAN_MAESTRO.md) §4.
+**Bloque analítico del TFM completo**, todo con protocolo pre-registrado, tests (35+) y capa gold:
+
+1. **T1 — Forecasting CCAA** con disciplina completa: [EDA](docs/eda_vivienda.md) → [baselines + backtesting rolling-origin](docs/backtest_t1_baselines.md) → [candidatos](docs/candidatos_t1.md) (SARIMAX/LightGBM: resultado negativo pre-registrado a corto) → [test final de un solo uso](docs/test_final_t1.md) (hipótesis GBM refutada; el protocolo evitó publicar una predicción de desplome) → [pronóstico de producción con abanico empírico y escenarios](docs/forecast_t1_mvp.md) (`gold_forecast_ccaa.csv`).
+2. **Atlas B1–B16** — [16 figuras con lectura guiada](docs/atlas.md): siglos XX–XXI, España vs mediana mundial/UE, incluida la inversión pública en vivienda SIEMPRE junto a la residencial total.
+3. **A1 — Rendimiento ajustado** del gasto sanitario ([funnel de 164 países](docs/rendimiento_a1.md), `gold_rendimiento_pais.csv`): residual con intervalo conformal por grupo de renta, nunca una liga; España +2,7 ± 3,5 años.
+4. **D1 — Simulador de escenarios de deuda** ([menú 2024–2050](docs/escenarios_d1.md), `gold_escenarios_deuda.csv`): aritmética r−g + presión demográfica del motor de proyección; la demografía domina cualquier palanca.
+
+Trabajo declarado en curso: driver de oferta [`oferta_nueva`](docs/oferta_nueva.md) (permisos residenciales: señal adelantada r=0,57 a 11 trimestres; adopción solo con datos 2026+), pata provincial MITMA, reescritura F0.2 de entregas pendiente del visto bueno del tutor. Calendario en el [PLAN_MAESTRO](docs/PLAN_MAESTRO.md) §4.

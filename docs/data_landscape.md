@@ -128,7 +128,8 @@
 ### Oferta privada de construcción (añadido 2026-07-18, revisión 1 de la Entrega 4)
 | Fuente | Serie | Estado |
 |---|---|---|
-| MITMA Boletín Estadístico — visados | Visados de dirección de obra nueva (Colegios de Aparejadores; mensual, provincial → CCAA) | ⏳ ruta identificada (mismo boletín que suelo/ICSC, parser xlrd reutilizable); verificar en extracción |
+| Eurostat `sts_cobp_q` — permisos | Permisos de vivienda (nº, residencial excl. colectivas, I21, NSA), 39 geos, ES 1995Q1→ | ✅ EXTRAÍDO 2026-07-18 (`building_permits_q.csv`); señal adelantada r=0,57 a 11 trimestres — ver [oferta_nueva.md](oferta_nueva.md) |
+| MITMA Boletín Estadístico — visados | Visados de dirección de obra nueva (Colegios de Aparejadores; mensual, provincial → CCAA) | ⏳ ruta identificada (mismo boletín que suelo/ICSC, parser xlrd reutilizable); daría la variación regional |
 | MITMA — viviendas iniciadas y terminadas | Obra nueva libre y protegida (calificaciones); trimestral/anual, provincial | ⏳ misma ruta; retardo visado→terminación ~18–24 meses = feature adelantada para T1 |
 | Eurostat `nama_10_an6` | FBCF por activo AN_111 "viviendas" %PIB (inversión residencial TOTAL; privada ≈ total − GF06 capital) | ⏳ mismo cliente Eurostat del pipeline; contexto obligatorio de la figura B3 del atlas |
 | INE — hipotecas constituidas | Número e importe por CCAA (mensual) | Opcional: demanda financiada, contraste del canal Euríbor |
