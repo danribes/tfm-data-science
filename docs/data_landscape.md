@@ -198,7 +198,14 @@
 
 ## 6. Capa de decisiones (boletines legales, contratos, subvenciones)
 
-*No existe en ninguna base estadística — es la laguna que haría novedoso un extractor.*
+*No existe en ninguna base estadística — es la laguna que haría novedoso un extractor. **Regla de decisión (verificada 2026-07-18): nunca extraer del BOE lo que Hacienda/IGAE publican como hoja de cálculo** — los IMPORTES aprobados y ejecutados están estructurados; del BOE solo es insustituible la capa de decisiones/eventos (instrumento legal + fecha + texto + rastro de prórrogas).*
+
+**Importes presupuestarios estructurados (sustituyen la extracción BOE de cifras):**
+| Fuente | Contenido | Estado |
+|---|---|---|
+| **SEPG/Hacienda — "PGE Consolidados" + "Series históricas"** | PGE APROBADOS en Excel (ejercicio en curso + 9 anteriores); años previos vía los "Libros" anuales del portal | ✅ verificado en vivo (datos.gob.es + sepg.pap 200) |
+| **IGAE — ejecución presupuestaria mensual + liquidaciones** | presupuesto EJECUTADO (mejor que aprobado para análisis) | ✅ página verificada |
+| **Hacienda — ejecución presupuestaria mensual de las CCAA** | ejecución regional mensual, dataset catalogado | ✅ catalogado datos.gob.es |
 
 | Fuente | Contenido | Estado |
 |---|---|---|
