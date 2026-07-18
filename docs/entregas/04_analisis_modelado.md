@@ -123,3 +123,19 @@ T2 produce `gold_rendimiento_pais.csv` análogo: `iso3`, outcome esperado vs obs
 | Sobre-alcance (riesgo nº 1, §6.1 del plan) | Programa ≫ TFM | Núcleo = atlas + T1 + T2 base; todo lo demás extensión etiquetada; calendario F0 con buffer |
 
 **¿Y si el enfoque entero fallara?** El fallback declarado en el [anexo](anexo_transicion_proyecto.md) §6 sigue vigente: el proyecto vivienda original (avalado) es entregable por sí solo con T1 + análisis 2-A.
+
+---
+
+## Revisión 1 (2026-07-18, posterior a la presentación de la entrega)
+
+*El enunciado pide explicar los cambios manteniendo la trazabilidad: la versión presentada queda congelada en el tag `entrega-4` del repositorio; esta revisión añade, no sustituye.*
+
+**Cambio: incorporación de la oferta privada de vivienda.** El diseño presentado modela la demanda (Euríbor, IPC, salarios) pero no la construcción privada, que produce la inmensa mayoría de la vivienda nueva en España — una variable omitida relevante para T1 y un posible confusor para T2. Se corrige así (detalle en [PLAN_MAESTRO §7.4](../PLAN_MAESTRO.md)):
+
+| Sección afectada | Qué cambia |
+|---|---|
+| §2-A (análisis) | Nueva hipótesis **H4**: la respuesta de la oferta privada (visados → viviendas terminadas, con ~18–24 meses de retardo) amortigua el crecimiento del precio; se analiza su correlación cruzada con el IPV por CCAA |
+| §3 / §4 (T1) | Nuevo driver de oferta V2 `oferta_nueva`: visados de obra nueva y viviendas iniciadas/terminadas (MITMA, Boletín Estadístico ya usado para suelo e ICSC; mensual, provincial → CCAA). El retardo natural visado→terminación lo hace utilizable como feature adelantada sin riesgo de fuga. Driver deseable: su ausencia no bloquea el núcleo (mismo contrato V2 de la Entrega 2) |
+| §2-B (atlas) | La figura de inversión pública en vivienda (GF06) se muestra siempre junto a la inversión residencial TOTAL (Eurostat `nama_10_an6`, FBCF en viviendas), para no sobredimensionar la palanca pública |
+| §7 (T2, errores) | La inversión residencial privada se añade a la auditoría de confusores en los outcomes de vivienda |
+| §8 (riesgos) | Nuevo riesgo: *variable omitida de oferta* — mitigado con H4 + driver V2; si los datos de visados no llegan a tiempo, se declara la limitación en la memoria y las conclusiones de T1 se formulan condicionadas a la demanda |
