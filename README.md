@@ -13,7 +13,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 |---|---|
 | [docs/PLAN_MAESTRO.md](docs/PLAN_MAESTRO.md) | Documento canónico: 20 preguntas de investigación, método, capa ML/DL, fases F0–F9, crítica y riesgos |
 | [docs/PLAN_MAESTRO_deck.pptx](docs/PLAN_MAESTRO_deck.pptx) | El plan en formato presentación |
-| [docs/entregas/](docs/entregas/) | Entregas incrementales del curso (01 ideas · 02 datos · 03 modelo de datos · anexo transición) + feedback del tutor |
+| [docs/entregas/](docs/entregas/) | Entregas incrementales del curso (01 ideas · 02 datos · 03 modelo de datos · 04 análisis y modelado · anexo transición) + feedback del tutor |
 | [docs/data_landscape.md](docs/data_landscape.md) | Inventario completo de fuentes de datos |
 | [docs/data_dictionary_master.md](docs/data_dictionary_master.md) · [data_dictionary_vivienda.md](docs/data_dictionary_vivienda.md) | Diccionarios de datos (programa fiscal y vista vivienda) |
 | [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas ↔ enunciados |
