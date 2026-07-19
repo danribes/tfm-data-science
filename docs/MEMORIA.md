@@ -49,6 +49,9 @@ La regla que organiza todo el modelado: **los criterios se fijan antes de mirar;
 5. **Multiverso** en el análisis transversal (3 definiciones de gasto; estabilidad Spearman como requisito para publicar).
 6. **Incertidumbre siempre**: abanico empírico por horizonte (asimétrico si los errores lo son), intervalos conformal por grupo de renta, bandas de variantes demográficas.
 
+### 3.1 Cómo se predicen los resultados: directa, encadenada y condicional
+Tres arquitecturas conviven y la elección está gobernada por una regla única (detalle en `docs/arquitecturas_prediccion.md`): la predicción **directa** (el objetivo desde su propio pasado, con drivers solo retardados — T1 y todos sus candidatos); la **encadenada** o two-stage (predecir primero los drivers y convertirlos en objetivo con una regresión — D1: proyecciones demográficas × elasticidades entrenadas → presión de gasto → senda de deuda); y la **condicional** (la misma regresión con el driver fijado por el usuario — abanico salarial, palancas de deuda, `POST /scenario`). Encadenar solo compensa cuando el driver es mucho más fácil de predecir que el objetivo: la demografía lo cumple (los mayores de 2050 ya han nacido), los drivers de vivienda no — y el caso límite está medido: ni con los valores verdaderos de los drivers (retardados) ningún candidato batió al drift, luego una cadena con drivers previstos sería estrictamente peor. Cuando la regresión vale pero el driver es imprevisible, se degrada honestamente a máquina condicional en lugar de fingir un pronóstico.
+
 ## 4. Resultados
 
 ### 4.1 T1 — Pronóstico de asequibilidad por CCAA (el núcleo avalado)

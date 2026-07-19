@@ -17,6 +17,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/data_landscape.md](docs/data_landscape.md) | Inventario completo de fuentes de datos |
 | [docs/data_dictionary_master.md](docs/data_dictionary_master.md) · [data_dictionary_vivienda.md](docs/data_dictionary_vivienda.md) | Diccionarios de datos (programa fiscal y vista vivienda) |
 | [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas ↔ enunciados |
+| [docs/arquitecturas_prediccion.md](docs/arquitecturas_prediccion.md) | Cómo se predicen los resultados: directa vs encadenada (two-stage) vs condicional, y la regla que gobierna la elección |
 
 ## Estructura del repositorio
 
