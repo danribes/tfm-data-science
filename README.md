@@ -38,7 +38,7 @@ connectors/    # extractores por fuente (INE, Eurostat, FMI-WEO, GMD/JST, GHED, 
 storage/
 ├── raw/       # descargas intactas + vintage_manifest.csv
 ├── processed/ # 32 datasets limpios (una fuente, un fichero)
-└── gold/      # 5 datasets finales de consumo (paneles anual/trimestral, siglo XX, proyecciones)
+└── gold/      # 23 datasets finales de consumo (paneles, pronósticos, fronteras, sobres 2070)
 api/           # esqueleto FastAPI que sirve la capa gold (uvicorn main:app / docker compose up)
 scripts/       # utilidades (generador del deck del plan)
 docs/          # planes, diccionarios, entregas
