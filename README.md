@@ -3,6 +3,8 @@
 **Trabajo de Fin de Máster — Máster en Data Science (Evolve), enero 2026.**
 Autor: Daniel Ribes ([danribes@gmail.com](mailto:danribes@gmail.com))
 
+**Demo en vivo:** [tfm-data-science-ufgfhpcvydyrswwzm7t6sz.streamlit.app](https://tfm-data-science-ufgfhpcvydyrswwzm7t6sz.streamlit.app/) — el dashboard completo (5 pestañas) desplegado desde este repo; cada push lo actualiza.
+
 ¿Qué obtiene cada país (y cada comunidad autónoma) a cambio de su gasto público? Este proyecto construye un **atlas de la evolución del gasto público en los siglos XX–XXI** (deuda, sanidad, pensiones, vivienda, salarios públicos, protección social…), un **modelo de rendimiento ajustado con incertidumbre** (GBM + intervalos conformales, nunca una "liga" de países) y un **simulador de escenarios fiscales** que proyecta consecuencias sin prescribir políticas.
 
 El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolucionó hacia este programa más ambicioso. La transición completa, y cómo responde al feedback del tutor, está documentada en **[docs/entregas/anexo_transicion_proyecto.md](docs/entregas/anexo_transicion_proyecto.md)** — el análisis de vivienda sigue vivo dentro del programa como vista propia, con su pipeline ya construido.
