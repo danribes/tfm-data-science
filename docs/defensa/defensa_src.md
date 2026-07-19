@@ -127,6 +127,12 @@ SARIMAX 1/17 · GBM 0/17 en validación corta; la hipótesis "GBM gana a largo" 
 
 ---
 
+# ¿Y esto no lo hace un LLM?
+
+(ver tabla en deck.marp.md — fuente autoritativa del render)
+
+---
+
 # Conclusiones
 
 1. Solo con fuentes públicas y código abierto: **datos → modelos → producto**, con trazabilidad profesional

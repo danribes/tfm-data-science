@@ -194,6 +194,20 @@ SARIMAX 1/17 · GBM 0/17 en validación corta; la hipótesis "GBM gana a largo" 
 
 ---
 
+# ¿Y esto no lo hace un LLM?
+
+| | LLM | Este sistema |
+|---|---|---|
+| El número | recordado del texto de entrenamiento | **calculado** de datos con cadena de custodia |
+| Evaluación | no puede suspender un backtest | **suspendió tres veces en público** — prueba de que es real |
+| Incertidumbre | tono de confianza | cuantiles medidos, conformal, cobertura comprobable |
+| Reproducible | varía con prompt y versión | mismo código+datos → mismos números (51 tests) |
+| Lo normativo | prescribe con soltura | pone precio y devuelve la elección a la política |
+
+**Declaración**: LLM usado como herramienta de proceso (código, redacción), nunca como fuente de números. **El LLM narra; el sistema calcula.**
+
+---
+
 # Conclusiones
 
 1. Solo con fuentes públicas y código abierto: **datos → modelos → producto**, con trazabilidad profesional

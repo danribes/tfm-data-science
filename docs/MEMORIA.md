@@ -83,6 +83,20 @@ Aritmética r−g con presión demográfica del motor de proyección propio (ela
 ### 4.5 El producto (MVP)
 API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel, menú de escenarios, simulador interactivo con palancas, proyecciones demográficas) y dashboard Streamlit de cuatro pestañas. Las advertencias de método viajan dentro de las respuestas de la API y de cada pestaña: la honestidad es parte del producto, no de la letra pequeña.
 
+### 4.6 ¿Por qué no basta un LLM?
+
+La pregunta obligada hoy: ¿no respondería todo esto un modelo de lenguaje? No, y la diferencia es examinable. Un LLM produce números *recordados o patroneados del texto* con el que se entrenó; este sistema los *calcula* con estimadores específicos sobre datos con cadena de custodia. Cinco diferencias defendibles, cada una con evidencia propia del proyecto:
+
+1. **Procedencia auditable**: cada cifra traza hasta `vintage_manifest.csv` (URL y fecha de cada descarga). La proyección de deuda de Q1 del stress test sale de una edición del WEO que está EN el repositorio; la de un LLM, de una memoria no verificable anterior a su corte de entrenamiento.
+2. **Falsabilidad**: las afirmaciones de rendimiento se puntúan out-of-sample (rolling-origin + test final de un solo uso). La mejor prueba de que la evaluación es real es que los modelos propios la **suspendieron tres veces en público** — la respuesta de un LLM no puede suspender un backtest porque nunca se presenta a uno.
+3. **Incertidumbre calibrada**: las bandas del abanico son cuantiles de errores medidos, con cobertura comprobable; los intervalos de A1 son conformal por grupo de renta. Un LLM emite *tono* de confianza, no intervalos calibrados.
+4. **Reproducibilidad**: mismo código + mismos datos → mismos números, con 51 tests que lo blindan (el tercer bug del parser lo cazó un test; el número erróneo de un LLM es silencioso para siempre).
+5. **Rechazo por diseño**: el reframe del Bloque D y los huecos declarados (déficit de vivienda, outcomes educativos) son arquitectura. Un LLM prescribe con soltura qué ministerios suprimir; este sistema pone precio a la pregunta (el 78 % del gasto) y devuelve la elección a la política.
+
+Los objetos entrenados que un tribunal puede examinar: la elasticidad de las pensiones al envejecimiento (0,91 ± 0,19, SE agrupado), los cuantiles de error por horizonte que forman el abanico (aprendidos de 486 errores de backtesting), los residuales LOOCV con su semiancho conformal, la estructura adelantada de los permisos (r=0,57 a 11 trimestres) y los parámetros de los modelos evaluados y RECHAZADOS — el resultado negativo también es conocimiento entrenado.
+
+**Declaración de uso de IA**: en este proyecto se emplearon asistentes LLM como herramienta de programación y redacción (proceso), nunca como fuente de los números (producto). El asistente RAG previsto como extensión es el papel correcto de un LLM aquí: interfaz de lenguaje natural SOBRE los artefactos calculados — el LLM narra, el sistema calcula.
+
 ## 5. Limitaciones
 
 1. **Causalidad**: todo el trabajo es asociativo y descriptivo; los retardos mitigan pero no resuelven la endogeneidad, y así se declara en cada pieza.
