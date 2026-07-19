@@ -130,3 +130,12 @@
 "fhfa_state.csv","https://www.fhfa.gov/hpi/download/quarterly_datasets/hpi_at_state.csv","2026-07-19T15:04:31",187060
 "zillow_metro.csv","https://files.zillowstatic.com/research/public_csvs/zhvi/Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv","2026-07-19T15:04:32",4444528
 "uk_avg.csv","http://publicdata.landregistry.gov.uk/market-trend-data/house-price-index-data/Average-prices-2025-05.csv","2026-07-19T15:04:33",7275613
+"rev_D91REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:21",17527
+"rev_D4REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:21",17509
+"rev_D7REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:21",17493
+"rev_P11_P12_P131","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:22",17561
+"rev_D39REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:22",17542
+"rev_D2REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:23",18502
+"rev_D5REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:23",18149
+"rev_D61REC","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:24",18246
+"rev_TR","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main","2026-07-19T18:45:24",18549

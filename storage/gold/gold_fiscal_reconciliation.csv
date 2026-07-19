@@ -1,0 +1,16 @@
+check,ambito,brecha_abs_media_pp,n,veredicto
+cofog_GF01_eurostat_vs_imf,UE,0.058,153,OK
+cofog_GF02_eurostat_vs_imf,UE,0.05,153,OK
+cofog_GF03_eurostat_vs_imf,UE,0.049,153,OK
+cofog_GF04_eurostat_vs_imf,UE,0.053,153,OK
+cofog_GF05_eurostat_vs_imf,UE,0.036,153,OK
+cofog_GF06_eurostat_vs_imf,UE,0.026,153,OK
+cofog_GF07_eurostat_vs_imf,UE,0.051,153,OK
+cofog_GF08_eurostat_vs_imf,UE,0.026,153,OK
+cofog_GF09_eurostat_vs_imf,UE,0.046,153,OK
+cofog_GF10_eurostat_vs_imf,UE,0.036,153,OK
+exp_total_eurostat_vs_weo,UE,0.307,153,OK
+rev_total_eurostat_vs_world,UE,0.646,153,OK
+rev_total_eurostat_vs_weo,UE,0.294,153,OK
+tax_world_vs_oecd,mundo,1.647,898,OK
+world_aditividad,mundo,0.0,3398,OK
