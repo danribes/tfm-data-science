@@ -5,7 +5,7 @@ núcleo está cerrado). Recupera pasajes de la documentación DEL PROPIO proyect
 (memoria, cadena de backtesting, atlas, entregas) por TF-IDF y responde:
 
 - Modo por defecto (sin red, sin clave): devuelve los pasajes citados tal cual.
-- Modo --llm: Claude redacta la respuesta SOLO a partir de los pasajes
+- Modo --llm: GLM-5.2 (Z.ai, Coding Plan) redacta la respuesta SOLO a partir de los pasajes
   recuperados, citándolos; los números solo pueden aparecer si están textualmente
   en un pasaje. Las preguntas normativas se reencuadran (Bloque D).
 
@@ -27,7 +27,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 GOLD = ROOT / "storage" / "gold"
 
-EXCLUIR = {"MEMORIA.docx", "MEMORIA.pdf"}
+EXCLUIR = {"MEMORIA.docx", "MEMORIA.pdf", "rag_asistente.md"}  # el doc del propio asistente se autorreferencia
 TOP_K = 4
 MIN_SIM = 0.05
 
@@ -85,29 +85,57 @@ def retrieve(chunks: list[dict], pregunta: str, k: int = TOP_K) -> list[tuple[fl
     return [(float(sims[i]), chunks[i]) for i in orden if sims[i] >= MIN_SIM]
 
 
+GLM_BASE = "https://api.z.ai/api/coding/paas/v4"  # endpoint del Coding Plan (el general da 429)
+GLM_MODEL = "glm-5.2"
+
+
+def _glm_api_key() -> str:
+    import os
+    key = os.environ.get("GLM_API_KEY", "")
+    if not key:  # fallback: leer ~/.secrets sin exigir shell login
+        secrets = pathlib.Path.home() / ".secrets"
+        if secrets.exists():
+            m = re.search(r'GLM_API_KEY=([^\s"\']+)', secrets.read_text())
+            key = m.group(1) if m else ""
+    if not key:
+        raise RuntimeError("GLM_API_KEY no encontrada (ni en el entorno ni en ~/.secrets)")
+    return key
+
+
 def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]]) -> str:
-    import anthropic
+    import requests
     contexto = "\n\n".join(
         f"[{i + 1}] ({c['fuente']} § {c['seccion']})\n{c['texto'][:2500]}"
         for i, (_, c) in enumerate(pasajes)
     )
-    client = anthropic.Anthropic()
-    resp = client.messages.create(
-        model="claude-opus-4-8",
-        max_tokens=1500,
-        thinking={"type": "adaptive"},
-        system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
-        messages=[{"role": "user", "content": f"Pasajes del corpus:\n\n{contexto}\n\nPregunta: {pregunta}"}],
+    r = requests.post(
+        f"{GLM_BASE}/chat/completions",
+        headers={"Authorization": f"Bearer {_glm_api_key()}"},
+        json={
+            "model": GLM_MODEL,
+            # modelo razonador: gasta tokens en reasoning oculto ANTES del
+            # contenido — un max_tokens corto devuelve content vacío
+            "max_tokens": 4000,
+            "messages": [
+                {"role": "system", "content": SYSTEM},
+                {"role": "user", "content": f"Pasajes del corpus:\n\n{contexto}\n\nPregunta: {pregunta}"},
+            ],
+        },
+        timeout=180,
     )
-    if resp.stop_reason == "refusal":
-        return "[El modelo declinó responder a esta pregunta.]"
-    return "".join(b.text for b in resp.content if b.type == "text")
+    r.raise_for_status()
+    choice = r.json()["choices"][0]
+    contenido = (choice["message"].get("content") or "").strip()
+    if not contenido:
+        razon = choice.get("finish_reason", "?")
+        return f"[GLM devolvió contenido vacío (finish_reason={razon}) — sube max_tokens]"
+    return contenido
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Asistente RAG del proyecto")
     ap.add_argument("pregunta", nargs="*", help="La pregunta")
-    ap.add_argument("--llm", action="store_true", help="Redactar respuesta con Claude (requiere credenciales)")
+    ap.add_argument("--llm", action="store_true", help="Redactar respuesta con GLM-5.2 (requiere GLM_API_KEY)")
     ap.add_argument("--build", action="store_true", help="Solo regenerar gold_corpus_manifest.csv")
     ap.add_argument("-k", type=int, default=TOP_K)
     args = ap.parse_args()
