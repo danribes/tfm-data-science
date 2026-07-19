@@ -120,3 +120,9 @@
 "siu_clases_suelo_2021.zip","http://web.archive.org/web/20220302050749/https://cdn.mitma.gob.es/portal-web-drupal/siu/datos_alfanumericos_siu_-_excel_-_20210709.zip","2026-07-19T13:33:08",6182021
 "siu_clases_suelo_2025.zip","https://cdn.mivau.gob.es/portal-web-mivau/urbanismo-suelo/Datos%20alfanumericos%20SIU%20-%20Excel%20-%2020250527.zip","2026-07-19T13:33:09",6895338
 "ecb_bls_es_vivienda.csv","https://data-api.ecb.europa.eu/service/data/BLS/Q.ES.ALL.Z.H.H.B3.ST.S.FNET?format=csvdata","2026-07-19T13:36:26",34286
+"bis_spp_N.csv","https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/Q..N.628?format=csv","2026-07-19T14:23:02",338096
+"bis_spp_R.csv","https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/Q..R.628?format=csv","2026-07-19T14:23:03",335800
+"oecd_house_prices.csv","https://sdmx.oecd.org/public/rest/data/OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,/all?format=csvfile","2026-07-19T14:23:05",6454411
+"oecd_land_cover.csv","https://sdmx.oecd.org/public/rest/data/OECD.ENV.EPI,DSD_LAND@DF_LAND_COVER,/._O.LC_SUR_ART+LCC_SUR_ART_GAIN.?format=csvfile","2026-07-19T14:23:09",2194609
+"lucas_artificial","https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lan_lcv_ovw","2026-07-19T14:23:10",45811
+"oecd_land_cover.csv","https://sdmx.oecd.org/public/rest/data/OECD.ENV.EPI,DSD_LAND@DF_LAND_COVER,/._O.LC_SUR_ART+LCC_SUR_ART_GAIN.?format=csvfile","2026-07-19T14:23:36",2194609
