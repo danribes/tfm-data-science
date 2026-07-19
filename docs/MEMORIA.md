@@ -1,0 +1,106 @@
+# Dinero público → Resultados
+## Memoria del Trabajo de Fin de Máster — v0.1 (borrador)
+
+*Máster en Data Science (Evolve, enero 2026) · Daniel Ribes · Repositorio: [github.com/danribes/tfm-data-science](https://github.com/danribes/tfm-data-science)*
+
+---
+
+## Resumen
+
+Este trabajo construye un sistema completo de ciencia de datos sobre una pregunta de interés público: **¿qué obtiene un país (y una comunidad autónoma) a cambio de su gasto público?** El sistema comprende: un pipeline reproducible de extracción por capas sobre más de 30 fuentes públicas (INE, Eurostat, FMI, OMS, Banco Mundial, GMD/JST); un **atlas de la evolución del gasto público en los siglos XX–XXI** (16 figuras); un **modelo de pronóstico de la asequibilidad de la vivienda por CCAA** seleccionado mediante un protocolo pre-registrado con test final de un solo uso; un **análisis de rendimiento ajustado del gasto sanitario** en 164 países con incertidumbre conformal; un **simulador de escenarios de deuda** 2024–2050; y un **producto funcional** (API + dashboard) que sirve todos los resultados con su incertidumbre siempre visible.
+
+El resultado metodológico central no es un modelo, sino una disciplina: todos los criterios de aceptación se fijaron ANTES de comparar modelos, y en las tres ocasiones en que un modelo flexible (SARIMAX, LightGBM) compitió contra una alternativa simple bajo esas reglas, **perdió** — incluido un caso en el que el test final refutó una hipótesis prometedora en validación y evitó publicar una predicción de desplome del precio de la vivienda en pleno boom. Los resultados negativos se publican como tales.
+
+## 1. Introducción y evolución del proyecto
+
+### 1.1 El problema
+El precio de la vivienda en España crece sistemáticamente por encima de los salarios, con divergencias fuertes entre comunidades autónomas, y no existe una herramienta pública, libre y actualizable que integre precio, salarios e inflación en un indicador regional con proyecciones e incertidumbre honesta. A escala internacional, el gasto público se compara casi siempre en bruto (%PIB) o mediante rankings que ignoran renta y demografía.
+
+### 1.2 De la vivienda al programa
+El proyecto avalado en las entregas 1–3 fue un **índice de asequibilidad de vivienda por CCAA**. Durante su construcción emergió la pregunta más general que lo contiene: la vivienda es una partida más (COFOG GF06) junto a sanidad, pensiones o intereses de la deuda, y los mismos ingredientes — ETL reproducible sobre APIs públicas, índices comparables, forecasting con escenarios — escalan del INE a Eurostat + FMI + histórico 1870–2023 sin cambiar de línea tecnológica. La transición **conserva el proyecto de vivienda completo como núcleo** (es el módulo con protocolo de modelado más exigente de la memoria) y está documentada con su trazabilidad en `docs/entregas/anexo_transicion_proyecto.md`.
+
+### 1.3 El feedback del tutor como especificación
+Tres indicaciones del tutor (12-jul) actuaron como requisitos de diseño verificables: (i) el ratio IPV/salario se presenta SIEMPRE como indicador aproximado y se complementa con una medida de esfuerzo real de compra; (ii) MVP primero — núcleo antes que extensiones; (iii) el repositorio es la entrega ("el formato de entrega funciona como un contrato"). Las tres atraviesan la memoria: la advertencia viaja hasta el propio payload de la API, las extensiones (RAG, DL) nunca bloquearon el núcleo, y el repositorio contiene el desarrollo completo con tests del contrato de datos.
+
+## 2. Datos y arquitectura
+
+### 2.1 Capas y contrato
+```
+connectors/  →  storage/raw  →  storage/processed  →  storage/gold  →  analysis/ · api/ · app/
+```
+- **raw**: descargas intactas con `vintage_manifest.csv` (fecha y URL de cada descarga — qué versión del dato existía en cada momento).
+- **processed**: un fichero por fuente, limpieza trazable (32 datasets).
+- **gold**: 9 datasets finales de consumo, con clave primaria verificada y tests automáticos (`tests/`, 42 tests): paneles fiscal europeo y mundial-histórico, panel CCAA trimestral, asequibilidad anual, proyecciones demográficas, y los tres artefactos de resultados (pronóstico, rendimiento, escenarios).
+
+### 2.2 Fuentes principales
+INE (IPV, IPC, salarios EES), Banco de España (Euríbor), Eurostat (COFOG, ESSPROS, demografía, EUROPOP2023, FBCF por activo, permisos de construcción), FMI-WEO, OMS-GHED, GHO, Banco Mundial (WDI, WWBI), Global Macro Database y Jordà-Schularick-Taylor (histórico 1870–2023, 202 países), UN DESA (migración), MITMA (suelo, costes).
+
+### 2.3 La calidad de datos como resultado, no como trámite
+Tres defectos de pipeline se detectaron y corrigieron durante el trabajo, dos de ellos declarados de antemano como riesgo: (1) el filtrado del IPC promediaba 1.120 series ECOICOP en lugar de la serie general; (2) la serie trimestral del IPV se descargaba pero no se persistía; (3) un patrón multi-carácter en `str.split` de pandas actúa como expresión regular, rompiendo silenciosamente las CCAA de nombre compuesto — el ratio de asequibilidad solo existía en 8 de 18 territorios y una comprobación laxa (`n >= 18`) lo enmascaraba. Los tres tienen hoy test de regresión. Además, el riesgo declarado en la Entrega 2 ("cambio de IDs de tabla del INE") **se materializó** durante el curso (49300/76201 → 80271/80270) y la mitigación prevista (cliente parametrizado + snapshots) funcionó.
+
+## 3. Metodología: el protocolo pre-registrado
+
+La regla que organiza todo el modelado: **los criterios se fijan antes de mirar; endurecerlos a posteriori está permitido, relajarlos no.**
+
+1. **EDA con decisiones vinculantes** (D1 transformación, D2 pooling, D3 exógenas) fijadas antes de comparar modelos.
+2. **Baselines difíciles** primero: la vara no fue el naive estacional (MASE 0,89 — la escala, inflada por la crisis 2008–14, lo hacía cómodo) sino el drift (0,40), y el criterio de aceptación se ENDURECIÓ en consecuencia antes de entrenar candidato alguno.
+3. **Validación rolling-origin** (17 orígenes 2019Q4–2023Q4, h=1–8) con guardas anti-fuga verificadas por tests (un forecaster-espía comprueba que ningún modelo ve datos posteriores a su origen).
+4. **Test final de un solo uso** (2024Q1–2025Q4), intocable durante toda la selección y gastado una única vez con la regla de decisión escrita en el código antes de ejecutar.
+5. **Multiverso** en el análisis transversal (3 definiciones de gasto; estabilidad Spearman como requisito para publicar).
+6. **Incertidumbre siempre**: abanico empírico por horizonte (asimétrico si los errores lo son), intervalos conformal por grupo de renta, bandas de variantes demográficas.
+
+## 4. Resultados
+
+### 4.1 T1 — Pronóstico de asequibilidad por CCAA (el núcleo avalado)
+- **EDA**: el ciclo es nacional, la presión es regional (ratio 2024: 0,99 Rioja/Extremadura – 1,35 Madrid; nacional 1,26). El crecimiento del IPV es no estacionario según ADF y KPSS concordantes (persistencia AR(1)=0,61).
+- **Selección**: ningún candidato (SARIMAX, SARIMAX+Euríbor, LightGBM global) batió al drift en h≤4 (1/17, 0/17, 0/17 CCAA) — los tres habrían aprobado el criterio original blando. Resultado negativo publicado.
+- **Test final**: la hipótesis post-hoc "GBM gana en h≥6" quedó **refutada** (0/17): el GBM pronosticó una caída (≈145→127) en el arranque del mayor boom de la muestra (152→187), por reversión a la media aprendida de la crisis. El protocolo evitó publicar esa predicción.
+- **Producción**: drift + abanico empírico 80/95 % (mediana de error +0,5 %→+4,9 % con el horizonte: el drift se queda corto en booms y la banda lo hereda) + escenarios salariales. **Lectura central: el ratio nacional pasaría de 1,26 (2024) a ~1,5–1,6 en 2027 incluso con salarios creciendo al 2 %** — el denominador no compensa el numerador sin cambio de régimen.
+- **Señal para la siguiente iteración**: los permisos residenciales (driver `oferta_nueva`, compromiso de la Revisión 1) son la señal adelantada más fuerte encontrada (r=0,57 con 11 trimestres; 3 trimestres de aviso en el único giro de la muestra). Se adoptará solo si lo confirman los datos de 2026+.
+
+### 4.2 Atlas B1–B16 — el siglo del gasto público
+Mediana mundial del gasto: ~10 %PIB (1900) → ~30 % (hoy); España 11 → 45,4 %. Deuda española en U (124 % tras 1898, 30 % en 1960, 105 % hoy). Los intereses cayeron de 5 a 2,4 %PIB pese a duplicarse la deuda (el dividendo del euro). La protección social es la partida mayor y la que más crece (14,3 → 18,5 %PIB). La inversión pública fue la variable de ajuste tras 2010 (5 → 3 %PIB). Y la figura exigida por la revisión de oferta privada: **la inversión residencial total española (6 → 11,7 → 3,9 → 5,8 %PIB) es un orden de magnitud mayor que el gasto público en vivienda (1,3 → 0,5 %PIB)** — contexto obligatorio de cualquier conclusión sobre política de vivienda.
+
+### 4.3 A1 — Rendimiento ajustado del gasto sanitario (164 países)
+Bajo las reglas pre-registradas ganó el OLS (el GBM no alcanzó la mejora exigida; tercera victoria consecutiva de lo simple). El hallazgo honesto: hasta el OLS empata con la mediana del grupo de renta — **la renta domina; la "eficiencia" es un efecto de segundo orden**. España: +2,7 ± 3,5 años de esperanza de vida sobre lo esperado — por encima, pero DENTRO de la banda de su grupo: el ejemplo canónico de por qué este análisis se publica como funnel con intervalos y nunca como liga. Solo 16/164 países salen de su banda, y los extremos se explican por epidemiología (VIH) o outperformance conocida (Albania, Costa Rica), no por "gestión".
+
+### 4.4 D1 — Escenarios de deuda 2024–2050
+Aritmética r−g con presión demográfica del motor de proyección propio (elasticidades panel UE: pensiones 0,91, sanidad 0,33 sobre la senda 65+ de Eurostat → +6,6 pp de PIB en 2050). El menú: sin envejecimiento 127 % / central 224 % (banda 198–267) / crecimiento 2 % 200 % / consolidación +2,5 pp 172 % / +1 pp inversión a deuda 236 % / tipos 4,5 % 256 %. **La demografía domina cualquier palanca individual** (97 pp de distancia central–contrafactual) y ninguna palanca aislada estabiliza la senda. La pregunta original del proyecto (más vivienda e infraestructura a déficit) queda cuantificada (+12 pp en 2050) en lugar de prescrita o descartada.
+
+### 4.5 El producto (MVP)
+API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel, menú de escenarios, simulador interactivo con palancas, proyecciones demográficas) y dashboard Streamlit de cuatro pestañas. Las advertencias de método viajan dentro de las respuestas de la API y de cada pestaña: la honestidad es parte del producto, no de la letra pequeña.
+
+## 5. Limitaciones
+
+1. **Causalidad**: todo el trabajo es asociativo y descriptivo; los retardos mitigan pero no resuelven la endogeneidad, y así se declara en cada pieza.
+2. **El ratio de asequibilidad es un indicador aproximado** de evolución relativa (no incorpora €/m², renta disponible, entrada ni financiación); el complemento de cuota hipotecaria teórica está especificado y pendiente del precio por m².
+3. **Regímenes**: el test final demostró que 2024–25 fue una aceleración fuera del régimen de entrenamiento — a 2 años vista, en cambios de régimen, la banda es la parte informativa del pronóstico, no el punto.
+4. **n pequeño en el análisis transversal** (164 países): gana lo simple y las bandas son anchas; el paso natural es el panel por bloques quinquenales.
+5. **El simulador es determinista y sin retroalimentaciones**: mapa de sensibilidades, no pronóstico.
+6. **Falacia ecológica**: nada de lo dicho a nivel país habla de centros, sistemas o personas concretas.
+
+## 6. Conclusiones
+
+1. Es posible construir, solo con fuentes públicas y código abierto, un sistema completo — datos → modelos → producto — sobre una pregunta de interés público, con estándares de trazabilidad de nivel profesional (vintage, tests de contrato, resultados negativos publicados).
+2. **La aportación diferencial es la disciplina**: pre-registro, test único, y la voluntad de dejar que las reglas maten a los modelos atractivos. Tres veces ganó lo simple; una vez el protocolo evitó una predicción de desplome en pleno boom. En un TFM, donde la tentación es exhibir el modelo más complejo, este trabajo defiende lo contrario con evidencia propia.
+3. Sustantivamente: la asequibilidad española no se corrige sola (ni con salarios al 4 %); la palanca pública de vivienda es un orden de magnitud menor que la promoción privada; la renta domina el rendimiento sanitario entre países; y la demografía domina la senda de deuda por encima de cualquier palanca fiscal individual.
+
+## 7. Trabajo futuro
+Pata provincial de visados (MITMA) y evaluación del driver de oferta con datos 2026+; cuota hipotecaria teórica con €/m²; panel quinquenal para A1 y módulos vivienda/educación; episodios históricos de consolidación (D2); actualización trimestral automática del pipeline.
+
+## Anexo — Guía de reproducción
+```
+python3 -m connectors.<fuente>      # extracción por fuente (raw → processed)
+python3 connectors/gold.py          # capa gold + smoke tests
+python3 analysis/eda_vivienda.py    # EDA y decisiones D1–D3
+python3 analysis/backtest_t1.py     # baselines + harness rolling-origin
+python3 analysis/candidates_t1.py   # candidatos (validación)
+python3 analysis/final_test_t1.py   # test final (YA GASTADO: no re-ejecutar para seleccionar)
+python3 analysis/forecast_t1.py     # pronóstico de producción + abanico
+python3 analysis/atlas.py           # 16 figuras del atlas
+python3 analysis/rendimiento_a1.py  # A1: funnel 164 países
+python3 analysis/escenarios_d1.py   # D1: menú de deuda
+python3 -m pytest tests/ -q         # 42 tests del contrato de datos y modelos
+streamlit run app/dashboard.py      # dashboard MVP
+```
+Documentos de detalle: `docs/eda_vivienda.md`, `docs/backtest_t1_baselines.md`, `docs/candidatos_t1.md`, `docs/test_final_t1.md`, `docs/forecast_t1_mvp.md`, `docs/atlas.md`, `docs/rendimiento_a1.md`, `docs/escenarios_d1.md`, `docs/oferta_nueva.md`, `docs/PLAN_MAESTRO.md`.
