@@ -28,6 +28,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
 | [docs/horizonte_50.md](docs/horizonte_50.md) | Sistema a 50 años: sobres condicionales de deuda (MC 2070) y bienestar, panel within y calibración con 300 años de historia |
 | [docs/despliegue.md](docs/despliegue.md) | Despliegue y operación: demo pública, réplica Docker, modo sin-red y qué sirve cada superficie |
+| [docs/glosario.md](docs/glosario.md) | Glosario de todas las siglas: instituciones, bases de datos, métodos y códigos de contabilidad nacional |
 
 ## Estructura del repositorio
 
@@ -37,7 +38,7 @@ connectors/    # extractores por fuente (INE, Eurostat, FMI-WEO, GMD/JST, GHED, 
                # SIEMPRE en storage/raw con fila de vintage (evidencia inmutable)
 storage/
 ├── raw/       # descargas intactas + vintage_manifest.csv
-├── processed/ # 32 datasets limpios (una fuente, un fichero)
+├── processed/ # 67 datasets limpios (una fuente, un fichero)
 └── gold/      # 23 datasets finales de consumo (paneles, pronósticos, fronteras, sobres 2070)
 api/           # esqueleto FastAPI que sirve la capa gold (uvicorn main:app / docker compose up)
 scripts/       # utilidades (generador del deck del plan)

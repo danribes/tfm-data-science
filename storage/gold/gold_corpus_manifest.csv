@@ -260,49 +260,55 @@ docs/forecast_t1_mvp.md#257,docs/forecast_t1_mvp.md,Pronóstico de producción T
 docs/forecast_t1_mvp.md#258,docs/forecast_t1_mvp.md,1. Cómo se construye,1098
 docs/forecast_t1_mvp.md#259,docs/forecast_t1_mvp.md,2. Lectura central (escenario salarial 2 %),687
 docs/forecast_t1_mvp.md#260,docs/forecast_t1_mvp.md,3. Advertencias que acompañan SIEMPRE a esta salida,623
-docs/horizonte_50.md#261,docs/horizonte_50.md,Horizonte 50 años: economía y bienestar 2025–2070/2075,425
-docs/horizonte_50.md#262,docs/horizonte_50.md,"Por qué ""predicción a 50 años"" no existe (medido, no opinado)",860
-docs/horizonte_50.md#263,docs/horizonte_50.md,1. La frontera re-estimada como panel (`analysis/bienestar_panel.py`),728
-docs/horizonte_50.md#264,docs/horizonte_50.md,2. Monte Carlo del simulador de deuda (`analysis/mc_d1.py`),575
-docs/horizonte_50.md#265,docs/horizonte_50.md,3. Horizonte 2070,321
-docs/horizonte_50.md#266,docs/horizonte_50.md,4. Sobres de bienestar 2050/2070 (`analysis/bienestar_50.py`),613
-docs/horizonte_50.md#267,docs/horizonte_50.md,5. El pseudo-backtest de continuidad (`analysis/backtest_50y.py`),312
-docs/horizonte_50.md#268,docs/horizonte_50.md,Cómo leer el sistema a 50 años (síntesis para la defensa),764
-docs/oferta_nueva.md#269,docs/oferta_nueva.md,Driver de oferta `oferta_nueva` — primera pata (permisos residenciales),571
-docs/oferta_nueva.md#270,docs/oferta_nueva.md,1. Hallazgos,1085
-docs/oferta_nueva.md#271,docs/oferta_nueva.md,2. Reglas de uso (disciplina post-test),1104
-docs/pitch_tutor_fiscal.md#272,docs/pitch_tutor_fiscal.md,"Propuesta de evolución del TFM — ""Dinero público → Resultados""",618
-docs/pitch_tutor_fiscal.md#273,docs/pitch_tutor_fiscal.md,La pregunta,615
-docs/pitch_tutor_fiscal.md#274,docs/pitch_tutor_fiscal.md,Una sola línea técnica,697
-docs/pitch_tutor_fiscal.md#275,docs/pitch_tutor_fiscal.md,"Datos: verificados en vivo, no supuestos (comprobaciones HTTP reales, 16–17 jul)",929
-docs/pitch_tutor_fiscal.md#276,docs/pitch_tutor_fiscal.md,Tres variantes — te pido criterio,1003
-docs/pitch_tutor_fiscal.md#277,docs/pitch_tutor_fiscal.md,"Calendario (10 semanas, deadline 30-sep)",269
-docs/pitch_tutor_fiscal.md#278,docs/pitch_tutor_fiscal.md,Lo que te pido,238
-docs/rendimiento_a1.md#279,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
-docs/rendimiento_a1.md#280,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
-docs/rendimiento_a1.md#281,docs/rendimiento_a1.md,2. Resultados de la selección,807
-docs/rendimiento_a1.md#282,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
-docs/rendimiento_a1.md#283,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
-docs/stress_test_qa.md#284,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
-docs/stress_test_qa.md#285,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
-docs/stress_test_qa.md#286,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
-docs/stress_test_qa.md#287,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
-docs/stress_test_qa.md#288,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
-docs/stress_test_qa.md#289,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
-docs/stress_test_qa.md#290,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
-docs/stress_test_qa.md#291,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
-docs/stress_test_qa.md#292,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
-docs/stress_test_qa.md#293,docs/stress_test_qa.md,Veredicto del stress test,646
-docs/test_final_t1.md#294,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
-docs/test_final_t1.md#295,docs/test_final_t1.md,1. Resultados,468
-docs/test_final_t1.md#296,docs/test_final_t1.md,2. Lecturas,1724
-docs/test_final_t1.md#297,docs/test_final_t1.md,3. Registro,378
-docs/tipologias_a2.md#298,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
-docs/tipologias_a2.md#299,docs/tipologias_a2.md,Método,307
-docs/tipologias_a2.md#300,docs/tipologias_a2.md,Resultados,1030
-docs/tipologias_a2.md#301,docs/tipologias_a2.md,Límites,354
-docs/vivienda_global.md#302,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
-docs/vivienda_global.md#303,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
-docs/vivienda_global.md#304,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
-docs/vivienda_global.md#305,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
-docs/vivienda_global.md#306,docs/vivienda_global.md,4. Uso en el proyecto,350
+docs/glosario.md#261,docs/glosario.md,Glosario de siglas y acrónimos,225
+docs/glosario.md#262,docs/glosario.md,Instituciones y fuentes de datos,1962
+docs/glosario.md#263,docs/glosario.md,Bases de datos y datasets,2297
+docs/glosario.md#264,docs/glosario.md,Métodos y términos de modelado,1251
+docs/glosario.md#265,docs/glosario.md,Etiquetas T1/A1/A2/D1 (nomenclatura interna del proyecto),409
+docs/glosario.md#266,docs/glosario.md,Códigos de contabilidad nacional (en `rev_*` y `gov_10a_exp_*`),782
+docs/horizonte_50.md#267,docs/horizonte_50.md,Horizonte 50 años: economía y bienestar 2025–2070/2075,425
+docs/horizonte_50.md#268,docs/horizonte_50.md,"Por qué ""predicción a 50 años"" no existe (medido, no opinado)",860
+docs/horizonte_50.md#269,docs/horizonte_50.md,1. La frontera re-estimada como panel (`analysis/bienestar_panel.py`),728
+docs/horizonte_50.md#270,docs/horizonte_50.md,2. Monte Carlo del simulador de deuda (`analysis/mc_d1.py`),575
+docs/horizonte_50.md#271,docs/horizonte_50.md,3. Horizonte 2070,321
+docs/horizonte_50.md#272,docs/horizonte_50.md,4. Sobres de bienestar 2050/2070 (`analysis/bienestar_50.py`),613
+docs/horizonte_50.md#273,docs/horizonte_50.md,5. El pseudo-backtest de continuidad (`analysis/backtest_50y.py`),312
+docs/horizonte_50.md#274,docs/horizonte_50.md,Cómo leer el sistema a 50 años (síntesis para la defensa),764
+docs/oferta_nueva.md#275,docs/oferta_nueva.md,Driver de oferta `oferta_nueva` — primera pata (permisos residenciales),571
+docs/oferta_nueva.md#276,docs/oferta_nueva.md,1. Hallazgos,1085
+docs/oferta_nueva.md#277,docs/oferta_nueva.md,2. Reglas de uso (disciplina post-test),1104
+docs/pitch_tutor_fiscal.md#278,docs/pitch_tutor_fiscal.md,"Propuesta de evolución del TFM — ""Dinero público → Resultados""",618
+docs/pitch_tutor_fiscal.md#279,docs/pitch_tutor_fiscal.md,La pregunta,615
+docs/pitch_tutor_fiscal.md#280,docs/pitch_tutor_fiscal.md,Una sola línea técnica,697
+docs/pitch_tutor_fiscal.md#281,docs/pitch_tutor_fiscal.md,"Datos: verificados en vivo, no supuestos (comprobaciones HTTP reales, 16–17 jul)",929
+docs/pitch_tutor_fiscal.md#282,docs/pitch_tutor_fiscal.md,Tres variantes — te pido criterio,1003
+docs/pitch_tutor_fiscal.md#283,docs/pitch_tutor_fiscal.md,"Calendario (10 semanas, deadline 30-sep)",269
+docs/pitch_tutor_fiscal.md#284,docs/pitch_tutor_fiscal.md,Lo que te pido,238
+docs/rendimiento_a1.md#285,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
+docs/rendimiento_a1.md#286,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
+docs/rendimiento_a1.md#287,docs/rendimiento_a1.md,2. Resultados de la selección,807
+docs/rendimiento_a1.md#288,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
+docs/rendimiento_a1.md#289,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
+docs/stress_test_qa.md#290,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
+docs/stress_test_qa.md#291,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
+docs/stress_test_qa.md#292,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
+docs/stress_test_qa.md#293,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
+docs/stress_test_qa.md#294,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
+docs/stress_test_qa.md#295,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
+docs/stress_test_qa.md#296,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
+docs/stress_test_qa.md#297,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
+docs/stress_test_qa.md#298,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
+docs/stress_test_qa.md#299,docs/stress_test_qa.md,Veredicto del stress test,646
+docs/test_final_t1.md#300,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
+docs/test_final_t1.md#301,docs/test_final_t1.md,1. Resultados,468
+docs/test_final_t1.md#302,docs/test_final_t1.md,2. Lecturas,1724
+docs/test_final_t1.md#303,docs/test_final_t1.md,3. Registro,378
+docs/tipologias_a2.md#304,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
+docs/tipologias_a2.md#305,docs/tipologias_a2.md,Método,307
+docs/tipologias_a2.md#306,docs/tipologias_a2.md,Resultados,1030
+docs/tipologias_a2.md#307,docs/tipologias_a2.md,Límites,354
+docs/vivienda_global.md#308,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
+docs/vivienda_global.md#309,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
+docs/vivienda_global.md#310,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
+docs/vivienda_global.md#311,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
+docs/vivienda_global.md#312,docs/vivienda_global.md,4. Uso en el proyecto,350
