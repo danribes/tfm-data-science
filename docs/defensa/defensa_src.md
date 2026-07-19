@@ -118,35 +118,75 @@ SARIMAX 1/17 · GBM 0/17 en validación corta; la hipótesis "GBM gana a largo" 
 
 ---
 
-# El producto (MVP)
+# El producto: publicado y replicable
 
-- **API FastAPI**: pronóstico con abanico, funnel, menú de escenarios, simulador interactivo con palancas r/g/pb
-- **Dashboard Streamlit** de 4 pestañas con "TU SENDA" sobre el menú
+- **Dashboard de 5 pestañas EN ABIERTO**: tfm-data-science-…streamlit.app — se redespliega con cada push
+- **API FastAPI** con simulador interactivo (`POST /scenario`, palancas r/g/pb)
+- **Réplica garantizada**: `docker compose up --build` — datos dentro de las imágenes, sin Python ni descargas
 - La honestidad viaja en el payload: `"no es un ranking"`, `"la banda es la parte informativa"`
-- Todo servido desde artefactos gold pre-computados y testeados
 
 ---
 
 # ¿Y esto no lo hace un LLM?
 
-(ver tabla en deck.marp.md — fuente autoritativa del render)
+| | LLM | Este sistema |
+|---|---|---|
+| El número | recordado del texto de entrenamiento | **calculado** de datos con cadena de custodia |
+| Evaluación | no puede suspender un backtest | **suspendió cinco veces en público** — prueba de que es real |
+| Incertidumbre | tono de confianza | cuantiles medidos, conformal, cobertura comprobable |
+| Reproducible | varía con prompt y versión | mismo código+datos → mismos números (91 tests) |
+| Lo normativo | prescribe con soltura | pone precio y devuelve la elección a la política |
+
+**Declaración**: LLM usado como herramienta de proceso (código, redacción), nunca como fuente de números. **El LLM narra; el sistema calcula.**
+
+---
+
+# Cinco contests de pronóstico: el drift sigue en pie
+
+| Candidato | MASE h≤4 (drift 0,395) | CCAA que baten |
+|---|---|---|
+| SARIMAX / +Euríbor | ≥0,74 | 1/17 · 0/17 |
+| LightGBM (± capas de demanda) | 0,666 · 0,653 | 0/17 |
+| Chronos (fundacional, zero-shot) | 0,460 | 0/17 |
+| **DL global (1.760 series extranjeras)** | **0,401 — empate técnico** | **7/17** (regla: 12) |
+
+- El DL entrenado con **booms extranjeros que murieron** es el único que gana algún horizonte (h=2)
+- No se adopta: la regla no se relaja — queda como apuesta auditable si el ciclo gira
+
+---
+
+# El triángulo fiscal completo, reconciliado
+
+- **Gasto por función**: COFOG, 89 países (FMI) + UE (Eurostat) — brechas entre compiladores de 0,03–0,06 pp
+- **Ingresos por tipo**: WoRLD, 195 países — ESP 2023: 41,2 % = impuestos 23,6 (IRPF 8,7 > IS 2,9) + cotizaciones 13,2
+- **Resultados de bienestar**: marco MPI/MODA de pobreza infantil, 13 series — 15/15 checks de reconciliación OK
+- Historia empalmada **1703–2025** con la trampa de perímetro MEDIDA (JST = solo Estado central: −21 pp)
+
+---
+
+# Horizonte 50 años: sobres, nunca pronósticos
+
+- Un solo driver pronosticado: **demografía** (los mayores de 2075 ya nacen); todo lo demás, palanca del usuario
+- **Monte Carlo 2070** con las SE de las elasticidades propagadas: central 409 % PIB [272–619] — el ancho ES el mensaje
+- Panel within: el ingreso público compra bienestar a **retardo 8 años** (−0,36 %/pp), 3× menos que la foto transversal; la renta domina
+- Calibración con la propia historia: proyectar 50 años por continuidad erró **~13 pp de PIB** de mediana → ningún sobre puede ser más estrecho
 
 ---
 
 # Conclusiones
 
 1. Solo con fuentes públicas y código abierto: **datos → modelos → producto**, con trazabilidad profesional
-2. **La aportación diferencial es la disciplina**: tres veces el modelo flexible perdió bajo reglas pre-registradas; una vez el protocolo evitó publicar una predicción de desplome en pleno boom
-3. Sustantivo: la asequibilidad no se corrige sola; la palanca pública de vivienda es pequeña frente a la privada; la renta domina el rendimiento sanitario; la demografía domina la deuda
+2. **La aportación diferencial es la disciplina**: cinco contests sin adopción (el mejor, empate 0,401 vs 0,395), cinco fronteras donde ganó el OLS, y un test final que evitó publicar una predicción de desplome en pleno boom
+3. Sustantivo: la asequibilidad no se corrige sola; el cuello de botella empieza en el suelo (mercado a 1/5 del pico); la renta domina salud y bienestar; la demografía domina la deuda; urbanizar más no compra asequibilidad (ρ=+0,01 en 40 países)
 
 ---
 
 # Trabajo futuro y cierre
 
-- Driver de oferta en la parrilla de validación con datos 2026+
-- Cuota hipotecaria teórica (falta €/m²) · panel quinquenal para A1 · episodios históricos de consolidación
-- Actualización trimestral: cada IPV nuevo re-ejecuta pipeline → gold → pronóstico
+- Revalidación del DL global y del driver de oferta con orígenes 2026+ (nunca contra el test gastado)
+- Catastro "suelo vacante" si reaparece publicado · microdatos MPI/MODA · panel quinquenal A1
+- Actualización trimestral: cada IPV nuevo re-ejecuta pipeline → gold → pronóstico → redespliegue
 
 **Gracias.**
 
-github.com/danribes/tfm-data-science · `docs/MEMORIA.md` · `streamlit run app/dashboard.py`
+github.com/danribes/tfm-data-science · demo en vivo: tfm-data-science-…streamlit.app · `docs/MEMORIA.md`
