@@ -24,6 +24,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/demanda_suelo.md](docs/demanda_suelo.md) | Capas de demanda, crédito y suelo urbanizable (SIU + mercado de suelo) + cuarto contest negativo |
 | [docs/vivienda_global.md](docs/vivienda_global.md) | Panel internacional de vivienda: precios reales (BIS 1971–), precio/renta (OCDE) y suelo artificial |
 | [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
+| [docs/horizonte_50.md](docs/horizonte_50.md) | Sistema a 50 años: sobres condicionales de deuda (MC 2070) y bienestar, panel within y calibración con 300 años de historia |
 
 ## Estructura del repositorio
 

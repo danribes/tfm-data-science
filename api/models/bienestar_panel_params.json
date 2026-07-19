@@ -1,0 +1,33 @@
+{
+  "outcome": "log_mortalidad_u5",
+  "lag_ingresos": 2,
+  "beta_rev_within": 0.0005633851883092324,
+  "se_rev_within_cr1": 0.0012512237240630427,
+  "beta_rev_between": -0.011038087552174551,
+  "beta_loggdp_within": -0.5093265323945145,
+  "se_loggdp_within_cr1": 0.0587183139103186,
+  "gradiente_retardos": {
+    "2": {
+      "beta": 0.0005633851883092324,
+      "se": 0.0012512237240630427,
+      "n": 4152
+    },
+    "5": {
+      "beta": -0.0008134854771299056,
+      "se": 0.0011117204792226636,
+      "n": 3939
+    },
+    "8": {
+      "beta": -0.0035511060258678513,
+      "se": 0.0015096132125688674,
+      "n": 3640
+    }
+  },
+  "n_paises": 184,
+  "n_obs": 4152,
+  "anios": [
+    2000,
+    2023
+  ],
+  "nota": "FE pais+anio, CR1 por pais; delta_t absorbe la mejora secular mundial. El efecto del ingreso es nulo a 2-5 anios y aparece a 8 (estructural): la cadena a 50 anios usa el lag 8 y lo declara."
+}
