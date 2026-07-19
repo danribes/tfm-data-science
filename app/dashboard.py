@@ -31,8 +31,9 @@ def load(name: str) -> pd.DataFrame:
     return pd.read_csv(GOLD / name)
 
 
-tab1, tab2, tab3, tab4 = st.tabs(
-    ["🏠 Asequibilidad CCAA", "🗺️ Atlas fiscal", "⚕️ Rendimiento A1", "📉 Deuda: escenarios D1"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(
+    ["🏠 Asequibilidad CCAA", "🗺️ Atlas fiscal", "⚕️ Rendimiento A1", "📉 Deuda: escenarios D1",
+     "🔭 Horizonte 50 años"])
 
 # ---------- 1. Asequibilidad ----------
 with tab1:
@@ -133,3 +134,49 @@ with tab4:
         st.plotly_chart(fig, use_container_width=True)
         st.caption(f"Tu senda termina 2050 en {propia[-1]:.0f} % del PIB. Aritmética determinista "
                    "sin retroalimentaciones: mapa de sensibilidades, no pronóstico (docs/escenarios_d1.md).")
+
+# ---------- 5. Horizonte 50 años ----------
+with tab5:
+    st.subheader("Sobres condicionales 2024–2070 — nunca pronósticos")
+    izq, der = st.columns([3, 2])
+    with izq:
+        mc = load("gold_escenarios_deuda_mc.csv")
+        esc = st.selectbox("Escenario de deuda (Monte Carlo, 4.000 trayectorias)",
+                           sorted(mc.escenario.unique()), index=0)
+        d = mc[mc.escenario == esc]
+        fig = go.Figure()
+        fig.add_scatter(x=d.year, y=d.p95, line=dict(width=0), showlegend=False)
+        fig.add_scatter(x=d.year, y=d.p5, fill="tonexty", fillcolor="rgba(42,120,214,0.15)",
+                        line=dict(width=0), name="banda 90 %")
+        fig.add_scatter(x=d.year, y=d.p75, line=dict(width=0), showlegend=False)
+        fig.add_scatter(x=d.year, y=d.p25, fill="tonexty", fillcolor="rgba(42,120,214,0.30)",
+                        line=dict(width=0), name="banda 50 %")
+        fig.add_scatter(x=d.year, y=d.p50, line=dict(color=BLUE, width=2.5), name="mediana")
+        fig.add_hline(y=60, line_dash="dot", line_color=GRIS, annotation_text="60 %")
+        fig.update_layout(height=430, yaxis_title="deuda (% PIB)", margin=dict(t=20))
+        st.plotly_chart(fig, use_container_width=True)
+        f50 = d[d.year == 2050].iloc[0]
+        f70 = d[d.year == 2070].iloc[0]
+        st.caption(f"2050: {f50.p50:.0f} [{f50.p5:.0f}–{f50.p95:.0f}] · "
+                   f"2070: {f70.p50:.0f} [{f70.p5:.0f}–{f70.p95:.0f}] % PIB. "
+                   "Incertidumbre de elasticidades demográficas, tipos y crecimiento propagada; "
+                   "condicional a continuidad institucional (docs/horizonte_50.md).")
+    with der:
+        b50 = load("gold_bienestar_50.csv")
+        anio = st.radio("Horizonte bienestar", [2050, 2070], horizontal=True)
+        bb = b50[(b50.year == anio) & (b50.ingresos == "constante")]
+        fig2 = go.Figure(go.Bar(
+            x=bb.crecimiento, y=bb.delta_mortalidad_pct,
+            error_y=dict(array=bb.ic95_hi_pct - bb.delta_mortalidad_pct,
+                         arrayminus=bb.delta_mortalidad_pct - bb.ic95_lo_pct),
+            marker_color=[ORANGE, BLUE, GREEN]))
+        fig2.update_layout(height=360, yaxis_title="Δ mortalidad <5 vs senda base (%)",
+                           margin=dict(t=30), title=dict(
+                               text="Bienestar según crecimiento (panel within)", font=dict(size=13)))
+        st.plotly_chart(fig2, use_container_width=True)
+        cal = load("gold_backtest_50y.csv")
+        med = cal[cal.ventana == "1975->2025"].err_congelar.abs().median()
+        st.caption(f"La palanca fiscal ±2,5 pp añade ±0,8 % (efecto estructural a retardo 8, "
+                   f"segundo orden frente al crecimiento). Calibración histórica: proyectar 50 años "
+                   f"por continuidad erró una mediana de {med:.0f} pp de PIB en 1975→2025 — "
+                   "ningún sobre puede ser más estrecho que eso.")

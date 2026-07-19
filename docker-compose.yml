@@ -11,8 +11,9 @@ services:
       # artefactos de modelo montados: entrenar en notebooks → soltar aquí sin rebuild
       - ./api/models:/app/models
 
-  # web: React (Vite) o Streamlit — se añade cuando exista el primer modelo
-  # web:
-  #   build: ./web
-  #   ports: ["8080:80"]
-  #   depends_on: [api]
+  dashboard:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    ports:
+      - "8501:8501"
