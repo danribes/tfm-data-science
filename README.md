@@ -18,6 +18,12 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/data_dictionary_master.md](docs/data_dictionary_master.md) · [data_dictionary_vivienda.md](docs/data_dictionary_vivienda.md) | Diccionarios de datos (programa fiscal y vista vivienda) |
 | [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas ↔ enunciados |
 | [docs/arquitecturas_prediccion.md](docs/arquitecturas_prediccion.md) | Cómo se predicen los resultados: directa vs encadenada (two-stage) vs condicional, y la regla que gobierna la elección |
+| [docs/bienestar_indicadores.md](docs/bienestar_indicadores.md) | Marco bienestar↔pobreza infantil (MPI/MODA): 7 bloques → 13 series + frontera ingreso público → bienestar objetivo |
+| [docs/fiscal_breakdown.md](docs/fiscal_breakdown.md) | Desglose mundial de gasto (COFOG, 89 países) e ingresos por tipo (195) + reconciliación de fuentes 15/15 OK |
+| [docs/fiscal_historia.md](docs/fiscal_historia.md) | Series históricas 1703–2025: denominador PIB verificado, trampa de perímetro medida y empalme canónico |
+| [docs/demanda_suelo.md](docs/demanda_suelo.md) | Capas de demanda, crédito y suelo urbanizable (SIU + mercado de suelo) + cuarto contest negativo |
+| [docs/vivienda_global.md](docs/vivienda_global.md) | Panel internacional de vivienda: precios reales (BIS 1971–), precio/renta (OCDE) y suelo artificial |
+| [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
 
 ## Estructura del repositorio
 
