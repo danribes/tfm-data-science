@@ -107,8 +107,8 @@ Aritmética r−g con presión demográfica del motor de proyección propio (ela
 ### 4.4-bis Horizonte 50 años: sobres condicionales de economía y bienestar
 El sistema se extiende a 2070 como máquina de sobres condicionales — nunca como pronosticador — con cinco piezas (`docs/horizonte_50.md`): (1) la frontera ingreso→bienestar re-estimada como PANEL within (184 países, FE país+año, CR1): el efecto del ingreso es nulo a 2–5 años y aparece a retardo 8 (−0,0036±0,0015 por pp), ~3× menor que el transversal — simular con el transversal sobrestimaría lo que compra el dinero; la renta domina (γ=−0,51±0,06). (2) Monte Carlo del simulador de deuda con la incertidumbre de parámetros propagada (4.000 trayectorias × escenario; coherente con el menú discreto: central 2050 mediana 231 vs 224, banda 90 % más ancha como debe). (3) Horizonte 2070 (EUROPOP): central mediana 409 % PIB [272–619] — el ancho ES el mensaje. (4) Sobres de bienestar 2050/2070 encadenando solo parámetros within: crecimiento 1 % pc/año → mortalidad <5 −12 %/−21 % vs senda base; la palanca fiscal ±2,5 pp añade ±0,8 % — real pero de segundo orden. (5) Pseudo-backtest de continuidad sobre las DOS ventanas reales de 50 años del panel histórico (1925→1975, 1975→2025): errores medianos 12,7–21,5 pp de PIB congelando, peores extrapolando tendencia (p90 102 pp); España +19 pp (la transición fiscal, invisible para la continuidad). **Calibración fijada: todo sobre a 50 años más estrecho de ~13 pp de PIB finge certeza.** Un solo driver pronosticado (demografía); todo lo demás, palanca expuesta.
 
-### 4.5 El producto (MVP)
-API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel, menú de escenarios, simulador interactivo con palancas, proyecciones demográficas) y dashboard Streamlit de cuatro pestañas. Las advertencias de método viajan dentro de las respuestas de la API y de cada pestaña: la honestidad es parte del producto, no de la letra pequeña.
+### 4.5 El producto (MVP): dashboard publicado, API y arranque garantizado
+Tres superficies sobre la misma capa gold. (1) **Dashboard Streamlit de cinco pestañas** (asequibilidad con abanico, atlas, funnel A1, simulador de deuda con palancas, horizonte 50 años con Monte Carlo), **publicado en abierto** en https://tfm-data-science-ufgfhpcvydyrswwzm7t6sz.streamlit.app/ — se redespliega automáticamente con cada push al repositorio. (2) **API FastAPI** con todos los artefactos y el simulador interactivo (`POST /scenario`). (3) **Arranque garantizado con Docker**: `docker compose up --build` levanta dashboard (8501) y API (8010) con los datos dentro de las imágenes — replicar no requiere Python, dependencias ni descargas; también sirve como modo sin-red para la defensa. Las advertencias de método viajan dentro de las respuestas de la API y de cada pestaña: la honestidad es parte del producto, no de la letra pequeña.
 
 ### 4.6 ¿Por qué no basta un LLM?
 
@@ -169,6 +169,14 @@ Pata provincial de visados (MITMA) y evaluación del driver de oferta con datos 
 - Tanzi, V. y Schuknecht, L. (2000). *Public Spending in the 20th Century: A Global Perspective*. Cambridge University Press.
 
 ## Anexo — Guía de reproducción
+
+**Vía rápida (sin instalar nada más que Docker):**
+```
+docker compose up --build           # dashboard en :8501 y API en :8010, datos incluidos
+```
+Demo pública equivalente: https://tfm-data-science-ufgfhpcvydyrswwzm7t6sz.streamlit.app/
+
+**Vía completa (re-ejecutar el pipeline; Python ≥3.10):**
 ```
 python3 -m connectors.<fuente>      # extracción por fuente (raw → processed)
 python3 connectors/gold.py          # capa gold + smoke tests
@@ -177,10 +185,19 @@ python3 analysis/backtest_t1.py     # baselines + harness rolling-origin
 python3 analysis/candidates_t1.py   # candidatos (validación)
 python3 analysis/final_test_t1.py   # test final (YA GASTADO: no re-ejecutar para seleccionar)
 python3 analysis/forecast_t1.py     # pronóstico de producción + abanico
-python3 analysis/atlas.py           # 16 figuras del atlas
-python3 analysis/rendimiento_a1.py  # A1: funnel 164 países
-python3 analysis/escenarios_d1.py   # D1: menú de deuda
-python3 -m pytest tests/ -q         # 42 tests del contrato de datos y modelos
-streamlit run app/dashboard.py      # dashboard MVP
+python3 analysis/atlas.py           # figuras del atlas (B1–B19 con suelo e historia)
+python3 analysis/rendimiento_a1.py  # A1 salud: funnel 164 países
+python3 analysis/expansion_dl.py    # A1 educación + auditoría SPI
+python3 analysis/bienestar_a1.py    # frontera ingreso→bienestar (marco MPI)
+python3 analysis/bienestar_panel.py # panel within (parámetros de simulación a 50 años)
+python3 analysis/escenarios_d1.py   # D1: menú de deuda 2024–2050
+python3 analysis/mc_d1.py           # Monte Carlo de deuda hasta 2070
+python3 analysis/bienestar_50.py    # sobres de bienestar 2050/2070
+python3 analysis/backtest_50y.py    # calibración histórica de continuidad
+python3 analysis/fiscal_breakdown.py    # desglose y reconciliación fiscal mundial
+python3 analysis/fiscal_historia.py     # empalme histórico 1703–2025
+python3 -m pytest tests/ -q         # 91 tests del contrato de datos y modelos
+streamlit run app/dashboard.py      # dashboard (5 pestañas)
+python3 app/rag_assistant.py "..."  # asistente RAG sobre la documentación del proyecto
 ```
-Documentos de detalle: `docs/eda_vivienda.md`, `docs/backtest_t1_baselines.md`, `docs/candidatos_t1.md`, `docs/test_final_t1.md`, `docs/forecast_t1_mvp.md`, `docs/atlas.md`, `docs/rendimiento_a1.md`, `docs/escenarios_d1.md`, `docs/oferta_nueva.md`, `docs/PLAN_MAESTRO.md`.
+Los contests DL (`foundation_t1.py`, `dl_global_t1.py`, `demanda_features.py`) son re-ejecutables pero sus veredictos ya están registrados; el test final de T1 está gastado y no debe usarse para seleccionar. Documentos de detalle: los enlazados en la tabla del README, más `docs/arquitecturas_prediccion.md` (cómo se predice), `docs/horizonte_50.md` (sistema a 50 años) y `docs/despliegue.md` (operación del producto).

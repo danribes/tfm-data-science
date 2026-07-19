@@ -27,6 +27,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/vivienda_global.md](docs/vivienda_global.md) | Panel internacional de vivienda: precios reales (BIS 1971–), precio/renta (OCDE) y suelo artificial |
 | [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
 | [docs/horizonte_50.md](docs/horizonte_50.md) | Sistema a 50 años: sobres condicionales de deuda (MC 2070) y bienestar, panel within y calibración con 300 años de historia |
+| [docs/despliegue.md](docs/despliegue.md) | Despliegue y operación: demo pública, réplica Docker, modo sin-red y qué sirve cada superficie |
 
 ## Estructura del repositorio
 
@@ -54,13 +55,15 @@ _old/          # proyecto vivienda original completo (trazabilidad; ver entrega 
 - Sin Docker: `cd api && pip install -r requirements.txt && GOLD_DIR=../storage/gold uvicorn main:app --reload` para la API; `pip install -r app/requirements.txt && streamlit run app/dashboard.py` para el dashboard.
 - Publicación gratuita del dashboard: el repo es desplegable tal cual en Streamlit Community Cloud (share.streamlit.io → `app/dashboard.py`).
 
-## Estado actual (2026-07-18)
+## Estado actual (2026-07-19)
 
-**Bloque analítico del TFM completo**, todo con protocolo pre-registrado, tests (35+) y capa gold:
+**Sistema completo**, todo con protocolo pre-registrado, 91 tests y capa gold; dashboard publicado (enlace arriba).
 
-1. **T1 — Forecasting CCAA** con disciplina completa: [EDA](docs/eda_vivienda.md) → [baselines + backtesting rolling-origin](docs/backtest_t1_baselines.md) → [candidatos](docs/candidatos_t1.md) (SARIMAX/LightGBM: resultado negativo pre-registrado a corto) → [test final de un solo uso](docs/test_final_t1.md) (hipótesis GBM refutada; el protocolo evitó publicar una predicción de desplome) → [pronóstico de producción con abanico empírico y escenarios](docs/forecast_t1_mvp.md) (`gold_forecast_ccaa.csv`).
-2. **Atlas B1–B16** — [16 figuras con lectura guiada](docs/atlas.md): siglos XX–XXI, España vs mediana mundial/UE, incluida la inversión pública en vivienda SIEMPRE junto a la residencial total.
-3. **A1 — Rendimiento ajustado** del gasto sanitario ([funnel de 164 países](docs/rendimiento_a1.md), `gold_rendimiento_pais.csv`): residual con intervalo conformal por grupo de renta, nunca una liga; España +2,7 ± 3,5 años.
-4. **D1 — Simulador de escenarios de deuda** ([menú 2024–2050](docs/escenarios_d1.md), `gold_escenarios_deuda.csv`): aritmética r−g + presión demográfica del motor de proyección; la demografía domina cualquier palanca.
+1. **T1 — Forecasting CCAA**: [EDA](docs/eda_vivienda.md) → [baselines rolling-origin](docs/backtest_t1_baselines.md) → cinco contests de candidatos ([clásicos](docs/candidatos_t1.md) · [demanda](docs/demanda_suelo.md) · [rutas DL](docs/dl_rutas.md): el mejor llegó al empate 0,401 vs 0,395 y no se adoptó) → [test final de un solo uso](docs/test_final_t1.md) → [producción drift + abanico empírico](docs/forecast_t1_mvp.md).
+2. **Atlas B1–B19** — [lectura guiada](docs/atlas.md) + [series históricas empalmadas 1703–2025](docs/fiscal_historia.md) con su trampa de perímetro medida.
+3. **El triángulo fiscal** — [gasto por función (89 países) e ingresos por tipo (195), reconciliados 15/15](docs/fiscal_breakdown.md) + [marco de bienestar y pobreza infantil](docs/bienestar_indicadores.md).
+4. **Fronteras de rendimiento** en tres dominios (salud, educación, bienestar/mortalidad infantil) con incertidumbre conformal — nunca rankings.
+5. **D1 y el horizonte largo** — [menú de deuda 2024–2050](docs/escenarios_d1.md) → [sistema a 50 años](docs/horizonte_50.md): Monte Carlo a 2070, panel within para bienestar y calibración de continuidad con la propia historia (~13 pp).
+6. **Producto**: dashboard de 5 pestañas publicado + API + [asistente RAG citado](docs/rag_asistente.md); [despliegue y operación](docs/despliegue.md).
 
-Trabajo declarado en curso: driver de oferta [`oferta_nueva`](docs/oferta_nueva.md) (permisos residenciales: señal adelantada r=0,57 a 11 trimestres; adopción solo con datos 2026+), pata provincial MITMA, reescritura F0.2 de entregas pendiente del visto bueno del tutor. Calendario en el [PLAN_MAESTRO](docs/PLAN_MAESTRO.md) §4.
+Trabajo declarado en curso: driver de oferta (visados, adopción solo con datos 2026+), revalidación del DL global con orígenes 2026+, respuesta del tutor pendiente.
