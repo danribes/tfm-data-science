@@ -40,6 +40,19 @@ def save_raw(name: str, payload: dict, source_url: str) -> pathlib.Path:
     return path
 
 
+def save_raw_bytes(filename: str, content: bytes, source_url: str) -> pathlib.Path:
+    """Como save_raw pero para binarios (XLS legado, etc.)."""
+    RAW.mkdir(parents=True, exist_ok=True)
+    path = RAW / filename
+    path.write_bytes(content)
+    stamp = dt.datetime.now().isoformat(timespec="seconds")
+    if not MANIFEST.exists():
+        MANIFEST.write_text('"name","url","fetched_at","bytes"\n')
+    with MANIFEST.open("a") as fh:
+        fh.write(f'"{filename}","{source_url}","{stamp}",{len(content)}\n')
+    return path
+
+
 def jsonstat_to_df(js: dict) -> pd.DataFrame:
     """JSON-stat 2.0 (API dissemination de Eurostat) -> DataFrame largo."""
     dims = js["id"]
