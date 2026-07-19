@@ -56,16 +56,26 @@ La regla que organiza todo el modelado: **los criterios se fijan antes de mirar;
 - **Selección**: ningún candidato (SARIMAX, SARIMAX+Euríbor, LightGBM global) batió al drift en h≤4 (1/17, 0/17, 0/17 CCAA) — los tres habrían aprobado el criterio original blando. Resultado negativo publicado.
 - **Test final**: la hipótesis post-hoc "GBM gana en h≥6" quedó **refutada** (0/17): el GBM pronosticó una caída (≈145→127) en el arranque del mayor boom de la muestra (152→187), por reversión a la media aprendida de la crisis. El protocolo evitó publicar esa predicción.
 - **Producción**: drift + abanico empírico 80/95 % (mediana de error +0,5 %→+4,9 % con el horizonte: el drift se queda corto en booms y la banda lo hereda) + escenarios salariales. **Lectura central: el ratio nacional pasaría de 1,26 (2024) a ~1,5–1,6 en 2027 incluso con salarios creciendo al 2 %** — el denominador no compensa el numerador sin cambio de régimen.
+
+![El test final: el GBM pronosticó caída en pleno boom](figures/backtest/b3_test_final.png)
+
+![Pronóstico de producción con abanico empírico](figures/backtest/b4_fan_nacional.png)
 - **Señal para la siguiente iteración**: los permisos residenciales (driver `oferta_nueva`, compromiso de la Revisión 1) son la señal adelantada más fuerte encontrada (r=0,57 con 11 trimestres; 3 trimestres de aviso en el único giro de la muestra). Se adoptará solo si lo confirman los datos de 2026+.
 
 ### 4.2 Atlas B1–B16 — el siglo del gasto público
 Mediana mundial del gasto: ~10 %PIB (1900) → ~30 % (hoy); España 11 → 45,4 %. Deuda española en U (124 % tras 1898, 30 % en 1960, 105 % hoy). Los intereses cayeron de 5 a 2,4 %PIB pese a duplicarse la deuda (el dividendo del euro). La protección social es la partida mayor y la que más crece (14,3 → 18,5 %PIB). La inversión pública fue la variable de ajuste tras 2010 (5 → 3 %PIB). Y la figura exigida por la revisión de oferta privada: **la inversión residencial total española (6 → 11,7 → 3,9 → 5,8 %PIB) es un orden de magnitud mayor que el gasto público en vivienda (1,3 → 0,5 %PIB)** — contexto obligatorio de cualquier conclusión sobre política de vivienda.
 
+![Vivienda: palanca pública vs promoción privada](figures/atlas/b03_vivienda_publica_vs_total.png)
+
 ### 4.3 A1 — Rendimiento ajustado del gasto sanitario (164 países)
 Bajo las reglas pre-registradas ganó el OLS (el GBM no alcanzó la mejora exigida; tercera victoria consecutiva de lo simple). El hallazgo honesto: hasta el OLS empata con la mediana del grupo de renta — **la renta domina; la "eficiencia" es un efecto de segundo orden**. España: +2,7 ± 3,5 años de esperanza de vida sobre lo esperado — por encima, pero DENTRO de la banda de su grupo: el ejemplo canónico de por qué este análisis se publica como funnel con intervalos y nunca como liga. Solo 16/164 países salen de su banda, y los extremos se explican por epidemiología (VIH) o outperformance conocida (Albania, Costa Rica), no por "gestión".
 
+![Funnel A1: años de vida sobre lo esperado, con intervalo](figures/a1/a1_funnel.png)
+
 ### 4.4 D1 — Escenarios de deuda 2024–2050
 Aritmética r−g con presión demográfica del motor de proyección propio (elasticidades panel UE: pensiones 0,91, sanidad 0,33 sobre la senda 65+ de Eurostat → +6,6 pp de PIB en 2050). El menú: sin envejecimiento 127 % / central 224 % (banda 198–267) / crecimiento 2 % 200 % / consolidación +2,5 pp 172 % / +1 pp inversión a deuda 236 % / tipos 4,5 % 256 %. **La demografía domina cualquier palanca individual** (97 pp de distancia central–contrafactual) y ninguna palanca aislada estabiliza la senda. La pregunta original del proyecto (más vivienda e infraestructura a déficit) queda cuantificada (+12 pp en 2050) en lugar de prescrita o descartada.
+
+![Menú de escenarios de deuda 2024–2050](figures/d1/d1_deuda_escenarios.png)
 
 ### 4.5 El producto (MVP)
 API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel, menú de escenarios, simulador interactivo con palancas, proyecciones demográficas) y dashboard Streamlit de cuatro pestañas. Las advertencias de método viajan dentro de las respuestas de la API y de cada pestaña: la honestidad es parte del producto, no de la letra pequeña.
@@ -87,6 +97,31 @@ API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel
 
 ## 7. Trabajo futuro
 Pata provincial de visados (MITMA) y evaluación del driver de oferta con datos 2026+; cuota hipotecaria teórica con €/m²; panel quinquenal para A1 y módulos vivienda/educación; episodios históricos de consolidación (D2); actualización trimestral automática del pipeline.
+
+## Referencias
+
+**Fuentes de datos** (versión exacta de cada descarga en `storage/raw/vintage_manifest.csv`):
+
+- Banco de España. *Tipos de interés: Euríbor a 12 meses*. https://www.bde.es
+- Eurostat. *Government expenditure by function (COFOG)* (`gov_10a_exp`); *ESSPROS social protection expenditure* (`spr_exp_type`, `spr_exp_func`); *Population projections EUROPOP2023* (`proj_23n`); *GFCF by asset type* (`nama_10_an6`); *Building permits* (`sts_cobp_q`); series demográficas, SILC y de mortalidad evitable. https://ec.europa.eu/eurostat
+- Fondo Monetario Internacional. *World Economic Outlook Database*. https://www.imf.org/en/Publications/WEO
+- Instituto Nacional de Estadística. *Índice de Precios de Vivienda* (tablas 80270/80271); *IPC* (76136); *Encuesta Anual de Estructura Salarial* (28191). https://www.ine.es
+- Jordà, Ò., Schularick, M. y Taylor, A. M. (2017). "Macrofinancial History and the New Business Cycle Facts". *NBER Macroeconomics Annual*, 31(1). Datos: https://www.macrohistory.net
+- Ministerio de Transportes y Movilidad Sostenible (MITMA). *Boletín Estadístico: precio del suelo urbano; índice de costes de la construcción*. https://apps.fomento.gob.es
+- Müller, K., Xu, C., Lehbib, M. y Chen, Z. (2025). *The Global Macro Database*. https://www.globalmacrodata.com
+- Naciones Unidas, DESA. *International Migrant Stock 2024*. https://www.un.org/development/desa/pd
+- Organización Mundial de la Salud. *Global Health Expenditure Database (GHED)*; *Global Health Observatory (GHO)*. https://apps.who.int/nha ; https://www.who.int/data/gho
+- World Bank. *World Development Indicators*; *Worldwide Bureaucracy Indicators (WWBI)*. https://data.worldbank.org
+
+**Métodos:**
+
+- Angelopoulos, A. N. y Bates, S. (2023). "Conformal Prediction: A Gentle Introduction". *Foundations and Trends in Machine Learning*, 16(4).
+- Blanchard, O. (2019). "Public Debt and Low Interest Rates". *American Economic Review*, 109(4).
+- Hyndman, R. J. y Athanasopoulos, G. (2021). *Forecasting: Principles and Practice* (3ª ed.). OTexts. https://otexts.com/fpp3
+- Hyndman, R. J. y Koehler, A. B. (2006). "Another look at measures of forecast accuracy". *International Journal of Forecasting*, 22(4).
+- Ke, G. et al. (2017). "LightGBM: A Highly Efficient Gradient Boosting Decision Tree". *NeurIPS 30*.
+- Lundberg, S. M. y Lee, S.-I. (2017). "A Unified Approach to Interpreting Model Predictions". *NeurIPS 30*.
+- Tanzi, V. y Schuknecht, L. (2000). *Public Spending in the 20th Century: A Global Perspective*. Cambridge University Press.
 
 ## Anexo — Guía de reproducción
 ```
