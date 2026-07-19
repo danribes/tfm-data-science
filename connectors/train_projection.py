@@ -48,8 +48,21 @@ def within_ols(df: pd.DataFrame, y: str, xs: list[str]) -> dict:
     dof = max(len(d) - len(cols) - d["geo"].nunique(), 1)
     sigma = float(np.sqrt((resid ** 2).sum() / dof))
     se = np.sqrt(np.diag(sigma ** 2 * np.linalg.pinv(X.T @ X)))
+    # errores estándar agrupados por país (CR1): los residuos de un mismo país
+    # están autocorrelacionados y los SE clásicos los tratan como independientes
+    bread = np.linalg.pinv(X.T @ X)
+    meat = np.zeros((X.shape[1], X.shape[1]))
+    geos = d["geo"].values
+    for g in np.unique(geos):
+        Xg, ug = X[geos == g], resid[geos == g]
+        s = Xg.T @ ug
+        meat += np.outer(s, s)
+    G, n, k = len(np.unique(geos)), len(d), X.shape[1]
+    cr1 = (G / (G - 1)) * ((n - 1) / max(n - k, 1))
+    se_cluster = np.sqrt(np.diag(cr1 * bread @ meat @ bread))
     return {
         "drivers": cols, "beta": beta.tolist(), "se": se.tolist(),
+        "se_cluster": se_cluster.tolist(),
         "sigma": sigma, "n": int(len(d)), "countries": int(d["geo"].nunique()),
     }
 

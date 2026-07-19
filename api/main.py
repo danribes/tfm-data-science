@@ -272,10 +272,15 @@ def project(
     b = dict(zip(pars["drivers"], pars["beta"]))
     y0, s0 = base["year"], base[pars["y"]]
     sh0 = base["pop65_share"]
+    se_c = dict(zip(pars["drivers"], pars.get("se_cluster", pars["se"])))
     out = {"module": module, "geo": geo, "base_year": y0, "base_value_pct_gdp": round(s0, 2),
            "elasticities": {k: round(v, 3) for k, v in b.items()},
+           "elasticities_se_cluster": {k: round(v, 3) for k, v in se_c.items()},
            "assumptions": {"gdp_growth": gdp_growth, "unemployment_delta": unemployment_delta,
                            "obesity": "constante", "nota": "proyección condicionada, no causal"},
+           "nota_banda": "banda = ±1,64σ del residuo within histórico; NO incluye la "
+                         "incertidumbre de las elasticidades (SE agrupados por país ≈ 2× "
+                         "los clásicos) ni la autocorrelación del panel: orientativa",
            "paths": []}
     import math
     for var in variants:

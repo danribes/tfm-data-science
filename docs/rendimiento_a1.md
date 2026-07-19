@@ -31,6 +31,8 @@ Outcome: esperanza de vida al nacer, media 2015–2019 (pre-COVID a propósito).
 
 ![Contribuciones](figures/a1/a1_contribuciones.png)
 
+*Procedencia de las explicaciones: las contribuciones por variable y el campo `explicacion` del gold provienen del MODELO PUBLICADO (OLS, contribuciones estandarizadas), no del GBM rechazado; el GBM solo se reajusta con fines comparativos y sus contribuciones no se publican.*
+
 ## 4. Límites (en primera plana, PLAN_MAESTRO §6)
 
 1. **Asociación, no causalidad**: el retardo de 5 años mitiga, no resuelve, la endogeneidad.

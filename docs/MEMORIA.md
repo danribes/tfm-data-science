@@ -72,6 +72,9 @@ Bajo las reglas pre-registradas ganó el OLS (el GBM no alcanzó la mejora exigi
 
 ![Funnel A1: años de vida sobre lo esperado, con intervalo](figures/a1/a1_funnel.png)
 
+### 4.3-bis A2 — Tipologías de composición del gasto
+PCA + KMeans sobre las 10 funciones COFOG (% del gasto total, medias 2019–23, 30 países). El hallazgo honesto: **las tipologías son débiles** (mejor silueta 0,20, k=2) — la composición europea es un continuo con dos polos suaves: "inversión y Estado clásico" (miembros de 2004+, asuntos económicos sobre-representados) y "Estado del bienestar maduro" (protección social +3,2 pp; España aquí, con el 40,9 % del gasto en protección social). El eje principal se lee casi como renta + antigüedad en la UE — coherente con A1.
+
 ### 4.4 D1 — Escenarios de deuda 2024–2050
 Aritmética r−g con presión demográfica del motor de proyección propio (elasticidades panel UE: pensiones 0,91, sanidad 0,33 sobre la senda 65+ de Eurostat → +6,6 pp de PIB en 2050). El menú: sin envejecimiento 127 % / central 224 % (banda 198–267) / crecimiento 2 % 200 % / consolidación +2,5 pp 172 % / +1 pp inversión a deuda 236 % / tipos 4,5 % 256 %. **La demografía domina cualquier palanca individual** (97 pp de distancia central–contrafactual) y ninguna palanca aislada estabiliza la senda. La pregunta original del proyecto (más vivienda e infraestructura a déficit) queda cuantificada (+12 pp en 2050) en lugar de prescrita o descartada.
 
@@ -86,7 +89,8 @@ API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel
 2. **El ratio de asequibilidad es un indicador aproximado** de evolución relativa (no incorpora €/m², renta disponible, entrada ni financiación); el complemento de cuota hipotecaria teórica está especificado y pendiente del precio por m².
 3. **Regímenes**: el test final demostró que 2024–25 fue una aceleración fuera del régimen de entrenamiento — a 2 años vista, en cambios de régimen, la banda es la parte informativa del pronóstico, no el punto.
 4. **n pequeño en el análisis transversal** (164 países): gana lo simple y las bandas son anchas; el paso natural es el panel por bloques quinquenales.
-5. **El simulador es determinista y sin retroalimentaciones**: mapa de sensibilidades, no pronóstico.
+5. **El simulador es determinista y sin retroalimentaciones**: mapa de sensibilidades, no pronóstico. Las bandas del motor de proyección usan el σ residual histórico y NO incluyen la incertidumbre de las elasticidades — los errores estándar agrupados por país son ≈2× los clásicos y así se reportan (la API lo declara en su respuesta).
+5-bis. **Hiperparámetros sin optimizar**: los GBM usan configuraciones conservadoras por defecto; con tres rechazos consecutivos del modelo flexible bajo reglas pre-registradas, optimizarlos habría sido buscar la métrica, no la verdad — la decisión es deliberada y se declara.
 6. **Falacia ecológica**: nada de lo dicho a nivel país habla de centros, sistemas o personas concretas.
 
 ## 6. Conclusiones
@@ -96,7 +100,7 @@ API FastAPI que sirve todos los artefactos gold (pronóstico con abanico, funnel
 3. Sustantivamente: la asequibilidad española no se corrige sola (ni con salarios al 4 %); la palanca pública de vivienda es un orden de magnitud menor que la promoción privada; la renta domina el rendimiento sanitario entre países; y la demografía domina la senda de deuda por encima de cualquier palanca fiscal individual.
 
 ## 7. Trabajo futuro
-Pata provincial de visados (MITMA) y evaluación del driver de oferta con datos 2026+; cuota hipotecaria teórica con €/m²; panel quinquenal para A1 y módulos vivienda/educación; episodios históricos de consolidación (D2); actualización trimestral automática del pipeline.
+Pata provincial de visados (MITMA) y evaluación del driver de oferta con datos 2026+; cuota hipotecaria teórica con €/m²; panel quinquenal para A1 y módulos vivienda/educación; episodios históricos de consolidación (D2); actualización trimestral automática del pipeline; registro formal de modelos y versiones (hoy el versionado es git + artefactos gold, suficiente a esta escala pero explícitamente mínimo).
 
 ## Referencias
 
