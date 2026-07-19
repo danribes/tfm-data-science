@@ -38,7 +38,8 @@ _old/          # proyecto vivienda original completo (trazabilidad; ver entrega 
 
 - Cada conector es ejecutable de forma autónoma: `python -m connectors.ine`, `python -m connectors.eurostat_gov`, etc. (Python ≥ 3.10; `pandas` + `requests`).
 - Nada entra en `storage/gold` sin pasar por `storage/raw` (evidencia) y `storage/processed` (limpieza trazable); `storage/raw/vintage_manifest.csv` registra fecha y URL de cada descarga.
-- La API local: `cd api && pip install -r requirements.txt && uvicorn main:app --reload`, o `docker compose up --build` desde la raíz.
+- **API** (sirve la capa gold + simulador interactivo): `cd api && pip install -r requirements.txt && GOLD_DIR=../storage/gold uvicorn main:app --reload`, o `docker compose up --build` desde la raíz. Endpoints: `/atlas`, `/century`, `/ccaa/affordability`, `/forecast/ccaa/{territorio}`, `/performance/health`, `/scenarios/debt`, `POST /scenario` (palancas r/g/pb), `/project/{pensions|health}`.
+- **Dashboard MVP** (cuatro pestañas: asequibilidad con abanico, atlas, funnel A1, simulador de deuda con sliders): `streamlit run app/dashboard.py`.
 
 ## Estado actual (2026-07-18)
 

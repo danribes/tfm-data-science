@@ -134,41 +134,101 @@ def ccaa_affordability(territorio: str | None = None):
     return df[cols].to_dict("records")
 
 
-# ---------- modelo (huecos 501 hasta entrenar) ----------
+# ---------- modelo (servido desde los artefactos gold del protocolo) ----------
+
+@lru_cache(maxsize=1)
+def rendimiento() -> pd.DataFrame:
+    return pd.read_csv(GOLD_DIR / "gold_rendimiento_pais.csv")
+
+
+@lru_cache(maxsize=1)
+def forecast_gold() -> pd.DataFrame:
+    return pd.read_csv(GOLD_DIR / "gold_forecast_ccaa.csv")
+
+
+@lru_cache(maxsize=1)
+def escenarios_gold() -> pd.DataFrame:
+    return pd.read_csv(GOLD_DIR / "gold_escenarios_deuda.csv")
+
 
 class ScenarioPath(BaseModel):
-    geo: str = Field(..., description="País ISO2, p.ej. ES")
-    horizon: int = Field(5, ge=1, le=10, description="Años a proyectar")
-    delta_housing_pp: float = Field(0.0, description="Cambio en gasto vivienda, pp de PIB")
-    delta_capital_share: float = Field(0.0, description="Cambio en la cuota de capital, pp")
-    primary_balance_pct: float = Field(0.0, description="Saldo primario supuesto, % PIB")
+    r_mercado: float = Field(3.5, ge=0.0, le=10.0, description="Tipo de mercado, %")
+    g_real: float = Field(1.3, ge=-2.0, le=5.0, description="Crecimiento real, %")
+    pb_palanca_pp: float = Field(0.0, ge=-5.0, le=5.0,
+                                 description="Ajuste permanente del saldo primario, pp de PIB")
+    con_demografia: bool = Field(True, description="Aplicar la presión demográfica del motor")
+    hasta: int = Field(2050, ge=2030, le=2050)
 
 
 @app.get("/performance/{module}")
-def performance(module: str):
-    """Funnel de rendimiento ajustado (op. 2). Requiere gbm_{module} + conformal_{module}."""
-    if module not in ("health", "housing", "education"):
-        raise HTTPException(404, "Módulos: health, housing, education")
-    if not (MODELS_DIR / f"gbm_{module}.txt").exists():
-        raise model_missing(f"gbm_{module}.txt")
-    raise model_missing(f"conformal_{module}.json")  # placeholder hasta implementar inferencia
+def performance(module: str, solo_destacados: bool = False):
+    """Funnel de rendimiento ajustado (A1). Residuales LOOCV con semiancho
+    conformal 90 % por cuartil de renta — NUNCA una liga (docs/rendimiento_a1.md)."""
+    if module != "health":
+        raise HTTPException(404, "Módulo disponible: health (housing/education: futuras iteraciones)")
+    df = rendimiento()
+    if solo_destacados:
+        df = df[df["destacado"]]
+    return {"module": module, "modelo": df["modelo"].iloc[0],
+            "nota": "residual out-of-fold con intervalo por grupo de renta; no es un ranking",
+            "paises": df.to_dict("records")}
 
 
 @app.get("/forecast/ccaa/{territorio}")
-def forecast_ccaa(territorio: str, h: int = Query(8, ge=1, le=12)):
-    """Predicción trimestral de asequibilidad (op. 6). Requiere forecast_ccaa.pkl."""
-    if not (MODELS_DIR / "forecast_ccaa.pkl").exists():
-        raise model_missing("forecast_ccaa.pkl")
-    raise model_missing("forecast_ccaa.pkl")
+def forecast_ccaa(territorio: str, h: int = Query(8, ge=1, le=8),
+                  escenario: str = Query("central_salarios_2pct")):
+    """Pronóstico de producción T1: drift + abanico empírico 80/95 % y
+    escenarios salariales (docs/forecast_t1_mvp.md; gold_forecast_ccaa.csv)."""
+    df = forecast_gold()
+    if escenario not in set(df["escenario"]):
+        raise HTTPException(404, f"Escenarios: {sorted(df['escenario'].unique().tolist())}")
+    sub = df[(df["ccaa"].str.lower() == territorio.lower())
+             & (df["escenario"] == escenario) & (df["h"] <= h)]
+    if sub.empty:
+        raise HTTPException(404, f"Territorio '{territorio}' no encontrado "
+                                 f"(disponibles: {sorted(df['ccaa'].unique().tolist())})")
+    return {"territorio": sub["ccaa"].iloc[0], "modelo": "drift",
+            "advertencia": "la banda es la parte informativa; punto ciego declarado en giros de ciclo",
+            "puntos": sub.sort_values("h").drop(columns=["ccaa"]).to_dict("records")}
+
+
+@app.get("/scenarios/debt")
+def scenarios_debt():
+    """Menú D1 pre-calculado (docs/escenarios_d1.md): 6 sendas de deuda 2024–2050."""
+    df = escenarios_gold()
+    return {"nota": "elegir es política, no estadística; aritmética determinista sin retroalimentaciones",
+            "escenarios": [{"escenario": k, "puntos": g.drop(columns=["escenario"]).to_dict("records")}
+                           for k, g in df.groupby("escenario")]}
 
 
 @app.post("/scenario")
 def scenario(path: ScenarioPath):
-    """Simulador D1 (op. 7): senda de gasto → outcomes proyectados + trayectoria de deuda.
-    Requiere el modelo de rendimiento entrenado; la aritmética de deuda (r−g) se añade aquí."""
-    if not (MODELS_DIR / "gbm_health.txt").exists():
-        raise model_missing("gbm_health.txt")
-    raise model_missing("scenario engine")
+    """Simulador D1 interactivo: aritmética r−g con las palancas del usuario y la
+    presión demográfica del motor de proyección (España)."""
+    import math
+    base = {"debt0": 105.2, "r0": 2.4 / 105.2 * 100, "pb0": -0.9, "deflactor": 2.0, "venc": 8}
+    demog = {}
+    if path.con_demografia:
+        pars, pj = proj_params(), projections()
+        s65 = (pj.query("geo=='ES' and variant=='BSL'").set_index("year")["share65"]
+               .reindex(range(2024, path.hasta + 1)).interpolate())
+        for mod, key in [("pensions", "pensions_oldage"), ("health", "te_gf07")]:
+            b = pars[mod]["base"]["ES"]
+            beta = pars[mod]["beta"][pars[mod]["drivers"].index("l_pop65_share")]
+            spend = b[key] * (s65 / b["pop65_share"]) ** beta
+            for y, v in (spend - spend.iloc[0]).items():
+                demog[y] = demog.get(y, 0.0) + float(v)
+    d, r = base["debt0"], base["r0"]
+    g = path.g_real + base["deflactor"]
+    out = []
+    for y in range(2024, path.hasta + 1):
+        r = r + (path.r_mercado - r) / base["venc"]
+        pb = base["pb0"] - demog.get(y, 0.0) + path.pb_palanca_pp
+        d = d * (1 + r / 100) / (1 + g / 100) - pb
+        out.append({"year": y, "deuda": round(d, 1), "pb": round(pb, 2), "r_efectivo": round(r, 2)})
+    return {"palancas": path.model_dump(), "geo": "ES",
+            "nota": "mapa de sensibilidades, no pronóstico (docs/escenarios_d1.md §3.4)",
+            "senda": out}
 
 
 @lru_cache(maxsize=1)
