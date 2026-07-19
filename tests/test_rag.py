@@ -7,7 +7,14 @@ import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "app"))
-from rag_assistant import SYSTEM, chunk_docs, retrieve  # noqa: E402
+from rag_assistant import DEFAULT_ENGINE, ENGINES, SYSTEM, chunk_docs, retrieve  # noqa: E402
+
+
+def test_registro_de_motores():
+    assert DEFAULT_ENGINE == "kimi" and DEFAULT_ENGINE in ENGINES
+    for cfg in ENGINES.values():
+        assert {"base", "model", "key_env", "max_tokens"} <= set(cfg)
+        assert cfg["max_tokens"] >= 300  # gotcha de los razonadores
 
 
 @pytest.fixture(scope="module")

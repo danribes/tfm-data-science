@@ -5,9 +5,12 @@ núcleo está cerrado). Recupera pasajes de la documentación DEL PROPIO proyect
 (memoria, cadena de backtesting, atlas, entregas) por TF-IDF y responde:
 
 - Modo por defecto (sin red, sin clave): devuelve los pasajes citados tal cual.
-- Modo --llm: GLM-5.2 (Z.ai, Coding Plan) redacta la respuesta SOLO a partir de los pasajes
+- Modo --llm: un LLM redacta la respuesta SOLO a partir de los pasajes
   recuperados, citándolos; los números solo pueden aparecer si están textualmente
   en un pasaje. Las preguntas normativas se reencuadran (Bloque D).
+  Motor configurable con --engine: kimi (defecto, Moonshot k2.6, sin impuesto de
+  razonamiento oculto), glm (Z.ai Coding Plan) o mimo (Xiaomi). Los tres son
+  OpenAI-compatibles y superaron la misma prueba de grounding (2026-07-19).
 
 El corpus externo (informes BdE/INE en PDF) queda como pata futura declarada;
 este corpus interno genera el gold_corpus_manifest.csv comprometido en la E3.
@@ -85,37 +88,47 @@ def retrieve(chunks: list[dict], pregunta: str, k: int = TOP_K) -> list[tuple[fl
     return [(float(sims[i]), chunks[i]) for i in orden if sims[i] >= MIN_SIM]
 
 
-GLM_BASE = "https://api.z.ai/api/coding/paas/v4"  # endpoint del Coding Plan (el general da 429)
-GLM_MODEL = "glm-5.2"
+# Motores OpenAI-compatibles verificados con la misma prueba de grounding
+# (2026-07-19). glm y mimo son razonadores: gastan tokens en reasoning oculto
+# ANTES del contenido — max_tokens corto devuelve content vacío; kimi k2.6 no.
+# kimi k2.6 además va con temperatura bloqueada: no se envía el parámetro.
+ENGINES = {
+    "kimi": {"base": "https://api.moonshot.ai/v1", "model": "kimi-k2.6",
+             "key_env": "KIMI_API_KEY", "max_tokens": 1500},
+    "glm": {"base": "https://api.z.ai/api/coding/paas/v4",  # Coding Plan (el general da 429)
+            "model": "glm-5.2", "key_env": "GLM_API_KEY", "max_tokens": 4000},
+    "mimo": {"base": "https://token-plan-ams.xiaomimimo.com/v1", "model": "mimo-v2.5-pro",
+             "key_env": "MIMO_API_KEY", "max_tokens": 4000},
+}
+DEFAULT_ENGINE = "kimi"
 
 
-def _glm_api_key() -> str:
+def _api_key(key_env: str) -> str:
     import os
-    key = os.environ.get("GLM_API_KEY", "")
+    key = os.environ.get(key_env, "")
     if not key:  # fallback: leer ~/.secrets sin exigir shell login
         secrets = pathlib.Path.home() / ".secrets"
         if secrets.exists():
-            m = re.search(r'GLM_API_KEY=([^\s"\']+)', secrets.read_text())
+            m = re.search(key_env + r'=([^\s"\']+)', secrets.read_text())
             key = m.group(1) if m else ""
     if not key:
-        raise RuntimeError("GLM_API_KEY no encontrada (ni en el entorno ni en ~/.secrets)")
+        raise RuntimeError(f"{key_env} no encontrada (ni en el entorno ni en ~/.secrets)")
     return key
 
 
-def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]]) -> str:
+def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]], engine: str = DEFAULT_ENGINE) -> str:
     import requests
+    cfg = ENGINES[engine]
     contexto = "\n\n".join(
         f"[{i + 1}] ({c['fuente']} § {c['seccion']})\n{c['texto'][:2500]}"
         for i, (_, c) in enumerate(pasajes)
     )
     r = requests.post(
-        f"{GLM_BASE}/chat/completions",
-        headers={"Authorization": f"Bearer {_glm_api_key()}"},
+        f"{cfg['base']}/chat/completions",
+        headers={"Authorization": f"Bearer {_api_key(cfg['key_env'])}"},
         json={
-            "model": GLM_MODEL,
-            # modelo razonador: gasta tokens en reasoning oculto ANTES del
-            # contenido — un max_tokens corto devuelve content vacío
-            "max_tokens": 4000,
+            "model": cfg["model"],
+            "max_tokens": cfg["max_tokens"],
             "messages": [
                 {"role": "system", "content": SYSTEM},
                 {"role": "user", "content": f"Pasajes del corpus:\n\n{contexto}\n\nPregunta: {pregunta}"},
@@ -128,14 +141,16 @@ def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]]) -> str:
     contenido = (choice["message"].get("content") or "").strip()
     if not contenido:
         razon = choice.get("finish_reason", "?")
-        return f"[GLM devolvió contenido vacío (finish_reason={razon}) — sube max_tokens]"
+        return f"[{cfg['model']} devolvió contenido vacío (finish_reason={razon}) — sube max_tokens]"
     return contenido
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Asistente RAG del proyecto")
     ap.add_argument("pregunta", nargs="*", help="La pregunta")
-    ap.add_argument("--llm", action="store_true", help="Redactar respuesta con GLM-5.2 (requiere GLM_API_KEY)")
+    ap.add_argument("--llm", action="store_true", help="Redactar respuesta con un LLM (requiere clave del motor)")
+    ap.add_argument("--engine", choices=sorted(ENGINES), default=DEFAULT_ENGINE,
+                    help=f"Motor del modo --llm (defecto: {DEFAULT_ENGINE})")
     ap.add_argument("--build", action="store_true", help="Solo regenerar gold_corpus_manifest.csv")
     ap.add_argument("-k", type=int, default=TOP_K)
     args = ap.parse_args()
@@ -156,7 +171,7 @@ def main() -> None:
 
     if args.llm:
         try:
-            print(responder_llm(pregunta, pasajes))
+            print(responder_llm(pregunta, pasajes, args.engine))
             print("\n— Fuentes —")
         except Exception as e:  # sin credenciales, sin saldo o sin red → degradar a pasajes
             detalle = str(e).split("message")[-1][:140]
