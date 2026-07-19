@@ -103,6 +103,49 @@ def main() -> None:
           f"vs 2013={tot13:,.0f} (colapso x{tot06 / max(tot13, 1):.0f}) → mitma_licencias_ccaa.csv")
 
 
+VT_ID = "35102000"  # Valor tasado vivienda libre, €/m², trimestral 2010–2014 (serie del Boletín v2)
+VT_CCAA = {
+    "TOTAL NACIONAL": "Nacional", "Andalucía": "Andalucía", "Aragón": "Aragón",
+    "Asturias (Principado de )": "Asturias, Principado de", "Balears (Illes)": "Balears, Illes",
+    "Canarias": "Canarias", "Cantabria": "Cantabria", "Castilla y León": "Castilla y León",
+    "Castilla-La Mancha": "Castilla - La Mancha", "Cataluña": "Cataluña",
+    "Comunitat Valenciana": "Comunitat Valenciana", "Extremadura": "Extremadura",
+    "Galicia": "Galicia", "Madrid (Comunidad de)": "Madrid, Comunidad de",
+    "Murcia (Región de)": "Murcia, Región de", "Navarra (Comunidad Foral de)": "Navarra, Comunidad Foral de",
+    "País Vasco": "País Vasco", "Rioja (La)": "Rioja, La", "Ceuta": "Ceuta", "Melilla": "Melilla",
+}
+
+
+def fetch_valor_tasado() -> None:
+    """€/m² tasado por CCAA (ancla 2010–2014; el puente a hoy lo pone el IPV propio)."""
+    url = BASE.format(xid=VT_ID).replace("BoletinOnline/", "BoletinOnline2/")
+    r = requests.get(url, headers=UA, timeout=90)
+    r.raise_for_status()
+    save_raw_bytes(f"mitma_valor_tasado_{VT_ID}.xls", r.content, url)
+    wb = xlrd.open_workbook(file_contents=r.content)
+    sh = wb.sheet_by_index(0)
+    rows = []
+    for i in range(15, sh.nrows):
+        etiqueta = str(sh.cell_value(i, 1)).strip()
+        ccaa = VT_CCAA.get(etiqueta)
+        if not ccaa:
+            continue  # provincias (etiquetas con padding) y filas vacías
+        for j in range(2, sh.ncols):
+            v = sh.cell_value(i, j)
+            if isinstance(v, float) and v > 0:
+                q = j - 2
+                rows.append({"ccaa": ccaa, "anyo": 2010 + q // 4, "quarter": q % 4 + 1,
+                             "eur_m2": v})
+    df = pd.DataFrame(rows)
+    assert df.duplicated(subset=["ccaa", "anyo", "quarter"]).sum() == 0
+    assert df.ccaa.nunique() >= 18, f"solo {df.ccaa.nunique()} territorios"
+    df.to_csv(PROCESSED / "mitma_valor_tasado_ccaa.csv", index=False)
+    nac14 = df.query("ccaa=='Nacional' and anyo==2014").eur_m2.mean()
+    print(f"SMOKE valor tasado: {df.ccaa.nunique()} territorios, 2010–2014; "
+          f"Nacional 2014 = {nac14:,.0f} €/m² → mitma_valor_tasado_ccaa.csv")
+
+
 if __name__ == "__main__":
     sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
     main()
+    fetch_valor_tasado()
