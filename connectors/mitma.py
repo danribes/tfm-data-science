@@ -145,7 +145,116 @@ def fetch_valor_tasado() -> None:
           f"Nacional 2014 = {nac14:,.0f} €/m² → mitma_valor_tasado_ccaa.csv")
 
 
+SUELO_TABLAS = {  # sección 36 del Boletín v2, trimestral 2004Q1– (verificado 2026-07-19)
+    "36100500": "transacciones_n",       # número de transacciones de suelo
+    "36200500": "valor_miles_eur",       # valor total (miles €)
+    "36300500": "superficie_miles_m2",   # superficie transmitida (miles m²)
+    "36400500": "precio_eur_m2",         # precio medio suelo urbano (€/m²)
+}
+
+
+def _norm_lab(s: str) -> str:
+    return re.sub(r"\s+", " ", s).replace("( ", "(").replace(" )", ")").strip()
+
+
+VT_NORM = {_norm_lab(k): v for k, v in VT_CCAA.items()}
+
+
+def fetch_suelo() -> None:
+    """Mercado de suelo por CCAA (flujo trimestral): nº, valor, superficie, precio.
+
+    La superficie transmitida es la medida viva de suelo urbanizable que cambia
+    de manos; el STOCK planificado lo cubre fetch_siu(). Cabecera: fila 10
+    "Año YYYY" cada 4 columnas; la última columna es "Variación" y se excluye
+    parando en el primer año no declarado. Filas 13+: TOTAL NACIONAL, CCAA y
+    provincias (solo se conservan las CCAA del mapa; "Ceuta y Melilla" agregado
+    se salta porque ya vienen por separado).
+    """
+    frames = []
+    for xid, var in SUELO_TABLAS.items():
+        url = BASE.format(xid=xid).replace("BoletinOnline/", "BoletinOnline2/")
+        r = requests.get(url, headers=UA, timeout=90)
+        r.raise_for_status()
+        save_raw_bytes(f"mitma_suelo_{xid}.xls", r.content, url)
+        wb = xlrd.open_workbook(file_contents=r.content)
+        sh = wb.sheet_by_index(0)
+        # columnas de trimestre: bajo cada "Año YYYY" de la fila 10 hay 4
+        qcols = []
+        for j in range(2, sh.ncols):
+            head = str(sh.cell_value(10, j))
+            m = re.search(r"Año (\d{4})", head)
+            if m:
+                y = int(m.group(1))
+                qcols += [(j + k, y, k + 1) for k in range(4)]
+        assert qcols, f"{xid}: cabecera de años no encontrada"
+        for i in range(13, sh.nrows):
+            ccaa = VT_NORM.get(_norm_lab(str(sh.cell_value(i, 1))))
+            if not ccaa:
+                continue
+            for j, y, q in qcols:
+                v = sh.cell_value(i, j) if j < sh.ncols else ""
+                if isinstance(v, float):
+                    frames.append({"ccaa": ccaa, "anyo": y, "quarter": q,
+                                   "variable": var, "valor": v})
+    df = pd.DataFrame(frames)
+    assert df.duplicated(subset=["ccaa", "anyo", "quarter", "variable"]).sum() == 0
+    assert df.ccaa.nunique() >= 18 and df.variable.nunique() == 4
+    df.to_csv(PROCESSED / "mitma_suelo_ccaa.csv", index=False)
+    sup24 = df.query("ccaa=='Nacional' and anyo==2024 and variable=='superficie_miles_m2'").valor.sum()
+    print(f"SMOKE suelo: {df.ccaa.nunique()} territorios, {df.anyo.min()}–{df.anyo.max()}, "
+          f"4 variables; superficie nacional 2024 = {sup24 / 1000:,.1f} millones m² → mitma_suelo_ccaa.csv")
+
+
+SIU_VINTAGES = {
+    # el paquete 2021 desapareció del CDN; se rescata del Wayback (declarado)
+    2021: "http://web.archive.org/web/20220302050749/https://cdn.mitma.gob.es/portal-web-drupal/siu/datos_alfanumericos_siu_-_excel_-_20210709.zip",
+    2025: "https://cdn.mivau.gob.es/portal-web-mivau/urbanismo-suelo/Datos%20alfanumericos%20SIU%20-%20Excel%20-%2020250527.zip",
+}
+
+
+def fetch_siu() -> None:
+    """STOCK de suelo por clases urbanísticas (SIU, planes municipales).
+
+    Única fuente machine-readable del suelo urbanizable PLANIFICADO por CCAA.
+    Dos añadas (2021 y 2025); la cobertura municipal difiere (49 %→71 % en
+    Andalucía p. ej.), así que la comparación honesta es entre PORCENTAJES de
+    la superficie estudiada, no entre km² absolutos — ambos se publican y la
+    cobertura viaja en la tabla. CPrSuzDe/Nd = % urbanizable delimitado/no
+    delimitado; CTotSue = km² de los municipios estudiados.
+    """
+    import io
+    import zipfile
+
+    rows = []
+    for vintage, url in SIU_VINTAGES.items():
+        r = requests.get(url, headers=UA, timeout=300)
+        r.raise_for_status()
+        zf = zipfile.ZipFile(io.BytesIO(r.content))
+        with zf.open("clases_suelo_ccaa.xlsx") as f:
+            d = pd.read_excel(f)
+        for _, x in d.iterrows():
+            cob = re.search(r"\((\d+)%\)", str(x.MunEstud))
+            rows.append({
+                "ccaa_siu": x.DenCA, "vintage": vintage,
+                "km2_estudiado": x.CTotSue,
+                "cobertura_mun_pct": int(cob.group(1)) if cob else None,
+                "pct_urbano_consolidado": x.CPrSuCon,
+                "pct_urbanizable_delimitado": x.CPrSuzDe,
+                "pct_urbanizable_no_delimitado": x.CPrSuzNd,
+                "km2_urbanizable": x.CTotSue * (x.CPrSuzDe + x.CPrSuzNd) / 100,
+            })
+        save_raw_bytes(f"siu_clases_suelo_{vintage}.zip", r.content, url)
+    df = pd.DataFrame(rows)
+    assert df.vintage.nunique() == 2 and df.ccaa_siu.nunique() >= 19
+    df.to_csv(PROCESSED / "siu_clases_suelo_ccaa.csv", index=False)
+    nac = df.groupby("vintage").km2_urbanizable.sum()
+    print(f"SMOKE SIU: {df.ccaa_siu.nunique()} CCAA × 2 añadas; urbanizable estudiado "
+          f"{nac[2021]:,.0f} km² (2021) → {nac[2025]:,.0f} km² (2025) → siu_clases_suelo_ccaa.csv")
+
+
 if __name__ == "__main__":
     sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
     main()
     fetch_valor_tasado()
+    fetch_suelo()
+    fetch_siu()
