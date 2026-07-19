@@ -29,6 +29,6 @@ def test_contests_ejecutados(archivo, metodo):
     d = pd.read_csv(f)
     assert set(d.metodo) == {metodo}
     assert d.h.max() == 8 and d.ccaa.nunique() >= 17
-    # el test final 2024+ sigue intocable: ningún error evaluado ahí
-    d["p"] = pd.PeriodIndex(d.t, freq="Q")
-    assert (d.p < pd.Period("2024Q1", freq="Q")).all()
+    # el test final 2024+ sigue intocable: ninguna diana (origen+h) cae ahí
+    diana = pd.PeriodIndex(d.origen, freq="Q") + d.h.values
+    assert (diana < pd.Period("2024Q1", freq="Q")).all()
