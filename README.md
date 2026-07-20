@@ -29,6 +29,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/vivienda_global.md](docs/vivienda_global.md) | Panel internacional de vivienda: precios reales (BIS 1971–), precio/renta (OCDE) y suelo artificial |
 | [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
 | [docs/Guia ML-DL.md](docs/Guia%20ML-DL.md) | Guía ML/DL: mapa de técnicas por módulo, el tooling con LLM (RAG, motores, consejo) y ejemplos de uso con Claude |
+| [docs/ablacion_llm.md](docs/ablacion_llm.md) | Ablación LLM: prueba de que la capa ML/DL+RAG diferencia (LLM solo 3/12 vs LLM+sistema 11/12) + dónde vive el ML/DL |
 | [docs/horizonte_50.md](docs/horizonte_50.md) | Sistema a 50 años: sobres condicionales de deuda (MC 2070) y bienestar, panel within y calibración con 300 años de historia |
 | [docs/despliegue.md](docs/despliegue.md) | Despliegue y operación: demo pública, réplica Docker, modo sin-red y qué sirve cada superficie |
 | [docs/glosario.md](docs/glosario.md) | Glosario de todas las siglas: instituciones, bases de datos, métodos y códigos de contabilidad nacional |

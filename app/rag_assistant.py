@@ -99,6 +99,8 @@ ENGINES = {
             "model": "glm-5.2", "key_env": "GLM_API_KEY", "max_tokens": 4000},
     "mimo": {"base": "https://token-plan-ams.xiaomimimo.com/v1", "model": "mimo-v2.5-pro",
              "key_env": "MIMO_API_KEY", "max_tokens": 4000},
+    "gemini": {"base": "https://generativelanguage.googleapis.com/v1beta/openai",
+               "model": "gemini-2.5-pro", "key_env": "GEMINI_API_KEY", "max_tokens": 4000},
 }
 DEFAULT_ENGINE = "kimi"
 

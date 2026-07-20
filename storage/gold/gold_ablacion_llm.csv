@@ -1,0 +1,13 @@
+id,verdad,llm_solo,llm_rag,err_solo,err_rag,acierto_solo,acierto_rag,fecha_ejecucion,engine
+ratio_2024,1.26,1.32,1.26,0.04761904761904766,0.0,True,True,2026-07-19,gemini-2.5-pro
+ratio_2027,1.64,40.7,1.64,23.81707317073171,0.0,False,True,2026-07-19,gemini-2.5-pro
+mase_drift,0.395,0.87,,1.2025316455696202,,False,False,2026-07-19,gemini-2.5-pro
+deuda_2050,224.0,135.0,224.0,0.39732142857142855,0.0,False,True,2026-07-19,gemini-2.5-pro
+deuda_sin_demo,127.0,6.5,127.0,0.9488188976377953,0.0,False,True,2026-07-19,gemini-2.5-pro
+deuda_2070_mc,409.0,181.0,409.0,0.5574572127139364,0.0,False,True,2026-07-19,gemini-2.5-pro
+esfuerzo_2024,41.6,37.0,41.6,0.1105769230769231,0.0,False,True,2026-07-19,gemini-2.5-pro
+gasto_1900,11.0,8.7,11.0,0.20909090909090916,0.0,False,True,2026-07-19,gemini-2.5-pro
+residual_esp,2.72,3.2,2.7,0.1764705882352941,0.007352941176470594,True,True,2026-07-19,gemini-2.5-pro
+bienestar_2050,-12.3,-8.2,-12.3,0.3333333333333334,0.0,False,True,2026-07-19,gemini-2.5-pro
+beta65,0.912,1.0,0.91,0.0964912280701754,0.002192982456140353,True,True,2026-07-19,gemini-2.5-pro
+spearman_suelo,0.01,0.35,0.01,0.33999999999999997,0.0,False,True,2026-07-19,gemini-2.5-pro
