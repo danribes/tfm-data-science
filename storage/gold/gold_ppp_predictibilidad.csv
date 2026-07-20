@@ -1,0 +1,4 @@
+prueba,metrica,drift,naive
+nivel_ppa,MAE_log,0.0853,0.0725
+crecimiento_ar1,corr,0.109,
+convergencia_beta,pendiente,-0.0044,-0.31

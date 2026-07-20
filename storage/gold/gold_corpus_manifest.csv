@@ -348,37 +348,43 @@ docs/pobreza_infantil.md#345,docs/pobreza_infantil.md,Lo que SÍ la predice: la 
 docs/pobreza_infantil.md#346,docs/pobreza_infantil.md,"Sobre condicional de pobreza infantil (España, base 33,8 %)",517
 docs/pobreza_infantil.md#347,docs/pobreza_infantil.md,Encaje con el resto del proyecto,408
 docs/pobreza_infantil.md#348,docs/pobreza_infantil.md,Límites declarados,447
-docs/proxy_adelantado.md#349,docs/proxy_adelantado.md,Proxies adelantados: variables que anticipan el precio de la vivienda,807
-docs/proxy_adelantado.md#350,docs/proxy_adelantado.md,Ranking (|correlación| con el precio futuro),628
-docs/proxy_adelantado.md#351,docs/proxy_adelantado.md,El hallazgo clave: la aceleración de la población,977
-docs/proxy_adelantado.md#352,docs/proxy_adelantado.md,El compañero robusto: las hipotecas,359
-docs/proxy_adelantado.md#353,docs/proxy_adelantado.md,Lo que NO se adopta sin más,813
-docs/proxy_adelantado.md#354,docs/proxy_adelantado.md,Uso propuesto,430
-docs/rendimiento_a1.md#355,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
-docs/rendimiento_a1.md#356,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
-docs/rendimiento_a1.md#357,docs/rendimiento_a1.md,2. Resultados de la selección,807
-docs/rendimiento_a1.md#358,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
-docs/rendimiento_a1.md#359,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
-docs/stress_test_qa.md#360,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
-docs/stress_test_qa.md#361,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
-docs/stress_test_qa.md#362,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
-docs/stress_test_qa.md#363,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
-docs/stress_test_qa.md#364,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
-docs/stress_test_qa.md#365,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
-docs/stress_test_qa.md#366,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
-docs/stress_test_qa.md#367,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
-docs/stress_test_qa.md#368,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
-docs/stress_test_qa.md#369,docs/stress_test_qa.md,Veredicto del stress test,646
-docs/test_final_t1.md#370,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
-docs/test_final_t1.md#371,docs/test_final_t1.md,1. Resultados,468
-docs/test_final_t1.md#372,docs/test_final_t1.md,2. Lecturas,1724
-docs/test_final_t1.md#373,docs/test_final_t1.md,3. Registro,378
-docs/tipologias_a2.md#374,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
-docs/tipologias_a2.md#375,docs/tipologias_a2.md,Método,307
-docs/tipologias_a2.md#376,docs/tipologias_a2.md,Resultados,1030
-docs/tipologias_a2.md#377,docs/tipologias_a2.md,Límites,354
-docs/vivienda_global.md#378,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
-docs/vivienda_global.md#379,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
-docs/vivienda_global.md#380,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
-docs/vivienda_global.md#381,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
-docs/vivienda_global.md#382,docs/vivienda_global.md,4. Uso en el proyecto,350
+docs/ppp_predictibilidad.md#349,docs/ppp_predictibilidad.md,¿Es predecible la renta en paridad de poder adquisitivo (PPA)?,425
+docs/ppp_predictibilidad.md#350,docs/ppp_predictibilidad.md,Respuesta en tres niveles,650
+docs/ppp_predictibilidad.md#351,docs/ppp_predictibilidad.md,"La convergencia, verificada adversarialmente (3 de 4 ataques superados)",1279
+docs/ppp_predictibilidad.md#352,docs/ppp_predictibilidad.md,Veredicto honesto (para el tribunal),805
+docs/ppp_predictibilidad.md#353,docs/ppp_predictibilidad.md,Encaje con el proyecto,522
+docs/ppp_predictibilidad.md#354,docs/ppp_predictibilidad.md,Límites declarados,339
+docs/proxy_adelantado.md#355,docs/proxy_adelantado.md,Proxies adelantados: variables que anticipan el precio de la vivienda,807
+docs/proxy_adelantado.md#356,docs/proxy_adelantado.md,Ranking (|correlación| con el precio futuro),628
+docs/proxy_adelantado.md#357,docs/proxy_adelantado.md,El hallazgo clave: la aceleración de la población,977
+docs/proxy_adelantado.md#358,docs/proxy_adelantado.md,El compañero robusto: las hipotecas,359
+docs/proxy_adelantado.md#359,docs/proxy_adelantado.md,Lo que NO se adopta sin más,813
+docs/proxy_adelantado.md#360,docs/proxy_adelantado.md,Uso propuesto,430
+docs/rendimiento_a1.md#361,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
+docs/rendimiento_a1.md#362,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
+docs/rendimiento_a1.md#363,docs/rendimiento_a1.md,2. Resultados de la selección,807
+docs/rendimiento_a1.md#364,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
+docs/rendimiento_a1.md#365,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
+docs/stress_test_qa.md#366,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
+docs/stress_test_qa.md#367,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
+docs/stress_test_qa.md#368,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
+docs/stress_test_qa.md#369,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
+docs/stress_test_qa.md#370,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
+docs/stress_test_qa.md#371,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
+docs/stress_test_qa.md#372,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
+docs/stress_test_qa.md#373,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
+docs/stress_test_qa.md#374,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
+docs/stress_test_qa.md#375,docs/stress_test_qa.md,Veredicto del stress test,646
+docs/test_final_t1.md#376,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
+docs/test_final_t1.md#377,docs/test_final_t1.md,1. Resultados,468
+docs/test_final_t1.md#378,docs/test_final_t1.md,2. Lecturas,1724
+docs/test_final_t1.md#379,docs/test_final_t1.md,3. Registro,378
+docs/tipologias_a2.md#380,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
+docs/tipologias_a2.md#381,docs/tipologias_a2.md,Método,307
+docs/tipologias_a2.md#382,docs/tipologias_a2.md,Resultados,1030
+docs/tipologias_a2.md#383,docs/tipologias_a2.md,Límites,354
+docs/vivienda_global.md#384,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
+docs/vivienda_global.md#385,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
+docs/vivienda_global.md#386,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
+docs/vivienda_global.md#387,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
+docs/vivienda_global.md#388,docs/vivienda_global.md,4. Uso en el proyecto,350
