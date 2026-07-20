@@ -59,7 +59,7 @@ docs/MEMORIA.md#56,docs/MEMORIA.md,4.3-nonies Bienestar y pobreza infantil: el m
 docs/MEMORIA.md#57,docs/MEMORIA.md,4.4 D1 — Escenarios de deuda 2024–2050,768
 docs/MEMORIA.md#58,docs/MEMORIA.md,4.4-bis Horizonte 50 años: sobres condicionales de economía y bienestar,1486
 docs/MEMORIA.md#59,docs/MEMORIA.md,"4.5 El producto (MVP): dashboard publicado, API y arranque garantizado",924
-docs/MEMORIA.md#60,docs/MEMORIA.md,4.6 ¿Por qué no basta un LLM?,3406
+docs/MEMORIA.md#60,docs/MEMORIA.md,4.6 ¿Por qué no basta un LLM?,3434
 docs/MEMORIA.md#61,docs/MEMORIA.md,5. Limitaciones,1491
 docs/MEMORIA.md#62,docs/MEMORIA.md,6. Conclusiones,983
 docs/MEMORIA.md#63,docs/MEMORIA.md,7. Trabajo futuro,429
@@ -95,7 +95,7 @@ docs/RECONCILIACION_plan_maestro_vs_entregas.md#92,docs/RECONCILIACION_plan_maes
 docs/RECONCILIACION_plan_maestro_vs_entregas.md#93,docs/RECONCILIACION_plan_maestro_vs_entregas.md,4. Secuencia recomendada (sin cambiar el calendario F0),685
 docs/ablacion_llm.md#94,docs/ablacion_llm.md,Resumen en lenguaje llano (para leer antes que las tablas),2284
 docs/ablacion_llm.md#95,docs/ablacion_llm.md,Diseño,567
-docs/ablacion_llm.md#96,docs/ablacion_llm.md,Resultado,883
+docs/ablacion_llm.md#96,docs/ablacion_llm.md,Resultado,1185
 docs/ablacion_llm.md#97,docs/ablacion_llm.md,Lectura,853
 docs/ablacion_llm.md#98,docs/ablacion_llm.md,Segunda parte: ¿dónde vive el ML/DL en el modelo?,1529
 docs/arquitecturas_prediccion.md#99,docs/arquitecturas_prediccion.md,"Cómo se predicen los resultados: directa, encadenada y condicional",421
@@ -122,7 +122,7 @@ docs/candidatos_t1.md#119,docs/candidatos_t1.md,4. Qué podría mover el resulta
 docs/candidatos_t1.md#120,docs/candidatos_t1.md,5. Estado de la disciplina de evaluación,315
 docs/comparativa_llm_vs_modelo.md#121,docs/comparativa_llm_vs_modelo.md,Comparativa detallada: asistente de IA solo vs modelo completo,510
 docs/comparativa_llm_vs_modelo.md#122,docs/comparativa_llm_vs_modelo.md,Qué significan las tres columnas,695
-docs/comparativa_llm_vs_modelo.md#123,docs/comparativa_llm_vs_modelo.md,Marcador global,333
+docs/comparativa_llm_vs_modelo.md#123,docs/comparativa_llm_vs_modelo.md,Marcador global,649
 docs/comparativa_llm_vs_modelo.md#124,docs/comparativa_llm_vs_modelo.md,"1. Ratio de asequibilidad de la vivienda en España, 2024",377
 docs/comparativa_llm_vs_modelo.md#125,docs/comparativa_llm_vs_modelo.md,2. Ratio de asequibilidad proyectado a finales de 2027,416
 docs/comparativa_llm_vs_modelo.md#126,docs/comparativa_llm_vs_modelo.md,"3. Precisión del modelo campeón en la validación (MASE, horizonte ≤4)",444

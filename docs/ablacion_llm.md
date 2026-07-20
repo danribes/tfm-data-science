@@ -68,7 +68,12 @@ citar con ellas.
 | Elasticidad β65 pensiones | 0,912 | 1,0 ✅ | 0,91 ✅ |
 | Spearman precio/renta vs suelo | 0,01 | **0,35** ❌ | 0,01 ✅ |
 
-**LLM solo: 3/12. LLM + sistema: 11/12. Error relativo mediano: 27 % → 0 %.**
+**LLM solo: 3/12. LLM + sistema: 11/12. Error relativo del LLM solo: mediana 27 % (rango 5 %–2382 %) → con el sistema, 0 %.**
+
+(El rango importa: la mediana del 27 % no significa "27 % de error de media" sino
+"típicamente 27 %, pero hasta 2382 %" — el caso del ratio 2027, donde el LLM solo
+dio 40,7 frente al 1,64 real. Un solo número esconde lo catastrófico de algunos
+fallos.)
 
 ### Lectura
 

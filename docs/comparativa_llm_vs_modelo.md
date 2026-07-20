@@ -23,10 +23,15 @@ Un acierto = caer dentro de una tolerancia razonable del valor verdadero
 
 ## Marcador global
 
-| | Aciertos | Error relativo mediano |
+| | Aciertos | Error relativo (mediana · rango) |
 |---|---|---|
-| **IA sola** | **3 / 12** | 27 % |
+| **IA sola** | **3 / 12** | 27 % · de 5 % a 2382 % |
 | **IA + modelo completo** | **11 / 12** | 0 % |
+
+El rango de la IA sola es lo revelador: la mediana del 27 % no dice "27 % de
+error de media", sino "típicamente 27 %, pero hasta 2382 %" — hay fallos
+puntuales catastróficos (el ratio 2027, donde da 40,7 en vez de 1,64). Un solo
+número esconde esa cola; por eso se reporta con su rango.
 
 La diferencia es masiva y en la dirección que exige el tutor: la capa de
 matemáticas y datos es la que produce los resultados; el asistente, sin ella,

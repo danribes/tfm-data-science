@@ -149,7 +149,9 @@ def main() -> None:
     print(f"\nRESULTADO: LLM solo acierta {int(d.acierto_solo.sum())}/{n}; "
           f"LLM+RAG acierta {int(d.acierto_rag.sum())}/{n}")
     rel = d[d.err_solo.notna() & d.err_rag.notna() & (d.id != "spearman_suelo")]
-    print(f"|error relativo| mediano: solo {rel.err_solo.median():.0%} vs rag {rel.err_rag.median():.0%}")
+    print(f"|error relativo| solo: mediana {rel.err_solo.median():.0%} "
+          f"(rango {rel.err_solo.min():.0%}–{rel.err_solo.max():.0%}) "
+          f"vs rag: mediana {rel.err_rag.median():.0%}")
     print("→ gold_ablacion_llm.csv")
 
 
