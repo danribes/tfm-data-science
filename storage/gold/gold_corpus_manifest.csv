@@ -93,7 +93,7 @@ docs/RECONCILIACION_plan_maestro_vs_entregas.md#90,docs/RECONCILIACION_plan_maes
 docs/RECONCILIACION_plan_maestro_vs_entregas.md#91,docs/RECONCILIACION_plan_maestro_vs_entregas.md,3.4 Métrica de asequibilidad — petición del tutor sin recoger aún en el plan,931
 docs/RECONCILIACION_plan_maestro_vs_entregas.md#92,docs/RECONCILIACION_plan_maestro_vs_entregas.md,3.5 Ficheros que no deben viajar al remoto,261
 docs/RECONCILIACION_plan_maestro_vs_entregas.md#93,docs/RECONCILIACION_plan_maestro_vs_entregas.md,4. Secuencia recomendada (sin cambiar el calendario F0),685
-docs/ablacion_llm.md#94,docs/ablacion_llm.md,Ablación LLM: ¿marca la diferencia la capa ML/DL + RAG?,655
+docs/ablacion_llm.md#94,docs/ablacion_llm.md,Resumen en lenguaje llano (para leer antes que las tablas),2284
 docs/ablacion_llm.md#95,docs/ablacion_llm.md,Diseño,567
 docs/ablacion_llm.md#96,docs/ablacion_llm.md,Resultado,883
 docs/ablacion_llm.md#97,docs/ablacion_llm.md,Lectura,853
@@ -120,236 +120,252 @@ docs/candidatos_t1.md#117,docs/candidatos_t1.md,"2. Resultados (MASE, media CCAA
 docs/candidatos_t1.md#118,docs/candidatos_t1.md,3. Veredicto según las reglas pre-registradas,1457
 docs/candidatos_t1.md#119,docs/candidatos_t1.md,4. Qué podría mover el resultado (trabajo futuro declarado),506
 docs/candidatos_t1.md#120,docs/candidatos_t1.md,5. Estado de la disciplina de evaluación,315
-docs/data_dictionary_master.md#121,docs/data_dictionary_master.md,Diccionario maestro de datos — todas las familias de fuentes,691
-docs/data_dictionary_master.md#122,docs/data_dictionary_master.md,EUROSTAT — Gobierno / finanzas públicas,1538
-docs/data_dictionary_master.md#123,docs/data_dictionary_master.md,EUROSTAT — EU-SILC ingresos y vivienda,1510
-docs/data_dictionary_master.md#124,docs/data_dictionary_master.md,EUROSTAT — Precios vivienda y migración,1020
-docs/data_dictionary_master.md#125,docs/data_dictionary_master.md,EUROSTAT — Protección social y residuos,915
-docs/data_dictionary_master.md#126,docs/data_dictionary_master.md,"EUROSTAT — Cuentas nacionales, demografía y salud",1548
-docs/data_dictionary_master.md#127,docs/data_dictionary_master.md,IMF — WEO (World Economic Outlook),628
-docs/data_dictionary_master.md#128,docs/data_dictionary_master.md,"IMF — GFS family (data.imf.org, new API)",1900
-docs/data_dictionary_master.md#129,docs/data_dictionary_master.md,IMF — related fiscal DBs found in same probe,369
-docs/data_dictionary_master.md#130,docs/data_dictionary_master.md,Cross-cutting traps,552
-docs/data_dictionary_master.md#131,docs/data_dictionary_master.md,WDI — World Development Indicators (source=2),936
-docs/data_dictionary_master.md#132,docs/data_dictionary_master.md,"WWBI — Worldwide Bureaucracy Indicators (source=64, 302 indicators [V])",718
-docs/data_dictionary_master.md#133,docs/data_dictionary_master.md,Sources registry (api.worldbank.org/v2/sources) [V],722
-docs/data_dictionary_master.md#134,docs/data_dictionary_master.md,WGI — six governance dimensions,840
-docs/data_dictionary_master.md#135,docs/data_dictionary_master.md,"HLO — Harmonized Learning Outcomes (under HCI, source=63)",423
-docs/data_dictionary_master.md#136,docs/data_dictionary_master.md,OECD — Gasto público COFOG (National Accounts Table 11),848
-docs/data_dictionary_master.md#137,docs/data_dictionary_master.md,OECD — Revenue Statistics (Global),806
-docs/data_dictionary_master.md#138,docs/data_dictionary_master.md,OECD — SOCX gasto social,959
-docs/data_dictionary_master.md#139,docs/data_dictionary_master.md,OECD — Analytical house prices,648
-docs/data_dictionary_master.md#140,docs/data_dictionary_master.md,OECD — ALMP / Labour market programmes,835
-docs/data_dictionary_master.md#141,docs/data_dictionary_master.md,OECD — International Migration Database,838
-docs/data_dictionary_master.md#142,docs/data_dictionary_master.md,"WHO GHED — Global Health Expenditure Database (via GHO OData, SHA-2011)",1334
-docs/data_dictionary_master.md#143,docs/data_dictionary_master.md,WHO GHO — Obesity & Tobacco indicators,1073
-docs/data_dictionary_master.md#144,docs/data_dictionary_master.md,UNESCO UIS — Education finance (new public API),1200
-docs/data_dictionary_master.md#145,docs/data_dictionary_master.md,ILOSTAT — Employment / public-sector employment,1442
-docs/data_dictionary_master.md#146,docs/data_dictionary_master.md,INE wstempus (base `https://servicios.ine.es/wstempus/js/ES/{FUNC}/{id}`) — [V] probed 2026-07-18,2008
-docs/data_dictionary_master.md#147,docs/data_dictionary_master.md,INE COFOG file,370
-docs/data_dictionary_master.md#148,docs/data_dictionary_master.md,IGAE subsector series,437
-docs/data_dictionary_master.md#149,docs/data_dictionary_master.md,"BOE open-data API — [V] probed (sumario 20260717, HTTP 200)",732
-docs/data_dictionary_master.md#150,docs/data_dictionary_master.md,AEAT informes de recaudación,477
-docs/data_dictionary_master.md#151,docs/data_dictionary_master.md,Liquidaciones presupuestos CCAA (Min. Hacienda),459
-docs/data_dictionary_master.md#152,docs/data_dictionary_master.md,MITMA vivienda/suelo,461
-docs/data_dictionary_master.md#153,docs/data_dictionary_master.md,1. TED API v3 (EU public procurement notices),1091
-docs/data_dictionary_master.md#154,docs/data_dictionary_master.md,"2. BDNS / infosubvenciones (Spanish subsidies, SNPSAP)",1134
-docs/data_dictionary_master.md#155,docs/data_dictionary_master.md,3. legislation.gov.uk (UK statute book),924
-docs/data_dictionary_master.md#156,docs/data_dictionary_master.md,"4. opentender.eu (bulk tender data, DIGIWHIST/TheyBuyForYou)",935
-docs/data_dictionary_master.md#157,docs/data_dictionary_master.md,5. EUR-Lex CELLAR / SPARQL,892
-docs/data_dictionary_master.md#158,docs/data_dictionary_master.md,6. EC Financial Transparency System (FTS),1060
-docs/data_dictionary_master.md#159,docs/data_dictionary_master.md,"JST Macrohistory Database (jst.xlsx, R6-style)",1162
-docs/data_dictionary_master.md#160,docs/data_dictionary_master.md,Global Macro Database (KMueller-Lab GMD),1177
-docs/data_dictionary_master.md#161,docs/data_dictionary_master.md,ICTD/UNU-WIDER Government Revenue Dataset (GRD),842
-docs/data_dictionary_master.md#162,docs/data_dictionary_master.md,SIPRI Military Expenditure Database,435
-docs/data_dictionary_master.md#163,docs/data_dictionary_master.md,WID.world (World Inequality Database),851
-docs/data_dictionary_master.md#164,docs/data_dictionary_master.md,CEPEJ-STAT (European judicial systems),745
-docs/data_dictionary_master.md#165,docs/data_dictionary_master.md,CPDS + QoG (one-liners),700
-docs/data_dictionary_master.md#166,docs/data_dictionary_master.md,1. OECD DAC CRS (creditor reporting system),899
-docs/data_dictionary_master.md#167,docs/data_dictionary_master.md,2. World Bank IDS (International Debt Statistics),804
-docs/data_dictionary_master.md#168,docs/data_dictionary_master.md,3. UN DESA International Migrant Stock 2024,585
-docs/data_dictionary_master.md#169,docs/data_dictionary_master.md,4. UNHCR Refugee Population Statistics API,626
-docs/data_dictionary_master.md#170,docs/data_dictionary_master.md,5. AidData Global Chinese Development Finance (GCDF 3.0),660
-docs/data_dictionary_master.md#171,docs/data_dictionary_master.md,6. World Bank / KNOMAD bilateral remittance matrix,616
-docs/data_dictionary_master.md#172,docs/data_dictionary_master.md,7. EU Cohesion Open Data (cohesiondata),690
-docs/data_dictionary_vivienda.md#173,docs/data_dictionary_vivienda.md,Diccionario de datos — Variante C (vivienda como consecuencias),501
-docs/data_dictionary_vivienda.md#174,docs/data_dictionary_vivienda.md,"0. Decisión: extracción SELECTIVA, nunca volcado completo",751
-docs/data_dictionary_vivienda.md#175,docs/data_dictionary_vivienda.md,1.1 Eurostat `gov_10a_exp` — gasto por función × tipo económico **[V]** (consultas reales 2026-07-16/17),786
-docs/data_dictionary_vivienda.md#176,docs/data_dictionary_vivienda.md,1.2 INE COFOG España (`aappgastcofog95_23.xlsx`) **[V]** (descargado y abierto),280
-docs/data_dictionary_vivienda.md#177,docs/data_dictionary_vivienda.md,1.3 IGAE series por subsector **[V]** (acceso verificado; UA navegador),260
-docs/data_dictionary_vivienda.md#178,docs/data_dictionary_vivienda.md,1.4 Liquidaciones presupuestarias CCAA (Hacienda) [D],271
-docs/data_dictionary_vivienda.md#179,docs/data_dictionary_vivienda.md,"1.5 BOE (API sumarios + XML) **[V]** (parser probado: PGE 2023 y 2021, leyes CCAA)",311
-docs/data_dictionary_vivienda.md#180,docs/data_dictionary_vivienda.md,2.1 EU-SILC `ilc_lvho07a` (sobrecarga >40% renta) [D],273
-docs/data_dictionary_vivienda.md#181,docs/data_dictionary_vivienda.md,2.3 Panel de asequibilidad propio (gold del TFM) **[V]** (construido),299
-docs/data_dictionary_vivienda.md#182,docs/data_dictionary_vivienda.md,"3. Núcleo España precios/drivers (B3, heredado del TFM) **[V]** (pipeline operativo)",1001
-docs/data_dictionary_vivienda.md#183,docs/data_dictionary_vivienda.md,4.1 OECD Analytical House Prices [D],275
-docs/data_dictionary_vivienda.md#184,docs/data_dictionary_vivienda.md,4.3 OECD Affordable Housing Database [D],204
-docs/data_dictionary_vivienda.md#185,docs/data_dictionary_vivienda.md,5.1 WWBI (WB source=64) **[V]** (diccionario completo extraído: 302 indicadores),711
-docs/data_dictionary_vivienda.md#186,docs/data_dictionary_vivienda.md,6. Demografía/amplificador (B4),539
-docs/data_dictionary_vivienda.md#187,docs/data_dictionary_vivienda.md,7. Resumen: el gold objetivo de la Variante C,831
-docs/data_landscape.md#188,docs/data_landscape.md,Panorama de bases de datos fiscales y económicas (mundo),600
-docs/data_landscape.md#189,docs/data_landscape.md,1. Multilaterales — núcleo armonizado,2035
-docs/data_landscape.md#190,docs/data_landscape.md,2. Multilaterales regionales,697
-docs/data_landscape.md#191,docs/data_landscape.md,3. Académicas / especializadas / históricas,1143
-docs/data_landscape.md#192,docs/data_landscape.md,3-bis. Serie histórica larga — siglo XX (1900–1995),2142
-docs/data_landscape.md#193,docs/data_landscape.md,"3-ter. Fuentes para módulos bolt-on gasto→resultado (3ª ronda del consejo, códigos verificados)",2450
-docs/data_landscape.md#194,docs/data_landscape.md,"3-quater. Pilares del programa integral: SOEs, flujos entre países, migración, satélite",2172
-docs/data_landscape.md#195,docs/data_landscape.md,3-quinquies. Fuentes para el análisis de vivienda (Variante C),253
-docs/data_landscape.md#196,docs/data_landscape.md,Núcleo España (ya en el pipeline del TFM),536
-docs/data_landscape.md#197,docs/data_landscape.md,"Oferta privada de construcción (añadido 2026-07-18, revisión 1 de la Entrega 4)",1182
-docs/data_landscape.md#198,docs/data_landscape.md,Gasto público en vivienda (la capa fiscal de la Variante C),744
-docs/data_landscape.md#199,docs/data_landscape.md,Comparables internacionales (outcomes + precios),1087
-docs/data_landscape.md#200,docs/data_landscape.md,Demografía/demanda (amplificador B4),342
-docs/data_landscape.md#201,docs/data_landscape.md,4. Subnacional (la mayor laguna del listado inicial),836
-docs/data_landscape.md#202,docs/data_landscape.md,5. Portales nacionales,2406
-docs/data_landscape.md#203,docs/data_landscape.md,"6. Capa de decisiones (boletines legales, contratos, subvenciones)",2183
-docs/data_landscape.md#204,docs/data_landscape.md,7. Agregadores,437
-docs/data_landscape.md#205,docs/data_landscape.md,8. Meta: transparencia y calidad fiscal (útiles como controles),383
-docs/data_landscape.md#206,docs/data_landscape.md,9. Notas prácticas (gotchas comprobados en sesión),1110
-docs/demanda_suelo.md#207,docs/demanda_suelo.md,"Capas de demanda, crédito y suelo (expansión Tier 1-3, 2026-07-19)",209
-docs/demanda_suelo.md#208,docs/demanda_suelo.md,1. Conectores nuevos (todos verificados en vivo),1419
-docs/demanda_suelo.md#209,docs/demanda_suelo.md,2. La medida de suelo urbanizable y su evolución,1140
-docs/demanda_suelo.md#210,docs/demanda_suelo.md,3. Contest de validación (protocolo intacto) — CUARTO resultado negativo,1077
-docs/despliegue.md#211,docs/despliegue.md,1. Demo pública (Streamlit Community Cloud) — el modo por defecto,790
-docs/despliegue.md#212,docs/despliegue.md,2. Local con Docker — la vía de réplica garantizada,795
-docs/despliegue.md#213,docs/despliegue.md,3. Local sin Docker (desarrollo),214
-docs/despliegue.md#214,docs/despliegue.md,Qué sirve cada superficie,777
-docs/despliegue.md#215,docs/despliegue.md,Advertencias que viajan con el producto,389
-docs/despliegue.md#216,docs/despliegue.md,Historial de despliegue (trazabilidad),401
-docs/dl_rutas.md#217,docs/dl_rutas.md,Dos rutas de deep learning contra el protocolo T1 (2026-07-19),356
-docs/dl_rutas.md#218,docs/dl_rutas.md,"Ruta 2 — Modelo fundacional zero-shot (Chronos-Bolt, Amazon)",659
-docs/dl_rutas.md#219,docs/dl_rutas.md,Ruta 1 — DL global entrenado en 1.760 series regionales extranjeras,1024
-docs/dl_rutas.md#220,docs/dl_rutas.md,Veredicto y camino declarado,789
-docs/eda_vivienda.md#221,docs/eda_vivienda.md,EDA §2-A — Hallazgos y decisiones de especificación (T1),432
-docs/eda_vivienda.md#222,docs/eda_vivienda.md,1. Hallazgos descriptivos,1038
-docs/eda_vivienda.md#223,docs/eda_vivienda.md,2. Diagnósticos de series (deciden la especificación),1271
-docs/eda_vivienda.md#224,docs/eda_vivienda.md,3. Correlaciones cruzadas con las exógenas candidatas,872
-docs/eda_vivienda.md#225,docs/eda_vivienda.md,4. Decisiones de especificación (quedan fijadas),1083
-docs/eda_vivienda.md#226,docs/eda_vivienda.md,5. Conexión con el MVP,262
-docs/entregas/01_ideas_producto.md#227,docs/entregas/01_ideas_producto.md,Entrega 1 — Ideas de Producto,301
-docs/entregas/01_ideas_producto.md#228,docs/entregas/01_ideas_producto.md,Idea 1 — Arquitectura de Data Science para una Red Energética Global 24/7,596
-docs/entregas/01_ideas_producto.md#229,docs/entregas/01_ideas_producto.md,"Idea 2 — Modelo ""Trigo-a-Cebolla"": ecosistema IA-Blockchain para cultivos perecederos",523
-docs/entregas/01_ideas_producto.md#230,docs/entregas/01_ideas_producto.md,Idea 3 — Blockchain Fiscal Circular y Auditoría Autónoma,467
-docs/entregas/01_ideas_producto.md#231,docs/entregas/01_ideas_producto.md,"Idea 4 — Extractor de Datos Científicos: liberando la ""data oscura""",488
-docs/entregas/01_ideas_producto.md#232,docs/entregas/01_ideas_producto.md,Idea 5 — Refactorizando el Estado: hacia una burocracia impulsada por IA,492
-docs/entregas/01_ideas_producto.md#233,docs/entregas/01_ideas_producto.md,2. Feedback del tutor,1094
-docs/entregas/01_ideas_producto.md#234,docs/entregas/01_ideas_producto.md,Índice de Asequibilidad de Vivienda Regional en España,1626
-docs/entregas/02_datos_necesarios.md#235,docs/entregas/02_datos_necesarios.md,1. Idea seleccionada,3064
-docs/entregas/02_datos_necesarios.md#236,docs/entregas/02_datos_necesarios.md,2. Variables y Datos Necesarios,2302
-docs/entregas/02_datos_necesarios.md#237,docs/entregas/02_datos_necesarios.md,INE — Instituto Nacional de Estadística,2220
-docs/entregas/02_datos_necesarios.md#238,docs/entregas/02_datos_necesarios.md,Fuentes complementarias (drivers y corpus RAG),1893
-docs/entregas/02_datos_necesarios.md#239,docs/entregas/02_datos_necesarios.md,4. Privacidad y Protección de Datos,1088
-docs/entregas/02_datos_necesarios.md#240,docs/entregas/02_datos_necesarios.md,✅ Favorable,537
-docs/entregas/02_datos_necesarios.md#241,docs/entregas/02_datos_necesarios.md,⚠️ Riesgos identificados,1447
-docs/entregas/02_datos_necesarios.md#242,docs/entregas/02_datos_necesarios.md,Alternativas de datos,305
-docs/entregas/03_modelo_datos.md#243,docs/entregas/03_modelo_datos.md,Entrega 3 — Diseño del modelo de datos y capa gold,311
-docs/entregas/03_modelo_datos.md#244,docs/entregas/03_modelo_datos.md,1. Resumen de la idea y datos del proyecto,1507
-docs/entregas/03_modelo_datos.md#245,docs/entregas/03_modelo_datos.md,2. Tecnología y formato de almacenamiento,1149
-docs/entregas/03_modelo_datos.md#246,docs/entregas/03_modelo_datos.md,3. Estructura de capas de datos,1427
-docs/entregas/03_modelo_datos.md#247,docs/entregas/03_modelo_datos.md,4.1 `gold_asequibilidad_ccaa.csv`,999
-docs/entregas/03_modelo_datos.md#248,docs/entregas/03_modelo_datos.md,4.2 `gold_panel_trimestral.csv`,1705
-docs/entregas/03_modelo_datos.md#249,docs/entregas/03_modelo_datos.md,4.3 `gold_corpus_manifest.csv`,897
-docs/entregas/03_modelo_datos.md#250,docs/entregas/03_modelo_datos.md,Resumen de la capa gold,530
-docs/entregas/03_modelo_datos.md#251,docs/entregas/03_modelo_datos.md,5. Relaciones entre datos,2001
-docs/entregas/03_modelo_datos.md#252,docs/entregas/03_modelo_datos.md,6. Diccionario de datos inicial,1929
-docs/entregas/03_modelo_datos.md#253,docs/entregas/03_modelo_datos.md,7. Problemas de calidad esperados (caso concreto),2532
-docs/entregas/03_modelo_datos.md#254,docs/entregas/03_modelo_datos.md,8. Decisiones de limpieza y transformación previstas,1873
-docs/entregas/03_modelo_datos.md#255,docs/entregas/03_modelo_datos.md,9. Riesgos del modelo de datos,1756
-docs/entregas/04_analisis_modelado.md#256,docs/entregas/04_analisis_modelado.md,Entrega 4 — Diseño del análisis y estrategia de modelado,812
-docs/entregas/04_analisis_modelado.md#257,docs/entregas/04_analisis_modelado.md,1. Problema que se busca resolver,1279
-docs/entregas/04_analisis_modelado.md#258,docs/entregas/04_analisis_modelado.md,2-A. Vivienda / asequibilidad (núcleo avalado),1054
-docs/entregas/04_analisis_modelado.md#259,docs/entregas/04_analisis_modelado.md,2-B. Programa fiscal (alcance ampliado),1132
-docs/entregas/04_analisis_modelado.md#260,docs/entregas/04_analisis_modelado.md,3. Modelos planteados,315
-docs/entregas/04_analisis_modelado.md#261,docs/entregas/04_analisis_modelado.md,T1 — Forecasting del IPV trimestral / asequibilidad por CCAA (regresión temporal),1277
-docs/entregas/04_analisis_modelado.md#262,docs/entregas/04_analisis_modelado.md,T2 — Rendimiento ajustado del gasto público (regresión de corte transversal/panel),849
-docs/entregas/04_analisis_modelado.md#263,docs/entregas/04_analisis_modelado.md,4. Datos de entrada,1712
-docs/entregas/04_analisis_modelado.md#264,docs/entregas/04_analisis_modelado.md,5. Salida del modelo y uso en el MVP,1668
-docs/entregas/04_analisis_modelado.md#265,docs/entregas/04_analisis_modelado.md,6. Estrategia para diseñar y seleccionar el modelo,1090
-docs/entregas/04_analisis_modelado.md#266,docs/entregas/04_analisis_modelado.md,"7. Validación, métricas y criterios de aceptación",2065
-docs/entregas/04_analisis_modelado.md#267,docs/entregas/04_analisis_modelado.md,8. Riesgos y alternativas,1687
-docs/entregas/04_analisis_modelado.md#268,docs/entregas/04_analisis_modelado.md,"Revisión 1 (2026-07-18, posterior a la presentación de la entrega)",1857
-docs/entregas/anexo_transicion_proyecto.md#269,docs/entregas/anexo_transicion_proyecto.md,"Anexo a las entregas — Transición del proyecto: de la vivienda al programa ""Dinero público → Resultados""",594
-docs/entregas/anexo_transicion_proyecto.md#270,docs/entregas/anexo_transicion_proyecto.md,1. Respuesta directa al feedback del 12 de julio,1495
-docs/entregas/anexo_transicion_proyecto.md#271,docs/entregas/anexo_transicion_proyecto.md,2. Por qué se amplía el proyecto,808
-docs/entregas/anexo_transicion_proyecto.md#272,docs/entregas/anexo_transicion_proyecto.md,3. Qué se conserva del proyecto vivienda (todo),2306
-docs/entregas/anexo_transicion_proyecto.md#273,docs/entregas/anexo_transicion_proyecto.md,4. Estructura real vs estructura documentada en la Entrega 3,781
-docs/entregas/anexo_transicion_proyecto.md#274,docs/entregas/anexo_transicion_proyecto.md,"5. Alcance TFM (el recorte, no el programa)",709
-docs/entregas/anexo_transicion_proyecto.md#275,docs/entregas/anexo_transicion_proyecto.md,6. Validación,396
-docs/entregas/feedback_tutor_2026-07-12.md#276,docs/entregas/feedback_tutor_2026-07-12.md,Feedback del tutor — Julio Valero (12 de julio de 2026),293
-docs/entregas/feedback_tutor_2026-07-12.md#277,docs/entregas/feedback_tutor_2026-07-12.md,"1. Sobre la entrega ""Trabajo de Fin de Máster. Análisis de datos necesarios"" (`02_datos_necesarios.md`)",1568
-docs/entregas/feedback_tutor_2026-07-12.md#278,docs/entregas/feedback_tutor_2026-07-12.md,"2. Sobre la entrega ""Trabajo de fin de máster: almacenamiento de datos"" (`03_modelo_datos.md`)",1435
-docs/entregas/feedback_tutor_2026-07-12.md#279,docs/entregas/feedback_tutor_2026-07-12.md,Resumen de acciones pendientes,785
-docs/escenarios_d1.md#280,docs/escenarios_d1.md,D1 — Simulador de escenarios fiscales: la deuda española 2024–2050,533
-docs/escenarios_d1.md#281,docs/escenarios_d1.md,1. Mecánica (transparente y auditable),657
-docs/escenarios_d1.md#282,docs/escenarios_d1.md,2. El menú (deuda %PIB en 2050),937
-docs/escenarios_d1.md#283,docs/escenarios_d1.md,3. Lo que el menú enseña (sin prescribir),983
-docs/escenarios_d1.md#284,docs/escenarios_d1.md,4. Encaje en el TFM,295
-docs/expansion_corpus.md#285,docs/expansion_corpus.md,Expansión del corpus de evidencia (2026-07-19),327
-docs/expansion_corpus.md#286,docs/expansion_corpus.md,1. Conectores implementados en esta expansión,1671
-docs/expansion_corpus.md#287,docs/expansion_corpus.md,"2. Sobre ""deep learning"" en este corpus — decisión declarada",617
-docs/expansion_corpus.md#288,docs/expansion_corpus.md,3. Conectores bloqueados (motivo declarado),1315
-docs/expansion_corpus.md#289,docs/expansion_corpus.md,"4. Qué mejora con el corpus ampliado (medido, no prometido)",850
-docs/fiscal_breakdown.md#290,docs/fiscal_breakdown.md,Desglose fiscal mundial + reconciliación de fuentes (2026-07-19),300
-docs/fiscal_breakdown.md#291,docs/fiscal_breakdown.md,"1. Fuentes nuevas (API nueva del FMI api.imf.org, sin clave; verificadas)",979
-docs/fiscal_breakdown.md#292,docs/fiscal_breakdown.md,2. La reconciliación (gold_fiscal_reconciliation.csv): 15/15 checks OK,1274
-docs/fiscal_breakdown.md#293,docs/fiscal_breakdown.md,"3. España 2023-24, el desglose que queda validado (% PIB)",481
-docs/fiscal_breakdown.md#294,docs/fiscal_breakdown.md,4. Uso en el proyecto,458
-docs/fiscal_historia.md#295,docs/fiscal_historia.md,"1. ¿Tenemos el PIB para calcular los porcentajes? Sí, y se comprueba",436
-docs/fiscal_historia.md#296,docs/fiscal_historia.md,2. ¿Cuadran las series históricas con las modernas (1995–2025)? Depende de la fuente — y la diferencia es el hallazgo,1360
-docs/fiscal_historia.md#297,docs/fiscal_historia.md,"3. ¿Qué se puede decir? España 1703–2025 (gold_fiscal_historico.csv, figura b19)",1149
-docs/forecast_t1_mvp.md#298,docs/forecast_t1_mvp.md,Pronóstico de producción T1 — abanico empírico y escenarios (MVP),469
-docs/forecast_t1_mvp.md#299,docs/forecast_t1_mvp.md,1. Cómo se construye,1098
-docs/forecast_t1_mvp.md#300,docs/forecast_t1_mvp.md,2. Lectura central (escenario salarial 2 %),687
-docs/forecast_t1_mvp.md#301,docs/forecast_t1_mvp.md,3. Advertencias que acompañan SIEMPRE a esta salida,623
-docs/glosario.md#302,docs/glosario.md,Glosario de siglas y acrónimos,225
-docs/glosario.md#303,docs/glosario.md,Instituciones y fuentes de datos,1962
-docs/glosario.md#304,docs/glosario.md,Bases de datos y datasets,2297
-docs/glosario.md#305,docs/glosario.md,Métodos y términos de modelado,1251
-docs/glosario.md#306,docs/glosario.md,Etiquetas T1/A1/A2/D1 (nomenclatura interna del proyecto),409
-docs/glosario.md#307,docs/glosario.md,Códigos de contabilidad nacional (en `rev_*` y `gov_10a_exp_*`),782
-docs/horizonte_50.md#308,docs/horizonte_50.md,Horizonte 50 años: economía y bienestar 2025–2070/2075,425
-docs/horizonte_50.md#309,docs/horizonte_50.md,"Por qué ""predicción a 50 años"" no existe (medido, no opinado)",860
-docs/horizonte_50.md#310,docs/horizonte_50.md,1. La frontera re-estimada como panel (`analysis/bienestar_panel.py`),728
-docs/horizonte_50.md#311,docs/horizonte_50.md,2. Monte Carlo del simulador de deuda (`analysis/mc_d1.py`),575
-docs/horizonte_50.md#312,docs/horizonte_50.md,3. Horizonte 2070,321
-docs/horizonte_50.md#313,docs/horizonte_50.md,4. Sobres de bienestar 2050/2070 (`analysis/bienestar_50.py`),613
-docs/horizonte_50.md#314,docs/horizonte_50.md,5. El pseudo-backtest de continuidad (`analysis/backtest_50y.py`),312
-docs/horizonte_50.md#315,docs/horizonte_50.md,Cómo leer el sistema a 50 años (síntesis para la defensa),764
-docs/oferta_nueva.md#316,docs/oferta_nueva.md,Driver de oferta `oferta_nueva` — primera pata (permisos residenciales),571
-docs/oferta_nueva.md#317,docs/oferta_nueva.md,1. Hallazgos,1085
-docs/oferta_nueva.md#318,docs/oferta_nueva.md,2. Reglas de uso (disciplina post-test),1104
-docs/pitch_tutor_fiscal.md#319,docs/pitch_tutor_fiscal.md,"Propuesta de evolución del TFM — ""Dinero público → Resultados""",618
-docs/pitch_tutor_fiscal.md#320,docs/pitch_tutor_fiscal.md,La pregunta,615
-docs/pitch_tutor_fiscal.md#321,docs/pitch_tutor_fiscal.md,Una sola línea técnica,697
-docs/pitch_tutor_fiscal.md#322,docs/pitch_tutor_fiscal.md,"Datos: verificados en vivo, no supuestos (comprobaciones HTTP reales, 16–17 jul)",929
-docs/pitch_tutor_fiscal.md#323,docs/pitch_tutor_fiscal.md,Tres variantes — te pido criterio,1003
-docs/pitch_tutor_fiscal.md#324,docs/pitch_tutor_fiscal.md,"Calendario (10 semanas, deadline 30-sep)",269
-docs/pitch_tutor_fiscal.md#325,docs/pitch_tutor_fiscal.md,Lo que te pido,238
-docs/rendimiento_a1.md#326,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
-docs/rendimiento_a1.md#327,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
-docs/rendimiento_a1.md#328,docs/rendimiento_a1.md,2. Resultados de la selección,807
-docs/rendimiento_a1.md#329,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
-docs/rendimiento_a1.md#330,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
-docs/stress_test_qa.md#331,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
-docs/stress_test_qa.md#332,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
-docs/stress_test_qa.md#333,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
-docs/stress_test_qa.md#334,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
-docs/stress_test_qa.md#335,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
-docs/stress_test_qa.md#336,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
-docs/stress_test_qa.md#337,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
-docs/stress_test_qa.md#338,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
-docs/stress_test_qa.md#339,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
-docs/stress_test_qa.md#340,docs/stress_test_qa.md,Veredicto del stress test,646
-docs/test_final_t1.md#341,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
-docs/test_final_t1.md#342,docs/test_final_t1.md,1. Resultados,468
-docs/test_final_t1.md#343,docs/test_final_t1.md,2. Lecturas,1724
-docs/test_final_t1.md#344,docs/test_final_t1.md,3. Registro,378
-docs/tipologias_a2.md#345,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
-docs/tipologias_a2.md#346,docs/tipologias_a2.md,Método,307
-docs/tipologias_a2.md#347,docs/tipologias_a2.md,Resultados,1030
-docs/tipologias_a2.md#348,docs/tipologias_a2.md,Límites,354
-docs/vivienda_global.md#349,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
-docs/vivienda_global.md#350,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
-docs/vivienda_global.md#351,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
-docs/vivienda_global.md#352,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
-docs/vivienda_global.md#353,docs/vivienda_global.md,4. Uso en el proyecto,350
+docs/comparativa_llm_vs_modelo.md#121,docs/comparativa_llm_vs_modelo.md,Comparativa detallada: asistente de IA solo vs modelo completo,510
+docs/comparativa_llm_vs_modelo.md#122,docs/comparativa_llm_vs_modelo.md,Qué significan las tres columnas,695
+docs/comparativa_llm_vs_modelo.md#123,docs/comparativa_llm_vs_modelo.md,Marcador global,333
+docs/comparativa_llm_vs_modelo.md#124,docs/comparativa_llm_vs_modelo.md,"1. Ratio de asequibilidad de la vivienda en España, 2024",377
+docs/comparativa_llm_vs_modelo.md#125,docs/comparativa_llm_vs_modelo.md,2. Ratio de asequibilidad proyectado a finales de 2027,416
+docs/comparativa_llm_vs_modelo.md#126,docs/comparativa_llm_vs_modelo.md,"3. Precisión del modelo campeón en la validación (MASE, horizonte ≤4)",444
+docs/comparativa_llm_vs_modelo.md#127,docs/comparativa_llm_vs_modelo.md,4. Deuda pública proyectada para 2050 (escenario central),355
+docs/comparativa_llm_vs_modelo.md#128,docs/comparativa_llm_vs_modelo.md,5. Deuda 2050 SIN presión demográfica (contrafactual),249
+docs/comparativa_llm_vs_modelo.md#129,docs/comparativa_llm_vs_modelo.md,6. Deuda mediana en 2070 (simulación Monte Carlo),244
+docs/comparativa_llm_vs_modelo.md#130,docs/comparativa_llm_vs_modelo.md,7. Esfuerzo hipotecario nacional en 2024 (% del salario bruto),260
+docs/comparativa_llm_vs_modelo.md#131,docs/comparativa_llm_vs_modelo.md,8. Gasto público de España en 1900 (% del PIB),214
+docs/comparativa_llm_vs_modelo.md#132,docs/comparativa_llm_vs_modelo.md,9. Rendimiento sanitario de España sobre lo esperado (años de vida),286
+docs/comparativa_llm_vs_modelo.md#133,docs/comparativa_llm_vs_modelo.md,10. Efecto en la mortalidad infantil a 2050 (crecimiento de renta 1 %),284
+docs/comparativa_llm_vs_modelo.md#134,docs/comparativa_llm_vs_modelo.md,11. Elasticidad del gasto en pensiones al envejecimiento,320
+docs/comparativa_llm_vs_modelo.md#135,docs/comparativa_llm_vs_modelo.md,12. Relación entre suelo urbanizado y precios de la vivienda (correlación),411
+docs/comparativa_llm_vs_modelo.md#136,docs/comparativa_llm_vs_modelo.md,Conclusión,730
+docs/data_dictionary_master.md#137,docs/data_dictionary_master.md,Diccionario maestro de datos — todas las familias de fuentes,691
+docs/data_dictionary_master.md#138,docs/data_dictionary_master.md,EUROSTAT — Gobierno / finanzas públicas,1538
+docs/data_dictionary_master.md#139,docs/data_dictionary_master.md,EUROSTAT — EU-SILC ingresos y vivienda,1510
+docs/data_dictionary_master.md#140,docs/data_dictionary_master.md,EUROSTAT — Precios vivienda y migración,1020
+docs/data_dictionary_master.md#141,docs/data_dictionary_master.md,EUROSTAT — Protección social y residuos,915
+docs/data_dictionary_master.md#142,docs/data_dictionary_master.md,"EUROSTAT — Cuentas nacionales, demografía y salud",1548
+docs/data_dictionary_master.md#143,docs/data_dictionary_master.md,IMF — WEO (World Economic Outlook),628
+docs/data_dictionary_master.md#144,docs/data_dictionary_master.md,"IMF — GFS family (data.imf.org, new API)",1900
+docs/data_dictionary_master.md#145,docs/data_dictionary_master.md,IMF — related fiscal DBs found in same probe,369
+docs/data_dictionary_master.md#146,docs/data_dictionary_master.md,Cross-cutting traps,552
+docs/data_dictionary_master.md#147,docs/data_dictionary_master.md,WDI — World Development Indicators (source=2),936
+docs/data_dictionary_master.md#148,docs/data_dictionary_master.md,"WWBI — Worldwide Bureaucracy Indicators (source=64, 302 indicators [V])",718
+docs/data_dictionary_master.md#149,docs/data_dictionary_master.md,Sources registry (api.worldbank.org/v2/sources) [V],722
+docs/data_dictionary_master.md#150,docs/data_dictionary_master.md,WGI — six governance dimensions,840
+docs/data_dictionary_master.md#151,docs/data_dictionary_master.md,"HLO — Harmonized Learning Outcomes (under HCI, source=63)",423
+docs/data_dictionary_master.md#152,docs/data_dictionary_master.md,OECD — Gasto público COFOG (National Accounts Table 11),848
+docs/data_dictionary_master.md#153,docs/data_dictionary_master.md,OECD — Revenue Statistics (Global),806
+docs/data_dictionary_master.md#154,docs/data_dictionary_master.md,OECD — SOCX gasto social,959
+docs/data_dictionary_master.md#155,docs/data_dictionary_master.md,OECD — Analytical house prices,648
+docs/data_dictionary_master.md#156,docs/data_dictionary_master.md,OECD — ALMP / Labour market programmes,835
+docs/data_dictionary_master.md#157,docs/data_dictionary_master.md,OECD — International Migration Database,838
+docs/data_dictionary_master.md#158,docs/data_dictionary_master.md,"WHO GHED — Global Health Expenditure Database (via GHO OData, SHA-2011)",1334
+docs/data_dictionary_master.md#159,docs/data_dictionary_master.md,WHO GHO — Obesity & Tobacco indicators,1073
+docs/data_dictionary_master.md#160,docs/data_dictionary_master.md,UNESCO UIS — Education finance (new public API),1200
+docs/data_dictionary_master.md#161,docs/data_dictionary_master.md,ILOSTAT — Employment / public-sector employment,1442
+docs/data_dictionary_master.md#162,docs/data_dictionary_master.md,INE wstempus (base `https://servicios.ine.es/wstempus/js/ES/{FUNC}/{id}`) — [V] probed 2026-07-18,2008
+docs/data_dictionary_master.md#163,docs/data_dictionary_master.md,INE COFOG file,370
+docs/data_dictionary_master.md#164,docs/data_dictionary_master.md,IGAE subsector series,437
+docs/data_dictionary_master.md#165,docs/data_dictionary_master.md,"BOE open-data API — [V] probed (sumario 20260717, HTTP 200)",732
+docs/data_dictionary_master.md#166,docs/data_dictionary_master.md,AEAT informes de recaudación,477
+docs/data_dictionary_master.md#167,docs/data_dictionary_master.md,Liquidaciones presupuestos CCAA (Min. Hacienda),459
+docs/data_dictionary_master.md#168,docs/data_dictionary_master.md,MITMA vivienda/suelo,461
+docs/data_dictionary_master.md#169,docs/data_dictionary_master.md,1. TED API v3 (EU public procurement notices),1091
+docs/data_dictionary_master.md#170,docs/data_dictionary_master.md,"2. BDNS / infosubvenciones (Spanish subsidies, SNPSAP)",1134
+docs/data_dictionary_master.md#171,docs/data_dictionary_master.md,3. legislation.gov.uk (UK statute book),924
+docs/data_dictionary_master.md#172,docs/data_dictionary_master.md,"4. opentender.eu (bulk tender data, DIGIWHIST/TheyBuyForYou)",935
+docs/data_dictionary_master.md#173,docs/data_dictionary_master.md,5. EUR-Lex CELLAR / SPARQL,892
+docs/data_dictionary_master.md#174,docs/data_dictionary_master.md,6. EC Financial Transparency System (FTS),1060
+docs/data_dictionary_master.md#175,docs/data_dictionary_master.md,"JST Macrohistory Database (jst.xlsx, R6-style)",1162
+docs/data_dictionary_master.md#176,docs/data_dictionary_master.md,Global Macro Database (KMueller-Lab GMD),1177
+docs/data_dictionary_master.md#177,docs/data_dictionary_master.md,ICTD/UNU-WIDER Government Revenue Dataset (GRD),842
+docs/data_dictionary_master.md#178,docs/data_dictionary_master.md,SIPRI Military Expenditure Database,435
+docs/data_dictionary_master.md#179,docs/data_dictionary_master.md,WID.world (World Inequality Database),851
+docs/data_dictionary_master.md#180,docs/data_dictionary_master.md,CEPEJ-STAT (European judicial systems),745
+docs/data_dictionary_master.md#181,docs/data_dictionary_master.md,CPDS + QoG (one-liners),700
+docs/data_dictionary_master.md#182,docs/data_dictionary_master.md,1. OECD DAC CRS (creditor reporting system),899
+docs/data_dictionary_master.md#183,docs/data_dictionary_master.md,2. World Bank IDS (International Debt Statistics),804
+docs/data_dictionary_master.md#184,docs/data_dictionary_master.md,3. UN DESA International Migrant Stock 2024,585
+docs/data_dictionary_master.md#185,docs/data_dictionary_master.md,4. UNHCR Refugee Population Statistics API,626
+docs/data_dictionary_master.md#186,docs/data_dictionary_master.md,5. AidData Global Chinese Development Finance (GCDF 3.0),660
+docs/data_dictionary_master.md#187,docs/data_dictionary_master.md,6. World Bank / KNOMAD bilateral remittance matrix,616
+docs/data_dictionary_master.md#188,docs/data_dictionary_master.md,7. EU Cohesion Open Data (cohesiondata),690
+docs/data_dictionary_vivienda.md#189,docs/data_dictionary_vivienda.md,Diccionario de datos — Variante C (vivienda como consecuencias),501
+docs/data_dictionary_vivienda.md#190,docs/data_dictionary_vivienda.md,"0. Decisión: extracción SELECTIVA, nunca volcado completo",751
+docs/data_dictionary_vivienda.md#191,docs/data_dictionary_vivienda.md,1.1 Eurostat `gov_10a_exp` — gasto por función × tipo económico **[V]** (consultas reales 2026-07-16/17),786
+docs/data_dictionary_vivienda.md#192,docs/data_dictionary_vivienda.md,1.2 INE COFOG España (`aappgastcofog95_23.xlsx`) **[V]** (descargado y abierto),280
+docs/data_dictionary_vivienda.md#193,docs/data_dictionary_vivienda.md,1.3 IGAE series por subsector **[V]** (acceso verificado; UA navegador),260
+docs/data_dictionary_vivienda.md#194,docs/data_dictionary_vivienda.md,1.4 Liquidaciones presupuestarias CCAA (Hacienda) [D],271
+docs/data_dictionary_vivienda.md#195,docs/data_dictionary_vivienda.md,"1.5 BOE (API sumarios + XML) **[V]** (parser probado: PGE 2023 y 2021, leyes CCAA)",311
+docs/data_dictionary_vivienda.md#196,docs/data_dictionary_vivienda.md,2.1 EU-SILC `ilc_lvho07a` (sobrecarga >40% renta) [D],273
+docs/data_dictionary_vivienda.md#197,docs/data_dictionary_vivienda.md,2.3 Panel de asequibilidad propio (gold del TFM) **[V]** (construido),299
+docs/data_dictionary_vivienda.md#198,docs/data_dictionary_vivienda.md,"3. Núcleo España precios/drivers (B3, heredado del TFM) **[V]** (pipeline operativo)",1001
+docs/data_dictionary_vivienda.md#199,docs/data_dictionary_vivienda.md,4.1 OECD Analytical House Prices [D],275
+docs/data_dictionary_vivienda.md#200,docs/data_dictionary_vivienda.md,4.3 OECD Affordable Housing Database [D],204
+docs/data_dictionary_vivienda.md#201,docs/data_dictionary_vivienda.md,5.1 WWBI (WB source=64) **[V]** (diccionario completo extraído: 302 indicadores),711
+docs/data_dictionary_vivienda.md#202,docs/data_dictionary_vivienda.md,6. Demografía/amplificador (B4),539
+docs/data_dictionary_vivienda.md#203,docs/data_dictionary_vivienda.md,7. Resumen: el gold objetivo de la Variante C,831
+docs/data_landscape.md#204,docs/data_landscape.md,Panorama de bases de datos fiscales y económicas (mundo),600
+docs/data_landscape.md#205,docs/data_landscape.md,1. Multilaterales — núcleo armonizado,2035
+docs/data_landscape.md#206,docs/data_landscape.md,2. Multilaterales regionales,697
+docs/data_landscape.md#207,docs/data_landscape.md,3. Académicas / especializadas / históricas,1143
+docs/data_landscape.md#208,docs/data_landscape.md,3-bis. Serie histórica larga — siglo XX (1900–1995),2142
+docs/data_landscape.md#209,docs/data_landscape.md,"3-ter. Fuentes para módulos bolt-on gasto→resultado (3ª ronda del consejo, códigos verificados)",2450
+docs/data_landscape.md#210,docs/data_landscape.md,"3-quater. Pilares del programa integral: SOEs, flujos entre países, migración, satélite",2172
+docs/data_landscape.md#211,docs/data_landscape.md,3-quinquies. Fuentes para el análisis de vivienda (Variante C),253
+docs/data_landscape.md#212,docs/data_landscape.md,Núcleo España (ya en el pipeline del TFM),536
+docs/data_landscape.md#213,docs/data_landscape.md,"Oferta privada de construcción (añadido 2026-07-18, revisión 1 de la Entrega 4)",1182
+docs/data_landscape.md#214,docs/data_landscape.md,Gasto público en vivienda (la capa fiscal de la Variante C),744
+docs/data_landscape.md#215,docs/data_landscape.md,Comparables internacionales (outcomes + precios),1087
+docs/data_landscape.md#216,docs/data_landscape.md,Demografía/demanda (amplificador B4),342
+docs/data_landscape.md#217,docs/data_landscape.md,4. Subnacional (la mayor laguna del listado inicial),836
+docs/data_landscape.md#218,docs/data_landscape.md,5. Portales nacionales,2406
+docs/data_landscape.md#219,docs/data_landscape.md,"6. Capa de decisiones (boletines legales, contratos, subvenciones)",2183
+docs/data_landscape.md#220,docs/data_landscape.md,7. Agregadores,437
+docs/data_landscape.md#221,docs/data_landscape.md,8. Meta: transparencia y calidad fiscal (útiles como controles),383
+docs/data_landscape.md#222,docs/data_landscape.md,9. Notas prácticas (gotchas comprobados en sesión),1110
+docs/demanda_suelo.md#223,docs/demanda_suelo.md,"Capas de demanda, crédito y suelo (expansión Tier 1-3, 2026-07-19)",209
+docs/demanda_suelo.md#224,docs/demanda_suelo.md,1. Conectores nuevos (todos verificados en vivo),1419
+docs/demanda_suelo.md#225,docs/demanda_suelo.md,2. La medida de suelo urbanizable y su evolución,1140
+docs/demanda_suelo.md#226,docs/demanda_suelo.md,3. Contest de validación (protocolo intacto) — CUARTO resultado negativo,1077
+docs/despliegue.md#227,docs/despliegue.md,1. Demo pública (Streamlit Community Cloud) — el modo por defecto,790
+docs/despliegue.md#228,docs/despliegue.md,2. Local con Docker — la vía de réplica garantizada,795
+docs/despliegue.md#229,docs/despliegue.md,3. Local sin Docker (desarrollo),214
+docs/despliegue.md#230,docs/despliegue.md,Qué sirve cada superficie,777
+docs/despliegue.md#231,docs/despliegue.md,Advertencias que viajan con el producto,389
+docs/despliegue.md#232,docs/despliegue.md,Historial de despliegue (trazabilidad),401
+docs/dl_rutas.md#233,docs/dl_rutas.md,Dos rutas de deep learning contra el protocolo T1 (2026-07-19),356
+docs/dl_rutas.md#234,docs/dl_rutas.md,"Ruta 2 — Modelo fundacional zero-shot (Chronos-Bolt, Amazon)",659
+docs/dl_rutas.md#235,docs/dl_rutas.md,Ruta 1 — DL global entrenado en 1.760 series regionales extranjeras,1024
+docs/dl_rutas.md#236,docs/dl_rutas.md,Veredicto y camino declarado,789
+docs/eda_vivienda.md#237,docs/eda_vivienda.md,EDA §2-A — Hallazgos y decisiones de especificación (T1),432
+docs/eda_vivienda.md#238,docs/eda_vivienda.md,1. Hallazgos descriptivos,1038
+docs/eda_vivienda.md#239,docs/eda_vivienda.md,2. Diagnósticos de series (deciden la especificación),1271
+docs/eda_vivienda.md#240,docs/eda_vivienda.md,3. Correlaciones cruzadas con las exógenas candidatas,872
+docs/eda_vivienda.md#241,docs/eda_vivienda.md,4. Decisiones de especificación (quedan fijadas),1083
+docs/eda_vivienda.md#242,docs/eda_vivienda.md,5. Conexión con el MVP,262
+docs/entregas/01_ideas_producto.md#243,docs/entregas/01_ideas_producto.md,Entrega 1 — Ideas de Producto,301
+docs/entregas/01_ideas_producto.md#244,docs/entregas/01_ideas_producto.md,Idea 1 — Arquitectura de Data Science para una Red Energética Global 24/7,596
+docs/entregas/01_ideas_producto.md#245,docs/entregas/01_ideas_producto.md,"Idea 2 — Modelo ""Trigo-a-Cebolla"": ecosistema IA-Blockchain para cultivos perecederos",523
+docs/entregas/01_ideas_producto.md#246,docs/entregas/01_ideas_producto.md,Idea 3 — Blockchain Fiscal Circular y Auditoría Autónoma,467
+docs/entregas/01_ideas_producto.md#247,docs/entregas/01_ideas_producto.md,"Idea 4 — Extractor de Datos Científicos: liberando la ""data oscura""",488
+docs/entregas/01_ideas_producto.md#248,docs/entregas/01_ideas_producto.md,Idea 5 — Refactorizando el Estado: hacia una burocracia impulsada por IA,492
+docs/entregas/01_ideas_producto.md#249,docs/entregas/01_ideas_producto.md,2. Feedback del tutor,1094
+docs/entregas/01_ideas_producto.md#250,docs/entregas/01_ideas_producto.md,Índice de Asequibilidad de Vivienda Regional en España,1626
+docs/entregas/02_datos_necesarios.md#251,docs/entregas/02_datos_necesarios.md,1. Idea seleccionada,3064
+docs/entregas/02_datos_necesarios.md#252,docs/entregas/02_datos_necesarios.md,2. Variables y Datos Necesarios,2302
+docs/entregas/02_datos_necesarios.md#253,docs/entregas/02_datos_necesarios.md,INE — Instituto Nacional de Estadística,2220
+docs/entregas/02_datos_necesarios.md#254,docs/entregas/02_datos_necesarios.md,Fuentes complementarias (drivers y corpus RAG),1893
+docs/entregas/02_datos_necesarios.md#255,docs/entregas/02_datos_necesarios.md,4. Privacidad y Protección de Datos,1088
+docs/entregas/02_datos_necesarios.md#256,docs/entregas/02_datos_necesarios.md,✅ Favorable,537
+docs/entregas/02_datos_necesarios.md#257,docs/entregas/02_datos_necesarios.md,⚠️ Riesgos identificados,1447
+docs/entregas/02_datos_necesarios.md#258,docs/entregas/02_datos_necesarios.md,Alternativas de datos,305
+docs/entregas/03_modelo_datos.md#259,docs/entregas/03_modelo_datos.md,Entrega 3 — Diseño del modelo de datos y capa gold,311
+docs/entregas/03_modelo_datos.md#260,docs/entregas/03_modelo_datos.md,1. Resumen de la idea y datos del proyecto,1507
+docs/entregas/03_modelo_datos.md#261,docs/entregas/03_modelo_datos.md,2. Tecnología y formato de almacenamiento,1149
+docs/entregas/03_modelo_datos.md#262,docs/entregas/03_modelo_datos.md,3. Estructura de capas de datos,1427
+docs/entregas/03_modelo_datos.md#263,docs/entregas/03_modelo_datos.md,4.1 `gold_asequibilidad_ccaa.csv`,999
+docs/entregas/03_modelo_datos.md#264,docs/entregas/03_modelo_datos.md,4.2 `gold_panel_trimestral.csv`,1705
+docs/entregas/03_modelo_datos.md#265,docs/entregas/03_modelo_datos.md,4.3 `gold_corpus_manifest.csv`,897
+docs/entregas/03_modelo_datos.md#266,docs/entregas/03_modelo_datos.md,Resumen de la capa gold,530
+docs/entregas/03_modelo_datos.md#267,docs/entregas/03_modelo_datos.md,5. Relaciones entre datos,2001
+docs/entregas/03_modelo_datos.md#268,docs/entregas/03_modelo_datos.md,6. Diccionario de datos inicial,1929
+docs/entregas/03_modelo_datos.md#269,docs/entregas/03_modelo_datos.md,7. Problemas de calidad esperados (caso concreto),2532
+docs/entregas/03_modelo_datos.md#270,docs/entregas/03_modelo_datos.md,8. Decisiones de limpieza y transformación previstas,1873
+docs/entregas/03_modelo_datos.md#271,docs/entregas/03_modelo_datos.md,9. Riesgos del modelo de datos,1756
+docs/entregas/04_analisis_modelado.md#272,docs/entregas/04_analisis_modelado.md,Entrega 4 — Diseño del análisis y estrategia de modelado,812
+docs/entregas/04_analisis_modelado.md#273,docs/entregas/04_analisis_modelado.md,1. Problema que se busca resolver,1279
+docs/entregas/04_analisis_modelado.md#274,docs/entregas/04_analisis_modelado.md,2-A. Vivienda / asequibilidad (núcleo avalado),1054
+docs/entregas/04_analisis_modelado.md#275,docs/entregas/04_analisis_modelado.md,2-B. Programa fiscal (alcance ampliado),1132
+docs/entregas/04_analisis_modelado.md#276,docs/entregas/04_analisis_modelado.md,3. Modelos planteados,315
+docs/entregas/04_analisis_modelado.md#277,docs/entregas/04_analisis_modelado.md,T1 — Forecasting del IPV trimestral / asequibilidad por CCAA (regresión temporal),1277
+docs/entregas/04_analisis_modelado.md#278,docs/entregas/04_analisis_modelado.md,T2 — Rendimiento ajustado del gasto público (regresión de corte transversal/panel),849
+docs/entregas/04_analisis_modelado.md#279,docs/entregas/04_analisis_modelado.md,4. Datos de entrada,1712
+docs/entregas/04_analisis_modelado.md#280,docs/entregas/04_analisis_modelado.md,5. Salida del modelo y uso en el MVP,1668
+docs/entregas/04_analisis_modelado.md#281,docs/entregas/04_analisis_modelado.md,6. Estrategia para diseñar y seleccionar el modelo,1090
+docs/entregas/04_analisis_modelado.md#282,docs/entregas/04_analisis_modelado.md,"7. Validación, métricas y criterios de aceptación",2065
+docs/entregas/04_analisis_modelado.md#283,docs/entregas/04_analisis_modelado.md,8. Riesgos y alternativas,1687
+docs/entregas/04_analisis_modelado.md#284,docs/entregas/04_analisis_modelado.md,"Revisión 1 (2026-07-18, posterior a la presentación de la entrega)",1857
+docs/entregas/anexo_transicion_proyecto.md#285,docs/entregas/anexo_transicion_proyecto.md,"Anexo a las entregas — Transición del proyecto: de la vivienda al programa ""Dinero público → Resultados""",594
+docs/entregas/anexo_transicion_proyecto.md#286,docs/entregas/anexo_transicion_proyecto.md,1. Respuesta directa al feedback del 12 de julio,1495
+docs/entregas/anexo_transicion_proyecto.md#287,docs/entregas/anexo_transicion_proyecto.md,2. Por qué se amplía el proyecto,808
+docs/entregas/anexo_transicion_proyecto.md#288,docs/entregas/anexo_transicion_proyecto.md,3. Qué se conserva del proyecto vivienda (todo),2306
+docs/entregas/anexo_transicion_proyecto.md#289,docs/entregas/anexo_transicion_proyecto.md,4. Estructura real vs estructura documentada en la Entrega 3,781
+docs/entregas/anexo_transicion_proyecto.md#290,docs/entregas/anexo_transicion_proyecto.md,"5. Alcance TFM (el recorte, no el programa)",709
+docs/entregas/anexo_transicion_proyecto.md#291,docs/entregas/anexo_transicion_proyecto.md,6. Validación,396
+docs/entregas/feedback_tutor_2026-07-12.md#292,docs/entregas/feedback_tutor_2026-07-12.md,Feedback del tutor — Julio Valero (12 de julio de 2026),293
+docs/entregas/feedback_tutor_2026-07-12.md#293,docs/entregas/feedback_tutor_2026-07-12.md,"1. Sobre la entrega ""Trabajo de Fin de Máster. Análisis de datos necesarios"" (`02_datos_necesarios.md`)",1568
+docs/entregas/feedback_tutor_2026-07-12.md#294,docs/entregas/feedback_tutor_2026-07-12.md,"2. Sobre la entrega ""Trabajo de fin de máster: almacenamiento de datos"" (`03_modelo_datos.md`)",1435
+docs/entregas/feedback_tutor_2026-07-12.md#295,docs/entregas/feedback_tutor_2026-07-12.md,Resumen de acciones pendientes,785
+docs/escenarios_d1.md#296,docs/escenarios_d1.md,D1 — Simulador de escenarios fiscales: la deuda española 2024–2050,533
+docs/escenarios_d1.md#297,docs/escenarios_d1.md,1. Mecánica (transparente y auditable),657
+docs/escenarios_d1.md#298,docs/escenarios_d1.md,2. El menú (deuda %PIB en 2050),937
+docs/escenarios_d1.md#299,docs/escenarios_d1.md,3. Lo que el menú enseña (sin prescribir),983
+docs/escenarios_d1.md#300,docs/escenarios_d1.md,4. Encaje en el TFM,295
+docs/expansion_corpus.md#301,docs/expansion_corpus.md,Expansión del corpus de evidencia (2026-07-19),327
+docs/expansion_corpus.md#302,docs/expansion_corpus.md,1. Conectores implementados en esta expansión,1671
+docs/expansion_corpus.md#303,docs/expansion_corpus.md,"2. Sobre ""deep learning"" en este corpus — decisión declarada",617
+docs/expansion_corpus.md#304,docs/expansion_corpus.md,3. Conectores bloqueados (motivo declarado),1315
+docs/expansion_corpus.md#305,docs/expansion_corpus.md,"4. Qué mejora con el corpus ampliado (medido, no prometido)",850
+docs/fiscal_breakdown.md#306,docs/fiscal_breakdown.md,Desglose fiscal mundial + reconciliación de fuentes (2026-07-19),300
+docs/fiscal_breakdown.md#307,docs/fiscal_breakdown.md,"1. Fuentes nuevas (API nueva del FMI api.imf.org, sin clave; verificadas)",979
+docs/fiscal_breakdown.md#308,docs/fiscal_breakdown.md,2. La reconciliación (gold_fiscal_reconciliation.csv): 15/15 checks OK,1274
+docs/fiscal_breakdown.md#309,docs/fiscal_breakdown.md,"3. España 2023-24, el desglose que queda validado (% PIB)",481
+docs/fiscal_breakdown.md#310,docs/fiscal_breakdown.md,4. Uso en el proyecto,458
+docs/fiscal_historia.md#311,docs/fiscal_historia.md,"1. ¿Tenemos el PIB para calcular los porcentajes? Sí, y se comprueba",436
+docs/fiscal_historia.md#312,docs/fiscal_historia.md,2. ¿Cuadran las series históricas con las modernas (1995–2025)? Depende de la fuente — y la diferencia es el hallazgo,1360
+docs/fiscal_historia.md#313,docs/fiscal_historia.md,"3. ¿Qué se puede decir? España 1703–2025 (gold_fiscal_historico.csv, figura b19)",1149
+docs/forecast_t1_mvp.md#314,docs/forecast_t1_mvp.md,Pronóstico de producción T1 — abanico empírico y escenarios (MVP),469
+docs/forecast_t1_mvp.md#315,docs/forecast_t1_mvp.md,1. Cómo se construye,1098
+docs/forecast_t1_mvp.md#316,docs/forecast_t1_mvp.md,2. Lectura central (escenario salarial 2 %),687
+docs/forecast_t1_mvp.md#317,docs/forecast_t1_mvp.md,3. Advertencias que acompañan SIEMPRE a esta salida,623
+docs/glosario.md#318,docs/glosario.md,Glosario de siglas y acrónimos,225
+docs/glosario.md#319,docs/glosario.md,Instituciones y fuentes de datos,1962
+docs/glosario.md#320,docs/glosario.md,Bases de datos y datasets,2297
+docs/glosario.md#321,docs/glosario.md,Métodos y términos de modelado,1251
+docs/glosario.md#322,docs/glosario.md,Etiquetas T1/A1/A2/D1 (nomenclatura interna del proyecto),409
+docs/glosario.md#323,docs/glosario.md,Códigos de contabilidad nacional (en `rev_*` y `gov_10a_exp_*`),782
+docs/horizonte_50.md#324,docs/horizonte_50.md,Horizonte 50 años: economía y bienestar 2025–2070/2075,425
+docs/horizonte_50.md#325,docs/horizonte_50.md,"Por qué ""predicción a 50 años"" no existe (medido, no opinado)",860
+docs/horizonte_50.md#326,docs/horizonte_50.md,1. La frontera re-estimada como panel (`analysis/bienestar_panel.py`),728
+docs/horizonte_50.md#327,docs/horizonte_50.md,2. Monte Carlo del simulador de deuda (`analysis/mc_d1.py`),575
+docs/horizonte_50.md#328,docs/horizonte_50.md,3. Horizonte 2070,321
+docs/horizonte_50.md#329,docs/horizonte_50.md,4. Sobres de bienestar 2050/2070 (`analysis/bienestar_50.py`),613
+docs/horizonte_50.md#330,docs/horizonte_50.md,5. El pseudo-backtest de continuidad (`analysis/backtest_50y.py`),312
+docs/horizonte_50.md#331,docs/horizonte_50.md,Cómo leer el sistema a 50 años (síntesis para la defensa),764
+docs/oferta_nueva.md#332,docs/oferta_nueva.md,Driver de oferta `oferta_nueva` — primera pata (permisos residenciales),571
+docs/oferta_nueva.md#333,docs/oferta_nueva.md,1. Hallazgos,1085
+docs/oferta_nueva.md#334,docs/oferta_nueva.md,2. Reglas de uso (disciplina post-test),1104
+docs/pitch_tutor_fiscal.md#335,docs/pitch_tutor_fiscal.md,"Propuesta de evolución del TFM — ""Dinero público → Resultados""",618
+docs/pitch_tutor_fiscal.md#336,docs/pitch_tutor_fiscal.md,La pregunta,615
+docs/pitch_tutor_fiscal.md#337,docs/pitch_tutor_fiscal.md,Una sola línea técnica,697
+docs/pitch_tutor_fiscal.md#338,docs/pitch_tutor_fiscal.md,"Datos: verificados en vivo, no supuestos (comprobaciones HTTP reales, 16–17 jul)",929
+docs/pitch_tutor_fiscal.md#339,docs/pitch_tutor_fiscal.md,Tres variantes — te pido criterio,1003
+docs/pitch_tutor_fiscal.md#340,docs/pitch_tutor_fiscal.md,"Calendario (10 semanas, deadline 30-sep)",269
+docs/pitch_tutor_fiscal.md#341,docs/pitch_tutor_fiscal.md,Lo que te pido,238
+docs/rendimiento_a1.md#342,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
+docs/rendimiento_a1.md#343,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
+docs/rendimiento_a1.md#344,docs/rendimiento_a1.md,2. Resultados de la selección,807
+docs/rendimiento_a1.md#345,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
+docs/rendimiento_a1.md#346,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
+docs/stress_test_qa.md#347,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
+docs/stress_test_qa.md#348,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
+docs/stress_test_qa.md#349,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
+docs/stress_test_qa.md#350,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
+docs/stress_test_qa.md#351,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
+docs/stress_test_qa.md#352,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
+docs/stress_test_qa.md#353,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
+docs/stress_test_qa.md#354,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
+docs/stress_test_qa.md#355,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
+docs/stress_test_qa.md#356,docs/stress_test_qa.md,Veredicto del stress test,646
+docs/test_final_t1.md#357,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
+docs/test_final_t1.md#358,docs/test_final_t1.md,1. Resultados,468
+docs/test_final_t1.md#359,docs/test_final_t1.md,2. Lecturas,1724
+docs/test_final_t1.md#360,docs/test_final_t1.md,3. Registro,378
+docs/tipologias_a2.md#361,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
+docs/tipologias_a2.md#362,docs/tipologias_a2.md,Método,307
+docs/tipologias_a2.md#363,docs/tipologias_a2.md,Resultados,1030
+docs/tipologias_a2.md#364,docs/tipologias_a2.md,Límites,354
+docs/vivienda_global.md#365,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
+docs/vivienda_global.md#366,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
+docs/vivienda_global.md#367,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
+docs/vivienda_global.md#368,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
+docs/vivienda_global.md#369,docs/vivienda_global.md,4. Uso en el proyecto,350

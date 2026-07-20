@@ -1,5 +1,32 @@
 # Ablación LLM: ¿marca la diferencia la capa ML/DL + RAG?
 
+## Resumen en lenguaje llano (para leer antes que las tablas)
+
+La pregunta: el valor del proyecto debe estar en las **matemáticas** (los
+modelos que procesan los datos); el asistente de IA solo debe poner esos
+resultados en palabras, nunca inventar los números. Para comprobarlo hicimos
+un experimento sencillo: cogimos **un mismo asistente de IA** (Gemini de Google)
+y le hicimos las mismas 12 preguntas dos veces. **Primera vuelta:** el asistente
+solo, de memoria, sin acceso al proyecto. **Segunda vuelta:** el mismo
+asistente, pero entregándole antes los resultados que ha calculado el proyecto,
+y pidiéndole que responda únicamente a partir de ellos. Las 12 preguntas tienen
+respuestas que *solo el proyecto puede saber* (por ejemplo, la deuda que
+proyecta el simulador para 2050). Resultado: **el asistente solo acertó 3 de 12;
+con los resultados del proyecto, 11 de 12.** Y sus fallos "a solas" son del tipo
+peligroso — sonar convincente y equivocarse: estimó la deuda de 2050 en 135 %
+del tamaño de la economía cuando el proyecto calcula 224 % (no "ve" el efecto
+del envejecimiento que las matemáticas del proyecto sí miden), e inventó una
+relación entre suelo y precios donde los datos muestran que apenas existe. En
+resumen: **sin la capa de matemáticas y datos el asistente se equivoca; con ella
+acierta — luego esa capa es la que produce el conocimiento, y el asistente solo
+lo narra.** ("RAG", que aparece más abajo, significa simplemente: antes de
+responder, buscar primero los documentos reales y contestar solo con ellos —
+ese "buscar primero" es toda la diferencia entre las dos vueltas.)
+
+Detalle completo pregunta a pregunta: `docs/comparativa_llm_vs_modelo.md`.
+
+---
+
 Requisito del tutor, convertido en experimento medible: **las matemáticas
 (la capa ML/DL) producen los resultados; el LLM se limita a explicarlos.** Si
 eso se cumple, un LLM a pelo — sin el sistema — NO debería reproducir los
