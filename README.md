@@ -9,6 +9,18 @@ Autor: Daniel Ribes ([danribes@gmail.com](mailto:danribes@gmail.com))
 
 El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolucionó hacia este programa más ambicioso. La transición completa, y cómo responde al feedback del tutor, está documentada en **[docs/entregas/anexo_transicion_proyecto.md](docs/entregas/anexo_transicion_proyecto.md)** — el análisis de vivienda sigue vivo dentro del programa como vista propia, con su pipeline ya construido.
 
+## ¿Qué contiene este repositorio?
+
+Un sistema completo y reproducible, construido **solo con datos públicos**, de extremo a extremo:
+
+- **Datos** (`connectors/`, `storage/`) — extractores de más de 40 fuentes oficiales (INE, Eurostat, FMI, OMS, Banco Mundial, BIS, OCDE, GMD/JST) con una capa de evidencia trazable (raw → processed → gold) y su manifiesto de versiones.
+- **Análisis** (`analysis/`) — el bloque analítico: pronóstico de vivienda seleccionado bajo un **protocolo pre-registrado** (cinco competiciones de modelos, test final de un solo uso), atlas del gasto 1703–2025, el **triángulo fiscal** (gasto por función + ingresos por tipo + resultados de bienestar) reconciliado entre fuentes, fronteras de rendimiento (salud, educación, bienestar), simulador de deuda y sistema de escenarios a 50 años.
+- **Producto** (`app/`, `api/`) — un **panel interactivo publicado** (5 pestañas), una API que sirve todos los resultados con su incertidumbre, y un asistente de texto que responde con citas.
+- **Documentación** (`docs/`) — la memoria del TFM más cinco compendios temáticos (guía de usuario, metodología, resultados de vivienda, resultados fiscales y de bienestar, datos); mapa completo en [docs/INDICE.md](docs/INDICE.md).
+- **Garantías** (`tests/`) — 95 pruebas que blindan el contrato de datos y los resultados, y arranque reproducible con `docker compose up --build`.
+
+La idea que lo atraviesa: **el LLM narra; el sistema calcula.** Los números salen siempre de código y datos con trazabilidad, y cada respuesta trae su incertidumbre y sus límites.
+
 ## Documentos principales
 
 La documentación está organizada en **documentos canónicos** y **cinco compendios temáticos**. El mapa completo está en **[docs/INDICE.md](docs/INDICE.md)**.
