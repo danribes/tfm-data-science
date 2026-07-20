@@ -244,9 +244,9 @@ SARIMAX 1/17 · GBM 0/17 en validación corta; la hipótesis "GBM gana a largo" 
 
 # Conclusiones
 
-1. Solo con fuentes públicas y código abierto: **datos → modelos → producto**, con trazabilidad profesional
-2. **La aportación diferencial es la disciplina**: cinco contests sin adopción (el mejor, empate 0,401 vs 0,395), cinco fronteras donde ganó el OLS, y un test final que evitó publicar una predicción de desplome en pleno boom
-3. Sustantivo: la asequibilidad no se corrige sola; el cuello de botella empieza en el suelo (mercado a 1/5 del pico); la renta domina salud y bienestar; la demografía domina la deuda; urbanizar más no compra asequibilidad (ρ=+0,01 en 40 países)
+1. **Un sistema completo y PUBLICADO**, solo con datos públicos: cualquiera prueba sus escenarios y ve de dónde sale cada número (panel en internet + código abierto + trazabilidad profesional)
+2. **Respuestas claras a la pregunta de fondo**: la vivienda no se abarata sola; el Estado invierte en vivienda una fracción de lo privado; entre países la renta pesa más que el gasto en salud y pobreza; el envejecimiento manda en la deuda
+3. **La aportación de método: saber dónde SE PUEDE predecir y dónde no.** Modelos sofisticados compitieron contra el más simple y ninguno lo superó de forma fiable; una vez ese rigor evitó anunciar un desplome falso en pleno auge. Un modelo sencillo, honesto y bien medido > uno complejo que aparenta acertar. **Reconocer los límites es un resultado, no una carencia.**
 
 ---
 
