@@ -1,6 +1,8 @@
 # Anexo a las entregas — Transición del proyecto: de la vivienda al programa "El precio de lo público"
 
-*2026-07-18. Documento incremental: las entregas [01](01_ideas_producto.md), [02](02_datos_necesarios.md) y [03](03_modelo_datos.md) se conservan íntegras, sin modificar, como exige el enunciado. Este documento explica la evolución del proyecto desde la idea avalada (índice de asequibilidad de vivienda por CCAA) hacia el programa descrito en [PLAN_MAESTRO.md](../PLAN_MAESTRO.md), y responde punto por punto al [feedback del tutor del 12 de julio](feedback_tutor_2026-07-12.md).*
+*2026-07-18. Documento incremental: las entregas [01](01_ideas_producto.md), [02](02_datos_necesarios.md) y [03](03_modelo_datos.md) se conservan íntegras, sin modificar, como exige el enunciado. Este documento explica la evolución del proyecto desde la idea avalada (índice de asequibilidad de vivienda por CCAA) hacia el programa descrito en [PLAN_MAESTRO.md](../PLAN_MAESTRO.md), y responde punto por punto al feedback del tutor del 12 de julio (comentarios privados en Classroom, no publicados en el repositorio).*
+
+> **Nota posterior.** Este anexo es un registro fechado del **18 de julio de 2026** y refleja el estado del proyecto en ese momento. Desde entonces el trabajo ha crecido considerablemente (triángulo fiscal mundial, marco de bienestar y pobreza, sistema de escenarios a 50 años, análisis de PPA, señales adelantadas, ablación LLM, consolidación de la documentación…) y algunas cosas descritas aquí como «pendientes» o «futuras» —la cuota hipotecaria teórica, la vista anual de asequibilidad, el asistente RAG— **ya están construidas**. Se conserva sin reescribir para mantener la trazabilidad de la transición. **El estado actual está en el [README](../../README.md) y en [docs/INDICE.md](../INDICE.md).**
 
 ---
 
