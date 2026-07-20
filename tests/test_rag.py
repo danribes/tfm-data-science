@@ -42,7 +42,8 @@ def test_manifest_contract():
 def test_retrieval_encuentra_el_test_final(chunks):
     res = retrieve(chunks, "por qué el modelo de producción es el drift y no el GBM")
     fuentes = [c["fuente"] for _, c in res]
-    assert any("candidatos_t1" in f or "test_final" in f or "backtest" in f for f in fuentes)
+    # el contenido de candidatos_t1/test_final/backtest vive ahora en el compendio de vivienda
+    assert any("RESULTADOS_VIVIENDA" in f or "METODOLOGIA" in f for f in fuentes)
 
 
 def test_retrieval_encuentra_pensiones(chunks):

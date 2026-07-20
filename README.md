@@ -11,33 +11,19 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 
 ## Documentos principales
 
+La documentación está organizada en **documentos canónicos** y **cinco compendios temáticos**. El mapa completo está en **[docs/INDICE.md](docs/INDICE.md)**.
+
 | Documento | Qué contiene |
 |---|---|
-| [docs/PLAN_MAESTRO.md](docs/PLAN_MAESTRO.md) | Documento canónico: 20 preguntas de investigación, método, capa ML/DL, fases F0–F9, crítica y riesgos |
-| [docs/PLAN_MAESTRO_deck.pptx](docs/PLAN_MAESTRO_deck.pptx) | El plan en formato presentación |
-| [docs/entregas/](docs/entregas/) | Entregas incrementales del curso (01 ideas · 02 datos · 03 modelo de datos · 04 análisis y modelado · anexo transición) + feedback del tutor |
-| [docs/data_landscape.md](docs/data_landscape.md) | Inventario completo de fuentes de datos |
-| [docs/CATALOGO_DATOS.md](docs/CATALOGO_DATOS.md) | Catálogo del storage: fuentes y contenido clasificado por raw / processed / gold, con filas y años reales |
-| [docs/Guia de Uso.md](docs/Guia%20de%20Uso.md) | Guía de uso: cómo funciona el dashboard y ejemplos de preguntas por escenario con la estimación real del modelo |
-| [docs/Catalogo de Preguntas.md](docs/Catalogo%20de%20Preguntas.md) | Catálogo completo de preguntas que admite el modelo, por área, con respuesta real y qué esperar |
-| [docs/data_dictionary_master.md](docs/data_dictionary_master.md) · [data_dictionary_vivienda.md](docs/data_dictionary_vivienda.md) | Diccionarios de datos (programa fiscal y vista vivienda) |
-| [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas ↔ enunciados |
-| [docs/arquitecturas_prediccion.md](docs/arquitecturas_prediccion.md) | Cómo se predicen los resultados: directa vs encadenada (two-stage) vs condicional, y la regla que gobierna la elección |
-| [docs/bienestar_indicadores.md](docs/bienestar_indicadores.md) | Marco bienestar↔pobreza infantil (MPI/MODA): 7 bloques → 13 series + frontera ingreso público → bienestar objetivo |
-| [docs/pobreza_infantil.md](docs/pobreza_infantil.md) | ¿Se predice la pobreza infantil? Absoluta sí (renta); relativa no del ciclo pero sí de la redistribución (palanca medida ~9 pp) |
-| [docs/fiscal_breakdown.md](docs/fiscal_breakdown.md) | Desglose mundial de gasto (COFOG, 89 países) e ingresos por tipo (195) + reconciliación de fuentes 15/15 OK |
-| [docs/fiscal_historia.md](docs/fiscal_historia.md) | Series históricas 1703–2025: denominador PIB verificado, trampa de perímetro medida y empalme canónico |
-| [docs/demanda_suelo.md](docs/demanda_suelo.md) | Capas de demanda, crédito y suelo urbanizable (SIU + mercado de suelo) + cuarto contest negativo |
-| [docs/proxy_adelantado.md](docs/proxy_adelantado.md) | Proxies adelantados: aceleración de población (→precio +10 trim.) e hipotecas (+1 trim.) — anticipan los giros |
-| [docs/ppp_predictibilidad.md](docs/ppp_predictibilidad.md) | ¿Es predecible la PPA? Nivel sí (persistencia), crecimiento no; convergencia real verificada (3/4 ataques) pero de club, no global |
-| [docs/vivienda_global.md](docs/vivienda_global.md) | Panel internacional de vivienda: precios reales (BIS 1971–), precio/renta (OCDE) y suelo artificial |
-| [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
-| [docs/Guia ML-DL.md](docs/Guia%20ML-DL.md) | Guía ML/DL: mapa de técnicas por módulo, el tooling con LLM (RAG, motores, consejo) y ejemplos de uso con Claude |
-| [docs/ablacion_llm.md](docs/ablacion_llm.md) | Ablación LLM: prueba de que la capa ML/DL+RAG diferencia (LLM solo 3/12 vs LLM+sistema 11/12) + dónde vive el ML/DL |
-| [docs/comparativa_llm_vs_modelo.md](docs/comparativa_llm_vs_modelo.md) | Comparativa detallada pregunta a pregunta: IA sola vs modelo completo (por qué difieren) |
-| [docs/horizonte_50.md](docs/horizonte_50.md) | Sistema a 50 años: sobres condicionales de deuda (MC 2070) y bienestar, panel within y calibración con 300 años de historia |
-| [docs/despliegue.md](docs/despliegue.md) | Despliegue y operación: demo pública, réplica Docker, modo sin-red y qué sirve cada superficie |
-| [docs/glosario.md](docs/glosario.md) | Glosario de todas las siglas: instituciones, bases de datos, métodos y códigos de contabilidad nacional |
+| [docs/MEMORIA.md](docs/MEMORIA.md) | La memoria completa del TFM (resumen, datos, método, resultados, conclusiones) |
+| [docs/PLAN_MAESTRO.md](docs/PLAN_MAESTRO.md) | Documento canónico de diseño: preguntas de investigación, método, fases, riesgos |
+| [docs/entregas/](docs/entregas/) | Entregas del curso (01–04 + anexo transición) y feedback del tutor |
+| [docs/GUIA_USUARIO.md](docs/GUIA_USUARIO.md) | **Cómo usar el sistema**: panel, catálogo de preguntas, guía ML/DL, despliegue, glosario |
+| [docs/METODOLOGIA.md](docs/METODOLOGIA.md) | Cómo predice el sistema y la prueba de que la capa de datos/cálculo aporta los números |
+| [docs/RESULTADOS_VIVIENDA.md](docs/RESULTADOS_VIVIENDA.md) | Bloque de vivienda: EDA, competición de modelos, pronóstico, demanda/suelo, señales, DL |
+| [docs/RESULTADOS_FISCAL_BIENESTAR.md](docs/RESULTADOS_FISCAL_BIENESTAR.md) | Atlas, historia 1703–2025, gasto/ingresos, fronteras, pobreza, deuda, horizonte 50 años |
+| [docs/DATOS.md](docs/DATOS.md) | Fuentes, catálogo del almacén (raw/processed/gold) y diccionarios de datos |
+| [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas |
 
 ## Estructura del repositorio
 
@@ -69,11 +55,11 @@ _old/          # proyecto vivienda original completo (trazabilidad; ver entrega 
 
 **Sistema completo**, todo con protocolo pre-registrado, 91 tests y capa gold; dashboard publicado (enlace arriba).
 
-1. **T1 — Forecasting CCAA**: [EDA](docs/eda_vivienda.md) → [baselines rolling-origin](docs/backtest_t1_baselines.md) → cinco contests de candidatos ([clásicos](docs/candidatos_t1.md) · [demanda](docs/demanda_suelo.md) · [rutas DL](docs/dl_rutas.md): el mejor llegó al empate 0,401 vs 0,395 y no se adoptó) → [test final de un solo uso](docs/test_final_t1.md) → [producción drift + abanico empírico](docs/forecast_t1_mvp.md).
-2. **Atlas B1–B19** — [lectura guiada](docs/atlas.md) + [series históricas empalmadas 1703–2025](docs/fiscal_historia.md) con su trampa de perímetro medida.
-3. **El triángulo fiscal** — [gasto por función (89 países) e ingresos por tipo (195), reconciliados 15/15](docs/fiscal_breakdown.md) + [marco de bienestar y pobreza infantil](docs/bienestar_indicadores.md).
+1. **T1 — Forecasting CCAA**: [EDA](docs/RESULTADOS_VIVIENDA.md) → [baselines rolling-origin](docs/RESULTADOS_VIVIENDA.md) → cinco contests de candidatos ([clásicos](docs/RESULTADOS_VIVIENDA.md) · [demanda](docs/RESULTADOS_VIVIENDA.md) · [rutas DL](docs/RESULTADOS_VIVIENDA.md): el mejor llegó al empate 0,401 vs 0,395 y no se adoptó) → [test final de un solo uso](docs/RESULTADOS_VIVIENDA.md) → [producción drift + abanico empírico](docs/RESULTADOS_VIVIENDA.md).
+2. **Atlas B1–B19** — [lectura guiada](docs/RESULTADOS_FISCAL_BIENESTAR.md) + [series históricas empalmadas 1703–2025](docs/RESULTADOS_FISCAL_BIENESTAR.md) con su trampa de perímetro medida.
+3. **El triángulo fiscal** — [gasto por función (89 países) e ingresos por tipo (195), reconciliados 15/15](docs/RESULTADOS_FISCAL_BIENESTAR.md) + [marco de bienestar y pobreza infantil](docs/RESULTADOS_FISCAL_BIENESTAR.md).
 4. **Fronteras de rendimiento** en tres dominios (salud, educación, bienestar/mortalidad infantil) con incertidumbre conformal — nunca rankings.
-5. **D1 y el horizonte largo** — [menú de deuda 2024–2050](docs/escenarios_d1.md) → [sistema a 50 años](docs/horizonte_50.md): Monte Carlo a 2070, panel within para bienestar y calibración de continuidad con la propia historia (~13 pp).
-6. **Producto**: dashboard de 5 pestañas publicado + API + [asistente RAG citado](docs/rag_asistente.md); [despliegue y operación](docs/despliegue.md).
+5. **D1 y el horizonte largo** — [menú de deuda 2024–2050](docs/RESULTADOS_FISCAL_BIENESTAR.md) → [sistema a 50 años](docs/RESULTADOS_FISCAL_BIENESTAR.md): Monte Carlo a 2070, panel within para bienestar y calibración de continuidad con la propia historia (~13 pp).
+6. **Producto**: dashboard de 5 pestañas publicado + API + [asistente RAG citado](docs/GUIA_USUARIO.md); [despliegue y operación](docs/GUIA_USUARIO.md).
 
 Trabajo declarado en curso: driver de oferta (visados, adopción solo con datos 2026+), revalidación del DL global con orígenes 2026+, respuesta del tutor pendiente.
