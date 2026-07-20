@@ -95,6 +95,8 @@ def retrieve(chunks: list[dict], pregunta: str, k: int = TOP_K) -> list[tuple[fl
 ENGINES = {
     "kimi": {"base": "https://api.moonshot.ai/v1", "model": "kimi-k2.6",
              "key_env": "KIMI_API_KEY", "max_tokens": 1500},
+    "kimi-k3": {"base": "https://api.moonshot.ai/v1", "model": "kimi-k3",  # razonador: más presupuesto
+                "key_env": "KIMI_API_KEY", "max_tokens": 4000},
     "glm": {"base": "https://api.z.ai/api/coding/paas/v4",  # Coding Plan (el general da 429)
             "model": "glm-5.2", "key_env": "GLM_API_KEY", "max_tokens": 4000},
     "mimo": {"base": "https://token-plan-ams.xiaomimimo.com/v1", "model": "mimo-v2.5-pro",
@@ -118,33 +120,44 @@ def _api_key(key_env: str) -> str:
     return key
 
 
-def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]], engine: str = DEFAULT_ENGINE) -> str:
+def _post_chat(cfg: dict, messages: list[dict], max_tokens: int):
+    """Una llamada al endpoint OpenAI-compatible; devuelve (content, reasoning, finish)."""
     import requests
+    r = requests.post(
+        f"{cfg['base']}/chat/completions",
+        headers={"Authorization": f"Bearer {_api_key(cfg['key_env'])}"},
+        json={"model": cfg["model"], "max_tokens": max_tokens, "messages": messages},
+        timeout=180,
+    )
+    r.raise_for_status()
+    ch = r.json()["choices"][0]
+    m = ch["message"]
+    return (m.get("content") or "").strip(), (m.get("reasoning_content") or "").strip(), ch.get("finish_reason", "?")
+
+
+def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]], engine: str = DEFAULT_ENGINE) -> str:
+    """Mitigación de razonadores (kimi-k3, glm, mimo): si el modelo gasta el
+    presupuesto en el razonamiento oculto y deja el contenido vacío
+    (finish_reason='length'), se reintenta UNA vez con el triple de tokens; si
+    aun así no emite, se devuelve la cola del razonamiento en lugar de un error."""
     cfg = ENGINES[engine]
     contexto = "\n\n".join(
         f"[{i + 1}] ({c['fuente']} § {c['seccion']})\n{c['texto'][:2500]}"
         for i, (_, c) in enumerate(pasajes)
     )
-    r = requests.post(
-        f"{cfg['base']}/chat/completions",
-        headers={"Authorization": f"Bearer {_api_key(cfg['key_env'])}"},
-        json={
-            "model": cfg["model"],
-            "max_tokens": cfg["max_tokens"],
-            "messages": [
-                {"role": "system", "content": SYSTEM},
-                {"role": "user", "content": f"Pasajes del corpus:\n\n{contexto}\n\nPregunta: {pregunta}"},
-            ],
-        },
-        timeout=180,
-    )
-    r.raise_for_status()
-    choice = r.json()["choices"][0]
-    contenido = (choice["message"].get("content") or "").strip()
-    if not contenido:
-        razon = choice.get("finish_reason", "?")
-        return f"[{cfg['model']} devolvió contenido vacío (finish_reason={razon}) — sube max_tokens]"
-    return contenido
+    messages = [
+        {"role": "system", "content": SYSTEM},
+        {"role": "user", "content": f"Pasajes del corpus:\n\n{contexto}\n\nPregunta: {pregunta}"},
+    ]
+    budget = cfg["max_tokens"]
+    contenido, razonamiento, finish = _post_chat(cfg, messages, budget)
+    if not contenido and finish == "length":  # razonador quedó sin presupuesto: reintenta
+        contenido, razonamiento, finish = _post_chat(cfg, messages, budget * 3)
+    if contenido:
+        return contenido
+    if razonamiento:  # emitió razonamiento pero no respuesta final: mejor eso que nada
+        return f"[respuesta no finalizada; razonamiento del modelo]\n{razonamiento[-1500:]}"
+    return f"[{cfg['model']} devolvió contenido vacío (finish_reason={finish})]"
 
 
 def main() -> None:
