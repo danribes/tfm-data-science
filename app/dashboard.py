@@ -1,4 +1,4 @@
-"""Dashboard MVP — "Dinero público → Resultados".
+"""Dashboard MVP — "El precio de lo público".
 
 Lee la capa gold directamente (sin depender de la API) y muestra las cuatro
 piezas del bloque analítico con su incertidumbre SIEMPRE visible.
@@ -20,8 +20,9 @@ FIGS = ROOT / "docs" / "figures"
 
 BLUE, GREEN, ORANGE, VIOLET, RED, GRIS = "#2a78d6", "#008300", "#eb6834", "#4a3aa7", "#e34948", "#9a9992"
 
-st.set_page_config(page_title="Dinero público → Resultados", page_icon="📊", layout="wide")
-st.title("Dinero público → Resultados")
+st.set_page_config(page_title="El precio de lo público", page_icon="📊", layout="wide")
+st.title("El precio de lo público")
+st.markdown("##### Qué recibe un país —y cada comunidad autónoma— a cambio del dinero que gasta")
 st.caption("TFM Máster en Data Science (Evolve) · Daniel Ribes · la banda es la parte "
            "informativa del pronóstico; los límites de método, en cada pestaña")
 

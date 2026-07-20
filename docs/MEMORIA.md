@@ -1,4 +1,4 @@
-# Dinero público → Resultados
+# El precio de lo público
 ## Memoria del Trabajo de Fin de Máster — v0.1 (borrador)
 
 *Máster en Data Science (Evolve, enero 2026) · Daniel Ribes · Repositorio: [github.com/danribes/tfm-data-science](https://github.com/danribes/tfm-data-science)*

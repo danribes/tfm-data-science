@@ -1,4 +1,4 @@
-# Anexo a las entregas — Transición del proyecto: de la vivienda al programa "Dinero público → Resultados"
+# Anexo a las entregas — Transición del proyecto: de la vivienda al programa "El precio de lo público"
 
 *2026-07-18. Documento incremental: las entregas [01](01_ideas_producto.md), [02](02_datos_necesarios.md) y [03](03_modelo_datos.md) se conservan íntegras, sin modificar, como exige el enunciado. Este documento explica la evolución del proyecto desde la idea avalada (índice de asequibilidad de vivienda por CCAA) hacia el programa descrito en [PLAN_MAESTRO.md](../PLAN_MAESTRO.md), y responde punto por punto al [feedback del tutor del 12 de julio](feedback_tutor_2026-07-12.md).*
 

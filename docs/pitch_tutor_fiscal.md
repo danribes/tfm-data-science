@@ -1,4 +1,4 @@
-# Propuesta de evolución del TFM — "Dinero público → Resultados"
+# Propuesta de evolución del TFM — "El precio de lo público"
 
 *Daniel Ribes · TFM Máster en Data Science · 2026-07-17 · 1 página*
 

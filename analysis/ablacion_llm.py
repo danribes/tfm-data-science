@@ -38,7 +38,7 @@ FECHA = "2026-07-19"
 
 # (id, pregunta, verdad calculada por el sistema, tolerancia relativa)
 PREGUNTAS = [
-    ("ratio_2024", "En el proyecto 'Dinero público → Resultados' (TFM, España): ¿cuál es el "
+    ("ratio_2024", "En el proyecto 'El precio de lo público' (TFM, España): ¿cuál es el "
      "ratio de asequibilidad de vivienda NACIONAL en 2024, definido como índice IPV/salarios "
      "con base 2015=1? Un solo número.", 1.26, 0.05),
     ("ratio_2027", "Según el pronóstico del modelo de ese proyecto, ¿qué valor alcanza ese "

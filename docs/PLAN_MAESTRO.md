@@ -1,4 +1,4 @@
-# PLAN MAESTRO — "Dinero público → Resultados": el documento único
+# PLAN MAESTRO — "El precio de lo público": el documento único
 
 *v1, 2026-07-18. **Documento canónico** que consolida: PLAN_integral (marco, 9 fases), PLAN_vivienda_consecuencias (Variante C, análisis complementario), PLAN_public_money_outcomes A/UE y B/GLOBAL (absorbidos como vistas), RESUMEN_ejecutivo, pitch_tutor_fiscal y el estado real de extracción. Los ficheros originales se conservan como anexos históricos; los esquemas técnicos viven en [data_dictionary_master.md](DATOS.md) y [data_dictionary_vivienda.md](DATOS.md); el inventario completo de fuentes en [data_landscape.md](DATOS.md).*
 

@@ -84,7 +84,7 @@ def card(slide, title_, body, x, y, w, h, accent=TEAL, stat=None):
 
 
 # 1 — cover
-s = base("Dinero público → resultados", dark=True)
+s = base("El precio de lo público", dark=True)
 text(s, "PLAN MAESTRO", .72, .58, 5, .35, 12, GOLD, True)
 text(s, "Un marco para medir evolución, rendimiento y escenarios fiscales", .72, 2.05, 8.8, 1.25, 30, WHITE, True)
 text(s, "TFM · versión ejecutiva", .75, 3.55, 4.5, .35, 16, RGBColor(191,205,219))
@@ -239,7 +239,7 @@ text(s,"Tres compromisos",.78,1.7,3.2,.35,13,GOLD,True)
 for i,t in enumerate(["alcance TFM radicalmente acotado","escenarios, no prescripción","causalidad limitada en primera plana"]):
     rect(s,.82,2.35+i*1.05,.32,.32,TEAL,True)
     text(s,t,1.35,2.25+i*1.05,7.9,.55,21,WHITE,True)
-text(s,"Dinero público → resultados",.82,6.45,6.5,.35,14,RGBColor(169,188,204))
+text(s,"El precio de lo público",.82,6.45,6.5,.35,14,RGBColor(169,188,204))
 rect(s,10.35,1.55,1.7,4.2,TEAL,True)
 text(s,"MEDIR",10.55,2.05,1.3,.35,15,WHITE,True,PP_ALIGN.CENTER)
 text(s,"↓",10.85,2.85,.7,.45,24,GOLD,True,PP_ALIGN.CENTER)
@@ -249,7 +249,7 @@ text(s,"DECIDIR",10.45,5.02,1.5,.35,15,WHITE,True,PP_ALIGN.CENTER)
 
 
 # Metadata and save
-prs.core_properties.title = "Dinero público → resultados — Plan Maestro"
+prs.core_properties.title = "El precio de lo público — Plan Maestro"
 prs.core_properties.subject = "Deck ejecutivo basado en PLAN_MAESTRO.md"
 prs.core_properties.author = "Proyecto evo_final_work"
 prs.core_properties.comments = "Generado desde docs/PLAN_MAESTRO.md el 2026-07-18"

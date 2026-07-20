@@ -34,7 +34,7 @@ EXCLUIR = {"MEMORIA.docx", "MEMORIA.pdf", "rag_asistente.md"}  # el doc del prop
 TOP_K = 4
 MIN_SIM = 0.05
 
-SYSTEM = """Eres el asistente del proyecto "Dinero público → Resultados" (TFM de Daniel Ribes).
+SYSTEM = """Eres el asistente del proyecto "El precio de lo público" (TFM de Daniel Ribes).
 Reglas ESTRICTAS, en este orden de prioridad:
 1. Responde SOLO con información presente en los pasajes proporcionados. Si los pasajes no
    contienen la respuesta, di "El corpus del proyecto no cubre esto" y sugiere dónde podría estar.

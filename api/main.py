@@ -1,4 +1,4 @@
-"""API del proyecto "Dinero público → Resultados" (esqueleto F-app).
+"""API del proyecto "El precio de lo público" (esqueleto F-app).
 
 Sirve la capa GOLD ya extraída (atlas + siglo) y deja huecos claros (501)
 para los artefactos de modelo que producirán los notebooks:
@@ -23,7 +23,7 @@ GOLD_DIR = pathlib.Path(os.environ.get("GOLD_DIR", "../storage/gold")).resolve()
 MODELS_DIR = pathlib.Path(__file__).parent / "models"
 
 app = FastAPI(
-    title="Dinero público → Resultados",
+    title="El precio de lo público",
     version="0.1.0",
     description="Atlas fiscal (1900–2023), rendimiento ajustado y simulador de escenarios. "
                 "Endpoints de modelo devuelven 501 hasta que los notebooks entrenen los artefactos.",

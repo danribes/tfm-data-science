@@ -1,4 +1,6 @@
-# Dinero público → Resultados
+# El precio de lo público
+
+*Qué recibe un país —y cada comunidad autónoma— a cambio del dinero que gasta y recauda.*
 
 **Trabajo de Fin de Máster — Máster en Data Science (Evolve), enero 2026.**
 Autor: Daniel Ribes ([danribes@gmail.com](mailto:danribes@gmail.com))
