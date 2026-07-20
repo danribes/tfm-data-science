@@ -341,31 +341,37 @@ docs/pitch_tutor_fiscal.md#338,docs/pitch_tutor_fiscal.md,"Datos: verificados en
 docs/pitch_tutor_fiscal.md#339,docs/pitch_tutor_fiscal.md,Tres variantes — te pido criterio,1003
 docs/pitch_tutor_fiscal.md#340,docs/pitch_tutor_fiscal.md,"Calendario (10 semanas, deadline 30-sep)",269
 docs/pitch_tutor_fiscal.md#341,docs/pitch_tutor_fiscal.md,Lo que te pido,238
-docs/rendimiento_a1.md#342,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
-docs/rendimiento_a1.md#343,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
-docs/rendimiento_a1.md#344,docs/rendimiento_a1.md,2. Resultados de la selección,807
-docs/rendimiento_a1.md#345,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
-docs/rendimiento_a1.md#346,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
-docs/stress_test_qa.md#347,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
-docs/stress_test_qa.md#348,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
-docs/stress_test_qa.md#349,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
-docs/stress_test_qa.md#350,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
-docs/stress_test_qa.md#351,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
-docs/stress_test_qa.md#352,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
-docs/stress_test_qa.md#353,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
-docs/stress_test_qa.md#354,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
-docs/stress_test_qa.md#355,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
-docs/stress_test_qa.md#356,docs/stress_test_qa.md,Veredicto del stress test,646
-docs/test_final_t1.md#357,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
-docs/test_final_t1.md#358,docs/test_final_t1.md,1. Resultados,468
-docs/test_final_t1.md#359,docs/test_final_t1.md,2. Lecturas,1724
-docs/test_final_t1.md#360,docs/test_final_t1.md,3. Registro,378
-docs/tipologias_a2.md#361,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
-docs/tipologias_a2.md#362,docs/tipologias_a2.md,Método,307
-docs/tipologias_a2.md#363,docs/tipologias_a2.md,Resultados,1030
-docs/tipologias_a2.md#364,docs/tipologias_a2.md,Límites,354
-docs/vivienda_global.md#365,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
-docs/vivienda_global.md#366,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
-docs/vivienda_global.md#367,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
-docs/vivienda_global.md#368,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
-docs/vivienda_global.md#369,docs/vivienda_global.md,4. Uso en el proyecto,350
+docs/proxy_adelantado.md#342,docs/proxy_adelantado.md,Proxies adelantados: variables que anticipan el precio de la vivienda,807
+docs/proxy_adelantado.md#343,docs/proxy_adelantado.md,Ranking (|correlación| con el precio futuro),628
+docs/proxy_adelantado.md#344,docs/proxy_adelantado.md,El hallazgo clave: la aceleración de la población,977
+docs/proxy_adelantado.md#345,docs/proxy_adelantado.md,El compañero robusto: las hipotecas,359
+docs/proxy_adelantado.md#346,docs/proxy_adelantado.md,Lo que NO se adopta sin más,813
+docs/proxy_adelantado.md#347,docs/proxy_adelantado.md,Uso propuesto,430
+docs/rendimiento_a1.md#348,docs/rendimiento_a1.md,"A1 — Rendimiento ajustado del gasto sanitario público (F3.1, módulo salud)",496
+docs/rendimiento_a1.md#349,docs/rendimiento_a1.md,1. Diseño (declarado antes de mirar resultados),557
+docs/rendimiento_a1.md#350,docs/rendimiento_a1.md,2. Resultados de la selección,807
+docs/rendimiento_a1.md#351,docs/rendimiento_a1.md,3. El funnel (la respuesta a A1),1297
+docs/rendimiento_a1.md#352,docs/rendimiento_a1.md,"4. Límites (en primera plana, PLAN_MAESTRO §6)",610
+docs/stress_test_qa.md#353,docs/stress_test_qa.md,Stress test — ocho preguntas de usuario real contra el sistema,503
+docs/stress_test_qa.md#354,docs/stress_test_qa.md,"Q1 · ""¿Cómo evolucionará la deuda el año que viene en los países del mundo?""",654
+docs/stress_test_qa.md#355,docs/stress_test_qa.md,"Q2 · ""¿Qué gastos hay que recortar para bajar al 10 % de impuestos en diez años?""",741
+docs/stress_test_qa.md#356,docs/stress_test_qa.md,"Q3 · ""¿Cuánta superficie hace falta para eliminar el déficit de vivienda en diez años?""",850
+docs/stress_test_qa.md#357,docs/stress_test_qa.md,"Q4 · ""¿Cuánta esperanza de vida compra +1 pp de PIB en sanidad?""",465
+docs/stress_test_qa.md#358,docs/stress_test_qa.md,"Q5 · ""¿Y el rendimiento del gasto educativo?""",372
+docs/stress_test_qa.md#359,docs/stress_test_qa.md,"Q6 · ""Volver a la inversión pública del 5 % del PIB, ¿qué cuesta?""",452
+docs/stress_test_qa.md#360,docs/stress_test_qa.md,"Q7 · ""¿Y si se reduce un 10 % el empleo público?""",506
+docs/stress_test_qa.md#361,docs/stress_test_qa.md,"Q8 · ""¿Qué ajuste neutraliza el envejecimiento en pensiones?""",384
+docs/stress_test_qa.md#362,docs/stress_test_qa.md,Veredicto del stress test,646
+docs/test_final_t1.md#363,docs/test_final_t1.md,Test final T1 — única pasada sobre 2024Q1–2025Q4,506
+docs/test_final_t1.md#364,docs/test_final_t1.md,1. Resultados,468
+docs/test_final_t1.md#365,docs/test_final_t1.md,2. Lecturas,1724
+docs/test_final_t1.md#366,docs/test_final_t1.md,3. Registro,378
+docs/tipologias_a2.md#367,docs/tipologias_a2.md,A2 — Tipologías de composición del gasto público (PCA + clustering),366
+docs/tipologias_a2.md#368,docs/tipologias_a2.md,Método,307
+docs/tipologias_a2.md#369,docs/tipologias_a2.md,Resultados,1030
+docs/tipologias_a2.md#370,docs/tipologias_a2.md,Límites,354
+docs/vivienda_global.md#371,docs/vivienda_global.md,Panel internacional de vivienda y suelo (2026-07-19),447
+docs/vivienda_global.md#372,docs/vivienda_global.md,1. Fuentes conectadas (verificadas en vivo),935
+docs/vivienda_global.md#373,docs/vivienda_global.md,2. Lo que NO existe (declarado),701
+docs/vivienda_global.md#374,docs/vivienda_global.md,"3. Lecturas (descriptivas, no causales)",1364
+docs/vivienda_global.md#375,docs/vivienda_global.md,4. Uso en el proyecto,350

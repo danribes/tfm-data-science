@@ -26,6 +26,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/fiscal_breakdown.md](docs/fiscal_breakdown.md) | Desglose mundial de gasto (COFOG, 89 países) e ingresos por tipo (195) + reconciliación de fuentes 15/15 OK |
 | [docs/fiscal_historia.md](docs/fiscal_historia.md) | Series históricas 1703–2025: denominador PIB verificado, trampa de perímetro medida y empalme canónico |
 | [docs/demanda_suelo.md](docs/demanda_suelo.md) | Capas de demanda, crédito y suelo urbanizable (SIU + mercado de suelo) + cuarto contest negativo |
+| [docs/proxy_adelantado.md](docs/proxy_adelantado.md) | Proxies adelantados: aceleración de población (→precio +10 trim.) e hipotecas (+1 trim.) — anticipan los giros |
 | [docs/vivienda_global.md](docs/vivienda_global.md) | Panel internacional de vivienda: precios reales (BIS 1971–), precio/renta (OCDE) y suelo artificial |
 | [docs/dl_rutas.md](docs/dl_rutas.md) | Deep learning contra el protocolo: Chronos zero-shot y DL global entrenado en 1.760 series extranjeras (empate técnico) |
 | [docs/Guia ML-DL.md](docs/Guia%20ML-DL.md) | Guía ML/DL: mapa de técnicas por módulo, el tooling con LLM (RAG, motores, consejo) y ejemplos de uso con Claude |
