@@ -51,7 +51,7 @@ docs/GUIA_USUARIO.md#48,docs/GUIA_USUARIO.md,Principio que gobierna la interfaz,
 docs/GUIA_USUARIO.md#49,docs/GUIA_USUARIO.md,Las cinco pestañas,1505
 docs/GUIA_USUARIO.md#50,docs/GUIA_USUARIO.md,Ejemplos de preguntas y la respuesta del modelo,3272
 docs/GUIA_USUARIO.md#51,docs/GUIA_USUARIO.md,Usar el motor por API (para reproducir los números),695
-docs/GUIA_USUARIO.md#52,docs/GUIA_USUARIO.md,Preguntar en lenguaje natural — el asistente RAG,375
+docs/GUIA_USUARIO.md#52,docs/GUIA_USUARIO.md,Preguntar en lenguaje natural — el asistente RAG,415
 docs/GUIA_USUARIO.md#53,docs/GUIA_USUARIO.md,Qué NO hace el sistema (y por qué es una virtud),466
 docs/GUIA_USUARIO.md#54,docs/GUIA_USUARIO.md,Catálogo de preguntas: qué se le puede preguntar al modelo,892
 docs/GUIA_USUARIO.md#55,docs/GUIA_USUARIO.md,"1. Vivienda: precio, asequibilidad y esfuerzo",707
@@ -70,7 +70,7 @@ docs/GUIA_USUARIO.md#67,docs/GUIA_USUARIO.md,Qué NO hace el sistema (y por qué
 docs/GUIA_USUARIO.md#68,docs/GUIA_USUARIO.md,Cómo preguntar en la práctica,619
 docs/GUIA_USUARIO.md#69,docs/GUIA_USUARIO.md,Guía de aplicaciones ML/DL y del tooling con Claude,646
 docs/GUIA_USUARIO.md#70,docs/GUIA_USUARIO.md,Parte 1 — El ML/DL dentro del modelo,3185
-docs/GUIA_USUARIO.md#71,docs/GUIA_USUARIO.md,Parte 2 — El tooling con LLM (Claude y motores),1875
+docs/GUIA_USUARIO.md#71,docs/GUIA_USUARIO.md,Parte 2 — El tooling con LLM (Claude y motores),2319
 docs/GUIA_USUARIO.md#72,docs/GUIA_USUARIO.md,Parte 3 — Ejemplos para sacar el máximo al ML/DL con Claude,2297
 docs/GUIA_USUARIO.md#73,docs/GUIA_USUARIO.md,Regla de oro para el usuario,533
 docs/GUIA_USUARIO.md#74,docs/GUIA_USUARIO.md,1. Demo pública (Streamlit Community Cloud) — el modo por defecto,791
@@ -81,7 +81,7 @@ docs/GUIA_USUARIO.md#78,docs/GUIA_USUARIO.md,Advertencias que viajan con el prod
 docs/GUIA_USUARIO.md#79,docs/GUIA_USUARIO.md,Historial de despliegue (trazabilidad),407
 docs/GUIA_USUARIO.md#80,docs/GUIA_USUARIO.md,"Asistente RAG — ""el LLM narra; el sistema calcula""",449
 docs/GUIA_USUARIO.md#81,docs/GUIA_USUARIO.md,Diseño,1654
-docs/GUIA_USUARIO.md#82,docs/GUIA_USUARIO.md,Uso,367
+docs/GUIA_USUARIO.md#82,docs/GUIA_USUARIO.md,Uso,390
 docs/GUIA_USUARIO.md#83,docs/GUIA_USUARIO.md,Límites declarados,703
 docs/GUIA_USUARIO.md#84,docs/GUIA_USUARIO.md,Glosario de siglas y acrónimos,226
 docs/GUIA_USUARIO.md#85,docs/GUIA_USUARIO.md,Instituciones y fuentes de datos,1963
@@ -117,7 +117,7 @@ docs/MEMORIA.md#114,docs/MEMORIA.md,4.3-nonies Bienestar y pobreza infantil: el 
 docs/MEMORIA.md#115,docs/MEMORIA.md,4.4 D1 — Escenarios de deuda 2024–2050,768
 docs/MEMORIA.md#116,docs/MEMORIA.md,4.4-bis Horizonte 50 años: sobres condicionales de economía y bienestar,1501
 docs/MEMORIA.md#117,docs/MEMORIA.md,"4.5 El producto (MVP): dashboard publicado, API y arranque garantizado",924
-docs/MEMORIA.md#118,docs/MEMORIA.md,4.6 ¿Por qué no basta un LLM?,3433
+docs/MEMORIA.md#118,docs/MEMORIA.md,4.6 ¿Por qué no basta un LLM?,3480
 docs/MEMORIA.md#119,docs/MEMORIA.md,5. Limitaciones,1491
 docs/MEMORIA.md#120,docs/MEMORIA.md,6. Conclusiones,1426
 docs/MEMORIA.md#121,docs/MEMORIA.md,7. Trabajo futuro,429

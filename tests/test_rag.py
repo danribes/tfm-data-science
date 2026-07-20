@@ -7,14 +7,18 @@ import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "app"))
-from rag_assistant import DEFAULT_ENGINE, ENGINES, SYSTEM, chunk_docs, retrieve  # noqa: E402
+from rag_assistant import (DEFAULT_ENGINE, ENGINES, FALLBACK_ENGINES, SYSTEM,  # noqa: E402
+                           chunk_docs, retrieve)
 
 
 def test_registro_de_motores():
-    assert DEFAULT_ENGINE == "kimi" and DEFAULT_ENGINE in ENGINES
+    assert DEFAULT_ENGINE == "gemini" and DEFAULT_ENGINE in ENGINES
     for cfg in ENGINES.values():
         assert {"base", "model", "key_env", "max_tokens"} <= set(cfg)
         assert cfg["max_tokens"] >= 300  # gotcha de los razonadores
+    # la reserva son motores reales y distintos del primario
+    assert FALLBACK_ENGINES and all(e in ENGINES for e in FALLBACK_ENGINES)
+    assert DEFAULT_ENGINE not in FALLBACK_ENGINES
 
 
 @pytest.fixture(scope="module")

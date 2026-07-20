@@ -169,9 +169,10 @@ sensibilidades, no pronóstico". Otros endpoints:
 python3 app/rag_assistant.py "¿Qué pasa con la deuda si los tipos suben al 5%?"
 ```
 
-Responde con pasajes citados de la documentación del proyecto (36 documentos).
-Con `--llm --engine kimi` redacta la respuesta a partir SOLO de esos pasajes,
-con cita por afirmación; sin clave, devuelve los pasajes tal cual.
+Responde con pasajes citados de la documentación del proyecto.
+Con `--llm` redacta la respuesta a partir SOLO de esos pasajes (motor `gemini`
+por defecto, con reserva automática a `glm` y `mimo`), con cita por afirmación;
+sin clave, devuelve los pasajes tal cual.
 
 ---
 
@@ -476,9 +477,15 @@ Recuperación aumentada sobre los 37 documentos del propio proyecto.
 
 | Motor | Modelo | Endpoint | Nota |
 |---|---|---|---|
-| `kimi` (defecto) | kimi-k2.6 | api.moonshot.ai | Sin "tasa de razonamiento", rápido |
-| `glm` | glm-5.2 | api.z.ai (Coding Plan) | max_tokens≥4000 |
-| `mimo` | mimo-v2.5-pro | xiaomimimo | Reasoner |
+| `gemini` (defecto) | gemini-2.5-pro | generativelanguage.googleapis.com | El más fiel+rápido+consistente en el benchmark de grounding |
+| `glm` (reserva) | glm-5.2 | api.z.ai (Coding Plan) | Reserva automática 1 |
+| `mimo` (reserva) | mimo-v2.5-pro | xiaomimimo | Reserva automática 2 |
+| `kimi` | kimi-k2.6 | api.moonshot.ai | Sin "tasa de razonamiento" |
+| `kimi-k3` | kimi-k3 | api.moonshot.ai | Razonador (más presupuesto) |
+
+Si el motor primario (gemini) falla o devuelve vacío, el asistente cae
+automáticamente a `glm` y luego a `mimo` (los dos más parecidos: fieles,
+rápidos, sin impuesto de razonamiento), anotando qué motor respondió.
 
 Uso:
 ```bash
@@ -654,7 +661,7 @@ El papel correcto de un LLM en este proyecto quedó fijado en la [memoria §4.6]
 
 ```
 python3 app/rag_assistant.py "¿por qué el modelo de producción es el drift?"
-python3 app/rag_assistant.py --llm "¿qué dice el test final?"              # kimi (defecto)
+python3 app/rag_assistant.py --llm "¿qué dice el test final?"              # gemini (defecto) con reserva glm/mimo
 python3 app/rag_assistant.py --llm --engine glm "¿qué dice el test final?"  # o glm / mimo
 python3 app/rag_assistant.py --build                                # regenerar manifiesto
 ```

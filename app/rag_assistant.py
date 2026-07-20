@@ -104,7 +104,10 @@ ENGINES = {
     "gemini": {"base": "https://generativelanguage.googleapis.com/v1beta/openai",
                "model": "gemini-2.5-pro", "key_env": "GEMINI_API_KEY", "max_tokens": 4000},
 }
-DEFAULT_ENGINE = "kimi"
+DEFAULT_ENGINE = "gemini"  # el más fiel+rápido+consistente en el benchmark de grounding (2026-07-19)
+# reserva automática: los dos motores más parecidos a gemini (fieles, rápidos, sin
+# impuesto de razonamiento). Si el primario falla o devuelve vacío, se prueban en orden.
+FALLBACK_ENGINES = ["glm", "mimo"]
 
 
 def _api_key(key_env: str) -> str:
@@ -160,6 +163,24 @@ def responder_llm(pregunta: str, pasajes: list[tuple[float, dict]], engine: str 
     return f"[{cfg['model']} devolvió contenido vacío (finish_reason={finish})]"
 
 
+def responder_con_reserva(pregunta: str, pasajes: list[tuple[float, dict]],
+                          engine: str = DEFAULT_ENGINE) -> str:
+    """Intenta el motor elegido y, si falla o devuelve vacío, cae a los de reserva.
+    Devuelve la respuesta anotando qué motor la produjo si no fue el primario."""
+    cadena = [engine] + [e for e in FALLBACK_ENGINES if e != engine]
+    errores = []
+    for eng in cadena:
+        try:
+            resp = responder_llm(pregunta, pasajes, eng)
+            if not resp.startswith("["):  # respuesta válida (no vacía / no truncada)
+                aviso = "" if eng == engine else f"_[motor primario no disponible; respondido por reserva: {eng}]_\n\n"
+                return aviso + resp
+            errores.append(f"{eng}: sin contenido")
+        except Exception as e:  # noqa: BLE001
+            errores.append(f"{eng}: {type(e).__name__}")
+    raise RuntimeError("todos los motores fallaron — " + "; ".join(errores))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Asistente RAG del proyecto")
     ap.add_argument("pregunta", nargs="*", help="La pregunta")
@@ -186,7 +207,7 @@ def main() -> None:
 
     if args.llm:
         try:
-            print(responder_llm(pregunta, pasajes, args.engine))
+            print(responder_con_reserva(pregunta, pasajes, args.engine))
             print("\n— Fuentes —")
         except Exception as e:  # sin credenciales, sin saldo o sin red → degradar a pasajes
             detalle = str(e).split("message")[-1][:140]

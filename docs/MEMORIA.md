@@ -126,7 +126,7 @@ Los objetos entrenados que un tribunal puede examinar: la elasticidad de las pen
 
 **Evidencia empírica (ablación, `docs/METODOLOGIA.md`)**: la afirmación anterior se comprobó como experimento. El mismo LLM (gemini-2.5-pro) respondió 12 preguntas cuya respuesta es una salida del sistema, en dos brazos idénticos salvo la capa de conocimiento: sin el sistema acertó **3/12** (error relativo mediano 27 %, con fallos de hasta 2382 %); con los resultados de la capa ML/DL recuperados por RAG, **11/12** (error mediano 0 %). Los fallos del LLM solo son del tipo "plausible pero falso" — proyecta la deuda 2050 en 135 % (ignora la presión demográfica que el motor cuantifica en +97 pp) e inventa una correlación suelo-precio de 0,35 donde el panel mide 0,01. La diferencia no es de matiz: es la capa ML/DL lo que produce los números, y sin ella el LLM se equivoca. Un test permanente (`tests/test_ablacion.py`) falla si esa diferencia desaparece.
 
-**Declaración de uso de IA**: en este proyecto se emplearon asistentes LLM como herramienta de programación y redacción (proceso), nunca como fuente de los números (producto). El asistente RAG (motores configurables: kimi, glm, mimo, gemini) es el papel correcto de un LLM aquí: interfaz de lenguaje natural SOBRE los artefactos calculados — el LLM narra, el sistema calcula.
+**Declaración de uso de IA**: en este proyecto se emplearon asistentes LLM como herramienta de programación y redacción (proceso), nunca como fuente de los números (producto). El asistente RAG (motor por defecto gemini, con reserva automática a glm/mimo; también kimi/kimi-k3 disponibles) es el papel correcto de un LLM aquí: interfaz de lenguaje natural SOBRE los artefactos calculados — el LLM narra, el sistema calcula.
 
 ## 5. Limitaciones
 
