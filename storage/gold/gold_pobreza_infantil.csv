@@ -1,0 +1,5 @@
+palanca,cambio_transferencias,d_pobreza_infantil_pp,nivel_proyectado,ratio_infantil_total,reduccion_transferencias_es_pp,efecto_transferencias_infantil_pp,ciclo_predice
+transferencias +25 %,0.25,-2.17,31.6,1.471,5.9,8.7,False
+sin cambios,0.0,-0.0,33.8,1.471,5.9,8.7,False
+transferencias −50 %,-0.5,4.34,38.1,1.471,5.9,8.7,False
+sin transferencias,-1.0,8.68,42.5,1.471,5.9,8.7,False

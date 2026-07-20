@@ -23,6 +23,7 @@ El proyecto nació como un índice de asequibilidad de vivienda por CCAA y evolu
 | [docs/RECONCILIACION_plan_maestro_vs_entregas.md](docs/RECONCILIACION_plan_maestro_vs_entregas.md) | Auditoría interna: coherencia plan ↔ entregas ↔ enunciados |
 | [docs/arquitecturas_prediccion.md](docs/arquitecturas_prediccion.md) | Cómo se predicen los resultados: directa vs encadenada (two-stage) vs condicional, y la regla que gobierna la elección |
 | [docs/bienestar_indicadores.md](docs/bienestar_indicadores.md) | Marco bienestar↔pobreza infantil (MPI/MODA): 7 bloques → 13 series + frontera ingreso público → bienestar objetivo |
+| [docs/pobreza_infantil.md](docs/pobreza_infantil.md) | ¿Se predice la pobreza infantil? Absoluta sí (renta); relativa no del ciclo pero sí de la redistribución (palanca medida ~9 pp) |
 | [docs/fiscal_breakdown.md](docs/fiscal_breakdown.md) | Desglose mundial de gasto (COFOG, 89 países) e ingresos por tipo (195) + reconciliación de fuentes 15/15 OK |
 | [docs/fiscal_historia.md](docs/fiscal_historia.md) | Series históricas 1703–2025: denominador PIB verificado, trampa de perímetro medida y empalme canónico |
 | [docs/demanda_suelo.md](docs/demanda_suelo.md) | Capas de demanda, crédito y suelo urbanizable (SIU + mercado de suelo) + cuarto contest negativo |
