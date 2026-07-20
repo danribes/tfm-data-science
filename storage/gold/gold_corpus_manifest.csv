@@ -80,7 +80,7 @@ docs/GUIA_USUARIO.md#77,docs/GUIA_USUARIO.md,Qué sirve cada superficie,778
 docs/GUIA_USUARIO.md#78,docs/GUIA_USUARIO.md,Advertencias que viajan con el producto,390
 docs/GUIA_USUARIO.md#79,docs/GUIA_USUARIO.md,Historial de despliegue (trazabilidad),407
 docs/GUIA_USUARIO.md#80,docs/GUIA_USUARIO.md,"Asistente RAG — ""el LLM narra; el sistema calcula""",449
-docs/GUIA_USUARIO.md#81,docs/GUIA_USUARIO.md,Diseño,1609
+docs/GUIA_USUARIO.md#81,docs/GUIA_USUARIO.md,Diseño,1654
 docs/GUIA_USUARIO.md#82,docs/GUIA_USUARIO.md,Uso,367
 docs/GUIA_USUARIO.md#83,docs/GUIA_USUARIO.md,Límites declarados,703
 docs/GUIA_USUARIO.md#84,docs/GUIA_USUARIO.md,Glosario de siglas y acrónimos,226
@@ -98,13 +98,13 @@ docs/MEMORIA.md#95,docs/MEMORIA.md,Resumen,2637
 docs/MEMORIA.md#96,docs/MEMORIA.md,1.1 El problema,458
 docs/MEMORIA.md#97,docs/MEMORIA.md,1.2 De la vivienda al programa,733
 docs/MEMORIA.md#98,docs/MEMORIA.md,1.3 El feedback del tutor como especificación,627
-docs/MEMORIA.md#99,docs/MEMORIA.md,2.1 Capas y contrato,641
+docs/MEMORIA.md#99,docs/MEMORIA.md,2.1 Capas y contrato,642
 docs/MEMORIA.md#100,docs/MEMORIA.md,2.2 Fuentes principales,357
 docs/MEMORIA.md#101,docs/MEMORIA.md,"2.3 La calidad de datos como resultado, no como trámite",844
 docs/MEMORIA.md#102,docs/MEMORIA.md,3. Metodología: el protocolo pre-registrado,1230
 docs/MEMORIA.md#103,docs/MEMORIA.md,"3.1 Cómo se predicen los resultados: directa, encadenada y condicional",1147
 docs/MEMORIA.md#104,docs/MEMORIA.md,4.1 T1 — Pronóstico de asequibilidad por CCAA (el núcleo avalado),1622
-docs/MEMORIA.md#105,docs/MEMORIA.md,4.2 Atlas B1–B16 — el siglo del gasto público,814
+docs/MEMORIA.md#105,docs/MEMORIA.md,4.2 Atlas B1–B19 — el siglo del gasto público,814
 docs/MEMORIA.md#106,docs/MEMORIA.md,4.3 A1 — Rendimiento ajustado del gasto sanitario (164 países),796
 docs/MEMORIA.md#107,docs/MEMORIA.md,4.3-bis A2 — Tipologías de composición del gasto,573
 docs/MEMORIA.md#108,docs/MEMORIA.md,"4.3-ter Expansión del corpus: educación, SPI y cuota teórica",1337
@@ -314,7 +314,7 @@ docs/entregas/04_analisis_modelado.md#311,docs/entregas/04_analisis_modelado.md,
 docs/entregas/04_analisis_modelado.md#312,docs/entregas/04_analisis_modelado.md,"7. Validación, métricas y criterios de aceptación",2065
 docs/entregas/04_analisis_modelado.md#313,docs/entregas/04_analisis_modelado.md,8. Riesgos y alternativas,1687
 docs/entregas/04_analisis_modelado.md#314,docs/entregas/04_analisis_modelado.md,"Revisión 1 (2026-07-18, posterior a la presentación de la entrega)",1857
-docs/entregas/anexo_transicion_proyecto.md#315,docs/entregas/anexo_transicion_proyecto.md,"Anexo a las entregas — Transición del proyecto: de la vivienda al programa ""El precio de lo público""",590
+docs/entregas/anexo_transicion_proyecto.md#315,docs/entregas/anexo_transicion_proyecto.md,"Anexo a las entregas — Transición del proyecto: de la vivienda al programa ""El precio de lo público""",1333
 docs/entregas/anexo_transicion_proyecto.md#316,docs/entregas/anexo_transicion_proyecto.md,1. Respuesta directa al feedback del 12 de julio,1495
 docs/entregas/anexo_transicion_proyecto.md#317,docs/entregas/anexo_transicion_proyecto.md,2. Por qué se amplía el proyecto,808
 docs/entregas/anexo_transicion_proyecto.md#318,docs/entregas/anexo_transicion_proyecto.md,3. Qué se conserva del proyecto vivienda (todo),2306

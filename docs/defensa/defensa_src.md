@@ -28,9 +28,9 @@ github.com/danribes/tfm-data-science
 connectors/ → raw (vintage) → processed (32) → gold (11) → analysis · api · app
 ```
 
-- Más de **30 fuentes públicas**: INE, BdE, Eurostat, FMI, OMS, Banco Mundial, GMD/JST (1870–2023), UN DESA, MITMA
+- Más de **40 fuentes públicas**: INE, BdE, Eurostat, FMI, OMS, Banco Mundial, GMD/JST (1870–2023), UN DESA, MITMA
 - `vintage_manifest.csv`: qué versión del dato existía en cada descarga
-- **51 tests automáticos** del contrato de datos y modelos
+- **95 tests automáticos** del contrato de datos y modelos
 - Nada entra en gold sin clave primaria verificada y smoke test
 
 ---
@@ -136,7 +136,7 @@ SARIMAX 1/17 · GBM 0/17 en validación corta; la hipótesis "GBM gana a largo" 
 | El número | recordado del texto de entrenamiento | **calculado** de datos con cadena de custodia |
 | Evaluación | no puede suspender un backtest | **suspendió cinco veces en público** — prueba de que es real |
 | Incertidumbre | tono de confianza | cuantiles medidos, conformal, cobertura comprobable |
-| Reproducible | varía con prompt y versión | mismo código+datos → mismos números (91 tests) |
+| Reproducible | varía con prompt y versión | mismo código+datos → mismos números (95 tests) |
 | Lo normativo | prescribe con soltura | pone precio y devuelve la elección a la política |
 
 **Declaración**: LLM usado como herramienta de proceso (código, redacción), nunca como fuente de números. **El LLM narra; el sistema calcula.**

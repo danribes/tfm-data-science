@@ -31,8 +31,8 @@ Tres indicaciones del tutor (12-jul) actuaron como requisitos de diseño verific
 connectors/  →  storage/raw  →  storage/processed  →  storage/gold  →  analysis/ · api/ · app/
 ```
 - **raw**: descargas intactas con `vintage_manifest.csv` (fecha y URL de cada descarga — qué versión del dato existía en cada momento).
-- **processed**: un fichero por fuente, limpieza trazable (32 datasets).
-- **gold**: 9 datasets finales de consumo, con clave primaria verificada y tests automáticos (`tests/`, 42 tests): paneles fiscal europeo y mundial-histórico, panel CCAA trimestral, asequibilidad anual, proyecciones demográficas, y los tres artefactos de resultados (pronóstico, rendimiento, escenarios).
+- **processed**: un fichero por fuente, limpieza trazable (67 datasets).
+- **gold**: 23 datasets finales de consumo, con clave primaria verificada y tests automáticos (`tests/`, 95 tests): paneles fiscal europeo y mundial-histórico, panel CCAA trimestral, asequibilidad anual, proyecciones demográficas, y los tres artefactos de resultados (pronóstico, rendimiento, escenarios).
 
 ### 2.2 Fuentes principales
 INE (IPV, IPC, salarios EES), Banco de España (Euríbor), Eurostat (COFOG, ESSPROS, demografía, EUROPOP2023, FBCF por activo, permisos de construcción), FMI-WEO, OMS-GHED, GHO, Banco Mundial (WDI, WWBI), Global Macro Database y Jordà-Schularick-Taylor (histórico 1870–2023, 202 países), UN DESA (migración), MITMA (suelo, costes).
@@ -67,7 +67,7 @@ Tres arquitecturas conviven y la elección está gobernada por una regla única 
 ![Pronóstico de producción con abanico empírico](figures/backtest/b4_fan_nacional.png)
 - **Señal para la siguiente iteración**: los permisos residenciales (driver `oferta_nueva`, compromiso de la Revisión 1) son la señal adelantada más fuerte encontrada (r=0,57 con 11 trimestres; 3 trimestres de aviso en el único giro de la muestra). Se adoptará solo si lo confirman los datos de 2026+.
 
-### 4.2 Atlas B1–B16 — el siglo del gasto público
+### 4.2 Atlas B1–B19 — el siglo del gasto público
 Mediana mundial del gasto: ~10 %PIB (1900) → ~30 % (hoy); España 11 → 45,4 %. Deuda española en U (124 % tras 1898, 30 % en 1960, 105 % hoy). Los intereses cayeron de 5 a 2,4 %PIB pese a duplicarse la deuda (el dividendo del euro). La protección social es la partida mayor y la que más crece (14,3 → 18,5 %PIB). La inversión pública fue la variable de ajuste tras 2010 (5 → 3 %PIB). Y la figura exigida por la revisión de oferta privada: **la inversión residencial total española (6 → 11,7 → 3,9 → 5,8 %PIB) es un orden de magnitud mayor que el gasto público en vivienda (1,3 → 0,5 %PIB)** — contexto obligatorio de cualquier conclusión sobre política de vivienda.
 
 ![Vivienda: palanca pública vs promoción privada](figures/atlas/b03_vivienda_publica_vs_total.png)
@@ -119,7 +119,7 @@ La pregunta obligada hoy: ¿no respondería todo esto un modelo de lenguaje? No,
 1. **Procedencia auditable**: cada cifra traza hasta `vintage_manifest.csv` (URL y fecha de cada descarga). La proyección de deuda de Q1 del stress test sale de una edición del WEO que está EN el repositorio; la de un LLM, de una memoria no verificable anterior a su corte de entrenamiento.
 2. **Falsabilidad**: las afirmaciones de rendimiento se puntúan out-of-sample (rolling-origin + test final de un solo uso). La mejor prueba de que la evaluación es real es que los modelos propios la **suspendieron tres veces en público** — la respuesta de un LLM no puede suspender un backtest porque nunca se presenta a uno.
 3. **Incertidumbre calibrada**: las bandas del abanico son cuantiles de errores medidos, con cobertura comprobable; los intervalos de A1 son conformal por grupo de renta. Un LLM emite *tono* de confianza, no intervalos calibrados.
-4. **Reproducibilidad**: mismo código + mismos datos → mismos números, con 51 tests que lo blindan (el tercer bug del parser lo cazó un test; el número erróneo de un LLM es silencioso para siempre).
+4. **Reproducibilidad**: mismo código + mismos datos → mismos números, con 95 tests que lo blindan (el tercer bug del parser lo cazó un test; el número erróneo de un LLM es silencioso para siempre).
 5. **Rechazo por diseño**: el reframe del Bloque D y los huecos declarados (déficit de vivienda, outcomes educativos) son arquitectura. Un LLM prescribe con soltura qué ministerios suprimir; este sistema pone precio a la pregunta (el 78 % del gasto) y devuelve la elección a la política.
 
 Los objetos entrenados que un tribunal puede examinar: la elasticidad de las pensiones al envejecimiento (0,91 ± 0,19, SE agrupado), los cuantiles de error por horizonte que forman el abanico (aprendidos de 486 errores de backtesting), los residuales LOOCV con su semiancho conformal, la estructura adelantada de los permisos (r=0,57 a 11 trimestres) y los parámetros de los modelos evaluados y RECHAZADOS — el resultado negativo también es conocimiento entrenado.
@@ -200,7 +200,7 @@ python3 analysis/bienestar_50.py    # sobres de bienestar 2050/2070
 python3 analysis/backtest_50y.py    # calibración histórica de continuidad
 python3 analysis/fiscal_breakdown.py    # desglose y reconciliación fiscal mundial
 python3 analysis/fiscal_historia.py     # empalme histórico 1703–2025
-python3 -m pytest tests/ -q         # 91 tests del contrato de datos y modelos
+python3 -m pytest tests/ -q         # 95 tests del contrato de datos y modelos
 streamlit run app/dashboard.py      # dashboard (5 pestañas)
 python3 app/rag_assistant.py "..."  # asistente RAG sobre la documentación del proyecto
 ```

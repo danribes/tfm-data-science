@@ -67,7 +67,7 @@ _old/          # proyecto vivienda original completo (solo local; excluido del r
 
 ## Estado actual (2026-07-19)
 
-**Sistema completo**, todo con protocolo pre-registrado, 91 tests y capa gold; dashboard publicado (enlace arriba).
+**Sistema completo**, todo con protocolo pre-registrado, 95 tests y capa gold; dashboard publicado (enlace arriba).
 
 1. **T1 — Forecasting CCAA**: [EDA](docs/RESULTADOS_VIVIENDA.md) → [baselines rolling-origin](docs/RESULTADOS_VIVIENDA.md) → cinco contests de candidatos ([clásicos](docs/RESULTADOS_VIVIENDA.md) · [demanda](docs/RESULTADOS_VIVIENDA.md) · [rutas DL](docs/RESULTADOS_VIVIENDA.md): el mejor llegó al empate 0,401 vs 0,395 y no se adoptó) → [test final de un solo uso](docs/RESULTADOS_VIVIENDA.md) → [producción drift + abanico empírico](docs/RESULTADOS_VIVIENDA.md).
 2. **Atlas B1–B19** — [lectura guiada](docs/RESULTADOS_FISCAL_BIENESTAR.md) + [series históricas empalmadas 1703–2025](docs/RESULTADOS_FISCAL_BIENESTAR.md) con su trampa de perímetro medida.
