@@ -1,3 +1,4 @@
 exercises/
 __pycache__/
 *.pyc
+_old/

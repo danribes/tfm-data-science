@@ -1,5 +1,0 @@
-{
-    "extraPaths": ["."],
-    "include": ["src", "fetch_data.py"],
-    "pythonVersion": "3.12"
-}

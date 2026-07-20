@@ -38,7 +38,7 @@ storage/
 api/           # esqueleto FastAPI que sirve la capa gold (uvicorn main:app / docker compose up)
 scripts/       # utilidades (generador del deck del plan)
 docs/          # planes, diccionarios, entregas
-_old/          # proyecto vivienda original completo (trazabilidad; ver entrega 04)
+_old/          # proyecto vivienda original completo (solo local; excluido del repo vía .gitignore)
 ```
 
 ## Reproducibilidad
