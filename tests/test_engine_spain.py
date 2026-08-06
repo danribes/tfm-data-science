@@ -166,3 +166,85 @@ def test_lever_signs():
     assert run_scenario(Levers(pm=50.0))["pi"][0] > base["pi"][0]    # pass-through
     assert run_scenario(Levers(lam=1.4))["wrealIdx"][k] > base["wrealIdx"][k]
     assert run_scenario(Levers(dem=0.6))["pens"][k] > base["pens"][k]
+
+
+# ---- Task 7: persona dependents ----
+from engine.spain import PERSONA_IDS, PERSONAS, persona_dependents
+
+EXPECTED_PILLS = ["💼 Bonista", "🏦 Banca", "🔑 Comprador", "🚀 Emprendedor",
+                  "🏛️ Funcionario", "🗳️ Político", "🕳️ Corrupto", "🧒 Infancia",
+                  "🌅 Jubilado", "🎓 Joven", "📋 Indefinido", "🧾 Autónomo"]
+
+
+def test_twelve_personas_verbatim_identity():
+    assert PERSONA_IDS == [f"{i:02d}" for i in range(1, 13)]
+    assert [p["pill"] for p in PERSONAS] == EXPECTED_PILLS
+    by_id = {p["id"]: p for p in PERSONAS}
+    assert by_id["01"]["h1"] == "💼 Inversor en bonos: ¿me pagarán los 10 años?"
+    assert by_id["08"]["h1"] == "🧒 ¿Qué país hereda quien hoy tiene 8 años?"
+    assert by_id["12"]["foot"] == "🧾 autónomo"
+    assert by_id["07"]["foot"] == "🕳️ político corrupto · sátira de transparencia"
+    for p in PERSONAS:
+        assert len(p["outs"]) == 5
+        assert p["headline"] in [o["k"] for o in p["outs"]]
+        assert len(p["reds"]) == 3
+        for o in p["outs"]:
+            assert o["k"] in SERIES_KEYS
+
+
+def test_persona_dependents_shape():
+    deps = persona_dependents(run_scenario(Levers()))
+    assert sorted(deps) == PERSONA_IDS
+    for pid, d in deps.items():
+        assert set(d) == {"pill", "headline", "series"}
+        assert d["headline"] in d["series"]
+        for series in d["series"].values():
+            assert len(series) == 25
+
+
+# One pinned numeric check per persona at BASE levers. Values computed while
+# drafting this plan by executing the verbatim v16 run() semantics (extract
+# L95-175) against the committed gold slice; k is the year index (0=2026,
+# 4=2030, 9=2035, 24=2050).
+BASE_PINS = [
+    ("01", "bono", 0, 3.42), ("01", "b", 24, 223.8414), ("01", "int", 4, 3.3436),
+    ("02", "cuota", 0, 744.9971), ("02", "bls", 0, 10.0),
+    ("03", "esf", 0, 42.5764), ("03", "precio", 4, 217954.5876),
+    ("04", "g", 0, 2.7), ("04", "auton", 0, 14.5),
+    ("05", "d1", 0, 10.9), ("05", "nomreal", 24, 100.0),
+    ("06", "saldo", 4, -5.8136), ("06", "u", 0, 10.1),
+    ("07", "p51", 0, 3.0), ("07", "p2", 0, 5.7), ("07", "d3", 0, 1.4),
+    ("08", "arop", 0, 28.5), ("08", "edu", 0, 4.1), ("08", "dep", 24, 59.0),
+    ("09", "pens", 9, 16.4858), ("09", "dep", 9, 41.7),
+    ("10", "ujuv", 0, 23.4017), ("10", "temp", 0, 15.3),
+    ("11", "wrealIdx", 4, 103.6489), ("11", "salario", 4, 28547.9608),
+    ("12", "auton", 0, 14.5), ("12", "r", 0, 2.8),
+]
+
+# One pinned moved-lever check per persona (same provenance).
+MOVED_PINS = [
+    ("01", {"prima": 150.0}, "bono", 0, 4.47),
+    ("02", {"r": 4.8}, "bls", 9, 35.4993),
+    ("03", {"r": 4.8}, "esf", 9, 35.7009),
+    ("04", {"ext": 3.0}, "lvl", 9, 0.4165),
+    ("05", {"sp": 1.0}, "d1", 9, 10.66),
+    ("06", {"sp": 1.0}, "b", 24, 210.3118),
+    ("07", {"sp": 1.0}, "p51", 9, 2.855),
+    ("08", {"sp": 1.0}, "arop", 9, 29.7665),
+    ("09", {"idx": -0.5}, "nomreal", 9, 95.589),
+    ("10", {"z": -1.0}, "temp", 9, 16.525),
+    ("11", {"lam": 1.4}, "wrealIdx", 24, 139.6082),
+    ("12", {"pm": 50.0}, "pi", 0, 5.2163),
+]
+
+
+@pytest.mark.parametrize("pid,key,k,expected", BASE_PINS)
+def test_persona_base_pins(pid, key, k, expected):
+    deps = persona_dependents(run_scenario(Levers()))
+    assert deps[pid]["series"][key][k] == pytest.approx(expected, abs=1e-3)
+
+
+@pytest.mark.parametrize("pid,moved,key,k,expected", MOVED_PINS)
+def test_persona_moved_lever_pins(pid, moved, key, k, expected):
+    deps = persona_dependents(run_scenario(Levers(**moved)))
+    assert deps[pid]["series"][key][k] == pytest.approx(expected, abs=1e-3)
