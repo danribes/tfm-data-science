@@ -137,3 +137,54 @@ def test_worldbank_client_skips_non_dict_observations():
         result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
     assert result.available
     assert result.values == {2021: 85.3}  # only valid observation parsed, non-dict skipped
+
+
+from data import oecd_client
+
+
+def test_oecd_client_parses_sdmx_payload():
+    payload = {
+        "data": {
+            "structures": [{"dimensions": {"observation": [{"values": [{"id": "2021"}, {"id": "2022"}]}]}}],
+            "dataSets": [{"series": {"0:0:0:0:0:0:0:0": {"observations": {"0": [1234.5], "1": [1300.0]}}}}],
+        }
+    }
+    with patch("data.oecd_client.requests.get", return_value=_mock_response(payload)):
+        result = oecd_client.fetch_indicator(
+            "ESP", "OECD.EDU.IMEP", "DSD_EAG_UOE_FIN@DF_UOE_INDIC_FIN_PERSTUD", "3.2",
+            {"MEASURE": "FIN_PERSTUD"}, ["MEASURE"],
+        )
+    assert result.available
+    assert result.values == {2021: 1234.5, 2022: 1300.0}
+
+
+def test_oecd_client_returns_na_when_no_series():
+    payload = {
+        "data": {
+            "structures": [{"dimensions": {"observation": [{"values": []}]}}],
+            "dataSets": [{"series": {}}],
+        }
+    }
+    with patch("data.oecd_client.requests.get", return_value=_mock_response(payload)):
+        result = oecd_client.fetch_indicator(
+            "ZZZ", "OECD.EDU.IMEP", "DSD_EAG_UOE_FIN@DF_UOE_INDIC_FIN_PERSTUD", "3.2",
+            {"MEASURE": "FIN_PERSTUD"}, ["MEASURE"],
+        )
+    assert not result.available
+
+
+def test_oecd_client_skips_malformed_observations():
+    # One malformed observation (invalid index) and one valid observation
+    payload = {
+        "data": {
+            "structures": [{"dimensions": {"observation": [{"values": [{"id": "2021"}, {"id": "2022"}]}]}}],
+            "dataSets": [{"series": {"0:0:0:0:0:0:0:0": {"observations": {"999": [1234.5], "1": [1300.0]}}}}],  # 999 is invalid index
+        }
+    }
+    with patch("data.oecd_client.requests.get", return_value=_mock_response(payload)):
+        result = oecd_client.fetch_indicator(
+            "ESP", "OECD.EDU.IMEP", "DSD_EAG_UOE_FIN@DF_UOE_INDIC_FIN_PERSTUD", "3.2",
+            {"MEASURE": "FIN_PERSTUD"}, ["MEASURE"],
+        )
+    assert result.available
+    assert result.values == {2022: 1300.0}  # only valid observation parsed, malformed skipped
