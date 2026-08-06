@@ -1,0 +1,17 @@
+source,url,fetched,bytes,raw_file,processed_file
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_manr?format=JSON&lang=EN&coicop=CP00&unit=RCH_A&geo=ES&geo=EU27_2020,2026-07-31,22215,eurostat_hicp_manr_es.json,eurostat_hicp_manr_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?format=JSON&lang=EN&s_adj=SA&age=TOTAL&age=Y_LT25&unit=PC_ACT&sex=T&geo=ES,2026-07-31,32010,eurostat_une_rt_m_es.json,eurostat_une_rt_m_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/namq_10_gdp?format=JSON&lang=EN&unit=CLV_PCH_SM&s_adj=SCA&na_item=B1GQ&geo=ES,2026-07-31,11172,eurostat_gdp_q_es.json,eurostat_gdp_q_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10dd_edpt1?format=JSON&lang=EN&na_item=GD&sector=S13&unit=PC_GDP&geo=ES&geo=EU27_2020&geo=DE&geo=IT,2026-07-31,4828,eurostat_gov_debt_es.json,eurostat_gov_debt_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10dd_edpt1?format=JSON&lang=EN&na_item=B9&sector=S13&unit=PC_GDP&geo=ES,2026-07-31,3763,eurostat_gov_deficit_es.json,eurostat_gov_deficit_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hpi_q?format=JSON&lang=EN&purchase=TOTAL&unit=RCH_A&geo=ES&geo=EU27_2020,2026-07-31,7360,eurostat_hpi_q_es.json,eurostat_hpi_q_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_lvho07a?format=JSON&lang=EN&unit=PC&rskpovth=TOTAL&age=TOTAL&sex=T&geo=ES,2026-07-31,4114,eurostat_overburden_es.json,eurostat_overburden_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_li02?format=JSON&lang=EN&statinfo=MED_EI&rskpovth=A_60&rskpovth=B_60&unit=PC&sex=T&age=Y_LT16&age=TOTAL&geo=ES,2026-07-31,5140,eurostat_arop_child_es.json,eurostat_arop_child_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_pens?format=JSON&lang=EN&unit=PC_GDP&geo=ES&geo=EU27_2020,2026-07-31,18295,eurostat_pensions_pcgdp_es.json,eurostat_pensions_pcgdp_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?format=JSON&lang=EN&sector=S13&cofog99=GF09&na_item=TE&unit=PC_GDP&geo=ES&geo=EU27_2020,2026-07-31,4295,eurostat_gov_edu_es.json,eurostat_gov_edu_es.csv
+Eurostat,https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsi_pt_q?format=JSON&lang=EN&wstatus=EMP_TEMP&s_adj=SA&unit=PC_SAL&sex=T&age=Y15-64&geo=ES,2026-07-31,7624,eurostat_temp_share_es.json,eurostat_temp_share_es.csv
+ECB SDW,https://data-api.ecb.europa.eu/service/data/IRS/M.ES.L.L40.CI.0000.EUR.N.Z,2026-07-31,114469,ecb_bono10y_es.csv,ecb_bono10y_es.csv
+ECB SDW,https://data-api.ecb.europa.eu/service/data/IRS/M.DE.L.L40.CI.0000.EUR.N.Z,2026-07-31,114894,ecb_bono10y_de.csv,ecb_bono10y_de.csv
+ECB SDW,https://data-api.ecb.europa.eu/service/data/FM/M.U2.EUR.RT.MM.EURIBOR1YD_.HSTA,2026-07-31,117628,ecb_euribor12m.csv,ecb_euribor12m.csv
+INE Tempus3,https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC251856?nult=400,2026-07-31,40559,ine_ipc_general.json,ine_ipc_general.csv
+World Bank,https://api.worldbank.org/v2/country/ES/indicator/SL.EMP.SELF.ZS,2026-07-31,16544,wb_self_employment.json,wb_self_employment.csv
