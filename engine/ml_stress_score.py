@@ -72,12 +72,20 @@ class FiscalStressModel:
             return StressScoreResult(score=None, percentile=None, available=False,
                                       error=f"missing features for scoring: {missing}")
 
-        x = pd.DataFrame([features])[FEATURES]
-        raw = float(self._model.predict_proba(x)[0, 1])
-        score = max(0.0, min(100.0, raw * 100.0))
+        try:
+            x = pd.DataFrame([features])[FEATURES]
+            raw = float(self._model.predict_proba(x)[0, 1])
+            score = max(0.0, min(100.0, raw * 100.0))
 
-        percentile = None
-        if self._training_scores:
-            percentile = 100.0 * sum(1 for s in self._training_scores if s <= score) / len(self._training_scores)
+            percentile = None
+            if self._training_scores:
+                percentile = (100.0 * sum(1 for s in self._training_scores if s <= score)
+                              / len(self._training_scores))
 
-        return StressScoreResult(score=score, percentile=percentile, available=True, error=None)
+            return StressScoreResult(score=score, percentile=percentile, available=True, error=None)
+        except Exception as exc:
+            # Module contract: never raise to the caller. A malformed feature
+            # value (e.g. a string where a float is expected) or any other
+            # scoring failure degrades to an honest unavailable result.
+            return StressScoreResult(score=None, percentile=None, available=False,
+                                      error=f"scoring failed: {exc}")

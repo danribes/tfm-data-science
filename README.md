@@ -50,9 +50,15 @@ confirm graceful degradation, that all 5 tabs render, and nothing crashes:
 2. Select a smaller/poorer, non-EU/OECD country (e.g. **Haiti (HTI)** or
    **Chad (TCD)**) -- expect a "limited data coverage" banner, several
    metrics showing "N/A -- not available for this country" instead of a
-   crash, and the ML fiscal-stress score still computing from whichever
-   macro features are available (or showing "model unavailable" if the
-   model artifact hasn't been trained).
+   crash, and a prominent warning above the tabs listing which of the seven
+   baseline scenario indicators fell back to a generic calibration default
+   for this country. The ML fiscal-stress score's six macro features always
+   get a value (real, or the disclosed generic default above); corruption
+   control has no fallback and is never substituted -- when it's unavailable
+   for this country, the score shows an honest "model unavailable" /
+   missing-feature message instead of scoring on a fabricated value. The
+   score does not compute "from whichever macro features are available";
+   it's all-seven-features-or-honestly-unavailable.
 3. Click **Refresh data** in the sidebar and confirm the panel re-fetches
    without error.
 4. On the **House-buyer/Landlord** tab, toggle to "Buy-to-let" for a
@@ -72,6 +78,20 @@ kill %1
 ```
 
 Expected: prints `200`.
+
+## Known gaps & limitations
+
+- **Plain-English scenario parsing (design spec section 4.5) is not implemented
+  in this MVP; LLM narratives are.** The design spec described a text box where
+  a user could describe a scenario in plain English and have it parsed into
+  lever settings when `ANTHROPIC_API_KEY` is set. That parsing box does not
+  exist. What is implemented is the separate LLM-generated narrative captions
+  on each persona tab (see `personas/narrative.py`), which summarize an
+  already-run scenario in prose -- they do not accept or parse free-text input.
+- See the in-app "Data & Methodology" tab for the full, live list of known
+  gaps (data coverage limitations, calibrated engine constants and their
+  generic-default fallback values, per-country baseline vintage, and Model
+  Lab's lever-to-objective wiring).
 
 ## Tests
 

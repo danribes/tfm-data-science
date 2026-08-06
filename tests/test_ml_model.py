@@ -90,3 +90,30 @@ def test_model_wrapper_scores_without_warnings_when_artifact_present(tmp_path, m
     assert result.error is None
     assert 0.0 <= result.score <= 100.0
     assert result.percentile is not None
+
+
+def test_model_wrapper_never_raises_on_malformed_feature_value(tmp_path, monkeypatch):
+    import engine.ml_stress_score as mod
+
+    df = _synthetic_panel()
+    model = GradientBoostingClassifier(random_state=0)
+    model.fit(df[FEATURES], df["label"])
+
+    model_path = tmp_path / "fiscal_stress_model.joblib"
+    joblib.dump(model, model_path)
+
+    monkeypatch.setattr(mod, "MODEL_PATH", model_path)
+    monkeypatch.setattr(mod, "TRAINING_DISTRIBUTION_PATH", tmp_path / "nonexistent_scores.json")
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        wrapped = mod.FiscalStressModel()
+
+    features = {f: 50.0 for f in mod.FEATURES}
+    features["debt_gdp"] = "not-a-number"  # malformed value, all keys still present
+
+    result = wrapped.score(features)
+    assert result.available is False
+    assert result.score is None
+    assert result.percentile is None
+    assert result.error is not None

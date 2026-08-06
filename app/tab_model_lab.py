@@ -10,8 +10,10 @@ def render(country_iso3, panel, levers):
         "health+education funding; welfare+public-wage-bill spending (combined into one "
         "social-spending-pressure objective for tractability). The funding/spending objectives are "
         "illustrative splits of an aggregate fiscal-space total -- not independently sourced per "
-        "category. Frontier points are conditional projections to explore trade-offs, not "
-        "recommendations."
+        "category. Under current engine wiring, the final-debt objective responds only to the "
+        "primary-balance lever; the tax-wedge, indexation, and wage-bill levers move the "
+        "fiscal-space and income objectives, not the debt path. Frontier points are conditional "
+        "projections to explore trade-offs, not recommendations."
     )
 
     if st.button("Compute Pareto frontier"):

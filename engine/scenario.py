@@ -30,23 +30,60 @@ class ScenarioResult:
     inflation_path_pct: List[float]
     nominal_wage_growth_path_pct: List[float]
     coverage_score: float
+    defaults_used: List[str] = field(default_factory=list)
+    baseline_years: Dict[str, int] = field(default_factory=dict)
 
 
-def _latest_value(result: FetchResult, default: float) -> float:
+# Generic calibration defaults substituted when a baseline indicator is
+# unavailable for a country. Keyed by the panel/indicator key used below.
+# Kept in one place so app/tab_methodology.py can render the same values
+# the engine actually falls back to.
+BASELINE_DEFAULTS = {
+    "debt_gdp": 60.0,
+    "gdp_growth": 1.5,
+    "inflation": 2.0,
+    "unemployment": 7.0,
+    "real_interest_rate": 2.0,
+    "net_lending_borrowing": -2.0,
+    "government_revenue_gdp": 35.0,
+}
+
+# Human-readable labels for the same seven baseline indicators, shared by
+# app/main.py (defaults-used / staleness warnings) and app/tab_methodology.py
+# (engine constants table, baseline-calibration table).
+BASELINE_INDICATOR_LABELS = {
+    "debt_gdp": "Debt/GDP",
+    "gdp_growth": "GDP growth",
+    "inflation": "Inflation",
+    "unemployment": "Unemployment",
+    "real_interest_rate": "Real interest rate",
+    "net_lending_borrowing": "Net lending/borrowing (primary-balance proxy)",
+    "government_revenue_gdp": "Government revenue (% GDP)",
+}
+
+
+def _latest_value(result: FetchResult, indicator_key: str, defaults_used: List[str],
+                   baseline_years: Dict[str, int]) -> float:
+    default = BASELINE_DEFAULTS[indicator_key]
     if not result.available:
+        defaults_used.append(indicator_key)
         return default
     latest_year = max(result.values)
+    baseline_years[indicator_key] = latest_year
     return result.values[latest_year]
 
 
 def run_scenario(country_iso3: str, panel: Dict[str, FetchResult], levers: ScenarioLevers) -> ScenarioResult:
-    baseline_debt = _latest_value(panel["debt_gdp"], default=60.0)
-    baseline_growth = _latest_value(panel["gdp_growth"], default=1.5)
-    baseline_inflation = _latest_value(panel["inflation"], default=2.0)
-    baseline_unemployment = _latest_value(panel["unemployment"], default=7.0)
-    baseline_rate = _latest_value(panel["real_interest_rate"], default=2.0)
-    baseline_pb = _latest_value(panel["net_lending_borrowing"], default=-2.0)
-    baseline_revenue = _latest_value(panel["government_revenue_gdp"], default=35.0)
+    defaults_used: List[str] = []
+    baseline_years: Dict[str, int] = {}
+
+    baseline_debt = _latest_value(panel["debt_gdp"], "debt_gdp", defaults_used, baseline_years)
+    baseline_growth = _latest_value(panel["gdp_growth"], "gdp_growth", defaults_used, baseline_years)
+    baseline_inflation = _latest_value(panel["inflation"], "inflation", defaults_used, baseline_years)
+    baseline_unemployment = _latest_value(panel["unemployment"], "unemployment", defaults_used, baseline_years)
+    baseline_rate = _latest_value(panel["real_interest_rate"], "real_interest_rate", defaults_used, baseline_years)
+    baseline_pb = _latest_value(panel["net_lending_borrowing"], "net_lending_borrowing", defaults_used, baseline_years)
+    baseline_revenue = _latest_value(panel["government_revenue_gdp"], "government_revenue_gdp", defaults_used, baseline_years)
 
     n = levers.horizon_years
     output_gaps = levers.output_gap_path_pct or [0.0] * n
@@ -85,4 +122,6 @@ def run_scenario(country_iso3: str, panel: Dict[str, FetchResult], levers: Scena
         inflation_path_pct=inflation_path,
         nominal_wage_growth_path_pct=wage_growth_path,
         coverage_score=coverage,
+        defaults_used=defaults_used,
+        baseline_years=baseline_years,
     )

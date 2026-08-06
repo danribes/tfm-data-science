@@ -1,3 +1,4 @@
+import datetime
 import sys
 from pathlib import Path
 
@@ -8,11 +9,13 @@ import streamlit as st
 from data.cache import DiskCache
 from data.country_list import load_country_list
 from data.panel_builder import build_country_panel, coverage_score
-from engine.scenario import ScenarioLevers, run_scenario
+from engine.scenario import ScenarioLevers, run_scenario, BASELINE_DEFAULTS, BASELINE_INDICATOR_LABELS
 from engine.ml_stress_score import FiscalStressModel
 from app import tab_retiree, tab_mortgage_banker, tab_house_buyer_landlord, tab_model_lab, tab_methodology
 
 st.set_page_config(page_title="Sovereign Fiscal Scenario Explorer", layout="wide")
+
+STALENESS_THRESHOLD_YEARS = 5
 
 
 def _init_session_state():
@@ -20,6 +23,41 @@ def _init_session_state():
         st.session_state.country_iso3 = "ESP"
     if "levers" not in st.session_state:
         st.session_state.levers = ScenarioLevers()
+
+
+def _render_baseline_disclosures(scenario):
+    """Surface, above the tabs, any generic-default substitution or stale
+    baseline vintage that fed this scenario's projection math. Every tab
+    that renders projections shares this single prominent disclosure.
+    """
+    if scenario.defaults_used:
+        lines = "\n".join(
+            f"- **{BASELINE_INDICATOR_LABELS[key]}**: N/A -- not available for this country; "
+            f"a generic calibration default of {BASELINE_DEFAULTS[key]} is used for projection math."
+            for key in scenario.defaults_used
+        )
+        st.warning(
+            "**Baseline defaults in use for this country.** The indicator(s) below are not "
+            "available for this country, so a generic calibration default (not this country's "
+            "real data) feeds every projection, chart, and score that depends on them:\n\n" + lines
+        )
+
+    current_year = datetime.date.today().year
+    stale = {
+        key: year for key, year in scenario.baseline_years.items()
+        if current_year - year > STALENESS_THRESHOLD_YEARS
+    }
+    if stale:
+        lines = "\n".join(
+            f"- **{BASELINE_INDICATOR_LABELS[key]}**: calibrated from {year} data"
+            for key, year in sorted(stale.items(), key=lambda kv: kv[1])
+        )
+        st.warning(
+            "**Stale baseline data for this country.** The indicator(s) below are available, but "
+            "the most recent value on record is more than "
+            f"{STALENESS_THRESHOLD_YEARS} years old, so projections start from an outdated "
+            "starting point:\n\n" + lines
+        )
 
 
 def main():
@@ -62,18 +100,25 @@ def main():
         "Pension/wage indexation delta (pp)", -1.5, 1.0, levers.indexation_delta_pp)
 
     scenario = run_scenario(selected_iso3, panel, levers)
+    _render_baseline_disclosures(scenario)
 
     corruption = panel["corruption_control"]
-    corruption_latest = corruption.values[max(corruption.values)] if corruption.available else 0.0
-    stress_result = stress_model.score({
+    stress_features = {
         "debt_gdp": scenario.debt_path[-1].debt_gdp_pct,
         "gdp_growth": scenario.debt_path[-1].growth_rate_pct,
         "inflation": scenario.inflation_path_pct[-1] if scenario.inflation_path_pct else 0.0,
         "unemployment": scenario.unemployment_path_pct[-1] if scenario.unemployment_path_pct else 0.0,
         "real_interest_rate": scenario.debt_path[-1].interest_rate_pct,
         "net_lending_borrowing": scenario.debt_path[-1].primary_balance_pct,
-        "corruption_control": corruption_latest,
-    })
+    }
+    # Corruption is not projected by the scenario engine, so unlike the other
+    # six features it can only ever come from the live panel. When it's
+    # unavailable, omit the key entirely rather than substituting 0.0 -- that
+    # lets FiscalStressModel.score() take its honest missing-feature path
+    # instead of silently scoring on a fabricated "no corruption" value.
+    if corruption.available:
+        stress_features["corruption_control"] = corruption.values[max(corruption.values)]
+    stress_result = stress_model.score(stress_features)
 
     tabs = st.tabs(["Retiree", "Mortgage Banker", "House-buyer/Landlord", "Model Lab", "Data & Methodology"])
     with tabs[0]:
@@ -85,7 +130,7 @@ def main():
     with tabs[3]:
         tab_model_lab.render(selected_iso3, panel, levers)
     with tabs[4]:
-        tab_methodology.render(panel, score, stress_model)
+        tab_methodology.render(panel, score, stress_model, scenario)
 
 
 if __name__ == "__main__":
