@@ -18,6 +18,9 @@ ANCHOR_YEARS = [2026, 2030, 2035, 2050]
 PROBE = {"r": 4.8, "prima": 150.0, "sp": 1.0, "lam": 1.4, "pm": 50.0,
          "tau": 1.5, "z": -1.0, "ext": 3.0, "dem": 0.6, "idx": -0.5}
 
+# Non-debt series pinned per preset / probe bundle (phase-2 additivity extension).
+PINNED_SERIES = ("u", "pi", "wrealIdx", "cuota", "esf", "pens", "saldo")
+
 
 def test_a1_debt_identity_reproduces_gold_central_to_the_decimal():
     # v16 AC-V3. Tolerance 0.05 = half a printed decimal: the CSV rounds deuda
@@ -89,3 +92,53 @@ def test_committed_fixture_matches_regenerated_values():
                 mc.percentiles[q][int(y) - 2026], abs=1e-3)
     for pid in ("S0", "S7"):
         assert pid in committed["presets_debt_2050"]
+
+    # presets_series_2035_2050: every preset, {u, pi, wrealIdx, cuota, esf,
+    # pens, saldo} at 2035/2050 must match a fresh run_scenario(preset_levers(...)).
+    for preset in PRESETS:
+        pid = preset["id"]
+        run = run_scenario(preset_levers(pid))
+        for y in ("2035", "2050"):
+            entry = committed["presets_series_2035_2050"][pid][y]
+            for k in PINNED_SERIES:
+                assert entry[k] == pytest.approx(run[k][int(y) - Y0], abs=1e-6), (pid, y, k)
+
+    # probe_bundle: all ten levers moved at once (same PROBE deltas as A3),
+    # pinning the same series plus debt "b" at 2035/2050.
+    probe_run = run_scenario(Levers(**PROBE))
+    for y in ("2035", "2050"):
+        entry = committed["probe_bundle"][y]
+        for k in (*PINNED_SERIES, "b"):
+            assert entry[k] == pytest.approx(probe_run[k][int(y) - Y0], abs=1e-6), (y, k)
+
+    # base_gold_identity: base-run ief/gnom/pb recorded alongside the gold CSV
+    # columns they derive from, at 2026/2030/2035/2050.
+    for y in ANCHOR_YEARS:
+        entry = committed["base_gold_identity"][str(y)]
+        assert entry["ief"]["engine"] == pytest.approx(base["ief"][y - Y0], abs=1e-6), y
+        assert entry["gnom"]["engine"] == pytest.approx(base["gnom"][y - Y0], abs=1e-6), y
+        assert entry["pb"]["engine"] == pytest.approx(base["pb"][y - Y0], abs=1e-6), y
+
+
+def test_a6_base_ief_gnom_pb_match_gold_central_exactly():
+    # At base levers every deviation term (di, lvl, pi_dev, L.sp-B["sp"],
+    # L.dem-B["dem"]) is zero by construction, so ief/gnom/pb must reproduce
+    # the gold central CSV's r_efectivo/g_nominal/pb columns exactly — not
+    # merely within the printed-decimal debt-identity tolerance used for A1.
+    # This is an independent check against a freshly loaded gold CSV, not
+    # against the committed fixture's own recorded copy.
+    base = run_scenario(Levers())
+    central = load_central()
+    for y in ANCHOR_YEARS:
+        assert base["ief"][y - Y0] == pytest.approx(central[y]["r_efectivo"], abs=1e-9), y
+        assert base["gnom"][y - Y0] == pytest.approx(central[y]["g_nominal"], abs=1e-9), y
+        assert base["pb"][y - Y0] == pytest.approx(central[y]["pb"], abs=1e-9), y
+
+
+def test_a7_probe_bundle_debt_diverges_from_s0_at_2050():
+    # probe_bundle moves all ten levers at once; its 2050 debt must differ
+    # from S0's (base) 2050 debt by more than float noise, proving the bundle
+    # actually exercises the debt-identity chain end to end.
+    base = run_scenario(Levers())
+    probe_run = run_scenario(Levers(**PROBE))
+    assert abs(probe_run["b"][2050 - Y0] - base["b"][2050 - Y0]) > 1e-6

@@ -4,7 +4,7 @@ from __future__ import annotations
 import csv
 from dataclasses import asdict
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.schemas import (ConstantsResponse, ConstantOut, CountriesResponse,
@@ -134,7 +134,10 @@ def scenario_generic(iso3: str, req: GenericScenarioRequest) -> GenericScenarioR
     p = panel_builder.build_country_panel(iso3)
     kwargs = {k: v for k, v in req.model_dump().items() if v is not None}
     levers = generic.ScenarioLevers(**kwargs)
-    result = generic.run_scenario(iso3, p, levers)
+    try:
+        result = generic.run_scenario(iso3, p, levers)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     return GenericScenarioResponse(
         country_iso3=result.country_iso3,
         coverage_score=result.coverage_score,

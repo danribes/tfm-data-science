@@ -211,3 +211,20 @@ def test_generic_scenario_endpoint(monkeypatch):
 
 def test_generic_scenario_validates_horizon():
     assert client.post("/scenario/generic/ESP", json={"horizon_years": 0}).status_code == 422
+
+
+def test_generic_scenario_invalid_allocation_shares_returns_422(monkeypatch):
+    import api.main as m
+    from engine import generic
+
+    monkeypatch.setattr(m.panel_builder, "build_country_panel",
+                        lambda iso3, **kw: _fixture_panel())
+    r = client.post("/scenario/generic/ESP", json={"allocation_shares": {"health": 1.0}})
+    assert r.status_code == 422
+    try:
+        generic.allocate_fiscal_space(0.0, 0.0, 0.0, {"health": 1.0})
+        expected_detail = None
+    except ValueError as exc:
+        expected_detail = str(exc)
+    assert expected_detail is not None
+    assert r.json()["detail"] == expected_detail
