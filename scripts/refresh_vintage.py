@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import csv
 import datetime
+import re
 from pathlib import Path
 
 import requests
@@ -17,10 +18,14 @@ import requests
 GOLD_MANIFEST = Path("data/gold/manifest.csv")
 VINTAGES_ROOT = Path("data/vintages")
 
+_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
 
 def refresh(manifest_path: Path = GOLD_MANIFEST, out_root: Path = VINTAGES_ROOT,
             fetch=requests.get, today: str | None = None) -> Path:
     today = today or datetime.date.today().isoformat()
+    if not _DATE_RE.fullmatch(today):
+        raise ValueError(f"today must be YYYY-MM-DD, got {today!r}")
     out_dir = out_root / today
     raw_dir = out_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
@@ -34,7 +39,7 @@ def refresh(manifest_path: Path = GOLD_MANIFEST, out_root: Path = VINTAGES_ROOT,
             try:
                 resp = fetch(row["url"], timeout=30)
                 resp.raise_for_status()
-                name = Path(row["raw_file"]).name or f"{row['source']}.bin"
+                name = Path(row["raw_file"]).name or Path(f"{row['source']}.bin").name
                 (raw_dir / name).write_bytes(resp.content)
                 entry.update(bytes=len(resp.content), raw_file=f"raw/{name}", status="ok")
             except Exception as exc:

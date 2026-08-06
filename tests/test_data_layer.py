@@ -4,6 +4,8 @@ import csv
 import json
 from pathlib import Path
 
+import pytest
+
 
 GOLD = Path(__file__).resolve().parents[1] / "data" / "gold"
 
@@ -494,3 +496,35 @@ def test_refresh_vintage_writes_new_dir_and_records_failures(tmp_path):
     assert not (out_dir / "raw" / "fail.json").exists()
     # the committed vintage is untouched
     assert (GOLD / "VINTAGE").read_text(encoding="utf-8").strip() == "2026-07-31"
+
+
+def test_refresh_vintage_sanitizes_traversal_in_source_and_rejects_bad_today(tmp_path):
+    from scripts.refresh_vintage import refresh
+
+    manifest = tmp_path / "manifest.csv"
+    manifest.write_text(
+        "source,url,fetched,bytes,raw_file,processed_file\n"
+        "../../evil,https://example.org/evil.json,2026-07-31,10,,evil.csv\n")
+
+    class FakeResp:
+        content = b"{}"
+        def raise_for_status(self):
+            pass
+
+    def fake_fetch(url, timeout):
+        return FakeResp()
+
+    out_root = tmp_path / "vintages"
+    out_dir = refresh(manifest_path=manifest, out_root=out_root,
+                      fetch=fake_fetch, today="2099-01-02")
+    # empty raw_file + a slash-bearing source must never escape out_root
+    written = list(out_dir.rglob("*"))
+    assert any(p.is_file() for p in written)  # something was actually written
+    for path in written:
+        if path.is_file():
+            assert path.resolve().is_relative_to(out_root.resolve())
+
+    # a caller-contract violation (malformed `today`) must raise, not fabricate a path
+    with pytest.raises(ValueError):
+        refresh(manifest_path=manifest, out_root=out_root,
+                fetch=fake_fetch, today="../../gold")
