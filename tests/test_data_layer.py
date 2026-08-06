@@ -35,3 +35,39 @@ def test_fetch_country_list_filters_aggregates():
     with patch("data.country_list.requests.get", return_value=mock):
         countries = fetch_country_list()
     assert countries == [{"iso3": "ESP", "iso2": "ES", "name": "Spain", "region": "Europe & Central Asia"}]
+
+
+from data import worldbank_client
+
+
+def _mock_response(payload):
+    mock = MagicMock()
+    mock.json.return_value = payload
+    mock.raise_for_status = MagicMock()
+    return mock
+
+
+def test_worldbank_client_parses_valid_payload():
+    payload = [
+        {"page": 1, "pages": 1, "total": 2},
+        [{"date": "2022", "value": 100.5}, {"date": "2021", "value": None}],
+    ]
+    with patch("data.worldbank_client.requests.get", return_value=_mock_response(payload)):
+        result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
+    assert result.available
+    assert result.values == {2022: 100.5}
+
+
+def test_worldbank_client_returns_na_sentinel_when_indicator_missing():
+    payload = {"message": [{"id": "175", "value": "The indicator was not found."}]}
+    with patch("data.worldbank_client.requests.get", return_value=_mock_response(payload)):
+        result = worldbank_client.fetch_indicator("ESP", "BOGUS.CODE", 2021, 2022)
+    assert not result.available
+    assert result.error is not None
+
+
+def test_worldbank_client_handles_network_error():
+    with patch("data.worldbank_client.requests.get", side_effect=ConnectionError("boom")):
+        result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
+    assert not result.available
+    assert "boom" in result.error
