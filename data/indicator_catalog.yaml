@@ -1,0 +1,154 @@
+indicators:
+  debt_gdp:
+    label: "Central government debt, total (% of GDP)"
+    unit: "% of GDP"
+    block: debt
+    sources:
+      - type: worldbank
+        code: GC.DOD.TOTL.GD.ZS
+  government_revenue_gdp:
+    label: "Revenue, excluding grants (% of GDP)"
+    unit: "% of GDP"
+    block: debt
+    note: "General government total revenue proxy -- used as the fiscal-space allocator's revenue baseline."
+    sources:
+      - type: worldbank
+        code: GC.REV.XGRT.GD.ZS
+  gdp_growth:
+    label: "GDP growth (annual %)"
+    unit: "% annual"
+    block: macro
+    sources:
+      - type: worldbank
+        code: NY.GDP.MKTP.KD.ZG
+  inflation:
+    label: "Inflation, consumer prices (annual %)"
+    unit: "% annual"
+    block: macro
+    sources:
+      - type: worldbank
+        code: FP.CPI.TOTL.ZG
+  unemployment:
+    label: "Unemployment, total (% of total labor force)"
+    unit: "% of labor force"
+    block: labor
+    sources:
+      - type: worldbank
+        code: SL.UEM.TOTL.ZS
+  net_lending_borrowing:
+    label: "General government net lending/borrowing, proxy for primary balance (% GDP)"
+    unit: "% of GDP"
+    block: debt
+    note: "Overall fiscal balance, not primary balance in the strict sense -- documented as a proxy in the UI."
+    sources:
+      - type: worldbank
+        code: GC.NLD.TOTL.GD.ZS
+  real_interest_rate:
+    label: "Real interest rate (%)"
+    unit: "%"
+    block: debt
+    note: "Whole-economy real interest rate proxy, not a sovereign-specific effective rate -- documented as a proxy in the UI. Sparse for several Eurozone countries under this WDI series' methodology (known gap, not a code error)."
+    sources:
+      - type: worldbank
+        code: FR.INR.RINR
+  corruption_control:
+    label: "Control of Corruption (Worldwide Governance Indicators estimate)"
+    unit: "index, approx. -2.5 (weak) to 2.5 (strong)"
+    block: governance
+    sources:
+      - type: worldbank
+        code: GOV_WGI_CC_EST
+  net_migration:
+    label: "Net migration (people, 5-year total)"
+    unit: "people"
+    block: demographics
+    sources:
+      - type: worldbank
+        code: SM.POP.NETM
+  health_exp_gdp:
+    label: "Domestic general government health expenditure (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    sources:
+      - type: worldbank
+        code: SH.XPD.GHED.GD.ZS
+  edu_exp_gdp:
+    label: "Government expenditure on education, total (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    sources:
+      - type: worldbank
+        code: SE.XPD.TOTL.GD.ZS
+  public_investment_gdp:
+    label: "Gross fixed capital formation (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    note: "Whole-economy GFCF, not government-only -- documented as a proxy in the UI."
+    sources:
+      - type: worldbank
+        code: NE.GDI.FTOT.ZS
+  productivity_level:
+    label: "GDP per person employed (constant 2021 PPP $)"
+    unit: "constant 2021 PPP $"
+    block: labor
+    note: "Level series; productivity GROWTH is derived as year-over-year %% change where needed, not fetched directly."
+    sources:
+      - type: worldbank
+        code: SL.GDP.PCAP.EM.KD
+  public_wage_bill_gdp:
+    label: "Compensation of employees, general government (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    note: "EU countries only (Eurostat government finance statistics)."
+    sources:
+      - type: eurostat
+        dataset_id: gov_10a_exp
+        dims: {unit: PC_GDP, sector: S13, cofog99: TOTAL, na_item: D1}
+  security_exp_gdp:
+    label: "Public order and safety expenditure, COFOG GF03 (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    note: "EU countries only (Eurostat government finance statistics)."
+    sources:
+      - type: eurostat
+        dataset_id: gov_10a_exp
+        dims: {unit: PC_GDP, sector: S13, cofog99: GF03, na_item: TE}
+  welfare_exp_gdp:
+    label: "Social protection expenditure, COFOG GF10 (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    note: "EU countries only (Eurostat government finance statistics)."
+    sources:
+      - type: eurostat
+        dataset_id: gov_10a_exp
+        dims: {unit: PC_GDP, sector: S13, cofog99: GF10, na_item: TE}
+  pension_exp_gdp:
+    label: "Old-age expenditure, COFOG GF1002 (% GDP)"
+    unit: "% of GDP"
+    block: spending
+    note: "EU countries only. COFOG old-age sub-function -- pension-specific proxy, not a full actuarial pension-spend figure. Worst case for an unconfirmed sub-code is graceful N/A, not a crash."
+    sources:
+      - type: eurostat
+        dataset_id: gov_10a_exp
+        dims: {unit: PC_GDP, sector: S13, cofog99: GF1002, na_item: TE}
+  house_price_index:
+    label: "House price index (2015=100)"
+    unit: "index, 2015=100"
+    block: housing
+    note: "EU countries only (Eurostat). Verified live for Spain: 2015=100.0 through 2025=180.6."
+    sources:
+      - type: eurostat
+        dataset_id: prc_hpi_a
+        dims: {unit: I15_A_AVG, purchase: TOTAL}
+  edu_spend_per_student:
+    label: "Education expenditure per student, upper secondary+post-secondary non-tertiary (USD, PPP)"
+    unit: "USD, PPP-converted"
+    block: spending
+    note: "OECD countries only. Single OECD indicator carried in this MVP; see Data & Methodology tab."
+    sources:
+      - type: oecd
+        agency: "OECD.EDU.IMEP"
+        dataflow_id: "DSD_EAG_UOE_FIN@DF_UOE_INDIC_FIN_PERSTUD"
+        version: "3.2"
+        dim_order: [MEASURE, EDUCATION_LEV, EXP_SOURCE, EXP_DESTINATION, EXPENDITURE_TYPE, PRICE_BASE, UNIT_MEASURE, Q_SHEET]
+        dims: {MEASURE: FIN_PERSTUD, EDUCATION_LEV: ISCED11_35_45, EXP_SOURCE: "_T", EXP_DESTINATION: INST_EDU, EXPENDITURE_TYPE: NORD, PRICE_BASE: Q, UNIT_MEASURE: USD_PPP_ST, Q_SHEET: SOURCE}
