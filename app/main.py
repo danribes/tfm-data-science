@@ -16,6 +16,7 @@ from app import tab_retiree, tab_mortgage_banker, tab_house_buyer_landlord, tab_
 st.set_page_config(page_title="Sovereign Fiscal Scenario Explorer", layout="wide")
 
 STALENESS_THRESHOLD_YEARS = 5
+OUTPUT_GAP_FADE_YEARS = 4  # initial output-gap lever fades linearly to zero over this many years
 
 
 def _init_session_state():
@@ -98,6 +99,29 @@ def main():
         "Primary balance target (% GDP)", -4.0, 4.0, levers.primary_balance_target_pct)
     levers.indexation_delta_pp = st.sidebar.slider(
         "Pension/wage indexation delta (pp)", -1.5, 1.0, levers.indexation_delta_pp)
+    initial_output_gap = st.sidebar.slider(
+        "Initial output gap (%)", -6.0, 6.0, 0.0, 0.5,
+        key="lever_initial_output_gap",
+        help="Recession (negative) or boom (positive) in the first projection year, "
+             "fading linearly to zero over 4 years. Drives unemployment (Okun's law), "
+             "inflation (Phillips curve), wage growth, GDP growth, and through them "
+             "the debt path and default-risk proxy.")
+    debt_shock_pp = st.sidebar.slider(
+        "Contingent-liability shock, year 1 (pp of GDP)", 0.0, 30.0, 0.0, 1.0,
+        key="lever_debt_shock_pp",
+        help="One-off addition to debt/GDP in the first projection year -- e.g. bank "
+             "recapitalization or guarantees being called. 0 = no shock.")
+    if initial_output_gap != 0.0:
+        levers.output_gap_path_pct = [
+            initial_output_gap * max(0.0, 1.0 - i / OUTPUT_GAP_FADE_YEARS)
+            for i in range(levers.horizon_years)
+        ]
+    else:
+        levers.output_gap_path_pct = None
+    if debt_shock_pp > 0.0:
+        levers.contingent_shocks_pct = [debt_shock_pp] + [0.0] * (levers.horizon_years - 1)
+    else:
+        levers.contingent_shocks_pct = None
 
     scenario = run_scenario(selected_iso3, panel, levers)
     _render_baseline_disclosures(scenario)

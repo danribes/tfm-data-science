@@ -73,6 +73,17 @@ def _latest_value(result: FetchResult, indicator_key: str, defaults_used: List[s
     return result.values[latest_year]
 
 
+def _normalize_path(path: Optional[List[float]], n: int) -> List[float]:
+    """Fit a list-valued lever to the projection horizon: pad with 0.0 or
+    truncate, so a UI-supplied path can never trip the length check in
+    project_debt_path."""
+    if not path:
+        return [0.0] * n
+    if len(path) >= n:
+        return list(path[:n])
+    return list(path) + [0.0] * (n - len(path))
+
+
 def run_scenario(country_iso3: str, panel: Dict[str, FetchResult], levers: ScenarioLevers) -> ScenarioResult:
     defaults_used: List[str] = []
     baseline_years: Dict[str, int] = {}
@@ -86,8 +97,8 @@ def run_scenario(country_iso3: str, panel: Dict[str, FetchResult], levers: Scena
     baseline_revenue = _latest_value(panel["government_revenue_gdp"], "government_revenue_gdp", defaults_used, baseline_years)
 
     n = levers.horizon_years
-    output_gaps = levers.output_gap_path_pct or [0.0] * n
-    shocks = levers.contingent_shocks_pct or [0.0] * n
+    output_gaps = _normalize_path(levers.output_gap_path_pct, n)
+    shocks = _normalize_path(levers.contingent_shocks_pct, n)
 
     unemployment_path = []
     inflation_path = []
