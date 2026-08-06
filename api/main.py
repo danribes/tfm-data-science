@@ -7,13 +7,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.schemas import (ConstantsResponse, ConstantOut, HealthResponse,
-                          PersonaCard, PersonasResponse, PresetOut, PresetsResponse,
-                          RedLineOut, RedLinesResponse, VintageFileOut, VintageResponse)
+                          MonteCarloRequest, MonteCarloResponse,
+                          PersonaCard, PersonaDependentsOut, PersonasResponse,
+                          PresetOut, PresetsResponse, RedLineOut, RedLinesResponse,
+                          RedLineStatusOut, ScenarioRequest, ScenarioResponse,
+                          VintageFileOut, VintageResponse)
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
                                load_kpis)
-from engine.levers import PRESETS
-from engine.redlines import RED_LINES
-from engine.spain import PERSONAS
+from engine.levers import PRESETS, Levers
+from engine.montecarlo import run_montecarlo
+from engine.redlines import RED_LINES, evaluate_redlines
+from engine.spain import PERSONAS, Y0, Y1, baseline, persona_dependents, run_scenario
 
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
@@ -61,3 +65,35 @@ def presets() -> PresetsResponse:
 @app.get("/redlines", response_model=RedLinesResponse)
 def redlines() -> RedLinesResponse:
     return RedLinesResponse(redlines=[RedLineOut(**r) for r in RED_LINES])
+
+
+@app.post("/scenario", response_model=ScenarioResponse)
+def scenario(req: ScenarioRequest) -> ScenarioResponse:
+    levers = Levers(**req.levers.model_dump())
+    run = run_scenario(levers)
+    base = baseline()
+    deltas = {k: [s - b for s, b in zip(run[k], base[k])] for k in run}
+    k = req.horizon - Y0
+    return ScenarioResponse(
+        horizon=req.horizon,
+        years=list(range(Y0, Y1 + 1)),
+        baseline=base,
+        scenario=run,
+        deltas=deltas,
+        personas={pid: PersonaDependentsOut(**dep)
+                  for pid, dep in persona_dependents(run).items()},
+        redlines=[RedLineStatusOut(**st) for st in evaluate_redlines(run, k)],
+    )
+
+
+@app.post("/scenario/montecarlo", response_model=MonteCarloResponse)
+def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
+    levers = Levers(**req.levers.model_dump())
+    mc = run_montecarlo(levers, n_paths=req.n_paths, seed=req.seed)
+    n = req.horizon - 2026 + 1
+    return MonteCarloResponse(
+        years=mc.years[:n],
+        percentiles={p: v[:n] for p, v in mc.percentiles.items()},
+        n_paths=mc.n_paths,
+        seed=mc.seed,
+    )

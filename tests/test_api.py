@@ -65,3 +65,73 @@ def test_redlines_shape():
     assert set(body) == {"vintage", "computed_not_advice", "redlines"}
     assert len(body["redlines"]) == 9
     assert set(body["redlines"][0]) == {"id", "label", "series", "threshold", "cmp", "source"}
+
+
+# ---- Task 12: scenario endpoints ----
+
+def test_scenario_shape_and_zero_deviation():
+    r = client.post("/scenario", json={})           # all defaults = base levers
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body) == {"vintage", "computed_not_advice", "horizon", "years",
+                         "baseline", "scenario", "deltas", "personas", "redlines"}
+    assert body["computed_not_advice"] is True
+    assert body["horizon"] == 2050
+    assert body["years"] == list(range(2026, 2051))
+    assert len(body["baseline"]) == len(body["scenario"]) == len(body["deltas"]) == 40
+    # deviation semantics: base levers -> scenario equals baseline, deltas all zero
+    assert body["scenario"] == body["baseline"]
+    assert all(v == 0.0 for series in body["deltas"].values() for v in series)
+    assert sorted(body["personas"]) == [f"{i:02d}" for i in range(1, 13)]
+    statuses = {rl["id"]: rl["status"] for rl in body["redlines"]}
+    # base 2050: b=223.84 -> both debt lines crossed (computed, never hand-written)
+    assert statuses["deuda_105"] == "crossed" and statuses["deuda_120"] == "crossed"
+
+
+def test_scenario_s7_adverse_crosses_redlines():
+    s7 = {"levers": {"r": 4.8, "pm": 50.0, "prima": 150.0}, "horizon": 2050}
+    body = client.post("/scenario", json=s7).json()
+    statuses = {rl["id"]: rl["status"] for rl in body["redlines"]}
+    assert statuses["deuda_120"] == "crossed"           # b 2050 = 349.80
+    assert statuses["deficit_suelo_2009"] == "crossed"  # saldo 2050 = -28.79
+    assert statuses["bono_rescate"] == "near"           # bono 6.47 vs 7.0
+    k = 2050 - 2026
+    assert abs(body["scenario"]["b"][k] - 349.7973) < 1e-3
+
+
+def test_scenario_lever_out_of_range_422():
+    r = client.post("/scenario", json={"levers": {"r": 9.0}})
+    assert r.status_code == 422
+    detail = r.json()["detail"][0]
+    assert detail["loc"][-1] == "r"
+    assert client.post("/scenario", json={"levers": {"prima": -1}}).status_code == 422
+    assert client.post("/scenario", json={"levers": {"idx": 1.2}}).status_code == 422
+
+
+def test_montecarlo_endpoint_shape_and_bounds():
+    r = client.post("/scenario/montecarlo", json={"seed": 42, "n_paths": 500})
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body) == {"vintage", "computed_not_advice", "years", "percentiles",
+                         "n_paths", "seed"}
+    assert body["years"][0] == 2026 and body["years"][-1] == 2070
+    assert set(body["percentiles"]) == {"p5", "p25", "p50", "p75", "p95"}
+    # reproducibility across calls with the same seed
+    again = client.post("/scenario/montecarlo", json={"seed": 42, "n_paths": 500}).json()
+    assert again["percentiles"] == body["percentiles"]
+    # spec §6 bounds
+    assert client.post("/scenario/montecarlo", json={"n_paths": 5000}).status_code == 422
+    assert client.post("/scenario/montecarlo", json={"horizon": 2080}).status_code == 422
+
+
+def test_montecarlo_horizon_truncates_years():
+    body = client.post("/scenario/montecarlo", json={"n_paths": 300, "horizon": 2050}).json()
+    assert body["years"][-1] == 2050
+    assert all(len(v) == len(body["years"]) for v in body["percentiles"].values())
+
+
+def test_cors_allows_null_and_localhost_origins():
+    r = client.get("/health", headers={"Origin": "null"})
+    assert r.headers.get("access-control-allow-origin") == "null"
+    r = client.get("/health", headers={"Origin": "http://localhost:5173"})
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
