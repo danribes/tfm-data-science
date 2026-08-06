@@ -2,16 +2,22 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import asdict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.schemas import (ConstantsResponse, ConstantOut, HealthResponse,
-                          MonteCarloRequest, MonteCarloResponse,
-                          PersonaCard, PersonaDependentsOut, PersonasResponse,
+from api.schemas import (ConstantsResponse, ConstantOut, CountriesResponse,
+                          CountryOut, DebtPointOut, FiscalSpaceOut,
+                          GenericScenarioRequest, GenericScenarioResponse,
+                          HealthResponse, IndicatorOut, MonteCarloRequest,
+                          MonteCarloResponse, PanelResponse, PersonaCard,
+                          PersonaDependentsOut, PersonasResponse,
                           PresetOut, PresetsResponse, RedLineOut, RedLinesResponse,
                           RedLineStatusOut, ScenarioRequest, ScenarioResponse,
                           VintageFileOut, VintageResponse)
+from data.live import country_list, panel_builder
+from engine import generic
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
                                load_kpis)
 from engine.levers import PRESETS, Levers
@@ -96,4 +102,47 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
         percentiles={p: v[:n] for p, v in mc.percentiles.items()},
         n_paths=mc.n_paths,
         seed=mc.seed,
+    )
+
+
+@app.get("/countries", response_model=CountriesResponse)
+def countries() -> CountriesResponse:
+    try:
+        entries = country_list.load_country_list()   # never raises; cache-first
+        return CountriesResponse(countries=[CountryOut(**e) for e in entries])
+    except Exception as exc:                          # belt and braces: no 500s
+        return CountriesResponse(countries=[], error=str(exc))
+
+
+@app.get("/panel/{iso3}", response_model=PanelResponse)
+def panel(iso3: str) -> PanelResponse:
+    iso3 = iso3.upper()
+    p = panel_builder.build_country_panel(iso3)
+    indicators = {
+        key: IndicatorOut(available=res.available, source=res.source,
+                          from_cache=res.from_cache, error=res.error,
+                          values=res.values)
+        for key, res in p.items()
+    }
+    return PanelResponse(iso3=iso3, coverage_score=panel_builder.coverage_score(p),
+                         indicators=indicators)
+
+
+@app.post("/scenario/generic/{iso3}", response_model=GenericScenarioResponse)
+def scenario_generic(iso3: str, req: GenericScenarioRequest) -> GenericScenarioResponse:
+    iso3 = iso3.upper()
+    p = panel_builder.build_country_panel(iso3)
+    kwargs = {k: v for k, v in req.model_dump().items() if v is not None}
+    levers = generic.ScenarioLevers(**kwargs)
+    result = generic.run_scenario(iso3, p, levers)
+    return GenericScenarioResponse(
+        country_iso3=result.country_iso3,
+        coverage_score=result.coverage_score,
+        defaults_used=result.defaults_used,
+        baseline_years=result.baseline_years,
+        debt_path=[DebtPointOut(**asdict(pt)) for pt in result.debt_path],
+        unemployment_path_pct=result.unemployment_path_pct,
+        inflation_path_pct=result.inflation_path_pct,
+        nominal_wage_growth_path_pct=result.nominal_wage_growth_path_pct,
+        fiscal_space_by_year=[FiscalSpaceOut(**asdict(fs)) for fs in result.fiscal_space_by_year],
     )

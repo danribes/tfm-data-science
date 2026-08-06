@@ -135,3 +135,79 @@ def test_cors_allows_null_and_localhost_origins():
     assert r.headers.get("access-control-allow-origin") == "null"
     r = client.get("/health", headers={"Origin": "http://localhost:5173"})
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+# ---- Task 13: generic-country layer (no network: monkeypatched) ----
+import json as _json
+from pathlib import Path as _Path
+
+from data.live.models import FetchResult
+
+_FIXTURE = _Path(__file__).parent / "fixtures" / "sample_country_panel.json"
+_BASELINE_KEYS = ["debt_gdp", "gdp_growth", "inflation", "unemployment",
+                  "real_interest_rate", "net_lending_borrowing", "government_revenue_gdp"]
+
+
+def _fixture_panel():
+    raw = _json.loads(_FIXTURE.read_text())
+    panel = {}
+    for key in _BASELINE_KEYS:
+        values = raw.get(key) or {}
+        panel[key] = FetchResult(
+            values={int(y): v for y, v in values.items()},
+            source="worldbank", from_cache=True, fetched_at=0.0,
+            error=None if values else "no data")
+    return panel
+
+
+def test_countries_endpoint(monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m.country_list, "load_country_list", lambda: [
+        {"iso3": "ESP", "iso2": "ES", "name": "Spain", "region": "Europe & Central Asia"}])
+    body = client.get("/countries").json()
+    assert set(body) == {"vintage", "computed_not_advice", "countries", "error"}
+    assert body["countries"] == [{"iso3": "ESP", "iso2": "ES", "name": "Spain",
+                                  "region": "Europe & Central Asia"}]
+    assert body["error"] is None
+
+
+def test_countries_endpoint_degrades_honestly(monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m.country_list, "load_country_list", lambda: [])
+    body = client.get("/countries").json()
+    assert body["countries"] == [] and body["error"] is None    # empty list, no 500
+
+
+def test_panel_endpoint(monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m.panel_builder, "build_country_panel",
+                        lambda iso3, **kw: _fixture_panel())
+    body = client.get("/panel/esp").json()
+    assert set(body) == {"vintage", "computed_not_advice", "iso3", "coverage_score",
+                         "indicators"}
+    assert body["iso3"] == "ESP"
+    assert 0.0 <= body["coverage_score"] <= 1.0
+    ind = body["indicators"]["debt_gdp"]
+    assert set(ind) == {"available", "source", "from_cache", "error", "values"}
+
+
+def test_generic_scenario_endpoint(monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m.panel_builder, "build_country_panel",
+                        lambda iso3, **kw: _fixture_panel())
+    body = client.post("/scenario/generic/ESP", json={"horizon_years": 5}).json()
+    assert set(body) == {"vintage", "computed_not_advice", "country_iso3",
+                         "coverage_score", "defaults_used", "baseline_years",
+                         "debt_path", "unemployment_path_pct", "inflation_path_pct",
+                         "nominal_wage_growth_path_pct", "fiscal_space_by_year"}
+    assert body["country_iso3"] == "ESP"
+    assert len(body["debt_path"]) == 5
+    assert set(body["debt_path"][0]) == {"year", "debt_gdp_pct", "interest_rate_pct",
+                                         "growth_rate_pct", "primary_balance_pct",
+                                         "contingent_shock_pct"}
+    assert isinstance(body["defaults_used"], list)      # honesty fields present
+    assert isinstance(body["baseline_years"], dict)
+
+
+def test_generic_scenario_validates_horizon():
+    assert client.post("/scenario/generic/ESP", json={"horizon_years": 0}).status_code == 422
