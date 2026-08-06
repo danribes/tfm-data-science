@@ -114,3 +114,26 @@ def test_eurostat_client_skips_malformed_values():
         result = eurostat_client.fetch_indicator("ES", "prc_hpi_a", {"unit": "I15_A_AVG"})
     assert result.available
     assert result.values == {2022: 150.5}  # only valid value parsed, malformed value skipped
+
+
+def test_eurostat_client_handles_dense_cube_list_form():
+    # JSON-stat 2.0 permits dense-cube form where value is a list instead of dict
+    payload = {
+        "dimension": {"time": {"category": {"index": {"2021": 0, "2022": 1}}}},
+        "value": [100.0, 180.6],  # dense form: list instead of dict
+    }
+    with patch("data.eurostat_client.requests.get", return_value=_mock_response(payload)):
+        result = eurostat_client.fetch_indicator("ES", "prc_hpi_a", {"unit": "I15_A_AVG"})
+    assert result.available
+    assert result.values == {2021: 100.0, 2022: 180.6}  # dense list parsed correctly
+
+
+def test_worldbank_client_skips_non_dict_observations():
+    payload = [
+        {"page": 1, "pages": 1, "total": 2},
+        ["not_a_dict", {"date": "2021", "value": 85.3}],  # first element non-dict, second valid
+    ]
+    with patch("data.worldbank_client.requests.get", return_value=_mock_response(payload)):
+        result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
+    assert result.available
+    assert result.values == {2021: 85.3}  # only valid observation parsed, non-dict skipped

@@ -27,7 +27,7 @@ def fetch_indicator(country_iso3: str, wb_code: str, start_year: int, end_year: 
         try:
             if row.get("value") is not None:
                 values[int(row["date"])] = float(row["value"])
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, AttributeError):
             # Skip malformed rows; if all rows are malformed, we'll hit the error path below
             continue
 

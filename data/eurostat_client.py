@@ -26,13 +26,17 @@ def fetch_indicator(country_iso2: str, dataset_id: str, dims: Dict[str, str], ti
         return FetchResult(values={}, source="eurostat", from_cache=False, fetched_at=time.time(),
                             error=f"unexpected JSON-stat shape: {exc}")
 
+    # Normalize raw_values: if it's a list (dense cube), convert to dict {index: value}
+    if isinstance(raw_values, list):
+        raw_values = {str(i): v for i, v in enumerate(raw_values)}
+
     values: Dict[int, float] = {}
     for year_str, position in time_positions:
         try:
             v = raw_values.get(str(position))
             if v is not None:
                 values[int(year_str)] = float(v)
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, AttributeError):
             # Skip malformed entries; keep valid ones
             continue
 
