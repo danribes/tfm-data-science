@@ -188,3 +188,37 @@ def test_oecd_client_skips_malformed_observations():
         )
     assert result.available
     assert result.values == {2022: 1300.0}  # only valid observation parsed, malformed skipped
+
+
+def test_oecd_client_handles_missing_observations_key():
+    # Series exists but has no "observations" key
+    payload = {
+        "data": {
+            "structures": [{"dimensions": {"observation": [{"values": [{"id": "2021"}, {"id": "2022"}]}]}}],
+            "dataSets": [{"series": {"0:0:0:0:0:0:0:0": {}}}],  # series entry missing "observations" key
+        }
+    }
+    with patch("data.oecd_client.requests.get", return_value=_mock_response(payload)):
+        result = oecd_client.fetch_indicator(
+            "ESP", "OECD.EDU.IMEP", "DSD_EAG_UOE_FIN@DF_UOE_INDIC_FIN_PERSTUD", "3.2",
+            {"MEASURE": "FIN_PERSTUD"}, ["MEASURE"],
+        )
+    assert not result.available
+    assert "unexpected SDMX-JSON shape" in result.error
+
+
+def test_oecd_client_handles_non_dict_observations():
+    # Series exists but observations is a list instead of dict
+    payload = {
+        "data": {
+            "structures": [{"dimensions": {"observation": [{"values": [{"id": "2021"}, {"id": "2022"}]}]}}],
+            "dataSets": [{"series": {"0:0:0:0:0:0:0:0": {"observations": [1234.5, 1300.0]}}}],  # observations is a list, not dict
+        }
+    }
+    with patch("data.oecd_client.requests.get", return_value=_mock_response(payload)):
+        result = oecd_client.fetch_indicator(
+            "ESP", "OECD.EDU.IMEP", "DSD_EAG_UOE_FIN@DF_UOE_INDIC_FIN_PERSTUD", "3.2",
+            {"MEASURE": "FIN_PERSTUD"}, ["MEASURE"],
+        )
+    assert not result.available
+    assert "unexpected SDMX-JSON shape" in result.error

@@ -25,16 +25,16 @@ def fetch_indicator(country_iso3: str, agency: str, dataflow_id: str, version: s
         time_values = [v["id"] for v in structures["dimensions"]["observation"][0]["values"]]
         datasets = payload["data"]["dataSets"][0]
         series = datasets["series"]
-    except (KeyError, IndexError, TypeError) as exc:
+        if not series:
+            return FetchResult(values={}, source="oecd", from_cache=False, fetched_at=time.time(),
+                                error="no series returned for this country/dimension combination")
+        series_key = next(iter(series))
+        observations = series[series_key]["observations"]
+        if not isinstance(observations, dict):
+            raise TypeError("observations must be a dict")
+    except (KeyError, IndexError, TypeError, AttributeError) as exc:
         return FetchResult(values={}, source="oecd", from_cache=False, fetched_at=time.time(),
                             error=f"unexpected SDMX-JSON shape: {exc}")
-
-    if not series:
-        return FetchResult(values={}, source="oecd", from_cache=False, fetched_at=time.time(),
-                            error="no series returned for this country/dimension combination")
-
-    series_key = next(iter(series))
-    observations = series[series_key]["observations"]
 
     values: Dict[int, float] = {}
     for idx_str, obs in observations.items():
