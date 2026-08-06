@@ -24,8 +24,12 @@ def fetch_indicator(country_iso3: str, wb_code: str, start_year: int, end_year: 
 
     values: Dict[int, float] = {}
     for row in payload[1]:
-        if row.get("value") is not None:
-            values[int(row["date"])] = float(row["value"])
+        try:
+            if row.get("value") is not None:
+                values[int(row["date"])] = float(row["value"])
+        except (KeyError, TypeError, ValueError):
+            # Skip malformed rows; if all rows are malformed, we'll hit the error path below
+            continue
 
     if not values:
         return FetchResult(values={}, source="worldbank", from_cache=False, fetched_at=time.time(),

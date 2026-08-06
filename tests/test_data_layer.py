@@ -71,3 +71,14 @@ def test_worldbank_client_handles_network_error():
         result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
     assert not result.available
     assert "boom" in result.error
+
+
+def test_worldbank_client_skips_malformed_rows():
+    payload = [
+        {"page": 1, "pages": 1, "total": 2},
+        [{"value": 100.5}, {"date": "2021", "value": 85.3}],  # first row missing "date"
+    ]
+    with patch("data.worldbank_client.requests.get", return_value=_mock_response(payload)):
+        result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
+    assert result.available
+    assert result.values == {2021: 85.3}  # only valid row parsed, malformed row skipped
