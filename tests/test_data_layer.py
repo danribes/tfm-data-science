@@ -222,3 +222,34 @@ def test_oecd_client_handles_non_dict_observations():
         )
     assert not result.available
     assert "unexpected SDMX-JSON shape" in result.error
+
+
+from data.panel_builder import coverage_score, fetch_one, load_catalog
+
+
+def test_coverage_score_computes_fraction_available():
+    panel = {
+        "a": FetchResult(values={2022: 1.0}, source="worldbank", from_cache=False, fetched_at=0.0),
+        "b": FetchResult(values={}, source="worldbank", from_cache=False, fetched_at=0.0, error="no data"),
+    }
+    assert coverage_score(panel) == 0.5
+
+
+def test_load_catalog_has_expected_keys():
+    catalog = load_catalog()
+    assert "debt_gdp" in catalog
+    assert "government_revenue_gdp" in catalog
+    assert catalog["debt_gdp"]["sources"][0]["type"] == "worldbank"
+
+
+def test_fetch_one_uses_cache_before_network(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    cached_result = FetchResult(values={2022: 42.0}, source="worldbank", from_cache=False, fetched_at=0.0)
+    cache.set("ESP", "debt_gdp", cached_result)
+
+    spec = {"sources": [{"type": "worldbank", "code": "GC.DOD.TOTL.GD.ZS"}]}
+    with patch("data.worldbank_client.requests.get", side_effect=AssertionError("should not hit network")):
+        result = fetch_one("ESP", "debt_gdp", spec, 2000, 2024, cache)
+    assert result.values == {2022: 42.0}
+    assert result.from_cache is True
