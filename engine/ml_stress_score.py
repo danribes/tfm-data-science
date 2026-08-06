@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import joblib
-import numpy as np
+import pandas as pd
 
 MODEL_PATH = Path(__file__).parent.parent / "models" / "fiscal_stress_model.joblib"
 TRAINING_DISTRIBUTION_PATH = Path(__file__).parent.parent / "models" / "training_scores.json"
@@ -72,7 +72,7 @@ class FiscalStressModel:
             return StressScoreResult(score=None, percentile=None, available=False,
                                       error=f"missing features for scoring: {missing}")
 
-        x = np.array([[features[f] for f in FEATURES]])
+        x = pd.DataFrame([features])[FEATURES]
         raw = float(self._model.predict_proba(x)[0, 1])
         score = max(0.0, min(100.0, raw * 100.0))
 

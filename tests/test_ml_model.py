@@ -1,3 +1,7 @@
+import json
+import warnings
+
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier
@@ -50,3 +54,39 @@ def test_model_wrapper_reports_unavailable_when_artifact_missing(tmp_path, monke
     assert result.available is False
     assert result.score is None
     assert "not found" in result.error
+
+
+def test_model_wrapper_scores_without_warnings_when_artifact_present(tmp_path, monkeypatch):
+    import engine.ml_stress_score as mod
+
+    df = _synthetic_panel()
+    model = GradientBoostingClassifier(random_state=0)
+    model.fit(df[FEATURES], df["label"])
+
+    model_path = tmp_path / "fiscal_stress_model.joblib"
+    joblib.dump(model, model_path)
+    scores_path = tmp_path / "training_scores.json"
+    scores_path.write_text(json.dumps([10.0, 20.0, 50.0, 80.0, 90.0]))
+
+    monkeypatch.setattr(mod, "MODEL_PATH", model_path)
+    monkeypatch.setattr(mod, "TRAINING_DISTRIBUTION_PATH", scores_path)
+
+    # Model loading (joblib.load) can emit unrelated library DeprecationWarnings
+    # depending on installed numpy/joblib versions -- irrelevant to this test, so
+    # it is silenced here. Only the scoring call itself must be warning-free
+    # (that's where sklearn's "X does not have valid feature names" UserWarning
+    # fires if features are passed as a bare array instead of a DataFrame with
+    # matching column names).
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        wrapped = mod.FiscalStressModel()
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = wrapped.score({f: 50.0 for f in mod.FEATURES})
+
+    assert caught == []
+    assert result.available is True
+    assert result.error is None
+    assert 0.0 <= result.score <= 100.0
+    assert result.percentile is not None
