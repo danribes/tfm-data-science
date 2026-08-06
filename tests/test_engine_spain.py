@@ -112,3 +112,57 @@ def test_preset_levers_raises_on_unknown_id():
         preset_levers("S9")
     assert "unknown preset id: 'S9'" in str(exc_info.value)
     assert "valid: S0..S7" in str(exc_info.value)
+
+
+# ---- Task 6: chain + debt identity + deviation semantics ----
+from engine.spain import N_YEARS, SERIES_KEYS, Y0, baseline, french, run_scenario
+
+
+def test_series_shape():
+    run = run_scenario(Levers())
+    assert len(SERIES_KEYS) == 40
+    assert set(run) == set(SERIES_KEYS)
+    for k in SERIES_KEYS:
+        assert len(run[k]) == N_YEARS == 25
+
+
+def test_deviation_semantics_base_levers_equal_baseline():
+    # spec §4.1: baseline freezes the vintage; all levers at base -> zero deviation
+    run = run_scenario(Levers())
+    base = baseline()
+    for k in SERIES_KEYS:
+        assert run[k] == base[k], k
+    assert all(v == 0.0 for v in run["lvl"])
+    assert all(v == 10.1 for v in run["u"])       # V0.u, constant at base
+    assert all(v == 3.0 for v in run["pi"])       # V0.pi
+    assert all(v == 2.7 for v in run["g"])        # V0.g
+    assert all(v == 3.42 for v in run["bono"])    # r + TERM + prima/100
+    assert all(v == 100.0 for v in run["nomreal"])
+    assert run["wrealIdx"][0] == 100.0
+
+
+def test_debt_identity_reproduces_gold_central():
+    # pre-A1: values measured while drafting (extract S3.1 rows L868-871):
+    # 2026 106.316196 vs 106.32 | 2030 112.885096 vs 112.9
+    # 2035 129.142456 vs 129.18 | 2050 223.841410 vs 223.86
+    run = run_scenario(Levers())
+    assert run["b"][2026 - Y0] == pytest.approx(106.316196, abs=1e-4)
+    assert run["b"][2030 - Y0] == pytest.approx(112.885096, abs=1e-4)
+    assert run["b"][2035 - Y0] == pytest.approx(129.142456, abs=1e-4)
+    assert run["b"][2050 - Y0] == pytest.approx(223.841410, abs=1e-4)
+
+
+def test_french_amortization():
+    # extract L93 / L1012-1013: cuota = P*i/(1-(1+i)^-n), i = tipo/1200
+    assert french(171444.46 * 0.8, 2.80 + 1.4757, 300) == pytest.approx(744.9991, abs=1e-3)
+
+
+def test_lever_signs():
+    base = baseline()
+    k = 2035 - Y0
+    assert run_scenario(Levers(r=4.8))["b"][k] > base["b"][k]        # dearer debt
+    assert run_scenario(Levers(sp=1.0))["b"][k] < base["b"][k]       # consolidation
+    assert run_scenario(Levers(sp=1.0))["u"][k] > base["u"][k]       # its social cost
+    assert run_scenario(Levers(pm=50.0))["pi"][0] > base["pi"][0]    # pass-through
+    assert run_scenario(Levers(lam=1.4))["wrealIdx"][k] > base["wrealIdx"][k]
+    assert run_scenario(Levers(dem=0.6))["pens"][k] > base["pens"][k]
