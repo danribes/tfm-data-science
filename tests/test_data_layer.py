@@ -461,3 +461,36 @@ def test_fetch_one_does_not_call_fallback_when_primary_available(tmp_path):
         result = fetch_one("ESP", "no_fallback_key", spec, 2000, 2024, cache)
     assert result.values == {2022: 10.0}
     assert result.source == "worldbank"
+
+
+# ---- Task 14: refresh_vintage ----
+
+def test_refresh_vintage_writes_new_dir_and_records_failures(tmp_path):
+    from scripts.refresh_vintage import refresh
+
+    manifest = tmp_path / "manifest.csv"
+    manifest.write_text(
+        "source,url,fetched,bytes,raw_file,processed_file\n"
+        "SrcOK,https://example.org/ok.json,2026-07-31,10,ok.json,ok.csv\n"
+        "SrcFail,https://example.org/fail.json,2026-07-31,10,fail.json,fail.csv\n")
+
+    class FakeResp:
+        content = b"{}"
+        def raise_for_status(self):
+            pass
+
+    def fake_fetch(url, timeout):
+        if "fail" in url:
+            raise RuntimeError("boom")
+        return FakeResp()
+
+    out_dir = refresh(manifest_path=manifest, out_root=tmp_path / "vintages",
+                      fetch=fake_fetch, today="2099-01-01")
+    assert out_dir == tmp_path / "vintages" / "2099-01-01"
+    assert (out_dir / "raw" / "ok.json").read_bytes() == b"{}"
+    rows = list(csv.DictReader((out_dir / "manifest.csv").open()))
+    assert rows[0]["status"] == "ok" and rows[0]["bytes"] == "2"
+    assert rows[1]["status"].startswith("error:")        # recorded, never fabricated
+    assert not (out_dir / "raw" / "fail.json").exists()
+    # the committed vintage is untouched
+    assert (GOLD / "VINTAGE").read_text(encoding="utf-8").strip() == "2026-07-31"
