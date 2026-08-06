@@ -103,7 +103,7 @@ def test_scenario_lever_out_of_range_422():
     r = client.post("/scenario", json={"levers": {"r": 9.0}})
     assert r.status_code == 422
     detail = r.json()["detail"][0]
-    assert detail["loc"][-1] == "r"
+    assert detail["loc"][-1] == "r" and "less than or equal" in detail["msg"]
     assert client.post("/scenario", json={"levers": {"prima": -1}}).status_code == 422
     assert client.post("/scenario", json={"levers": {"idx": 1.2}}).status_code == 422
 
