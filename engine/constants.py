@@ -5,6 +5,10 @@ docs/superpowers/plans/references/v16-engine-extract.md S1 (extract L69-91:
 `const BASE` and `const C`). They are calibrated defaults, NOT estimates —
 phase 3 contests may replace them (AC-V6). Vintage-anchored values (V0,
 BASE_LEVERS) load from the committed gold slice, never hardcoded twice.
+
+Generic-engine defaults (OKUN_COEFFICIENT, PHILLIPS_SLOPE) are imported from
+engine.generic to avoid duplication — CONSTANTS_TABLE always reflects the
+canonical runtime values.
 """
 from __future__ import annotations
 
@@ -12,6 +16,8 @@ import csv
 import json
 from functools import lru_cache
 from pathlib import Path
+
+from engine.generic import OKUN_COEFFICIENT, PHILLIPS_SLOPE
 
 GOLD_DIR = Path(__file__).resolve().parents[1] / "data" / "gold"
 VINTAGE = (GOLD_DIR / "VINTAGE").read_text(encoding="utf-8").strip()
@@ -162,8 +168,8 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "RJUV", "value": RJUV, "unit": "x", "provenance": _V16 + " · youth/total unemployment ratio, 5y series"},
     {"name": "PM_DECAY", "value": PM_DECAY, "unit": "x", "provenance": _V16 + " · import-price shock decay"},
     {"name": "CAL_SALARIO_MES", "value": CAL_SALARIO_MES, "unit": "EUR/mes", "provenance": "kpis_perfiles.json salario_medio 24497 / 14 (build_v16 calib)"},
-    {"name": "GENERIC_OKUN", "value": 0.5, "unit": "pp u / pp GDP", "provenance": "generic engine calibrated default (literature 0.3-0.5), NOT country-specific — distinct from Spain's 0.48"},
-    {"name": "GENERIC_PHILLIPS", "value": 0.3, "unit": "pp pi / pp gap", "provenance": "generic engine calibrated default, NOT country-specific — distinct from Spain's 0.22"},
+    {"name": "GENERIC_OKUN", "value": OKUN_COEFFICIENT, "unit": "pp u / pp GDP", "provenance": "engine.generic.OKUN_COEFFICIENT (generic engine calibrated default, literature 0.3-0.5), NOT country-specific — distinct from Spain's 0.48"},
+    {"name": "GENERIC_PHILLIPS", "value": PHILLIPS_SLOPE, "unit": "pp pi / pp gap", "provenance": "engine.generic.PHILLIPS_SLOPE (generic engine calibrated default, NOT country-specific — distinct from Spain's 0.22)"},
     {"name": "MC_RHO", "value": MC_RHO, "unit": "x", "provenance": _MC},
     {"name": "MC_SIG_R", "value": MC_SIG_R, "unit": "pp", "provenance": _MC},
     {"name": "MC_SIG_G", "value": MC_SIG_G, "unit": "pp", "provenance": _MC},

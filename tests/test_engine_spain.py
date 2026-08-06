@@ -5,6 +5,7 @@ import math
 import pytest
 
 from engine import constants as c
+from engine import generic as g
 
 
 def test_vintage_and_version():
@@ -52,3 +53,12 @@ def test_constants_table_has_provenance_for_every_entry():
     names = [e["name"] for e in c.CONSTANTS_TABLE]
     for expected in ("MULT", "OKUN", "DIFF", "MC_SIG_R", "GENERIC_OKUN", "GENERIC_PHILLIPS"):
         assert expected in names
+
+
+def test_generic_engine_constants_sourced_not_hardcoded():
+    """Verify CONSTANTS_TABLE generic defaults are imported from engine.generic,
+    not hardcoded, to keep CONSTANTS_TABLE in sync with canonical runtime values."""
+    generic_okun_entry = next(e for e in c.CONSTANTS_TABLE if e["name"] == "GENERIC_OKUN")
+    generic_phillips_entry = next(e for e in c.CONSTANTS_TABLE if e["name"] == "GENERIC_PHILLIPS")
+    assert generic_okun_entry["value"] == g.OKUN_COEFFICIENT
+    assert generic_phillips_entry["value"] == g.PHILLIPS_SLOPE
