@@ -1,5 +1,4 @@
-"""FastAPI app: static GET endpoints (spec §5). Response models live in
-api/schemas.py."""
+"""FastAPI service — all endpoints (spec §5). Shapes live in api/schemas.py."""
 from __future__ import annotations
 
 import csv
@@ -16,9 +15,9 @@ from engine.levers import PRESETS
 from engine.redlines import RED_LINES
 from engine.spain import PERSONAS
 
-app = FastAPI(title="evo API", version=ENGINE_VERSION)
+app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
-# spec §5 CORS: local dev servers + the "null" origin (file:// dev pages)
+# spec §5 conventions: CORS allows localhost + the file:// "null" origin
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["null"],

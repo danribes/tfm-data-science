@@ -43,17 +43,18 @@ class ConstantsResponse(ApiMeta):
 
 
 class KpiOut(BaseModel):
-    """One of the 39-42 KPIs; a few (e.g. Monte Carlo fans, per-CCAA maxima)
-    carry a dict-valued `valor` instead of a scalar — kpis_perfiles.json."""
-    valor: Any
-    unidad: str
-    fuente: str
-    periodo: str
+    # `valor` is numeric for 39 of the 42 KPIs; deuda_mc_2030, deuda_mc_2050 and
+    # cuota_hipoteca_max carry a structured dict valor (verified against the
+    # gold kpis_perfiles.json while drafting) — hence Any, not float.
+    valor: Optional[Any] = None
+    unidad: Optional[str] = None
+    fuente: Optional[str] = None
+    periodo: Optional[str] = None
 
 
 class SeriesOut(BaseModel):
-    puntos: list[list[Any]]
-    fuente: str
+    puntos: list[list]           # [[period, value], ...] — period is str or number
+    fuente: Optional[str] = None
 
 
 class PersonaOutItem(BaseModel):
@@ -149,8 +150,11 @@ class PersonaDependentsOut(BaseModel):
 
 
 class ScenarioResponse(ApiMeta):
+    horizon: int
     years: list[int]
-    series: dict[str, list[float]]
+    baseline: dict[str, list[float]]
+    scenario: dict[str, list[float]]
+    deltas: dict[str, list[float]]
     personas: dict[str, PersonaDependentsOut]
     redlines: list[RedLineStatusOut]
 
@@ -222,7 +226,12 @@ class FiscalSpaceOut(BaseModel):
 
 
 class GenericScenarioResponse(ApiMeta):
-    iso3: str
-    horizon_years: int
+    country_iso3: str
+    coverage_score: float
+    defaults_used: list[str]
+    baseline_years: dict[str, int]
     debt_path: list[DebtPointOut]
-    fiscal_space: list[FiscalSpaceOut]
+    unemployment_path_pct: list[float]
+    inflation_path_pct: list[float]
+    nominal_wage_growth_path_pct: list[float]
+    fiscal_space_by_year: list[FiscalSpaceOut]
