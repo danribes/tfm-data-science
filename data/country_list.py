@@ -24,7 +24,14 @@ def fetch_country_list(timeout: int = 30) -> List[dict]:
 def load_country_list() -> List[dict]:
     if COUNTRY_LIST_CACHE.exists():
         return json.loads(COUNTRY_LIST_CACHE.read_text())
-    countries = fetch_country_list()
+    try:
+        countries = fetch_country_list()
+    except Exception:
+        # Never raise to the caller: fall back to a cached file written concurrently
+        # (if any), else degrade honestly to an empty list.
+        if COUNTRY_LIST_CACHE.exists():
+            return json.loads(COUNTRY_LIST_CACHE.read_text())
+        return []
     COUNTRY_LIST_CACHE.parent.mkdir(parents=True, exist_ok=True)
     COUNTRY_LIST_CACHE.write_text(json.dumps(countries))
     return countries

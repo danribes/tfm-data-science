@@ -253,3 +253,148 @@ def test_fetch_one_uses_cache_before_network(tmp_path):
         result = fetch_one("ESP", "debt_gdp", spec, 2000, 2024, cache)
     assert result.values == {2022: 42.0}
     assert result.from_cache is True
+
+
+# --- Finding 1: routing-branch coverage ---------------------------------------
+
+
+def test_fetch_one_dispatches_to_eurostat_client(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    spec = {"sources": [{"type": "eurostat", "dataset_id": "gov_10a_exp", "dims": {"unit": "PC_GDP"}}]}
+    available = FetchResult(values={2022: 7.0}, source="eurostat", from_cache=False, fetched_at=0.0)
+    with patch("data.panel_builder.iso3_to_iso2_map", return_value={"ESP": "ES"}), \
+         patch("data.eurostat_client.fetch_indicator", return_value=available) as mock_fetch:
+        result = fetch_one("ESP", "public_wage_bill_gdp", spec, 2000, 2024, cache)
+    mock_fetch.assert_called_once_with("ES", "gov_10a_exp", {"unit": "PC_GDP"})
+    assert result.values == {2022: 7.0}
+
+
+def test_fetch_one_dispatches_to_oecd_client(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    spec = {
+        "sources": [{
+            "type": "oecd", "agency": "OECD.EDU.IMEP", "dataflow_id": "DSD_X", "version": "3.2",
+            "dims": {"MEASURE": "FIN_PERSTUD"}, "dim_order": ["MEASURE"],
+        }]
+    }
+    available = FetchResult(values={2022: 9.0}, source="oecd", from_cache=False, fetched_at=0.0)
+    with patch("data.oecd_client.fetch_indicator", return_value=available) as mock_fetch:
+        result = fetch_one("ESP", "edu_spend_per_student", spec, 2000, 2024, cache)
+    mock_fetch.assert_called_once_with(
+        "ESP", "OECD.EDU.IMEP", "DSD_X", "3.2", {"MEASURE": "FIN_PERSTUD"}, ["MEASURE"],
+    )
+    assert result.values == {2022: 9.0}
+
+
+def test_fetch_one_missing_iso2_degrades_without_exception(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    spec = {"sources": [{"type": "eurostat", "dataset_id": "gov_10a_exp", "dims": {"unit": "PC_GDP"}}]}
+    with patch("data.panel_builder.iso3_to_iso2_map", return_value={}):
+        result = fetch_one("ZZZ", "public_wage_bill_gdp", spec, 2000, 2024, cache)
+    assert not result.available
+    assert "no ISO2 code found" in result.error
+
+
+def test_fetch_one_unknown_source_type_degrades_without_exception(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    spec = {"sources": [{"type": "imf", "code": "XX"}]}
+    result = fetch_one("ESP", "made_up", spec, 2000, 2024, cache)
+    assert not result.available
+    assert "unknown source type: imf" in result.error
+
+
+def test_fetch_one_calls_cache_set_when_result_available():
+    mock_cache = MagicMock()
+    mock_cache.get.return_value = None
+    spec = {"sources": [{"type": "worldbank", "code": "GC.DOD.TOTL.GD.ZS"}]}
+    available = FetchResult(values={2022: 1.0}, source="worldbank", from_cache=False, fetched_at=0.0)
+    with patch("data.worldbank_client.fetch_indicator", return_value=available):
+        result = fetch_one("ESP", "debt_gdp", spec, 2000, 2024, mock_cache)
+    mock_cache.set.assert_called_once_with("ESP", "debt_gdp", available)
+    assert result is available
+
+
+def test_fetch_one_does_not_call_cache_set_when_result_unavailable():
+    mock_cache = MagicMock()
+    mock_cache.get.return_value = None
+    spec = {"sources": [{"type": "worldbank", "code": "BOGUS.CODE"}]}
+    unavailable = FetchResult(values={}, source="worldbank", from_cache=False, fetched_at=0.0, error="no data")
+    with patch("data.worldbank_client.fetch_indicator", return_value=unavailable):
+        result = fetch_one("ESP", "debt_gdp", spec, 2000, 2024, mock_cache)
+    mock_cache.set.assert_not_called()
+    assert result is unavailable
+
+
+# --- Finding 2: guarded country-list fetch --------------------------------------
+
+
+def test_load_country_list_network_failure_no_cache_returns_empty(tmp_path):
+    from data import country_list
+    fake_cache_path = tmp_path / "_country_list.json"
+    with patch.object(country_list, "COUNTRY_LIST_CACHE", fake_cache_path), \
+         patch("data.country_list.requests.get", side_effect=ConnectionError("boom")):
+        assert country_list.iso3_to_iso2_map() == {}
+
+
+def test_fetch_one_eurostat_degrades_when_country_list_fetch_fails(tmp_path):
+    from data import country_list
+    from data.cache import DiskCache
+    fake_cache_path = tmp_path / "_country_list.json"
+    cache = DiskCache(cache_dir=str(tmp_path / "data_cache"))
+    spec = {"sources": [{"type": "eurostat", "dataset_id": "gov_10a_exp", "dims": {"unit": "PC_GDP"}}]}
+    with patch.object(country_list, "COUNTRY_LIST_CACHE", fake_cache_path), \
+         patch("data.country_list.requests.get", side_effect=ConnectionError("boom")):
+        result = fetch_one("ZZZ", "public_wage_bill_gdp", spec, 2000, 2024, cache)
+    assert not result.available
+    assert "no ISO2 code found" in result.error
+
+
+# --- Finding 3: source fallback iteration ---------------------------------------
+
+
+def test_fetch_one_falls_back_to_second_source_when_primary_unavailable(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    spec = {
+        "sources": [
+            {"type": "worldbank", "code": "BOGUS.CODE"},
+            {
+                "type": "oecd", "agency": "OECD.EDU.IMEP", "dataflow_id": "DSD_X", "version": "3.2",
+                "dims": {"MEASURE": "FIN_PERSTUD"}, "dim_order": ["MEASURE"],
+            },
+        ]
+    }
+    unavailable = FetchResult(values={}, source="worldbank", from_cache=False, fetched_at=0.0, error="no data")
+    available = FetchResult(values={2022: 5.0}, source="oecd", from_cache=False, fetched_at=0.0)
+    with patch("data.worldbank_client.fetch_indicator", return_value=unavailable), \
+         patch("data.oecd_client.fetch_indicator", return_value=available):
+        result = fetch_one("ESP", "fallback_key", spec, 2000, 2024, cache)
+    assert result.values == {2022: 5.0}
+    assert result.source == "oecd"
+    cached = cache.get("ESP", "fallback_key")
+    assert cached is not None
+    assert cached.values == {2022: 5.0}
+
+
+def test_fetch_one_does_not_call_fallback_when_primary_available(tmp_path):
+    from data.cache import DiskCache
+    cache = DiskCache(cache_dir=str(tmp_path))
+    spec = {
+        "sources": [
+            {"type": "worldbank", "code": "GC.DOD.TOTL.GD.ZS"},
+            {
+                "type": "oecd", "agency": "OECD.EDU.IMEP", "dataflow_id": "DSD_X", "version": "3.2",
+                "dims": {"MEASURE": "FIN_PERSTUD"}, "dim_order": ["MEASURE"],
+            },
+        ]
+    }
+    available = FetchResult(values={2022: 10.0}, source="worldbank", from_cache=False, fetched_at=0.0)
+    with patch("data.worldbank_client.fetch_indicator", return_value=available), \
+         patch("data.oecd_client.fetch_indicator", side_effect=AssertionError("fallback should not be called")):
+        result = fetch_one("ESP", "no_fallback_key", spec, 2000, 2024, cache)
+    assert result.values == {2022: 10.0}
+    assert result.source == "worldbank"
