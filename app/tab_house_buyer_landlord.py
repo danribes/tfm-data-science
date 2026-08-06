@@ -35,6 +35,9 @@ def render(scenario, panel):
         st.line_chart({
             "House price index": {v.year: v.house_price_index for v in views if v.house_price_index is not None},
         })
-        if views[-1].house_price_growth_pct is not None:
-            st.metric("Cumulative house price growth", f"{views[-1].house_price_growth_pct:.1f}%")
+        growth = views[-1].house_price_growth_pct
+        st.metric(
+            "Cumulative house price growth",
+            f"{growth:.1f}%" if growth is not None else "N/A -- not available for this country",
+        )
         st.info(f"Rental yield: {views[-1].rental_yield_pct}")

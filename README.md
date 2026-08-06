@@ -72,3 +72,9 @@ kill %1
 ```
 
 Expected: prints `200`.
+
+## Tests
+
+```
+pytest
+```
