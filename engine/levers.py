@@ -10,16 +10,16 @@ from engine.constants import BASE_LEVERS
 
 @dataclass(frozen=True)
 class Levers:
-    r: float = BASE_LEVERS["r"]          # 2.8
-    prima: float = float(BASE_LEVERS["prima"])   # 45.0
-    sp: float = 0.0
-    lam: float = 0.9
-    pm: float = 0.0
-    tau: float = 0.0
-    z: float = 0.0
-    ext: float = 1.8
-    dem: float = 0.0
-    idx: float = 0.0
+    r: float = BASE_LEVERS["r"]
+    prima: float = BASE_LEVERS["prima"]
+    sp: float = BASE_LEVERS["sp"]
+    lam: float = BASE_LEVERS["lam"]
+    pm: float = BASE_LEVERS["pm"]
+    tau: float = BASE_LEVERS["tau"]
+    z: float = BASE_LEVERS["z"]
+    ext: float = BASE_LEVERS["ext"]
+    dem: float = BASE_LEVERS["dem"]
+    idx: float = BASE_LEVERS["idx"]
 
 
 # v16 `const LEVERS` — Spanish copy verbatim (template L390-399, extract L178-189)
@@ -63,7 +63,10 @@ _SPEC_BY_ID = {s["id"]: s for s in LEVER_SPECS}
 
 
 def preset_levers(preset_id: str) -> Levers:
-    preset = next(p for p in PRESETS if p["id"] == preset_id)
+    try:
+        preset = next(p for p in PRESETS if p["id"] == preset_id)
+    except StopIteration:
+        raise ValueError(f"unknown preset id: {preset_id!r} (valid: S0..S7)")
     return Levers(**preset["set"])
 
 

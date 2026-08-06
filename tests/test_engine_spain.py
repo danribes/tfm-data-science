@@ -65,6 +65,7 @@ def test_generic_engine_constants_sourced_not_hardcoded():
 
 
 # ---- Task 5: levers & presets ----
+from dataclasses import asdict
 from engine.levers import LEVER_SPECS, PRESETS, Levers, preset_levers, validate_levers
 
 # spec §4.1 table (binding) — (id, min, max, base)
@@ -85,6 +86,8 @@ def test_lever_specs_ranges_and_bases():
     syms = [s["sym"] for s in LEVER_SPECS]
     assert syms == ["r", "σ", "sp", "λ", "pᵐ", "τ", "z", "Y*", "β₆₅", "ι"]
     assert LEVER_SPECS[0]["nm"] == "Tipo de interés · Euríbor 12m"
+    # Verify all Levers defaults come from BASE_LEVERS (single source of truth)
+    assert asdict(Levers()) == c.BASE_LEVERS
 
 
 def test_presets_verbatim_and_within_ranges():
@@ -102,3 +105,10 @@ def test_presets_verbatim_and_within_ranges():
 def test_validate_levers_flags_out_of_range():
     assert validate_levers(Levers(r=9.0)) == ["r=9.0 outside [0.0, 6.0]"]
     assert validate_levers(Levers()) == []
+
+
+def test_preset_levers_raises_on_unknown_id():
+    with pytest.raises(ValueError) as exc_info:
+        preset_levers("S9")
+    assert "unknown preset id: 'S9'" in str(exc_info.value)
+    assert "valid: S0..S7" in str(exc_info.value)
