@@ -25,6 +25,8 @@ def french_amortization_payment(principal: float, annual_rate_pct: float, term_y
 def build_mortgage_dashboard(sovereign_rate_path_pct: List[float], unemployment_path_pct: List[float],
                               years: List[int], loan_principal: float, loan_term_years: int,
                               baseline_unemployment_pct: float) -> List[MortgageYearView]:
+    if not sovereign_rate_path_pct:
+        return []
     views = []
     baseline_mortgage_rate = sovereign_rate_path_pct[0] + MORTGAGE_SPREAD_PP
     for year, rate, unemployment in zip(years, sovereign_rate_path_pct, unemployment_path_pct):

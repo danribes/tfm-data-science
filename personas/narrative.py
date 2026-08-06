@@ -27,22 +27,29 @@ def llm_available() -> bool:
 def render_llm_narrative(persona: str, scenario_summary: str) -> Optional[str]:
     if not llm_available():
         return None
-    import anthropic
-    client = anthropic.Anthropic()
-    message = client.messages.create(
-        model="claude-sonnet-5",
-        max_tokens=300,
-        messages=[{
-            "role": "user",
-            "content": (
-                f"Write a short (3-4 sentence), plain-English narrative for a {persona} persona "
-                f"reading a sovereign fiscal scenario dashboard. Never issue advice or a "
-                f"buy/sell/vote recommendation -- describe conditional projections only. "
-                f"Scenario summary:\n{scenario_summary}"
-            ),
-        }],
-    )
-    return message.content[0].text
+    # Never let an LLM failure (missing package, network error, rate limit,
+    # invalid key, malformed response, ...) propagate to the caller -- the
+    # narrative always has a template-based fallback, so any failure here
+    # should degrade silently to that fallback via render_narrative.
+    try:
+        import anthropic
+        client = anthropic.Anthropic()
+        message = client.messages.create(
+            model="claude-sonnet-5",
+            max_tokens=300,
+            messages=[{
+                "role": "user",
+                "content": (
+                    f"Write a short (3-4 sentence), plain-English narrative for a {persona} persona "
+                    f"reading a sovereign fiscal scenario dashboard. Never issue advice or a "
+                    f"buy/sell/vote recommendation -- describe conditional projections only. "
+                    f"Scenario summary:\n{scenario_summary}"
+                ),
+            }],
+        )
+        return message.content[0].text
+    except Exception:
+        return None
 
 
 def render_narrative(persona: str, scenario_summary: str, **template_kwargs) -> str:
