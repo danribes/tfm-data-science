@@ -82,3 +82,35 @@ def test_worldbank_client_skips_malformed_rows():
         result = worldbank_client.fetch_indicator("ESP", "GC.DOD.TOTL.GD.ZS", 2021, 2022)
     assert result.available
     assert result.values == {2021: 85.3}  # only valid row parsed, malformed row skipped
+
+
+from data import eurostat_client
+
+
+def test_eurostat_client_parses_jsonstat_payload():
+    payload = {
+        "dimension": {"time": {"category": {"index": {"2021": 0, "2022": 1}}}},
+        "value": {"0": 100.0, "1": 180.6},
+    }
+    with patch("data.eurostat_client.requests.get", return_value=_mock_response(payload)):
+        result = eurostat_client.fetch_indicator("ES", "prc_hpi_a", {"unit": "I15_A_AVG"})
+    assert result.available
+    assert result.values == {2021: 100.0, 2022: 180.6}
+
+
+def test_eurostat_client_returns_na_when_no_observations():
+    payload = {"dimension": {"time": {"category": {"index": {}}}}, "value": {}}
+    with patch("data.eurostat_client.requests.get", return_value=_mock_response(payload)):
+        result = eurostat_client.fetch_indicator("ZZ", "prc_hpi_a", {"unit": "I15_A_AVG"})
+    assert not result.available
+
+
+def test_eurostat_client_skips_malformed_values():
+    payload = {
+        "dimension": {"time": {"category": {"index": {"2021": 0, "2022": 1}}}},
+        "value": {"0": "not_a_number", "1": 150.5},  # first value malformed, second valid
+    }
+    with patch("data.eurostat_client.requests.get", return_value=_mock_response(payload)):
+        result = eurostat_client.fetch_indicator("ES", "prc_hpi_a", {"unit": "I15_A_AVG"})
+    assert result.available
+    assert result.values == {2022: 150.5}  # only valid value parsed, malformed value skipped
