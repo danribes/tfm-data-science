@@ -62,3 +62,43 @@ def test_generic_engine_constants_sourced_not_hardcoded():
     generic_phillips_entry = next(e for e in c.CONSTANTS_TABLE if e["name"] == "GENERIC_PHILLIPS")
     assert generic_okun_entry["value"] == g.OKUN_COEFFICIENT
     assert generic_phillips_entry["value"] == g.PHILLIPS_SLOPE
+
+
+# ---- Task 5: levers & presets ----
+from engine.levers import LEVER_SPECS, PRESETS, Levers, preset_levers, validate_levers
+
+# spec §4.1 table (binding) — (id, min, max, base)
+EXPECTED_RANGES = [
+    ("r", 0.0, 6.0, 2.8), ("prima", 0.0, 400.0, 45.0), ("sp", -4.0, 4.0, 0.0),
+    ("lam", -0.5, 2.5, 0.9), ("pm", -50.0, 100.0, 0.0), ("tau", -5.0, 5.0, 0.0),
+    ("z", -2.0, 2.0, 0.0), ("ext", -4.0, 6.0, 1.8), ("dem", -1.0, 1.0, 0.0),
+    ("idx", -1.5, 1.0, 0.0),
+]
+
+
+def test_lever_specs_ranges_and_bases():
+    assert [s["id"] for s in LEVER_SPECS] == [rid for rid, *_ in EXPECTED_RANGES]
+    base = Levers()
+    for (rid, lo, hi, base_val), spec in zip(EXPECTED_RANGES, LEVER_SPECS):
+        assert (spec["min"], spec["max"]) == (lo, hi), rid
+        assert getattr(base, rid) == base_val, rid
+    syms = [s["sym"] for s in LEVER_SPECS]
+    assert syms == ["r", "σ", "sp", "λ", "pᵐ", "τ", "z", "Y*", "β₆₅", "ι"]
+    assert LEVER_SPECS[0]["nm"] == "Tipo de interés · Euríbor 12m"
+
+
+def test_presets_verbatim_and_within_ranges():
+    assert [p["id"] for p in PRESETS] == [f"S{i}" for i in range(8)]
+    assert [p["nm"] for p in PRESETS] == [
+        "S0 base", "S1 tipos +200 pb", "S2 petróleo +50 %", "S3 consolidación",
+        "S4 productividad", "S5 desregulación lab.", "S6 envejecimiento", "S7 adverso"]
+    assert PRESETS[0]["set"] == {}
+    assert PRESETS[7]["set"] == {"r": 4.8, "pm": 50.0, "prima": 150.0}
+    assert preset_levers("S0") == Levers()
+    for p in PRESETS:
+        assert validate_levers(preset_levers(p["id"])) == [], p["id"]
+
+
+def test_validate_levers_flags_out_of_range():
+    assert validate_levers(Levers(r=9.0)) == ["r=9.0 outside [0.0, 6.0]"]
+    assert validate_levers(Levers()) == []
