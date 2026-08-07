@@ -31,6 +31,9 @@ export function Gauge({
     const crossed = redCmp === "gt" ? value > red : value < red;
     if (crossed) fillClass = "f bad";
     else if (Math.abs(value - red) <= Math.abs(red || 1) * NEAR) fillClass = "f warn2";
+    // safe: green (--s3). Without this the safe state fell back to the default
+    // blue fill and base.css's `.gaugebar .f.ok` rule was dead.
+    else fillClass = "f ok";
   }
   return (
     <div className="gaugebar">
