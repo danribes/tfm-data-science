@@ -3,6 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { queryClient, useHealth, usePersonas } from "./api/hooks";
 import { crossCheckEngine } from "./state/appHealth";
+import { useScenarioStore } from "./state/scenarioStore";
 import { ApiDownScreen } from "./components/ApiDownScreen";
 import { LeverRail } from "./components/LeverRail";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -16,6 +17,7 @@ import Persona from "./routes/Persona";
 function Shell() {
   const health = useHealth();
   const personas = usePersonas();
+  const hotIds = useScenarioStore((s) => s.hotIds);
   useEffect(() => {
     if (health.isSuccess) void crossCheckEngine();
   }, [health.isSuccess]);
@@ -40,7 +42,7 @@ function Shell() {
         <ThemeToggle />
       </header>
       <div className="body">
-        <LeverRail />
+        <LeverRail hotIds={hotIds} />
         <main className="main">
           <Warnings />
           <Routes>

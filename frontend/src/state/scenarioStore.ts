@@ -16,9 +16,11 @@ export const HORIZON_YEARS = [2026, 2030, 2035, 2040, 2050];
 interface ScenarioState {
   levers: Levers;
   horizon: number;
+  hotIds: string[];
   setLever: (id: LeverId, value: number) => void;
   applyPreset: (presetId: string) => void;
   setHorizon: (year: number) => void;
+  setHotIds: (ids: string[]) => void;
   resetAll: () => void;
 }
 
@@ -27,9 +29,13 @@ const clampHorizon = (y: number): number => Math.min(Y1, Math.max(Y0, Math.round
 export const useScenarioStore = create<ScenarioState>()((set) => ({
   levers: { ...BASE_LEVERS },
   horizon: Y0,
+  hotIds: [],
   setLever: (id, value) => set((s) => ({ levers: { ...s.levers, [id]: value } })),
   applyPreset: (presetId) => set({ levers: presetLevers(presetId) }),
   setHorizon: (year) => set({ horizon: clampHorizon(year) }),
+  setHotIds: (ids) => set({ hotIds: ids }),
+  // hotIds belongs to the visible route, not the scenario — resetAll (levers/horizon
+  // reset by the Laboratorio "reset" button) must not clobber which levers Persona lit up.
   resetAll: () => set({ levers: { ...BASE_LEVERS }, horizon: Y0 }),
 }));
 

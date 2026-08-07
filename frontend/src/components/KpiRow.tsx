@@ -29,6 +29,12 @@ export const UP_IS_BAD = new Set([
   "pens", "sobre", "temp", "ujuv", "bls", "deficitAbs",
 ]);
 
+/** Half-width (years) of the baseline window used to build a gauge's frame. */
+const GAUGE_WINDOW = 4;
+/** Minimum frame width as a fraction of |baseline value at k|, so flat/near-zero
+ * series (e.g. a lever pass-through like the policy rate) still get headroom. */
+const GAUGE_MIN_SPAN_FRAC = 0.06;
+
 interface TileProps {
   out: { k: string; lab: string };
   scn: Scenario;
@@ -47,7 +53,21 @@ function KpiTile({ out, scn, base, k, fresh, year, red }: TileProps) {
   const baseValue = base[key][k];
   const shown = useRollup(value); // ~180 ms roll-up on change; exact on first render
   const delta = value - baseValue;
-  const [lo, hi] = dialDomain([...base[key], ...scn[key]], red?.thr ?? undefined);
+  // Gauge frame is lever-independent: built ONLY from the baseline path (never the
+  // scenario) so moving a lever moves the needle, not the frame. The old domain spanned
+  // the full 2026-2050 trajectory of BOTH base and scenario; for compounding series
+  // (e.g. debt %PIB) the scenario's 2050 endpoint dwarfs any near-term move, so a 200bp
+  // rate rise shifted debt at 2026 by 0.83pp but the gauge by only ~0.3 points. Now the
+  // frame is a small window of the baseline around the selected year (plus the red
+  // threshold and a relative floor for flat series), so the same move is clearly visible.
+  const baseSeries = base[key];
+  const lo_i = Math.max(0, k - GAUGE_WINDOW);
+  const hi_i = Math.min(baseSeries.length - 1, k + GAUGE_WINDOW);
+  const floor = Math.abs(baseValue) * GAUGE_MIN_SPAN_FRAC || 1;
+  const [lo, hi] = dialDomain(
+    [...baseSeries.slice(lo_i, hi_i + 1), baseValue - floor / 2, baseValue + floor / 2],
+    red?.thr ?? undefined,
+  );
   const deltaClass =
     Math.abs(delta) <= 1e-9 ? "" : (delta > 0) === UP_IS_BAD.has(out.k) ? "bad" : "good";
   return (
