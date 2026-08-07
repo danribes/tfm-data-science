@@ -1,6 +1,8 @@
 import { nf, sg } from "../lib/fmt";
 import { useRollup } from "../lib/motion";
-import type { Scenario } from "../engine/spain";
+import { runScenario, type Scenario } from "../engine/spain";
+import { PRESETS, presetLevers } from "../engine/levers";
+import { seriesOf, type AnySeriesKey } from "../engine/derived";
 import type { PersonaRedOut } from "../api/types";
 import { Gauge, dialDomain } from "./Gauge";
 import { Stamp } from "./Stamp";
@@ -31,9 +33,36 @@ export const UP_IS_BAD = new Set([
 
 /** Half-width (years) of the baseline window used to build a gauge's frame. */
 const GAUGE_WINDOW = 4;
-/** Minimum frame width as a fraction of |baseline value at k|, so flat/near-zero
- * series (e.g. a lever pass-through like the policy rate) still get headroom. */
-const GAUGE_MIN_SPAN_FRAC = 0.06;
+
+// The frame also has to cover whatever the 8 static presets (S0..S7) can reach, so a
+// lever pass-through with a flat baseline (e.g. Euríbor `r`, `spread`) doesn't pin the
+// bar the moment a real preset is applied. Presets are static config — not the user's
+// current lever position — so folding them into the frame keeps the frame fully
+// lever-independent (spec: no user-lever input may feed the domain).
+//
+// Computing 8 scenarios per gauge per render would be wasteful, so both the scenarios
+// and their per-series projections are memoized at module scope: the 8 preset runs
+// happen once per session (runScenario is ~1 ms; 8 runs total for the whole app), and
+// each series' preset values are derived once per series key and reused by every gauge
+// tile (across all personas, all renders) that reads that key.
+let _presetScenarios: Scenario[] | null = null;
+function presetScenarios(): Scenario[] {
+  if (_presetScenarios === null) {
+    _presetScenarios = PRESETS.map((p) => runScenario(presetLevers(p.id)));
+  }
+  return _presetScenarios;
+}
+
+const _presetSeriesCache = new Map<AnySeriesKey, number[][]>();
+/** The 8 presets' full projections for one series key, computed once and cached. */
+function presetSeriesFor(key: AnySeriesKey): number[][] {
+  let cached = _presetSeriesCache.get(key);
+  if (!cached) {
+    cached = presetScenarios().map((scn) => seriesOf(scn, key));
+    _presetSeriesCache.set(key, cached);
+  }
+  return cached;
+}
 
 interface TileProps {
   out: { k: string; lab: string };
@@ -47,25 +76,30 @@ interface TileProps {
 
 /** One tile = one component so useRollup (a hook) can animate its figure (spec §5). */
 function KpiTile({ out, scn, base, k, fresh, year, red }: TileProps) {
-  const key = out.k as keyof Scenario;
+  const key = out.k as AnySeriesKey;
   const fmtSpec = SERIES_FORMAT[out.k] ?? { dec: 1, unit: "" };
-  const value = scn[key][k];
-  const baseValue = base[key][k];
+  const scnSeries = seriesOf(scn, key);
+  const baseSeries = seriesOf(base, key);
+  const value = scnSeries[k];
+  const baseValue = baseSeries[k];
   const shown = useRollup(value); // ~180 ms roll-up on change; exact on first render
   const delta = value - baseValue;
-  // Gauge frame is lever-independent: built ONLY from the baseline path (never the
-  // scenario) so moving a lever moves the needle, not the frame. The old domain spanned
-  // the full 2026-2050 trajectory of BOTH base and scenario; for compounding series
-  // (e.g. debt %PIB) the scenario's 2050 endpoint dwarfs any near-term move, so a 200bp
-  // rate rise shifted debt at 2026 by 0.83pp but the gauge by only ~0.3 points. Now the
-  // frame is a small window of the baseline around the selected year (plus the red
-  // threshold and a relative floor for flat series), so the same move is clearly visible.
-  const baseSeries = base[key];
+  // Gauge frame is lever-independent: built ONLY from constants (never the user's current
+  // scenario) so moving a lever moves the needle, not the frame. Task 13 first fixed this by
+  // windowing the baseline around the selected year instead of spanning 2026-2050 (that older
+  // domain let a compounding series' 2050 endpoint dwarf any near-term move — a 200bp rate rise
+  // shifted debt at 2026 by 0.83pp but the gauge by only ~0.3 points). But for series whose
+  // baseline is flat (e.g. Euríbor `r`, `spread` — pure lever pass-throughs with no engine
+  // dynamics), the window collapses to ~baseValue, so any real lever move lands far outside the
+  // frame and the bar pins at 0 or 100. So the frame is now the baseline window UNION the value
+  // this series takes at the same year under each of the 8 static presets (S0..S7) — sized to
+  // the real reachable space while remaining lever-independent, since presets are fixed config,
+  // not the live lever position.
   const lo_i = Math.max(0, k - GAUGE_WINDOW);
   const hi_i = Math.min(baseSeries.length - 1, k + GAUGE_WINDOW);
-  const floor = Math.abs(baseValue) * GAUGE_MIN_SPAN_FRAC || 1;
+  const presetValuesAtK = presetSeriesFor(key).map((series) => series[k]);
   const [lo, hi] = dialDomain(
-    [...baseSeries.slice(lo_i, hi_i + 1), baseValue - floor / 2, baseValue + floor / 2],
+    [...baseSeries.slice(lo_i, hi_i + 1), ...presetValuesAtK],
     red?.thr ?? undefined,
   );
   const deltaClass =
