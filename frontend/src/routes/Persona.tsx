@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { usePersonas, useRedlines } from "../api/hooks";
 import { baseline, YEARS } from "../engine/spain";
-import { allAtBase } from "../engine/levers";
 import { evaluatePersonaReds } from "../engine/redlines";
 import { seriesOf, type AnySeriesKey } from "../engine/derived";
 import { nf } from "../lib/fmt";
@@ -12,8 +11,8 @@ import { NarrativeBlock } from "../components/NarrativeBlock";
 import { ProjectionChart } from "../components/ProjectionChart";
 import { Semaphore } from "../components/Semaphore";
 import { Stamp } from "../components/Stamp";
-import { getPersonaModule } from "../personas/registry";
-import { kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
+import { SHIPPED_IDS, getPersonaModule } from "../personas/registry";
+import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 
 export default function Persona() {
   const { id } = useParams<{ id: string }>();
@@ -33,12 +32,17 @@ export default function Persona() {
 
   if (personas.isPending) return <p>Cargando perfil…</p>;
   if (personas.isError) return <div className="banner err">Personas no disponibles — el resto de la app sigue funcionando.</div>;
-  if (!card || !mod) return <p>Perfil no disponible — perfiles publicados: 01, 02, 03, 06.</p>;
+  // The published list is read from the registry, never retyped: adding a
+  // persona module is meant to be one MODULES line plus one SHIPPED_IDS entry.
+  if (!card || !mod) return <p>Perfil no disponible — perfiles publicados: {SHIPPED_IDS.join(", ")}.</p>;
 
   const base = baseline();
   const k = kIndex(horizon);
-  const fresh = allAtBase(levers) && horizon === 2026;
+  const fresh = isFresh(levers, horizon);
   const year = horizon;
+  // `puntos` periods are string|number — a plain year arrives as a number, a
+  // month or quarter as "2021-07"/"2020-Q2". The chart prints them verbatim
+  // rather than pretending an index is a year (see ProjectionChart#labels).
   const hist = personas.data.series[card.series_keys[0]];
   const headlineKey = card.headline as AnySeriesKey;
   const headlineDec = SERIES_FORMAT[card.headline]?.dec ?? 1;
@@ -65,6 +69,7 @@ export default function Persona() {
           {hist ? (
             <ProjectionChart
               years={hist.puntos.map((_, i) => i)}
+              labels={hist.puntos.map(([p]) => String(p))}
               baseline={hist.puntos.map(([, v]) => v)}
               scenario={hist.puntos.map(([, v]) => v)}
               dec={2}

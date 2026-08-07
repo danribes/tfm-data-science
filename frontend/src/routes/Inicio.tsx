@@ -2,12 +2,11 @@ import { Link } from "react-router-dom";
 import { usePersonas, useRedlines, useVintage } from "../api/hooks";
 import { Y1, baseline } from "../engine/spain";
 import { evaluateRedlines } from "../engine/redlines";
-import { allAtBase } from "../engine/levers";
 import { nf, sg } from "../lib/fmt";
 import { Semaphore } from "../components/Semaphore";
 import { Stamp } from "../components/Stamp";
 import { SERIES_FORMAT, UP_IS_BAD } from "../components/KpiRow";
-import { kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
+import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 import { SHIPPED_IDS } from "../personas/registry";
 
 const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean }[] = [
@@ -26,7 +25,7 @@ export default function Inicio() {
   const horizon = useScenarioStore((s) => s.horizon);
   const k = kIndex(horizon);
   const base = baseline();
-  const fresh = allAtBase(levers) && horizon === 2026;
+  const fresh = isFresh(levers, horizon);
 
   return (
     <div>

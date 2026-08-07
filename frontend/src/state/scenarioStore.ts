@@ -3,6 +3,7 @@ import { create } from "zustand";
 import {
   LEVER_IDS,
   LEVER_SPECS,
+  allAtBase,
   isMoved,
   presetLevers,
   type LeverId,
@@ -40,6 +41,14 @@ export const useScenarioStore = create<ScenarioState>()((set) => ({
 }));
 
 export const kIndex = (horizon: number): number => horizon - Y0;
+
+/** True when the view shows only observed/frozen data: every lever at its
+ *  vintage base AND the horizon still on the first year. Drives the 📅/🔮
+ *  stamp. Lives here, next to kIndex, because both routes need it and both
+ *  previously inlined the base year as a literal `2026` — a second place for
+ *  Y0 to drift out of step with the engine. */
+export const isFresh = (levers: Levers, horizon: number): boolean =>
+  allAtBase(levers) && horizon === Y0;
 
 /** Local recompute — spec §3: <16 ms, no network. */
 export function useScenario(): Scenario {

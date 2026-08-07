@@ -1,4 +1,18 @@
-const NEAR = 0.10; // same near fraction as the semaphore (spec §4.5 — v16 used 12%)
+import { statusOf, type RedLineStatus } from "../engine/redlines";
+
+/** The dial paints exactly what the semáforo says. The near-band rule lives in
+ *  ONE place (engine/redlines.ts::statusOf) — the fraction, the zero-threshold
+ *  absolute band, and the gt/lt direction all come from there. An earlier
+ *  version re-derived the band here as `|value − red| <= |red || 1| * 0.10`,
+ *  which silently became a 0.1-absolute band when the threshold was 0 while
+ *  statusOf used ZERO_THRESHOLD_BAND = 0.5 — so a `g < 0` red line would show
+ *  a green dial beside an amber semáforo row on the same card. */
+const STATUS_CLASS: Record<RedLineStatus, string> = {
+  crossed: "f bad",
+  near: "f warn2",
+  safe: "f ok",
+  sd: "f",
+};
 
 export function dialDomain(values: number[], red?: number): [number, number] {
   const all = red === undefined ? values : [...values, red];
@@ -26,15 +40,10 @@ export function Gauge({
   red?: number;
   redCmp?: "gt" | "lt";
 }) {
-  let fillClass = "f";
-  if (red !== undefined) {
-    const crossed = redCmp === "gt" ? value > red : value < red;
-    if (crossed) fillClass = "f bad";
-    else if (Math.abs(value - red) <= Math.abs(red || 1) * NEAR) fillClass = "f warn2";
-    // safe: green (--s3). Without this the safe state fell back to the default
-    // blue fill and base.css's `.gaugebar .f.ok` rule was dead.
-    else fillClass = "f ok";
-  }
+  // No red line → no status to paint: the plain blue fill (default `.f`).
+  // With one, `safe` is green (--s3); without that branch base.css's
+  // `.gaugebar .f.ok` rule was dead and safe rendered blue.
+  const fillClass = red === undefined ? "f" : STATUS_CLASS[statusOf(value, red, redCmp)];
   return (
     <div className="gaugebar">
       <span className={fillClass} style={{ width: pct(value, lo, hi) }} />
