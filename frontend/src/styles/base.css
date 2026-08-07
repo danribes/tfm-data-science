@@ -1,0 +1,133 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+button { font: inherit; }
+code { font: 0.75em ui-monospace, Consolas, monospace; background: var(--code); padding: 0 4px; border-radius: 3px; }
+
+/* --- app shell: fluid grid, not fixed canvas (spec §5) --- */
+.shell { min-height: 100%; display: flex; flex-direction: column; background: var(--surface); }
+.body { display: flex; flex: 1; min-height: 0; }
+.rail {
+  flex: 0 0 var(--rail-w); width: var(--rail-w);
+  border-right: 1px solid var(--grid); background: var(--card);
+  padding: var(--sp-1); display: flex; flex-direction: column; gap: var(--sp-1);
+  position: sticky; top: 0; align-self: flex-start; max-height: 100vh; overflow-y: auto;
+}
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-1) var(--sp-2); }
+.topbar { display: flex; align-items: center; gap: var(--sp-1); padding: var(--sp-1) var(--sp-2); border-bottom: 1px solid var(--grid); flex-wrap: wrap; }
+.topbar nav { display: flex; gap: var(--sp-0); flex-wrap: wrap; }
+.topbar nav a { color: var(--ink-2); text-decoration: none; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: var(--rad-pill); }
+.topbar nav a.active { background: var(--chip); color: var(--accent); }
+.foot { border-top: 1px solid var(--grid); padding: var(--sp-0) var(--sp-2); font-size: 11px; color: var(--muted); display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+/* rail drawer below 1024px (spec §5) */
+.rail-toggle { display: none; }
+@media (max-width: 1024px) {
+  .rail-toggle { display: inline-block; }
+  .rail { position: fixed; left: 0; top: 0; bottom: 0; z-index: 40; transform: translateX(-100%); transition: transform var(--dur) ease; box-shadow: var(--shadow-app); max-height: none; }
+  .rail.open { transform: translateX(0); }
+}
+
+/* --- v16 §C.2 rhythm: 5 KPI → 2 charts → semáforo/cadenas/narrativa --- */
+.outs { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-1); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1); }
+.row3 { display: grid; grid-template-columns: 1.05fr 0.95fr 1.2fr; gap: var(--sp-1); }
+@media (max-width: 1440px) { .outs { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 1024px) { .row2, .row3 { grid-template-columns: 1fr; } .outs { grid-template-columns: repeat(2, 1fr); } }
+
+/* --- card primitive (v16 §C.3) --- */
+.card { border: 1px solid var(--grid); border-radius: var(--rad-card); background: var(--surface); padding: var(--sp-1) var(--sp-1) var(--sp-1); display: flex; flex-direction: column; min-width: 0; }
+.card h4 { margin: 0 0 var(--sp-0); font-size: 12px; display: flex; align-items: baseline; gap: 6px; }
+.card h4 small { font-weight: 600; color: var(--muted); font-size: 10px; }
+
+/* --- KPI dial tile (v16 §B.1) --- */
+.out { border: 1px solid var(--grid); border-radius: var(--rad-card); padding: var(--sp-1); background: var(--surface); position: relative; }
+.out .o-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; }
+.out .o-val { font-size: 21px; font-weight: 800; line-height: 1.1; }
+.out .o-val small { font-size: 11px; font-weight: 700; color: var(--muted); }
+.out .o-delta { font-size: 10.5px; font-weight: 700; }
+.out .o-delta.bad { color: var(--div-neg); }
+.out .o-delta.good { color: var(--good); }
+.out .o-seal { position: absolute; top: 7px; right: 8px; font-size: 9px; }
+.gaugebar { position: relative; height: 6px; border-radius: 4px; background: var(--grid); margin: 5px 0 3px; }
+.gaugebar .f { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--s1); transition: width var(--dur) ease; }
+.gaugebar .f.bad { background: var(--div-neg); }
+.gaugebar .f.warn2 { background: var(--warn); }
+.gaugebar .f.ok { background: var(--s3); }
+.gaugebar .rl { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--div-neg); }
+.gaugebar .bm { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--baseline); }
+
+/* --- lever row (v16 §B.2) --- */
+.levers { display: flex; flex-direction: column; gap: var(--sp-0); }
+.lev { border-radius: var(--rad-chip); padding: 2px 5px 3px; }
+.lev.hot { background: var(--chip-lab); }
+.lev .l1 { display: flex; align-items: baseline; gap: 5px; }
+.lev .nm { font-size: 10.5px; font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lev .sym { font-size: 9.5px; font-weight: 800; color: var(--lab); font-style: italic; }
+.lev .vv { font-size: 11.5px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.lev .vv.moved { color: var(--lab); }
+.lev input[type="range"] { width: 100%; height: 13px; margin: 0; accent-color: var(--lab); cursor: pointer; }
+.lev .src { font-size: 8.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* --- preset chips (v16 §B.3) --- */
+.presets { display: flex; flex-wrap: wrap; gap: var(--sp-0); }
+.ps { font-size: 9.5px; font-weight: 700; padding: 3px 6px; border-radius: 5px; border: 1px solid var(--grid); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.ps:hover { border-color: var(--lab); color: var(--lab); }
+.ps.on { background: var(--lab); color: #fff; border-color: var(--lab); }
+.horiz { display: flex; flex-wrap: wrap; gap: var(--sp-0); }
+.hb { font-size: 9.5px; font-weight: 700; padding: 3px 6px; border-radius: 5px; border: 1px solid var(--grid); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.hb.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* --- stamp badges (v16 §B.4) --- */
+.badge-fwd { background: var(--chip); color: var(--accent); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: var(--rad-pill); white-space: nowrap; }
+.badge-fwd.lab { background: var(--chip-lab); color: var(--lab); }
+
+/* --- semaphore (v16 §B.5, tokens from spec §5) --- */
+.rl-item { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 5px; border: 1px solid var(--grid); border-radius: var(--rad-chip); padding: 4px 7px; font-size: 10.5px; margin-bottom: var(--sp-0); }
+.rl-item .ic { font-size: 12px; }
+.rl-item .t b { white-space: nowrap; }
+.rl-item .st { font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: var(--rad-pill); white-space: nowrap; }
+.st.cross { background: var(--st-crossed-bg); color: var(--st-crossed-fg); }
+.st.near { background: var(--st-near-bg); color: var(--st-near); }
+.st.safe { background: var(--st-safe-bg); color: var(--st-safe); }
+.st.sd { background: var(--code); color: var(--muted); }
+.rl-item .x { font-size: 9px; color: var(--muted); grid-column: 2 / 4; }
+
+/* --- transmission chain (v16 §B.6) --- */
+.chain { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+.ch { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink-2); flex-wrap: wrap; }
+.ch .a { font-weight: 700; color: var(--ink); background: var(--code); border-radius: 5px; padding: 2px 6px; white-space: nowrap; }
+.ch .u { font-size: 8.5px; font-weight: 800; color: var(--accent); background: var(--chip); border-radius: var(--rad-pill); padding: 1px 6px; white-space: nowrap; }
+.ch .arr { color: var(--baseline); }
+.ch .d { font-weight: 800; white-space: nowrap; }
+.ch .d.up { color: var(--div-neg); }
+.ch .d.dn { color: var(--good); }
+.ch .d.flat { color: var(--muted); }
+
+/* --- narrative block (v16 §B.8) --- */
+.narr { border-left: 3px solid var(--accent); border-radius: 0 7px 7px 0; padding: 6px 10px; background: var(--card); margin-top: 5px; }
+.narr .h { font-size: 10px; font-weight: 800; color: var(--accent); }
+.narr .x { font-size: 10.5px; color: var(--ink-2); line-height: 1.4; }
+.narr .cite { font-size: 9px; color: var(--muted); margin-top: 3px; }
+
+/* --- chart legend (v16 §B.9) --- */
+.legend { font-size: 9px; color: var(--ink-2); display: flex; gap: 10px; flex-wrap: wrap; margin: 1px 0 2px; }
+.legend i { display: inline-block; width: 9px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+.legend s { display: inline-block; width: 9px; height: 0; border-top: 2px dashed var(--baseline); vertical-align: middle; margin-right: 4px; text-decoration: none; }
+
+/* --- persona head (v16 §B.10) --- */
+.head { display: flex; align-items: baseline; gap: var(--sp-1); flex-wrap: wrap; }
+.head h1 { margin: 0; font-size: 17px; font-weight: 800; }
+.head .meta { margin-left: auto; font-size: 9px; color: var(--muted); }
+
+/* --- banners (spec §8) --- */
+.banner { border: 1px solid var(--warn); background: var(--chip-warn); color: var(--warn); border-radius: var(--rad-chip); padding: var(--sp-0) var(--sp-1); font-size: 11px; font-weight: 700; }
+.banner.err { border-color: var(--div-neg); background: transparent; color: var(--div-neg); }
+.blocking { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--page); }
+.blocking .card { max-width: 560px; }

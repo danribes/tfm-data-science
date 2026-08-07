@@ -1,0 +1,67 @@
+:root {
+  /* --- light palette (v16 §A.1 + spec §5 paper/ink overrides) --- */
+  --page: #f7f5f0;          /* spec §5 "paper" (v16 was #eeeee9) */
+  --surface: #fcfcfb;
+  --card: #f9f9f7;
+  --ink: #1a1a1a;           /* spec §5 (v16 was #0b0b0b) */
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --ring: rgba(11, 11, 11, 0.10);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --band-out: #cde2fb; --band-in: #9ec5f4;
+  --div-neg: #e34948; --good: #006300;
+  --accent: #2a78d6;        /* spec §5 "signature blue" */
+  --chip: #eef3fa; --code: #f2f1ed;
+  --retro: #7a5ea8; --chip-retro: #f1ecf9;
+  --warn: #a86a00; --chip-warn: #fdf3e2;
+  --lab: #b0399a; --chip-lab: #fbecf7;
+
+  /* --- semantic semaphore tokens (spec §5) --- */
+  --st-crossed: var(--div-neg);
+  --st-crossed-bg: var(--div-neg);
+  --st-crossed-fg: #ffffff;
+  --st-near: var(--warn);
+  --st-near-bg: var(--chip-warn);
+  --st-safe: var(--good);
+  --st-safe-bg: var(--chip);
+
+  /* --- 8-pt spacing scale (spec §5, replaces v16 ad-hoc) --- */
+  --sp-0: 4px; --sp-1: 8px; --sp-2: 16px; --sp-3: 24px; --sp-4: 32px;
+
+  /* --- radii / shadow (v16 §A.4) --- */
+  --rad-card: 8px; --rad-chip: 6px; --rad-pill: 999px;
+  --shadow-app: 0 2px 6px var(--ring), 0 18px 44px -22px var(--ring);
+
+  /* --- motion (spec §5; v16's single transition was .18s) --- */
+  --dur: 180ms;
+  --rail-w: 300px;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --page: #060606;
+  --surface: #1a1a19;
+  --card: #141413;
+  --ink: #f4f4f1;
+  --ink-2: #b9b8b2;
+  --muted: #898781;
+  --grid: #2a2a28;
+  --baseline: #383835;
+  --ring: rgba(255, 255, 255, 0.10);
+  --s1: #6ba3e8; --s2: #f2895c; --s3: #3fc796;
+  --band-out: #1d3352; --band-in: #244d7d;
+  --div-neg: #f0706f; --good: #5fc25f;
+  --accent: #6ba3e8;
+  --chip: #16283d; --code: #232322;
+  --retro: #a98cd8; --chip-retro: #2a2140;
+  --warn: #d9a441; --chip-warn: #3a2c12;
+  --lab: #e07ac8; --chip-lab: #38182f;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
