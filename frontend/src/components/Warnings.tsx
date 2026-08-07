@@ -1,4 +1,5 @@
 import { useHealth } from "../api/hooks";
+import { nf } from "../lib/fmt";
 import { STALE_LIMIT_DAYS, staleDays, useAppHealth } from "../state/appHealth";
 
 export function Warnings({ now }: { now?: Date }) {
@@ -16,7 +17,7 @@ export function Warnings({ now }: { now?: Date }) {
       )}
       {health && days > STALE_LIMIT_DAYS && (
         <div className="banner" role="status">
-          El vintage {health.vintage} tiene {days} días — los datos observados pueden estar desactualizados.
+          El vintage {health.vintage} tiene {nf(days, 0)} días — los datos observados pueden estar desactualizados.
         </div>
       )}
       {extraWarnings.map((w) => (
