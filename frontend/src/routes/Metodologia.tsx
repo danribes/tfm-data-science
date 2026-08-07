@@ -27,10 +27,10 @@ export default function Metodologia() {
         <h4>Vintage <small>congelado — la app nunca mezcla fechas</small></h4>
         <p style={{ fontSize: 12 }}>
           Datos congelados el <b>{health.data?.vintage ?? "…"}</b>
-          {vintage.data ? <> ({vintage.data.n_files} ficheros fuente)</> : null}.
+          {vintage.data ? <> ({nf(vintage.data.n_files, 0)} ficheros fuente)</> : null}.
           {days !== null && (days > STALE_LIMIT_DAYS
-            ? ` Aviso: el vintage tiene ${days} días — los datos observados pueden estar desactualizados.`
-            : ` Antigüedad actual: ${days} días (umbral de aviso: ${STALE_LIMIT_DAYS}).`)}
+            ? ` Aviso: el vintage tiene ${nf(days, 0)} días — los datos observados pueden estar desactualizados.`
+            : ` Antigüedad actual: ${nf(days, 0)} días (umbral de aviso: ${nf(STALE_LIMIT_DAYS, 0)}).`)}
         </p>
       </div>
 

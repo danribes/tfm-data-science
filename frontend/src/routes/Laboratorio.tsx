@@ -45,7 +45,10 @@ export default function Laboratorio() {
       <div className="row2">
         <div className="card">
           <h4>Abanico Monte Carlo · deuda/PIB hasta 2070
-            <small>{mc.data ? `${mc.data.n_paths} trayectorias · semilla ${mc.data.seed}` : "4000 trayectorias · semilla 42"}</small>
+            {/* n_paths is a count → es-ES formatting. The seed is an opaque
+                identifier, not a quantity, so it stays unformatted for the same
+                reason years do (nf would render 4000 as "4.000"). */}
+            <small>{mc.data ? `${nf(mc.data.n_paths, 0)} trayectorias · semilla ${mc.data.seed}` : `${nf(4000, 0)} trayectorias · semilla 42`}</small>
           </h4>
           {mc.isError && <div className="banner err">Monte Carlo no disponible — el resto de la app sigue funcionando.</div>}
           {mc.isPending && !mc.data && <p style={{ fontSize: 12 }}>Calculando abanico…</p>}
