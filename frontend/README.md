@@ -80,9 +80,11 @@ aceptación en el lado TS es la envolvente dorada ±2 pp.
   el payload de la API; la tile muestra la línea de delta calculado en su
   lugar.
 - **Gráfico histórico del perfil reutiliza `ProjectionChart`** (serie
-  observada única) en vez de un componente retro dedicado (línea `--retro`
-  morada, eje X de fechas). Diferencia solo visual — leyenda y color de
-  línea. Pendiente de un pase de pulido rápido.
+  observada única) en vez de un componente retro dedicado con línea `--retro`
+  morada. El eje X y el tooltip **sí** imprimen el periodo real
+  (`2021-07`, `2020-Q2`) vía la prop `labels`; lo que queda es cosmético —
+  la leyenda dice «escenario / base» para una serie observada, y el color de
+  línea no es el morado retro. Pendiente de un pase de pulido rápido.
 - **Tarjeta de atribución por palanca no implementada** — v16 la recalculaba
   por palanca; fuera del alcance de la especificación fase 2 (§10). El
   semáforo + cadena + narrativa del perfil cubren el mismo argumento.
