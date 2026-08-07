@@ -2,13 +2,15 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 
+const dirname = import.meta.dirname;
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@fixtures": path.resolve(__dirname, "../tests/fixtures"),
-      "@": path.resolve(__dirname, "src"),
+      "@fixtures": path.resolve(dirname, "../tests/fixtures"),
+      "@": path.resolve(dirname, "src"),
     },
   },
-  server: { fs: { allow: [path.resolve(__dirname, ".."), __dirname] } },
+  server: { fs: { allow: [path.resolve(dirname, ".."), dirname] } },
 });
