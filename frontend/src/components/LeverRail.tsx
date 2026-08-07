@@ -7,8 +7,11 @@ import { PresetBar } from "./PresetBar";
 
 const THROTTLE_MS = 60;
 
-/** Leading-edge throttle per lever id, keyed so two levers moved in the same
- *  window never clobber each other's pending value.
+/** Throttle with BOTH edges, per lever id, keyed so two levers moved in the
+ *  same window never clobber each other's pending value. The trailing flush
+ *  is load-bearing: a leading-only throttle would drop the last change of a
+ *  drag whenever it landed inside the window, leaving the slider showing one
+ *  value while the engine computed another.
  *
  *  Why: `startUrlSync` (Task 7) subscribes to the whole store with no
  *  selector and no debounce, so every `setLever` call fires a synchronous
