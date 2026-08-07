@@ -41,15 +41,11 @@ export interface RedLineDef {
   source: string;
 }
 
-export interface RedLineResult {
-  id: string;
-  label: string;
-  series: string;
+/** Extends RedLineDef so any field added to the API's /redlines shape
+ * propagates here automatically instead of silently going missing. */
+export interface RedLineResult extends RedLineDef {
   value: number;
-  threshold: number;
-  cmp: string;
   status: RedLineStatus;
-  source: string;
 }
 
 /** Global red lines (mirrors engine/redlines.py::evaluate_redlines). */
@@ -57,14 +53,9 @@ export function evaluateRedlines(defs: RedLineDef[], scn: Scenario, k: number): 
   return defs.map((rl) => {
     const value = seriesOf(scn, rl.series as AnySeriesKey)[k];
     return {
-      id: rl.id,
-      label: rl.label,
-      series: rl.series,
+      ...rl,
       value,
-      threshold: rl.threshold,
-      cmp: rl.cmp,
       status: statusOf(value, rl.threshold, rl.cmp as "gt" | "lt"),
-      source: rl.source,
     };
   });
 }
