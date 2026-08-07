@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { usePersonas, useRedlines, useVintage } from "../api/hooks";
-import { baseline } from "../engine/spain";
+import { Y1, baseline } from "../engine/spain";
 import { evaluateRedlines } from "../engine/redlines";
 import { allAtBase } from "../engine/levers";
 import { nf, sg } from "../lib/fmt";
@@ -11,7 +11,7 @@ import { kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 import { SHIPPED_IDS } from "../personas/registry";
 
 const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean }[] = [
-  { k: "b", lab: "Deuda 2050", at2050: true },
+  { k: "b", lab: "Deuda", at2050: true },
   { k: "saldo", lab: "Saldo público" },
   { k: "u", lab: "Paro" },
   { k: "pi", lab: "IPCA" },
@@ -34,7 +34,7 @@ export default function Inicio() {
         <h1>España en escenarios</h1>
         <Stamp fresh={fresh} year={horizon} />
         {vintage.isSuccess ? (
-          <span className="meta">vintage {vintage.data.vintage} · {vintage.data.n_files} fuentes congeladas</span>
+          <span className="meta">vintage {vintage.data.vintage} · {nf(vintage.data.n_files, 0)} fuentes congeladas</span>
         ) : vintage.isError ? (
           <span className="meta">cobertura no disponible</span>
         ) : null}
@@ -48,7 +48,11 @@ export default function Inicio() {
           const cls = Math.abs(delta) <= 1e-9 ? "" : (delta > 0) === UP_IS_BAD.has(key) ? "bad" : "good";
           return (
             <div className="out" key={key}>
-              <div className="o-label">{lab}</div>
+              {/* every tile states its own year: the debt tile is pinned to the
+                  end of the projection, the rest read at the selected horizon.
+                  Without this a reader sees two different "deuda" magnitudes on
+                  one screen (tile vs semáforo) with no obvious explanation. */}
+              <div className="o-label">{lab} <small>{at2050 ? Y1 : horizon}</small></div>
               <div className="o-val">{nf(scn[key][i], f.dec)} <small>{f.unit}</small></div>
               <div className={`o-delta ${cls}`}>{sg(delta, f.dec)} vs base</div>
             </div>
