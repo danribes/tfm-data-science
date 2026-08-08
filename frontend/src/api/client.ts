@@ -1,5 +1,6 @@
 import type {
-  ConstantsResponse, HealthResponse, MonteCarloRequest, MonteCarloResponse,
+  ConstantsResponse, ExplainRequest, ExplainResponse, HealthResponse,
+  MonteCarloRequest, MonteCarloResponse,
   PersonasResponse, PresetsResponse, RedLinesResponse, ScenarioRequest,
   ScenarioResponse, VintageResponse,
 } from "./types";
@@ -40,4 +41,6 @@ export const api = {
     request<ScenarioResponse>("/scenario", { method: "POST", body: JSON.stringify(body), signal }),
   montecarlo: (body: MonteCarloRequest, signal?: AbortSignal) =>
     request<MonteCarloResponse>("/scenario/montecarlo", { method: "POST", body: JSON.stringify(body), signal }),
+  explain: (body: ExplainRequest, signal?: AbortSignal) =>
+    request<ExplainResponse>("/explain", { method: "POST", body: JSON.stringify(body), signal }),
 };

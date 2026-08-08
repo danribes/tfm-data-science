@@ -5,6 +5,7 @@ import { ALL_SERIES_KEYS, seriesOf, type AnySeriesKey } from "../engine/derived"
 import { LEVER_SPECS } from "../engine/levers";
 import { BASE_LEVERS } from "../engine/vintage";
 import { nf } from "../lib/fmt";
+import { Caption } from "../components/Caption";
 import { FanChart } from "../components/FanChart";
 import { ProjectionChart } from "../components/ProjectionChart";
 import { SERIES_FORMAT } from "../components/KpiRow";
@@ -40,6 +41,11 @@ export default function Laboratorio() {
         </select>
         <ProjectionChart years={YEARS} baseline={seriesOf(base, seriesKey)}
           scenario={seriesOf(scn, seriesKey)} redLines={bound} unit={f.unit} dec={f.dec} />
+        <Caption>
+          La línea continua es tu escenario; la punteada es la base congelada del
+          vintage. La distancia entre ambas es lo único que has causado tú — todo
+          lo demás ya estaba en los datos.
+        </Caption>
       </div>
 
       <div className="row2">
@@ -53,6 +59,12 @@ export default function Laboratorio() {
           {mc.isError && <div className="banner err">Monte Carlo no disponible — el resto de la app sigue funcionando.</div>}
           {mc.isPending && !mc.data && <p style={{ fontSize: 12 }}>Calculando abanico…</p>}
           {mc.data && <FanChart years={mc.data.years} percentiles={mc.data.percentiles} />}
+          <Caption>
+            Lo que informa aquí es la anchura de la banda, no la mediana. Si las
+            bandas se abren en abanico, el resultado central importa poco: el
+            modelo está diciendo que no puede distinguir entre desenlaces muy
+            distintos. Un acreedor mira este ancho, no la línea del medio.
+          </Caption>
           <p className="src" style={{ whiteSpace: "normal" }}>
             El abanico se calcula en el servidor (Python). Validación: envolvente dorada
             gold_escenarios_deuda_mc.csv con tolerancia ±2 pp en 2030/2050/2070 — los pines de

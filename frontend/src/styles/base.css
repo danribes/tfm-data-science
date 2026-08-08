@@ -131,3 +131,58 @@ code { font: 0.75em ui-monospace, Consolas, monospace; background: var(--code); 
 .banner.err { border-color: var(--div-neg); background: transparent; color: var(--div-neg); }
 .blocking { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--page); }
 .blocking .card { max-width: 560px; }
+
+/* --- explanation layer (spec §10) --- */
+.withexp { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.explainer { border: 1px solid var(--grid); border-radius: var(--rad-card); background: var(--card); padding: var(--sp-1) var(--sp-2) var(--sp-2); }
+.explainer-h { font-size: 11px; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.explainer-busy { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: .45; animation: exp-pulse 1s ease-in-out infinite; }
+@keyframes exp-pulse { 0%,100% { opacity: .18 } 50% { opacity: .7 } }
+.explainer-loading { font-size: 11px; color: var(--muted); margin: 0; }
+.explainer-resumen { font-size: 12.5px; line-height: 1.55; color: var(--ink); margin: 0 0 var(--sp-1); }
+.explainer-warn { font-size: 10.5px; line-height: 1.45; color: var(--ink-2); margin: var(--sp-1) 0 0; }
+.explainer-prov { font-size: 9px; color: var(--muted); margin: 6px 0 0; }
+.explainer-prov code { font-size: 9px; }
+
+.mech-toggle { background: none; border: 0; padding: 0; margin-top: var(--sp-1); font-size: 10.5px; font-weight: 700; color: var(--accent); cursor: pointer; font-family: inherit; }
+.mech-toggle:hover { text-decoration: underline; }
+.mech-body { font-size: 10px; line-height: 1.5; color: var(--ink-2); background: var(--surface); border-radius: var(--rad-chip); padding: var(--sp-1); margin: 5px 0 0; white-space: pre-wrap; font-family: inherit; overflow-x: auto; }
+
+/* --- contribution decomposition --- */
+.contrib { margin-top: var(--sp-1); }
+.contrib-head { font-size: 10px; font-weight: 800; color: var(--ink-2); display: flex; gap: 8px; align-items: baseline; }
+.contrib-total { margin-left: auto; color: var(--muted); font-weight: 700; }
+.contrib-rows { list-style: none; margin: 5px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.cr { display: grid; grid-template-columns: minmax(90px, 40%) 1fr 52px; gap: 7px; align-items: center; font-size: 10px; }
+.cr-label { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cr-track { background: var(--surface); border-radius: 3px; height: 9px; overflow: hidden; }
+.cr-bar { display: block; height: 100%; border-radius: 3px; transition: width var(--dur) ease; }
+.cr-bar.up { background: var(--div-neg); }
+.cr-bar.down { background: var(--good); }
+.cr-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; }
+.cr.resid .cr-label { font-style: italic; color: var(--muted); }
+.cr.resid .cr-bar { opacity: .5; }
+.contrib-note { font-size: 9px; line-height: 1.45; color: var(--muted); margin: 6px 0 0; }
+.contrib-note.dim { opacity: .8; }
+
+/* --- inline chart captions --- */
+.caption { font-size: 9.5px; line-height: 1.45; color: var(--muted); margin: 3px 0 0; }
+
+/* --- guided tour --- */
+.guide { display: flex; flex-direction: column; gap: var(--sp-2); }
+.guide-s h2 { font-size: 13px; font-weight: 800; margin: 0 0 var(--sp-1); color: var(--ink); }
+.guide-s p { font-size: 11.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 var(--sp-1); }
+.guide-s p:last-child { margin-bottom: 0; }
+.guide-s code { font-size: 10.5px; background: var(--code); border-radius: 3px; padding: 0 3px; }
+.guide-eq { font-size: 15px !important; font-weight: 700; text-align: center; color: var(--ink) !important; background: var(--surface); border-radius: var(--rad-chip); padding: var(--sp-1); font-variant-numeric: tabular-nums; }
+.tscroll { overflow-x: auto; }
+.guide-t { width: 100%; border-collapse: collapse; font-size: 10px; }
+.guide-t th { text-align: left; font-weight: 800; color: var(--muted); border-bottom: 1px solid var(--grid); padding: 4px 8px 4px 0; white-space: nowrap; }
+.guide-t td { padding: 4px 8px 4px 0; border-bottom: 1px solid var(--grid); color: var(--ink-2); vertical-align: top; }
+.guide-t td.sym { font-weight: 700; color: var(--accent); }
+.guide-t td.dim, .guide-rl .dim { color: var(--muted); }
+.guide-chain, .guide-no, .guide-rl { margin: 0 0 var(--sp-1); padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+.guide-chain li, .guide-no li, .guide-rl li { font-size: 11.5px; line-height: 1.55; color: var(--ink-2); }
+.guide-rl { list-style: none; padding-left: 0; }
+.guide-rl li { font-size: 10.5px; }

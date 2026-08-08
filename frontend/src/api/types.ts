@@ -60,6 +60,29 @@ export interface ScenarioResponse extends ApiMeta {
   redlines: RedLineStatusOut[];
 }
 
+export interface ExplainRequest {
+  levers?: Partial<Levers>;
+  horizon?: number;
+  headline?: string;
+  /** false forces the deterministic path (offline build, smoke test). */
+  narrate?: boolean;
+}
+export interface ContributionOut { lever_id: string; lever_name: string; delta: number; share: number }
+export interface ExplainResponse extends ApiMeta {
+  resumen: string;
+  mecanismo: string;
+  advertencia: string;
+  /** "llm" or "deterministic" — shown to the reader, never hidden. */
+  source: string;
+  model: string | null;
+  fallback_reason: string | null;
+  contributions: ContributionOut[];
+  interaction: number;
+  joint_delta: number;
+  headline_key: string;
+  headline_year: number;
+}
+
 export interface MonteCarloRequest { levers?: Partial<Levers>; seed?: number; n_paths?: number; horizon?: number }
 export type PercentileKey = "p5" | "p25" | "p50" | "p75" | "p95";
 export interface MonteCarloResponse extends ApiMeta {

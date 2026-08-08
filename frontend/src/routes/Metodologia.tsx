@@ -96,6 +96,49 @@ export default function Metodologia() {
       </div>
 
       <div className="card">
+        <h4>Cómo se generan las explicaciones <small>quién escribe qué</small></h4>
+        <p style={{ fontSize: 12 }}>
+          El panel «Qué está pasando» separa deliberadamente dos cosas: <b>los
+          números</b> y <b>las palabras</b>.
+        </p>
+        <ul style={{ fontSize: 12, margin: 0, paddingLeft: 18 }}>
+          <li>
+            <b>Los números los calcula el motor.</b> El endpoint <code>/explain</code>{" "}
+            vuelve a correr <code>engine/spain.py</code> — el mismo motor que fija
+            el fixture de anclas — y produce un bloque de hechos: qué palancas se
+            han movido, qué series cambian, qué líneas rojas cambian de estado y
+            cuánto aporta cada palanca por separado.
+          </li>
+          <li>
+            <b>La descomposición no es una estimación.</b> Para atribuir el
+            movimiento se vuelve a correr el motor con una sola palanca movida
+            cada vez. Como el motor no es lineal, esas corridas individuales no
+            suman el efecto conjunto: la diferencia se publica como término de
+            interacción en vez de repartirse entre las palancas.
+          </li>
+          <li>
+            <b>Las palabras las puede escribir un modelo de lenguaje.</b> Los
+            hechos se le pasan ya calculados con una instrucción explícita: no
+            calcular, no estimar y no citar ninguna cifra que no esté en el
+            bloque. El panel indica en cada caso si el texto lo ha redactado el
+            modelo o las plantillas deterministas.
+          </li>
+          <li>
+            <b>Si el modelo no está disponible, el texto no desaparece.</b> Hay
+            una capa de plantillas deterministas sobre los mismos hechos, que es
+            además lo que verifica la suite de tests. La aplicación nunca depende
+            de una llamada de red para poder explicarse.
+          </li>
+        </ul>
+        <p style={{ fontSize: 12 }}>
+          Consecuencia para quien revise este trabajo: cualquier cifra que
+          aparezca en un texto explicativo es trazable al motor y reproducible
+          desactivando la narración (<code>narrate: false</code>). La redacción
+          puede variar entre ejecuciones; los números no.
+        </p>
+      </div>
+
+      <div className="card">
         <h4>Huecos conocidos <small>lo que falta se declara, no se rellena</small></h4>
         <ul style={{ fontSize: 12, margin: 0, paddingLeft: 18 }}>
           {KNOWN_GAPS.map((g) => <li key={g}>{g}</li>)}

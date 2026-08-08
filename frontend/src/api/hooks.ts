@@ -37,3 +37,22 @@ export function useMonteCarlo(levers: Levers, enabled: boolean) {
     placeholderData: keepPreviousData,
   });
 }
+
+/** Narrated explanation of the current scenario.
+ *
+ *  Debounced at 400 ms like the Monte Carlo fan, for the same reason and one
+ *  more: dragging a slider must not fire one billed LLM call per pixel. The
+ *  query key is the lever vector, so React Query serves a repeat of any
+ *  scenario the user has already seen from cache with no request at all. */
+export function useExplain(levers: Levers, horizon: number, enabled = true) {
+  const debouncedLevers = useDebounced(levers, 400);
+  const debouncedHorizon = useDebounced(horizon, 400);
+  return useQuery({
+    queryKey: ["explain", debouncedLevers, debouncedHorizon],
+    queryFn: ({ signal }) =>
+      api.explain({ levers: debouncedLevers, horizon: debouncedHorizon }, signal),
+    enabled,
+    staleTime: Infinity,
+    placeholderData: keepPreviousData,
+  });
+}

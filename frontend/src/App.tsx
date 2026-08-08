@@ -1,18 +1,30 @@
 import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import { BrowserRouter, NavLink, Outlet, Route, Routes } from "react-router-dom";
 import { queryClient, useHealth, usePersonas } from "./api/hooks";
 import { crossCheckEngine } from "./state/appHealth";
 import { useScenarioStore } from "./state/scenarioStore";
 import { ApiDownScreen } from "./components/ApiDownScreen";
+import { Explainer } from "./components/Explainer";
 import { LeverRail } from "./components/LeverRail";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Warnings } from "./components/Warnings";
 import { SHIPPED_IDS } from "./personas/registry";
+import ComoFunciona from "./routes/ComoFunciona";
 import Inicio from "./routes/Inicio";
 import Laboratorio from "./routes/Laboratorio";
 import Metodologia from "./routes/Metodologia";
 import Persona from "./routes/Persona";
+
+/** Layout for the scenario routes: the page, then the explanation of it. */
+function WithExplainer() {
+  return (
+    <div className="withexp">
+      <Outlet />
+      <Explainer />
+    </div>
+  );
+}
 
 function Shell() {
   const health = useHealth();
@@ -36,6 +48,7 @@ function Shell() {
             <NavLink key={c.id} to={`/persona/${c.id}`}>{c.pill}</NavLink>
           ))}
           <NavLink to="/laboratorio">Laboratorio</NavLink>
+          <NavLink to="/como-funciona">Cómo funciona</NavLink>
           <NavLink to="/metodologia">Datos y método</NavLink>
         </nav>
         <span style={{ marginLeft: "auto" }} className="badge-fwd">vintage {health.data.vintage}</span>
@@ -46,9 +59,15 @@ function Shell() {
         <main className="main">
           <Warnings />
           <Routes>
-            <Route path="/" element={<Inicio />} />
-            <Route path="/persona/:id" element={<Persona />} />
-            <Route path="/laboratorio" element={<Laboratorio />} />
+            {/* Scenario routes carry the live explainer; the two reference
+                pages don't — there is no scenario on them to explain, and a
+                panel narrating levers the reader can't see would be noise. */}
+            <Route element={<WithExplainer />}>
+              <Route path="/" element={<Inicio />} />
+              <Route path="/persona/:id" element={<Persona />} />
+              <Route path="/laboratorio" element={<Laboratorio />} />
+            </Route>
+            <Route path="/como-funciona" element={<ComoFunciona />} />
             <Route path="/metodologia" element={<Metodologia />} />
           </Routes>
         </main>

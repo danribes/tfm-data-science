@@ -3,6 +3,7 @@ import { usePersonas, useRedlines, useVintage } from "../api/hooks";
 import { Y1, baseline } from "../engine/spain";
 import { evaluateRedlines } from "../engine/redlines";
 import { nf, sg } from "../lib/fmt";
+import { Caption } from "../components/Caption";
 import { Semaphore } from "../components/Semaphore";
 import { Stamp } from "../components/Stamp";
 import { SERIES_FORMAT, UP_IS_BAD } from "../components/KpiRow";
@@ -73,6 +74,13 @@ export default function Inicio() {
         ) : redlines.isError ? (
           <div className="banner err">Líneas rojas no disponibles</div>
         ) : null}
+        <Caption>
+          Cada umbral está anclado a un episodio que ocurrió de verdad, no a una
+          intuición: por eso lleva su fuente al lado. El estado se calcula desde
+          el escenario en el año seleccionado — «cerca» es el 10 % del umbral.
+          Que una línea aparezca cruzada en la línea base significa que España ya
+          está por encima de ese umbral hoy, no que este escenario la haya roto.
+        </Caption>
       </div>
 
       <div className="row2">

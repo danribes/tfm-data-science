@@ -7,8 +7,9 @@ from dataclasses import asdict
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.schemas import (ConstantsResponse, ConstantOut, CountriesResponse,
-                          CountryOut, DebtPointOut, FiscalSpaceOut,
+from api.schemas import (ConstantsResponse, ConstantOut, ContributionOut,
+                          CountriesResponse, CountryOut, DebtPointOut,
+                          ExplainRequest, ExplainResponse, FiscalSpaceOut,
                           GenericScenarioRequest, GenericScenarioResponse,
                           HealthResponse, IndicatorOut, MonteCarloRequest,
                           MonteCarloResponse, PanelResponse, PersonaCard,
@@ -16,6 +17,9 @@ from api.schemas import (ConstantsResponse, ConstantOut, CountriesResponse,
                           PresetOut, PresetsResponse, RedLineOut, RedLinesResponse,
                           RedLineStatusOut, ScenarioRequest, ScenarioResponse,
                           VintageFileOut, VintageResponse)
+from explain.facts import build_facts
+from explain.fallback import fallback_narration
+from explain.narrate import NarrationUnavailable, narrate
 from data.live import country_list, panel_builder
 from engine import generic
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
@@ -23,7 +27,8 @@ from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE
 from engine.levers import PRESETS, Levers
 from engine.montecarlo import run_montecarlo
 from engine.redlines import RED_LINES, evaluate_redlines
-from engine.spain import PERSONAS, Y0, Y1, baseline, persona_dependents, run_scenario
+from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
+                           persona_dependents, run_scenario)
 
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
@@ -148,4 +153,41 @@ def scenario_generic(iso3: str, req: GenericScenarioRequest) -> GenericScenarioR
         inflation_path_pct=result.inflation_path_pct,
         nominal_wage_growth_path_pct=result.nominal_wage_growth_path_pct,
         fiscal_space_by_year=[FiscalSpaceOut(**asdict(fs)) for fs in result.fiscal_space_by_year],
+    )
+
+
+@app.post("/explain", response_model=ExplainResponse)
+def explain(req: ExplainRequest) -> ExplainResponse:
+    """Narrate a scenario. Facts come from the engine; only prose comes from the LLM.
+
+    The narration never blocks the response: if Claude is unreachable, the
+    deterministic templates answer instead and `source` says so.
+    """
+    levers = Levers(**req.levers.model_dump())
+    if req.headline not in SERIES_KEYS:
+        raise HTTPException(status_code=422,
+                            detail=f"unknown series: {req.headline!r}")
+    facts = build_facts(levers, req.horizon, headline=req.headline)
+
+    source, model, reason = "deterministic", None, None
+    blocks = fallback_narration(facts)
+    if req.narrate:
+        try:
+            result = narrate(facts)
+            blocks = {"resumen": result.resumen, "mecanismo": result.mecanismo,
+                      "advertencia": result.advertencia}
+            source, model = "llm", result.model
+        except NarrationUnavailable as exc:
+            reason = str(exc)
+
+    return ExplainResponse(
+        **blocks,
+        source=source,
+        model=model,
+        fallback_reason=reason,
+        contributions=[ContributionOut(**asdict(ct)) for ct in facts.contributions],
+        interaction=facts.interaction,
+        joint_delta=facts.joint_delta,
+        headline_key=facts.headline_key,
+        headline_year=facts.headline_year,
     )

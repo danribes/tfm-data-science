@@ -235,3 +235,38 @@ class GenericScenarioResponse(ApiMeta):
     inflation_path_pct: list[float]
     nominal_wage_growth_path_pct: list[float]
     fiscal_space_by_year: list[FiscalSpaceOut]
+
+
+# ---- /explain (spec §10): engine-computed facts, LLM-narrated prose ----
+
+class ExplainRequest(BaseModel):
+    levers: LeverValues = Field(default_factory=LeverValues)
+    horizon: int = Field(2026, ge=2026, le=2050)
+    headline: str = Field("b", description="Serie que encabeza la explicación")
+    #: False forces the deterministic path — used by the offline mock build and
+    #: the smoke test, which must never depend on a network call.
+    narrate: bool = True
+
+
+class ContributionOut(BaseModel):
+    lever_id: str
+    lever_name: str
+    delta: float
+    share: float
+
+
+class ExplainResponse(ApiMeta):
+    resumen: str
+    mecanismo: str
+    advertencia: str
+    #: "llm" when Claude wrote it, "deterministic" when the templates did. The
+    #: UI shows this: a reader is entitled to know which produced the text.
+    source: str
+    model: str | None = None
+    #: Populated only when source == "deterministic" and a narration was tried.
+    fallback_reason: str | None = None
+    contributions: list[ContributionOut]
+    interaction: float
+    joint_delta: float
+    headline_key: str
+    headline_year: int

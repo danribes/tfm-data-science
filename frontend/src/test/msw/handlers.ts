@@ -1,9 +1,11 @@
 import { http, HttpResponse } from "msw";
 import { BASE_LEVERS } from "../../engine/vintage";
+import { LEVER_SPECS } from "../../engine/levers";
+import type { SeriesKey } from "../../engine/spain";
 import { SERIES_KEYS, YEARS, baseline, runScenario } from "../../engine/spain";
 import { evaluateRedlines } from "../../engine/redlines";
 import { CONSTANTS_META } from "../../engine/constants";
-import type { MonteCarloRequest, ScenarioRequest } from "../../api/types";
+import type { ExplainRequest, MonteCarloRequest, ScenarioRequest } from "../../api/types";
 import {
   MOCK_VINTAGE,
   mockKpis,
@@ -84,6 +86,58 @@ export const handlers = [
       percentiles: mockPercentiles(years),
       n_paths: body.n_paths ?? 4000,
       seed: body.seed ?? 42,
+    });
+  }),
+
+  // The explanation, offline. The decomposition runs the real TS engine one
+  // lever at a time — same method as the Python `explain.facts.decompose` — so
+  // the mocked numbers are the engine's, not canned. Only the prose is a
+  // shortened stand-in for the server's deterministic templates.
+  http.post(`${BASE}/explain`, async ({ request }) => {
+    const body = (await request.json()) as ExplainRequest;
+    const levers = { ...BASE_LEVERS, ...(body.levers ?? {}) };
+    const key = (body.headline ?? "b") as SeriesKey;
+    const last = YEARS.length - 1;
+
+    const bas = baseline();
+    const scn = runScenario(levers);
+    const jointDelta = scn[key][last] - bas[key][last];
+
+    const moved = LEVER_SPECS.filter(
+      (s) => Math.abs(levers[s.id] - BASE_LEVERS[s.id]) > 1e-9,
+    );
+    const contributions = moved
+      .map((s) => {
+        const solo = runScenario({ ...BASE_LEVERS, [s.id]: levers[s.id] });
+        return { lever_id: s.id, lever_name: s.nm, delta: solo[key][last] - bas[key][last], share: 0 };
+      })
+      .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+    const grossTotal = contributions.reduce((acc, c) => acc + Math.abs(c.delta), 0);
+    for (const c of contributions) c.share = grossTotal > 1e-12 ? Math.abs(c.delta) / grossTotal : 0;
+    const interaction = jointDelta - contributions.reduce((acc, c) => acc + c.delta, 0);
+
+    const resumen = moved.length
+      ? `Has movido ${moved.length} palanca${moved.length > 1 ? "s" : ""}: ` +
+        `${moved.map((s) => s.nm).join("; ")}. La deuda pública queda en ` +
+        `${scn[key][last].toFixed(1)} %PIB en ${YEARS[last]}.`
+      : `Estás viendo la línea base del vintage ${MOCK_VINTAGE}: nada está proyectado todavía.`;
+
+    return HttpResponse.json({
+      ...META,
+      resumen,
+      mecanismo: moved.length
+        ? "Cada palanca se propaga por la identidad de deuda b(t+1) = b(t)·(1+r−g) − sp."
+        : "Sin palancas movidas no hay mecanismo que trazar.",
+      advertencia:
+        "Proyección condicional. No es una previsión ni una recomendación de compra, venta o voto.",
+      source: "deterministic",
+      model: null,
+      fallback_reason: "offline mock",
+      contributions,
+      interaction,
+      joint_delta: jointDelta,
+      headline_key: key,
+      headline_year: YEARS[last],
     });
   }),
 ];
