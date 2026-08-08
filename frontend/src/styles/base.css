@@ -186,3 +186,27 @@ code { font: 0.75em ui-monospace, Consolas, monospace; background: var(--code); 
 .guide-chain li, .guide-no li, .guide-rl li { font-size: 11.5px; line-height: 1.55; color: var(--ink-2); }
 .guide-rl { list-style: none; padding-left: 0; }
 .guide-rl li { font-size: 10.5px; }
+
+/* --- spaghetti + debt-vs-gdp (debt problem block) --- */
+.spag { margin-top: 2px; }
+.dvg-read { font-size: 10.5px; line-height: 1.5; color: var(--ink-2); margin: 4px 0 0; }
+.dvg-read strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.snow { display: flex; flex-direction: column; gap: 5px; margin-top: var(--sp-1); }
+.snow-row { display: grid; grid-template-columns: minmax(120px, 34%) 1fr auto; gap: 8px; align-items: center; font-size: 10px; }
+.snow-lab { color: var(--ink-2); }
+.snow-track { position: relative; background: var(--surface); border-radius: 3px; height: 10px; overflow: visible; }
+.snow-fill { display: block; height: 100%; border-radius: 3px; background: var(--accent); opacity: .55; transition: width var(--dur) ease; }
+.snow-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--st-crossed); }
+.snow-mark::after { content: "7 %"; position: absolute; left: 4px; top: -1px; font-size: 8px; color: var(--st-crossed); white-space: nowrap; }
+.snow-val { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+.snow-val.bad { color: var(--st-crossed); }
+.snow-badge { grid-column: 2 / span 2; font-size: 9.5px; font-weight: 700; border-radius: var(--rad-chip); padding: 1px 7px; justify-self: start; }
+.snow-badge.bad { background: var(--st-crossed-bg); color: var(--st-crossed-fg); }
+.snow-badge.ok { background: var(--st-safe-bg); color: var(--good); }
+
+/* --- macro to micro bridge --- */
+.macromicro-intro { font-size: 11.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 var(--sp-1); }
+.macromicro { margin: 0 0 var(--sp-1); padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.macromicro li { font-size: 11.5px; line-height: 1.55; color: var(--ink-2); }
+.macromicro b { color: var(--ink); }

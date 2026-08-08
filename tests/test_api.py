@@ -113,7 +113,7 @@ def test_montecarlo_endpoint_shape_and_bounds():
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"vintage", "computed_not_advice", "years", "percentiles",
-                         "n_paths", "seed"}
+                         "n_paths", "seed", "paths"}
     assert body["years"][0] == 2026 and body["years"][-1] == 2070
     assert set(body["percentiles"]) == {"p5", "p25", "p50", "p75", "p95"}
     # reproducibility across calls with the same seed

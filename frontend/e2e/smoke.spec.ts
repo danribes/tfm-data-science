@@ -9,7 +9,9 @@ test("smoke: boot → lever → persona → persistence → theme → no console
   await page.goto("/");
   await expect(page.getByText("España en escenarios").first()).toBeVisible();
   await expect(page.getByText(/proyección condicional, no recomendación/i)).toBeVisible();
-  await expect(page.getByText("223,8")).toBeVisible(); // deuda 2050 at base
+  // Scoped to the KPI tile: "223,8" also appears in the debt-vs-GDP reading
+  // line ("la ratio pasa de 106,3 a 223,8 %PIB"), which is a strict-mode match.
+  await expect(page.locator(".o-val").getByText("223,8")).toBeVisible(); // deuda 2050 at base
 
   // persona 01: capture gauge figure and chart path
   // (the name matches both the nav pill and Inicio's card link — either navigates)

@@ -42,8 +42,12 @@ describe("Inicio — headline figures + global semaphore + persona cards", () =>
   it("links to the four shipped personas", async () => {
     ui();
     await waitFor(() => expect(screen.getByText(/💼 Bonista/)).toBeInTheDocument());
-    const links = screen.getAllByRole("link").filter((a) => a.getAttribute("href")?.startsWith("/persona/"));
-    expect(links.map((a) => a.getAttribute("href"))).toEqual([
+    // Scoped to the persona *cards*: the macro-to-micro section also links to
+    // individual personas in prose, and those are not cards.
+    const cards = screen
+      .getAllByRole("link")
+      .filter((a) => a.getAttribute("href")?.startsWith("/persona/") && a.classList.contains("card"));
+    expect(cards.map((a) => a.getAttribute("href"))).toEqual([
       "/persona/01", "/persona/02", "/persona/03", "/persona/06",
     ]);
   });

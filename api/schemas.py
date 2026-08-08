@@ -164,6 +164,8 @@ class MonteCarloRequest(BaseModel):
     seed: int = Field(42, ge=0)
     n_paths: int = Field(4000, ge=100, le=4000)  # spec §6: capped at 4,000
     horizon: int = Field(2070, ge=2030, le=2070)  # spec §6: capped at 2070
+    #: Individual trajectories to return for the spaghetti plot.
+    n_show: int = Field(60, ge=0, le=200)
 
 
 class MonteCarloResponse(ApiMeta):
@@ -171,6 +173,8 @@ class MonteCarloResponse(ApiMeta):
     percentiles: dict[str, list[float]]
     n_paths: int
     seed: int
+    #: Individual trajectories for the spaghetti plot (see McResult.paths).
+    paths: list[list[float]] = Field(default_factory=list)
 
 
 class CountryOut(BaseModel):

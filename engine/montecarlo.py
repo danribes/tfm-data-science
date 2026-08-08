@@ -25,6 +25,20 @@ class McResult:
     percentiles: dict[str, list[float]]
     n_paths: int
     seed: int
+    #: A subsample of individual trajectories, for the spaghetti plot. The
+    #: percentile bands say where the probability mass sits; the individual
+    #: paths say what a single future actually looks like — one drifts up
+    #: monotonically, another improves for a decade and then turns. A reader
+    #: who only ever sees smooth bands tends to read the median as "the
+    #: forecast". Deterministic given the seed: these are the first `n_show`
+    #: paths of the seeded draw, so the same levers always give the same
+    #: spaghetti.
+    paths: list[list[float]]
+
+
+#: How many trajectories to return for plotting: enough to show the shape of
+#: the distribution, few enough to stay legible and keep the payload small.
+N_SHOW_DEFAULT = 60
 
 
 _PCT_LEVELS = (5, 25, 50, 75, 95)
@@ -71,7 +85,8 @@ def mc_input_paths(levers: Levers) -> tuple[list[int], np.ndarray, np.ndarray, n
 
 
 def run_montecarlo(levers: Levers = Levers(), n_paths: int = c.MC_N_PATHS,
-                   seed: int = c.MC_SEED_DEFAULT) -> McResult:
+                   seed: int = c.MC_SEED_DEFAULT,
+                   n_show: int = N_SHOW_DEFAULT) -> McResult:
     years, ief, gnom, pb = mc_input_paths(levers)
     b0 = c.load_central()[c.MC_START_YEAR - 1]["deuda"]     # 105.6 (2025)
 
@@ -87,6 +102,8 @@ def run_montecarlo(levers: Levers = Levers(), n_paths: int = c.MC_N_PATHS,
     b_det_prev = b0
     e_r = np.zeros(n_paths); e_g = np.zeros(n_paths); e_sp = np.zeros(n_paths)
     percentiles: dict[str, list[float]] = {f"p{p}": [] for p in _PCT_LEVELS}
+    keep = min(max(0, n_show), n_paths)
+    shown: list[list[float]] = [[] for _ in range(keep)]
     for i in range(len(years)):
         e_r = c.MC_RHO * e_r + rng.normal(0.0, c.MC_SIG_R, n_paths)
         e_g = c.MC_RHO * e_g + rng.normal(0.0, c.MC_SIG_G, n_paths)
@@ -100,4 +117,7 @@ def run_montecarlo(levers: Levers = Levers(), n_paths: int = c.MC_N_PATHS,
         q = np.percentile(paths, _PCT_LEVELS)
         for j, p in enumerate(_PCT_LEVELS):
             percentiles[f"p{p}"].append(float(q[j]))
-    return McResult(years=years, percentiles=percentiles, n_paths=n_paths, seed=seed)
+        for j in range(keep):
+            shown[j].append(float(paths[j]))
+    return McResult(years=years, percentiles=percentiles, n_paths=n_paths,
+                    seed=seed, paths=shown)

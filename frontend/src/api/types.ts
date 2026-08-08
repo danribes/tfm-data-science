@@ -83,11 +83,20 @@ export interface ExplainResponse extends ApiMeta {
   headline_year: number;
 }
 
-export interface MonteCarloRequest { levers?: Partial<Levers>; seed?: number; n_paths?: number; horizon?: number }
+export interface MonteCarloRequest {
+  levers?: Partial<Levers>;
+  seed?: number;
+  n_paths?: number;
+  horizon?: number;
+  /** Individual trajectories to return for the spaghetti plot. */
+  n_show?: number;
+}
 export type PercentileKey = "p5" | "p25" | "p50" | "p75" | "p95";
 export interface MonteCarloResponse extends ApiMeta {
   years: number[];
   percentiles: Record<PercentileKey, number[]>;
   n_paths: number;
   seed: number;
+  /** Individual paths — the spaghetti. Deterministic given the seed. */
+  paths: number[][];
 }

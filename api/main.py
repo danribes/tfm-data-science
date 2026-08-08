@@ -100,13 +100,14 @@ def scenario(req: ScenarioRequest) -> ScenarioResponse:
 @app.post("/scenario/montecarlo", response_model=MonteCarloResponse)
 def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
     levers = Levers(**req.levers.model_dump())
-    mc = run_montecarlo(levers, n_paths=req.n_paths, seed=req.seed)
+    mc = run_montecarlo(levers, n_paths=req.n_paths, seed=req.seed, n_show=req.n_show)
     n = req.horizon - 2026 + 1
     return MonteCarloResponse(
         years=mc.years[:n],
         percentiles={p: v[:n] for p, v in mc.percentiles.items()},
         n_paths=mc.n_paths,
         seed=mc.seed,
+        paths=[p[:n] for p in mc.paths],
     )
 
 

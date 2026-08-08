@@ -80,12 +80,24 @@ export const handlers = [
     const body = (await request.json()) as MonteCarloRequest;
     const horizon = body.horizon ?? 2070;
     const years = Array.from({ length: horizon - 2026 + 1 }, (_, i) => 2026 + i);
+    const pct = mockPercentiles(years);
+    const nShow = body.n_show ?? 60;
+    // Spaghetti strands for the offline build: deterministic pseudo-paths
+    // spread across the mocked p5–p95 envelope. No RNG — a fixed hash of
+    // (strand, year) keeps the smoke test and the mock build reproducible.
+    const paths = Array.from({ length: nShow }, (_, j) =>
+      years.map((_, i) => {
+        const wobble = Math.sin((j + 1) * 12.9898 + i * 78.233) * 0.5 + 0.5;
+        return pct.p5[i] + (pct.p95[i] - pct.p5[i]) * wobble;
+      }),
+    );
     return HttpResponse.json({
       ...META,
       years,
-      percentiles: mockPercentiles(years),
+      percentiles: pct,
       n_paths: body.n_paths ?? 4000,
       seed: body.seed ?? 42,
+      paths,
     });
   }),
 
