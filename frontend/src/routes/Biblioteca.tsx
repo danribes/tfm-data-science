@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { RagReportCard } from "../components/RagReportCard";
 import { api, ragChatStream } from "../api/client";
 import type { Authority, Passage, RagChatResponse } from "../api/types";
 import { useScenarioStore } from "../state/scenarioStore";
@@ -249,6 +250,8 @@ export default function Biblioteca() {
           )}
         </div>
       )}
+
+      <RagReportCard />
     </div>
   );
 }

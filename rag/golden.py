@@ -199,6 +199,15 @@ GOLDEN: tuple[Question, ...] = (
         expect_terms=(("pobreza", "poverty"), ("infantil", "child")),
     ),
     Question(
+        id="esp-mora-bancaria",
+        question="¿Cuál era la ratio de crédito dudoso de la banca española según el Banco de España?",
+        collection="libros", topic="espana",
+        expect_docs=("Banco de Espana - Informe Anual",),
+        expect_terms=(("dudoso", "mora", "npl", "doubtful"),),
+        note=("Nació como pregunta 'incontestable' y el chat demostró que no lo "
+              "era: la respondió desde el Informe Anual con la fecha explícita."),
+    ),
+    Question(
         id="esp-informe-anual",
         question="¿Qué dijo el Banco de España sobre la economía española en su informe anual de 2023?",
         collection="libros", topic="espana",
@@ -311,10 +320,13 @@ GOLDEN: tuple[Question, ...] = (
         note="Declarado como hueco conocido en Metodología: no hay API pública.",
     ),
     Question(
-        id="fuera-mora-bancaria",
-        question="¿Cuál es la tasa de mora de la banca española en el último trimestre?",
+        id="fuera-cotizacion-hoy",
+        question="¿A cuánto cotiza hoy la acción del Banco Santander?",
         collection="libros", topic="fuera-de-alcance", unanswerable=True,
-        note="La serie de NPL del Banco de España sigue sin conectar.",
+        note=("Sustituye a una pregunta sobre la mora bancaria que resultó estar "
+              "mal etiquetada: el Informe Anual 2023 del corpus SÍ contiene la "
+              "ratio de dudosos, y el chat la respondió correctamente fechada. "
+              "El evaluador estaba en deuda con el modelo, no al revés."),
     ),
     Question(
         id="fuera-receta-cocina",

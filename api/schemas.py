@@ -536,3 +536,26 @@ class StateDependenceResponse(ApiMeta):
     state_dependent: bool = False
     spain_excluded_reason: str = ""
     note: str = ""
+
+
+# ---- La biblioteca, evaluada: resumen de las dos capas ----
+
+class RagEvalResponse(ApiMeta):
+    available: bool
+    #: Recuperación: ¿sale el documento correcto, y a qué altura de la lista?
+    n_questions: int = 0
+    hit_rate: float = 0.0
+    mrr: float = 0.0
+    top1: float = 0.0
+    isolation_clean: bool = False
+    guardrail_clean: bool = False
+    #: Chat: ¿rechaza lo incontestable, cita lo que afirma, y las citas apuntan
+    #: a pasajes reales?
+    unanswerable_refused: int = 0
+    unanswerable_total: int = 0
+    answered: int = 0
+    cited_share: float = 0.0
+    dangling_answers: int = 0
+    fidelity_supported: int = 0
+    fidelity_checked: int = 0
+    note: str = ""

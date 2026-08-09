@@ -7,10 +7,10 @@
   "retrieval": {
     "top_k": 8,
     "overall": {
-      "n": 32,
-      "hit_rate": 0.96875,
-      "mrr": 0.7615327380952381,
-      "top1": 0.65625,
+      "n": 35,
+      "hit_rate": 0.9714285714285714,
+      "mrr": 0.7819727891156463,
+      "top1": 0.6857142857142857,
       "term_recall": 1.0
     },
     "by_topic": {
@@ -50,10 +50,10 @@
         "term_recall": 1.0
       },
       "espana": {
-        "n": 5,
+        "n": 6,
         "hit_rate": 1.0,
-        "mrr": 0.9,
-        "top1": 0.8,
+        "mrr": 0.9166666666666666,
+        "top1": 0.8333333333333334,
         "term_recall": 1.0
       },
       "austriaco": {
@@ -82,6 +82,13 @@
         "hit_rate": 1.0,
         "mrr": 0.75,
         "top1": 0.5,
+        "term_recall": 1.0
+      },
+      "defensa": {
+        "n": 2,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "top1": 1.0,
         "term_recall": 1.0
       }
     },
@@ -552,6 +559,29 @@
       "top_score": 0.140771
     },
     {
+      "id": "esp-mora-bancaria",
+      "topic": "espana",
+      "collection": "libros",
+      "rank": 1,
+      "hit": true,
+      "rr": 1.0,
+      "n_passages": 8,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
+        "Banco de Espana - Documento Ocasional 1803 (ES)",
+        "Banco de Espana - Documento Ocasional 1803 (ES)",
+        "Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES)",
+        "Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market",
+        "Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market"
+      ],
+      "top_score": 0.113168
+    },
+    {
       "id": "esp-informe-anual",
       "topic": "espana",
       "collection": "libros",
@@ -826,10 +856,42 @@
         "Abre_los_ojo_gráficas_199_F8eHddzvbXQ"
       ],
       "top_score": 0.11449
+    },
+    {
+      "id": "defensa-doble-motor",
+      "topic": "defensa",
+      "collection": "defensa_tfm",
+      "rank": 1,
+      "hit": true,
+      "rr": 1.0,
+      "n_passages": 1,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "DEFENSA_TFM"
+      ],
+      "top_score": 0.114754
+    },
+    {
+      "id": "defensa-monte-carlo-semilla",
+      "topic": "defensa",
+      "collection": "defensa_tfm",
+      "rank": 1,
+      "hit": true,
+      "rr": 1.0,
+      "n_passages": 1,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "DEFENSA_TFM"
+      ],
+      "top_score": 0.114754
     }
   ],
   "isolation": {
-    "searches": 108,
+    "searches": 156,
     "leaks": [],
     "clean": true
   },
@@ -842,10 +904,10 @@
     "clean": true
   },
   "corpus": {
-    "documents": 473,
-    "chunks": 17847,
-    "embeddings": 17847,
-    "fts_rows": 17847,
+    "documents": 474,
+    "chunks": 17848,
+    "embeddings": 17848,
+    "fts_rows": 17848,
     "embeddings_complete": true,
     "fts_complete": true,
     "empty_documents": [],
@@ -854,6 +916,10 @@
       "crack23": {
         "documents": 420,
         "chunks": 3586
+      },
+      "defensa_tfm": {
+        "documents": 1,
+        "chunks": 1
       },
       "libros": {
         "documents": 43,

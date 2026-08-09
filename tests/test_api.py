@@ -454,3 +454,25 @@ def test_state_dependence_says_so_when_not_run(monkeypatch):
     body = client.get("/state-dependence").json()
     assert body["available"] is False
     assert "research.state_dependence" in body["note"]
+
+
+# ---- /rag/eval: las notas de la biblioteca ----
+
+def test_rag_eval_serves_both_evaluation_layers():
+    body = client.get("/rag/eval").json()
+    assert body["available"] is True
+    assert body["n_questions"] >= 30
+    assert body["hit_rate"] > 0.9
+    assert body["unanswerable_refused"] == body["unanswerable_total"] == 4
+    assert body["dangling_answers"] == 0
+    assert body["isolation_clean"] is True and body["guardrail_clean"] is True
+
+
+def test_rag_eval_says_so_when_artifacts_are_missing(monkeypatch):
+    import api.main as m
+    from pathlib import Path
+
+    monkeypatch.setattr(m, "_RAG_CHAT_EVAL", Path("/nonexistent/x.json"))
+    body = client.get("/rag/eval").json()
+    assert body["available"] is False
+    assert "rag.eval_chat" in body["note"]

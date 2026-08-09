@@ -209,6 +209,16 @@ export interface StateDependenceResponse extends ApiMeta {
   note: string;
 }
 
+export interface RagEvalResponse extends ApiMeta {
+  available: boolean;
+  n_questions: number; hit_rate: number; mrr: number; top1: number;
+  isolation_clean: boolean; guardrail_clean: boolean;
+  unanswerable_refused: number; unanswerable_total: number;
+  answered: number; cited_share: number; dangling_answers: number;
+  fidelity_supported: number; fidelity_checked: number;
+  note: string;
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

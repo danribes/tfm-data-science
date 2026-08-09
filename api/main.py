@@ -28,6 +28,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           BacktestRowOut, BacktestVerdictOut, PredictionResponse,
                           DistressFeatureOut, DistressCountryOut, DistressResponse,
                           EmpiricalImportanceOut, RegimeSlopeOut, StateDependenceResponse,
+                          RagEvalResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
@@ -284,6 +285,35 @@ def state_dependence() -> StateDependenceResponse:
         diff_ci=raw["diff_ci"], n_boot=raw["n_boot"],
         state_dependent=raw["state_dependent"],
         spain_excluded_reason=raw["spain_excluded_reason"],
+    )
+
+
+_RAG_EVAL = GOLD_DIR.parents[1] / "docs" / "eval" / "rag-eval-2026-08-09.json"
+_RAG_CHAT_EVAL = GOLD_DIR.parents[1] / "docs" / "eval" / "rag-chat-eval.json"
+
+
+@app.get("/rag/eval", response_model=RagEvalResponse)
+def rag_eval() -> RagEvalResponse:
+    """The library's report card: retrieval and chat, from committed artifacts."""
+    if not (_RAG_EVAL.exists() and _RAG_CHAT_EVAL.exists()):
+        return RagEvalResponse(
+            available=False,
+            note=("Faltan artefactos de evaluación. Genéralos con "
+                  "`python -m rag.evaluate` y `python -m rag.eval_chat`."))
+    ret = json.loads(_RAG_EVAL.read_text(encoding="utf-8"))
+    cht = json.loads(_RAG_CHAT_EVAL.read_text(encoding="utf-8"))["summary"]
+    ov = ret["retrieval"]["overall"]
+    return RagEvalResponse(
+        available=True,
+        n_questions=ov["n"], hit_rate=ov["hit_rate"], mrr=ov["mrr"], top1=ov["top1"],
+        isolation_clean=ret["isolation"]["clean"],
+        guardrail_clean=ret["guardrail"]["clean"],
+        unanswerable_refused=cht["unanswerable_refused"],
+        unanswerable_total=cht["unanswerable_total"],
+        answered=cht["answered"], cited_share=cht["mean_cited_share"],
+        dangling_answers=cht["answers_with_dangling_refs"],
+        fidelity_supported=cht["fidelity_supported"],
+        fidelity_checked=cht["fidelity_checked"],
     )
 
 

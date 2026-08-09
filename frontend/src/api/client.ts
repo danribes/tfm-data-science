@@ -3,7 +3,7 @@ import type {
   MonteCarloRequest, MonteCarloResponse,
   Passage,
   PersonasResponse, PredictionResponse, PresetsResponse,
-  RagChatRequest, RagChatResponse, RagCollectionsResponse,
+  RagChatRequest, RagChatResponse, RagCollectionsResponse, RagEvalResponse,
   RagSearchRequest, RagSearchResponse,
   RedLinesResponse, ScenarioRequest,
   ScenarioResponse, SensitivityResponse, StateDependenceResponse, VintageResponse,
@@ -58,6 +58,7 @@ export const api = {
   distress: () => request<DistressResponse>("/distress"),
   stateDependence: () => request<StateDependenceResponse>("/state-dependence"),
   ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
+  ragEval: () => request<RagEvalResponse>("/rag/eval"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
     request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),
   ragChat: (body: RagChatRequest, signal?: AbortSignal) =>

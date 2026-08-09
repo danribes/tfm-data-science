@@ -85,12 +85,27 @@ def _call(provider: dict, messages: list[dict], max_tokens: int,
         f"{provider['base']}/chat/completions",
         headers={"Authorization": f"Bearer {key}",
                  "Content-Type": "application/json"},
+        # max_tokens is a budget for the WHOLE response, and gemini-2.5-flash
+        # is a reasoning model: through the OpenAI-compat endpoint its hidden
+        # thinking spends from the same budget as the visible answer. At 900
+        # the thinking ate ~750 and every answer arrived truncated to a
+        # sentence and a half — measured, not hypothetical. 2600 leaves room
+        # for both; reasoning_effort caps the invisible half where supported
+        # and is ignored where not.
         json={"model": provider["model"], "messages": messages,
-              "max_tokens": max_tokens, "temperature": 0.2},
+              "max_tokens": max_tokens, "temperature": 0.2,
+              "reasoning_effort": "low"},
         timeout=timeout,
     )
     r.raise_for_status()
-    return (r.json()["choices"][0]["message"].get("content") or "").strip()
+    body = r.json()
+    choice = body["choices"][0]
+    text = (choice["message"].get("content") or "").strip()
+    if choice.get("finish_reason") == "length" and not text:
+        # All budget went to reasoning, none to text. Treated as a provider
+        # failure so the cascade moves on instead of returning emptiness.
+        raise RuntimeError("respuesta agotada en razonamiento (finish=length)")
+    return text
 
 
 def _call_stream(provider: dict, messages: list[dict], max_tokens: int,
@@ -108,7 +123,8 @@ def _call_stream(provider: dict, messages: list[dict], max_tokens: int,
         headers={"Authorization": f"Bearer {key}",
                  "Content-Type": "application/json"},
         json={"model": provider["model"], "messages": messages,
-              "max_tokens": max_tokens, "temperature": 0.2, "stream": True},
+              "max_tokens": max_tokens, "temperature": 0.2, "stream": True,
+              "reasoning_effort": "low"},
         timeout=timeout, stream=True,
     ) as r:
         r.raise_for_status()
@@ -137,7 +153,7 @@ def _call_stream(provider: dict, messages: list[dict], max_tokens: int,
 
 def stream(question: str, collection: str = "libros", *,
            top_k: int | None = None, scenario_facts: dict | None = None,
-           max_tokens: int = 900, timeout: float = 60.0):
+           max_tokens: int = 2600, timeout: float = 60.0):
     """Generator of events for SSE: passages first, then answer deltas.
 
     Retrieval finishes in well under a second while generation takes several,
@@ -255,7 +271,7 @@ def refusal_for(question: str) -> str | None:
 
 
 def ask(question: str, collection: str = "libros", *, top_k: int | None = None,
-        scenario_facts: dict | None = None, max_tokens: int = 900,
+        scenario_facts: dict | None = None, max_tokens: int = 2600,
         timeout: float = 60.0) -> Answer:
     """Retrieve, then answer with citations. Never answers ungrounded."""
     refusal = refusal_for(question)

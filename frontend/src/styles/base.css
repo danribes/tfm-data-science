@@ -305,3 +305,12 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .et-track { position: relative; height: 10px; background: var(--grid); border-radius: 5px; }
 .et-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--s1); }
 .et-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* --- the library's report card --- */
+.rag-report-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 6px 0 10px; }
+@media (max-width: 1024px) { .rag-report-row { grid-template-columns: repeat(2, 1fr); } }
+.rr-item { border: 1px solid var(--grid); border-radius: var(--rad-chip); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.rr-item.bad { border-color: var(--div-neg); }
+.rr-val { font-size: 24px; font-weight: 800; }
+.rr-item.bad .rr-val { color: var(--div-neg); }
+.rr-lab { font-size: 12.5px; color: var(--muted); line-height: 1.35; }

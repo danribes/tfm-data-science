@@ -297,6 +297,19 @@ export const handlers = [
     }),
   ),
 
+  http.get(`${BASE}/rag/eval`, () =>
+    HttpResponse.json({
+      ...META,
+      available: true,
+      n_questions: 35, hit_rate: 0.971, mrr: 0.782, top1: 0.686,
+      isolation_clean: true, guardrail_clean: true,
+      unanswerable_refused: 4, unanswerable_total: 4,
+      answered: 12, cited_share: 0.927, dangling_answers: 0,
+      fidelity_supported: 10, fidelity_checked: 12,
+      note: "",
+    }),
+  ),
+
   // --- RAG, offline ---
   // The corpus itself cannot ship to the browser (copyrighted textbooks), so
   // the mock serves a small fixed set of passages with the real response shape.

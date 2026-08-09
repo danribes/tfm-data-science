@@ -295,3 +295,56 @@ def test_english_probe_runs_when_a_term_is_present():
     with patch.object(retrieve, "_dense", wraps=retrieve._dense) as spy:
         retrieve.search("¿qué es la brecha del producto?", "libros", 4)
         assert spy.call_count == 2        # Spanish probe plus English probe
+
+
+# ---- the chat-level evaluator's own instruments -----------------------------
+
+def test_refusal_detector_understands_the_models_actual_wording():
+    """The first live run flagged three correct refusals as inventions because
+    the model wrote "no contiene información" and the detector only knew "no
+    cubre". The evaluator was the broken part; its detector gets pinned."""
+    from rag import eval_chat as ec
+
+    assert ec.is_refusal("El corpus no cubre esta pregunta.")
+    assert ec.is_refusal("El corpus proporcionado no contiene información sobre eso.")
+    assert ec.is_refusal("No contiene informacion al respecto")     # sin tilde
+    assert ec.is_refusal("NO HAY INFORMACIÓN sobre este punto")
+    assert not ec.is_refusal("La elasticidad de la demanda depende de [1].")
+
+
+def test_citation_report_counts_sentences_and_flags_dangling_refs():
+    from rag import eval_chat as ec
+
+    answer = ("La deuda crece cuando r supera a g [1]. El saldo primario "
+              "compensa parte del efecto [2]. Esta frase larga no lleva cita "
+              "ninguna y debe contarse. La comparación con Alemania aparece "
+              "desarrollada en el noveno pasaje [9].")
+    rep = ec.citation_report(answer, n_passages=3)
+    assert rep["n_sentences"] == 4
+    assert rep["n_cited"] == 3
+    # [9] with only three passages: a citation pointing at nothing.
+    assert rep["dangling_refs"] == [9]
+    # Short fragments ("Ver [3].") are dropped by the length floor on purpose —
+    # they are connective tissue, not claims needing support.
+    tiny = ec.citation_report("Ver también [9].", n_passages=3)
+    assert tiny["n_sentences"] == 0
+    assert tiny["dangling_refs"] == [9]   # but the dangling ref still counts
+
+
+def test_citation_report_is_calm_about_an_empty_answer():
+    from rag import eval_chat as ec
+
+    rep = ec.citation_report("", n_passages=5)
+    assert rep["n_sentences"] == 0 and rep["cited_share"] == 0.0
+
+
+def test_the_committed_chat_eval_shows_no_inventions_and_no_dangling_refs():
+    import json
+
+    from rag import eval_chat as ec
+
+    d = json.loads((ec.OUT / "rag-chat-eval.json").read_text(encoding="utf-8"))
+    s = d["summary"]
+    assert s["unanswerable_refused"] == s["unanswerable_total"]
+    assert s["answers_with_dangling_refs"] == 0
+    assert s["mean_cited_share"] > 0.8

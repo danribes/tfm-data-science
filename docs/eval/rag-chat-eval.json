@@ -1,0 +1,285 @@
+{
+  "summary": {
+    "unanswerable_total": 4,
+    "unanswerable_refused": 4,
+    "answered": 12,
+    "mean_cited_share": 0.9271474139895193,
+    "answers_with_dangling_refs": 0,
+    "fidelity_checked": 12,
+    "fidelity_supported": 10
+  },
+  "refusals": [
+    {
+      "id": "fuera-cuota-autonomos",
+      "grounded": true,
+      "provider": "gemini",
+      "refused": true,
+      "text_head": "El corpus de textos proporcionado no contiene información específica sobre las bases de cotización del RETA para 2026 ni sobre la cuantía mensual que paga un au"
+    },
+    {
+      "id": "fuera-cotizacion-hoy",
+      "grounded": true,
+      "provider": "gemini",
+      "refused": true,
+      "text_head": "El corpus proporcionado no contiene información sobre la cotización actual de la acción del Banco Santander. Los pasajes mencionan \"Santander\" en el contexto de"
+    },
+    {
+      "id": "fuera-receta-cocina",
+      "grounded": true,
+      "provider": "gemini",
+      "refused": true,
+      "text_head": "El corpus proporcionado no contiene información sobre la receta tradicional de la fabada asturiana. Los pasajes abordan temas económicos como siglas y abreviatu"
+    },
+    {
+      "id": "fuera-prediccion-ibex",
+      "grounded": true,
+      "provider": "gemini",
+      "refused": true,
+      "text_head": "El corpus proporcionado no contiene información sobre a cuánto cerrará el IBEX 35 el 31 de diciembre de 2026. Los pasajes únicamente mencionan que la rentabilid"
+    }
+  ],
+  "answers": [
+    {
+      "id": "micro-elasticidad",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 19,
+        "n_cited": 13,
+        "cited_share": 0.6842105263157895,
+        "n_refs": 14,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "micro-incidencia-fiscal",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 11,
+        "n_cited": 10,
+        "cited_share": 0.9090909090909091,
+        "n_refs": 10,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "macro-multiplicador",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 23,
+        "n_cited": 23,
+        "cited_share": 1.0,
+        "n_refs": 27,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "macro-okun",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 7,
+        "n_cited": 5,
+        "cited_share": 0.7142857142857143,
+        "n_refs": 7,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "dsa-bola-nieve",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 6,
+        "n_cited": 6,
+        "cited_share": 1.0,
+        "n_refs": 6,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "dsa-estocastico",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 22,
+        "n_cited": 22,
+        "cited_share": 1.0,
+        "n_refs": 25,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "econ-proyecciones-locales",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 17,
+        "n_cited": 17,
+        "cited_share": 1.0,
+        "n_refs": 21,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "econ-errores-agrupados",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 11,
+        "n_cited": 9,
+        "cited_share": 0.8181818181818182,
+        "n_refs": 9,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "esp-vivienda-riesgo",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 11,
+        "n_cited": 11,
+        "cited_share": 1.0,
+        "n_refs": 13,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "esp-mercado-laboral",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 6,
+        "n_cited": 6,
+        "cited_share": 1.0,
+        "n_refs": 6,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "esp-mora-bancaria",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 4,
+        "n_cited": 4,
+        "cited_share": 1.0,
+        "n_refs": 6,
+        "dangling_refs": []
+      }
+    },
+    {
+      "id": "mises-calculo",
+      "grounded": true,
+      "provider": "gemini",
+      "error": null,
+      "citations": {
+        "n_sentences": 14,
+        "n_cited": 14,
+        "cited_share": 1.0,
+        "n_refs": 22,
+        "dangling_refs": []
+      }
+    }
+  ],
+  "fidelity": [
+    {
+      "id": "micro-elasticidad",
+      "sentence": "Por el contrario, la demanda es inelástica cuando la elasticidad es menor que uno, indicando que la cantidad demandada se mueve proporcionalmente menos que el precio [4].",
+      "cited": 4,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "micro-incidencia-fiscal",
+      "sentence": "La carga de un impuesto recae de manera más pronunciada sobre el lado del mercado que es menos elástico [7].",
+      "cited": 7,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "macro-multiplicador",
+      "sentence": "El multiplicador fiscal no tiene un valor único y su tamaño depende de diversas condiciones [1], [4].",
+      "cited": 1,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "macro-okun",
+      "sentence": "Los pasajes definen la brecha de producción como la diferencia entre el nivel de output real y el de output real potencial [2].",
+      "cited": 2,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "dsa-bola-nieve",
+      "sentence": "El efecto bola de nieve de la deuda se refiere al diferencial entre el tipo de interés y el crecimiento económico [7].",
+      "cited": 7,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "dsa-estocastico",
+      "sentence": "Un análisis estocástico de sostenibilidad de la deuda con abanicos de probabilidad se construye para valorar la sostenibilidad de las posiciones presupuestarias y los riesgos asociados a un nivel de e",
+      "cited": 2,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "econ-proyecciones-locales",
+      "sentence": "Las proyecciones locales de Jordà son un enfoque econométrico que sirve como puente entre los métodos tradicionales de series temporales y la microeconometría aplicada [1].",
+      "cited": 1,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "econ-errores-agrupados",
+      "sentence": "Hay que agrupar los errores estándar cuando las observaciones están correlacionadas dentro de un grupo porque la correlación del término de error entre observaciones es una de las principales razones ",
+      "cited": 4,
+      "provider": "glm",
+      "supported": false
+    },
+    {
+      "id": "esp-vivienda-riesgo",
+      "sentence": "El Banco de España realiza un seguimiento de las vulnerabilidades y los riesgos para la estabilidad financiera asociados al mercado de la vivienda en España [4].",
+      "cited": 4,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "esp-mercado-laboral",
+      "sentence": "Según la Autoridad Independiente de Responsabilidad Fiscal (AIReF), el mercado laboral español arrastra disfunciones estructurales relevantes desde la década de 1980 [1].",
+      "cited": 1,
+      "provider": "glm",
+      "supported": true
+    },
+    {
+      "id": "esp-mora-bancaria",
+      "sentence": "Según el Banco de España, la ratio de crédito dudoso del crédito bancario al conjunto del sector privado en España se situó en el 3,4 % en diciembre de 2023 [1].",
+      "cited": 1,
+      "provider": "glm",
+      "supported": false
+    },
+    {
+      "id": "mises-calculo",
+      "sentence": "Mises sostiene que el socialismo no puede calcular precios porque, en esencia, es incapaz de resolver el \"problema del cálculo económico\" [4].",
+      "cited": 4,
+      "provider": "glm",
+      "supported": true
+    }
+  ]
+}
