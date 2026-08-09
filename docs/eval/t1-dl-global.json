@@ -1,0 +1,72 @@
+{
+  "n_windows": 113649,
+  "n_series": 1760,
+  "cutoff": "2019Q3",
+  "window": 16,
+  "horizon": 8,
+  "epochs": 8,
+  "seed": 42,
+  "verdict": {
+    "candidate": "dl_global",
+    "beaten_ccaa": 5,
+    "total_ccaa": 17,
+    "required": 12,
+    "horizon": 4,
+    "mase_candidate": 0.4000055337486443,
+    "mase_drift": 0.39532474762722836,
+    "mase_candidate_long": 0.8421137516659518,
+    "mase_drift_long": 0.7959752975086279,
+    "wins": false,
+    "verdict": "no bate al drift"
+  },
+  "mase_by_h": {
+    "1": {
+      "dl_global": 0.2435,
+      "drift": 0.2411,
+      "naive": 0.2953,
+      "snaive": 0.8424
+    },
+    "2": {
+      "dl_global": 0.3507,
+      "drift": 0.358,
+      "naive": 0.4986,
+      "snaive": 0.8656
+    },
+    "3": {
+      "dl_global": 0.4783,
+      "drift": 0.4647,
+      "naive": 0.7209,
+      "snaive": 0.8996
+    },
+    "4": {
+      "dl_global": 0.5652,
+      "drift": 0.5535,
+      "naive": 0.9424,
+      "snaive": 0.9424
+    },
+    "5": {
+      "dl_global": 0.7074,
+      "drift": 0.6578,
+      "naive": 1.2139,
+      "snaive": 1.861
+    },
+    "6": {
+      "dl_global": 0.7769,
+      "drift": 0.7427,
+      "naive": 1.5369,
+      "snaive": 1.959
+    },
+    "7": {
+      "dl_global": 0.8991,
+      "drift": 0.8552,
+      "naive": 1.8451,
+      "snaive": 2.0455
+    },
+    "8": {
+      "dl_global": 1.0381,
+      "drift": 0.9794,
+      "naive": 2.1287,
+      "snaive": 2.1287
+    }
+  }
+}
