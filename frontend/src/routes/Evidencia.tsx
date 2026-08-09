@@ -108,7 +108,7 @@ export default function Evidencia() {
                       </td>
                       <td className="ev-band"><BandBar c={c} /></td>
                       <td>
-                        <span className={c.compatible ? "st safe" : "st crossed"}>
+                        <span className={c.compatible ? "st safe" : "st cross"}>
                           {c.verdict}
                         </span>
                         <div className="dim ev-lab">{c.source}</div>

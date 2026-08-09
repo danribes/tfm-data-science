@@ -148,6 +148,32 @@ export interface EvidenceResponse extends ApiMeta {
   engine_version: string;
 }
 
+// ---- Predicción: el backtest T1 ----
+
+export interface BacktestVerdictOut {
+  candidate: string;
+  beaten_ccaa: number;
+  total_ccaa: number;
+  required: number;
+  horizon: number;
+  mase_candidate: number;
+  mase_drift: number;
+  mase_candidate_long: number;
+  mase_drift_long: number;
+  /** false es el resultado real y se enseña como tal. */
+  wins: boolean;
+  verdict: string;
+}
+export interface BacktestRowOut { h: number; mase: Record<string, number> }
+export interface PredictionResponse extends ApiMeta {
+  available: boolean;
+  protocol: Record<string, string | number>;
+  rows: BacktestRowOut[];
+  verdict: BacktestVerdictOut | null;
+  methods: string[];
+  note: string;
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

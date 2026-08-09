@@ -2,7 +2,7 @@ import type {
   ConstantsResponse, EvidenceResponse, ExplainRequest, ExplainResponse, HealthResponse,
   MonteCarloRequest, MonteCarloResponse,
   Passage,
-  PersonasResponse, PresetsResponse,
+  PersonasResponse, PredictionResponse, PresetsResponse,
   RagChatRequest, RagChatResponse, RagCollectionsResponse,
   RagSearchRequest, RagSearchResponse,
   RedLinesResponse, ScenarioRequest,
@@ -54,6 +54,7 @@ export const api = {
   explain: (body: ExplainRequest, signal?: AbortSignal) =>
     request<ExplainResponse>("/explain", { method: "POST", body: JSON.stringify(body), signal }),
   evidence: () => request<EvidenceResponse>("/evidence"),
+  prediction: () => request<PredictionResponse>("/prediction"),
   ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
     request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),

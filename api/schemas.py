@@ -429,3 +429,36 @@ class SensitivityResponse(ApiMeta):
     target_series: list[SensitivityTargetOut]
     matrix: dict[str, SensitivityItemOut]
 
+
+
+# ---- Predicción: el backtest T1 y su veredicto pre-registrado ----
+
+class BacktestVerdictOut(BaseModel):
+    candidate: str
+    beaten_ccaa: int
+    total_ccaa: int
+    required: int
+    horizon: int
+    mase_candidate: float
+    mase_drift: float
+    mase_candidate_long: float
+    mase_drift_long: float
+    #: False es el resultado real, y la página lo enseña como tal.
+    wins: bool
+    verdict: str
+
+
+class BacktestRowOut(BaseModel):
+    h: int
+    mase: dict[str, float]
+
+
+class PredictionResponse(ApiMeta):
+    #: Artefacto congelado: entrenar la red cuesta minutos, así que la
+    #: evaluación se calcula fuera de línea y se versiona con el repo.
+    available: bool
+    protocol: dict[str, object] = {}
+    rows: list[BacktestRowOut] = []
+    verdict: BacktestVerdictOut | None = None
+    methods: list[str] = []
+    note: str = ""

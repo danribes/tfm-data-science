@@ -226,6 +226,36 @@ export const handlers = [
     }),
   ),
 
+  // Predicción, offline. The numbers are the real ones from
+  // docs/eval/t1-dl-global.json: the page's whole job is to render a loss
+  // correctly, so a fixture where the candidate wins would test the wrong path.
+  http.get(`${BASE}/prediction`, () =>
+    HttpResponse.json({
+      ...META,
+      available: true,
+      protocol: {
+        origins: "2019Q4–2023Q4", test_start: "2024Q1", horizons: 8,
+        n_ccaa: 17, train_series: 1760, train_windows: 113649,
+        train_cutoff: "2019Q3", seed: 42,
+      },
+      methods: ["dl_global", "drift", "naive", "snaive"],
+      rows: [
+        { h: 1, mase: { dl_global: 0.2435, drift: 0.2411, naive: 0.2953, snaive: 0.8424 } },
+        { h: 2, mase: { dl_global: 0.3514, drift: 0.3579, naive: 0.4993, snaive: 0.8664 } },
+        { h: 4, mase: { dl_global: 0.5651, drift: 0.5541, naive: 0.9424, snaive: 0.9424 } },
+        { h: 8, mase: { dl_global: 1.0382, drift: 0.9792, naive: 2.1289, snaive: 2.1289 } },
+      ],
+      verdict: {
+        candidate: "dl_global", beaten_ccaa: 5, total_ccaa: 17,
+        required: 12, horizon: 4,
+        mase_candidate: 0.4, mase_drift: 0.3953,
+        mase_candidate_long: 0.8421, mase_drift_long: 0.796,
+        wins: false, verdict: "no bate al drift",
+      },
+      note: "",
+    }),
+  ),
+
   // --- RAG, offline ---
   // The corpus itself cannot ship to the browser (copyrighted textbooks), so
   // the mock serves a small fixed set of passages with the real response shape.

@@ -161,7 +161,7 @@ export default function ComoFunciona() {
         <h2>6. Qué significan las líneas rojas</h2>
         <p>
           Son umbrales anclados a episodios que de verdad ocurrieron, no a
-          intuiciones. El estado (<span className="st crossed">cruzada</span>,{" "}
+          intuiciones. El estado (<span className="st cross">cruzada</span>,{" "}
           <span className="st near">cerca</span>,{" "}
           <span className="st safe">segura</span>) se <strong>calcula</strong>{" "}
           desde el escenario en cada año; no hay ningún estado escrito a mano.

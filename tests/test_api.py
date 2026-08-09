@@ -357,3 +357,37 @@ def test_every_lever_has_a_span_so_no_row_is_silently_unrankable():
     for lid, row in m.items():
         assert row["lever_span"] > 0, lid
         assert row["span_effects"], lid
+
+
+# ---- /prediction: el backtest T1 servido desde el artefacto ----
+
+def test_prediction_serves_the_committed_evaluation():
+    body = client.get("/prediction").json()
+    assert body["available"] is True
+    assert set(body["methods"]) == {"dl_global", "drift", "naive", "snaive"}
+    assert [r["h"] for r in body["rows"]] == list(range(1, 9))
+    assert body["protocol"]["test_start"] == "2024Q1"
+    assert body["protocol"]["train_cutoff"] == "2019Q3"
+    assert body["protocol"]["n_ccaa"] == 17
+
+
+def test_prediction_reports_the_loss_rather_than_omitting_it():
+    """The endpoint's contract includes being able to say the model lost. A
+    shape that could only express a win would make the page decoration."""
+    v = client.get("/prediction").json()["verdict"]
+    assert v["wins"] is False
+    assert v["beaten_ccaa"] < v["required"]
+    assert v["mase_candidate"] > v["mase_drift"]
+    assert "no bate" in v["verdict"]
+
+
+def test_prediction_says_so_when_the_evaluation_has_not_been_run(monkeypatch):
+    """A missing artifact must not render as a model with no error."""
+    import api.main as m
+    from pathlib import Path
+
+    monkeypatch.setattr(m, "_T1_REPORT", Path("/nonexistent/t1.json"))
+    body = client.get("/prediction").json()
+    assert body["available"] is False
+    assert body["rows"] == [] and body["verdict"] is None
+    assert "research.dl_global" in body["note"]

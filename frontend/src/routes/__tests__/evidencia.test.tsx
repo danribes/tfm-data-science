@@ -28,7 +28,7 @@ describe("Evidencia — calibrado frente a estimado", () => {
     await waitFor(() => expect(screen.getByText("IPV_LR")).toBeInTheDocument());
     const row = screen.getByText("IPV_LR").closest("tr")!;
     const verdict = within(row).getByText(/fuera de la banda/);
-    expect(verdict.className).toContain("crossed");
+    expect(verdict.className).toContain("cross");
   });
 
   it("draws the band, the estimate and the calibration marker", async () => {

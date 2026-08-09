@@ -25,6 +25,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           RagSearchResponse, RedLineOut, RedLinesResponse,
                           RedLineStatusOut, ScenarioRequest, ScenarioResponse,
                           SensitivityResponse,
+                          BacktestRowOut, BacktestVerdictOut, PredictionResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
@@ -32,6 +33,7 @@ from explain.narrate import NarrationUnavailable, narrate
 from explain.report import generate_policy_brief_html
 from data.live import country_list, panel_builder
 from engine import generic
+from research import backtest as research_backtest
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
                                load_kpis)
 from engine.levers import PRESETS, Levers, validate_levers
@@ -184,6 +186,47 @@ def scenario_report_custom(req: ScenarioRequest) -> HTMLResponse:
         raise HTTPException(status_code=422, detail={"errors": errors})
     html_content = generate_policy_brief_html(levers, horizon=req.horizon)
     return HTMLResponse(content=html_content)
+
+
+#: The T1 evaluation is a committed artifact, not a live computation: training
+#: the transfer network takes minutes, and a route that retrained on every page
+#: load would be slower than it is informative. Regenerated deliberately with
+#: `python -m research.dl_global`, which is also what makes the number quotable.
+_T1_REPORT = GOLD_DIR.parents[1] / "docs" / "eval" / "t1-dl-global.json"
+
+
+@app.get("/prediction", response_model=PredictionResponse)
+def prediction() -> PredictionResponse:
+    """The pre-registered house-price backtest, and whether the model won."""
+    if not _T1_REPORT.exists():
+        # A missing artifact is reported, not faked. The page says the
+        # evaluation has not been run rather than showing an empty table that
+        # reads like a model with no error.
+        return PredictionResponse(
+            available=False,
+            note=("La evaluación T1 no se ha ejecutado en esta copia. "
+                  "Genérala con `python -m research.dl_global`."))
+
+    raw = json.loads(_T1_REPORT.read_text(encoding="utf-8"))
+    rows = [BacktestRowOut(h=int(h), mase=m)
+            for h, m in sorted(raw["mase_by_h"].items(), key=lambda kv: int(kv[0]))]
+    methods = sorted({m for r in rows for m in r.mase})
+    return PredictionResponse(
+        available=True,
+        protocol={
+            "origins": f"{research_backtest.ORIGINS[0]}–{research_backtest.ORIGINS[-1]}",
+            "test_start": str(research_backtest.TEST_START),
+            "horizons": research_backtest.H,
+            "n_ccaa": raw["verdict"]["total_ccaa"],
+            "train_series": raw["n_series"],
+            "train_windows": raw["n_windows"],
+            "train_cutoff": raw["cutoff"],
+            "seed": raw["seed"],
+        },
+        rows=rows,
+        verdict=BacktestVerdictOut(**raw["verdict"]),
+        methods=methods,
+    )
 
 
 @app.get("/countries", response_model=CountriesResponse)

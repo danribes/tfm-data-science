@@ -188,6 +188,9 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .guide-t td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--grid); color: var(--ink-2); vertical-align: top; }
 .guide-t td.sym { font-weight: 700; color: var(--accent); }
 .guide-t td.dim, .guide-rl .dim { color: var(--muted); }
+/* A whole row can be out of scope without being hidden — the class has to
+   reach the cells, which is where the text colour actually lives. */
+.guide-t tr.dim td { color: var(--muted); }
 .guide-chain, .guide-no, .guide-rl { margin: 0 0 var(--sp-1); padding-left: 24px; display: flex; flex-direction: column; gap: 8px; }
 .guide-chain li, .guide-no li, .guide-rl li { font-size: 15px; line-height: 1.65; color: var(--ink-2); }
 .guide-rl { list-style: none; padding-left: 0; }
@@ -281,3 +284,7 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .ev-sub td { font-size: 13px; padding-top: 5px; padding-bottom: 5px; }
 .ev-sub .band { padding: 5px 0 3px; }
 .ev-sub .band-track { height: 10px; }
+
+/* --- predicción: el veredicto pre-registrado --- */
+.verdict-line { margin: 0 0 var(--sp-1); }
+.verdict-line .st { font-size: 15px; padding: 6px 14px; }
