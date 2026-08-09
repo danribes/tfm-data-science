@@ -1,6 +1,7 @@
 import type {
   ConstantsResponse, ExplainRequest, ExplainResponse, HealthResponse,
   MonteCarloRequest, MonteCarloResponse,
+  Passage,
   PersonasResponse, PresetsResponse,
   RagChatRequest, RagChatResponse, RagCollectionsResponse,
   RagSearchRequest, RagSearchResponse,
@@ -52,3 +53,76 @@ export const api = {
   ragChat: (body: RagChatRequest, signal?: AbortSignal) =>
     request<RagChatResponse>("/rag/chat", { method: "POST", body: JSON.stringify(body), signal }),
 };
+
+/** Events emitted by /rag/chat/stream, in order: one `passages`, many
+ *  `delta`, one `done`. */
+export interface RagStreamHandlers {
+  onPassages?: (passages: Passage[], grounded: boolean) => void;
+  onDelta?: (text: string) => void;
+  onDone?: (final: {
+    answer: string; grounded: boolean;
+    provider: string | null; model: string | null; error?: string | null;
+  }) => void;
+}
+
+/** Consume the SSE stream.
+ *
+ *  Hand-parsed rather than via EventSource because that API is GET-only and
+ *  this endpoint needs a POST body. Frames are split on the blank line, and a
+ *  partial tail is carried between reads — a chunk boundary can land mid-frame
+ *  and dropping it would silently lose words from the answer.
+ */
+export async function ragChatStream(
+  body: RagChatRequest,
+  handlers: RagStreamHandlers,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/rag/chat/stream`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok || !res.body) throw new ApiError("/rag/chat/stream", `HTTP ${res.status}`);
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    let sep: number;
+    while ((sep = buffer.indexOf("\n\n")) !== -1) {
+      const frame = buffer.slice(0, sep);
+      buffer = buffer.slice(sep + 2);
+
+      let event = "message";
+      const dataLines: string[] = [];
+      for (const line of frame.split("\n")) {
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) dataLines.push(line.slice(5).trim());
+      }
+      if (!dataLines.length) continue;
+
+      let payload: Record<string, unknown>;
+      try {
+        payload = JSON.parse(dataLines.join("\n"));
+      } catch {
+        continue;
+      }
+
+      if (event === "passages") {
+        handlers.onPassages?.(payload.passages as Passage[], payload.grounded as boolean);
+      } else if (event === "delta") {
+        handlers.onDelta?.(payload.text as string);
+      } else if (event === "done") {
+        handlers.onDone?.(payload as never);
+      } else if (event === "error") {
+        throw new ApiError("/rag/chat/stream", String(payload.detail ?? "error"));
+      }
+    }
+  }
+}

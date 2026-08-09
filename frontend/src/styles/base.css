@@ -257,3 +257,4 @@ code { font: 0.75em ui-monospace, Consolas, monospace; background: var(--code); 
 /* --- biblioteca: estado intermedio mientras se redacta --- */
 .biblio-pending { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); margin: 0 0 var(--sp-1); }
 .biblio-dots { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: exp-pulse 1s ease-in-out infinite; flex: none; }
+.biblio-caret { display: inline-block; width: 6px; height: 1em; background: var(--accent); margin-left: 2px; vertical-align: text-bottom; animation: exp-pulse .9s ease-in-out infinite; }

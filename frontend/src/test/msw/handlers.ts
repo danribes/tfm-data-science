@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse, delay, http } from "msw";
 import { BASE_LEVERS } from "../../engine/vintage";
 import { LEVER_SPECS } from "../../engine/levers";
 import type { SeriesKey } from "../../engine/spain";
@@ -144,6 +144,54 @@ export const handlers = [
             cita: "Banco de Espana - Documento Ocasional 1803 (ES) · 3.1 · p. 12",
           }]
         : [],
+    });
+  }),
+
+  // SSE mock: one `passages` frame, then deltas, then `done` — the same order
+  // the real endpoint emits, so the UI's streaming path is genuinely exercised.
+  http.post(`${BASE}/rag/chat/stream`, async ({ request }) => {
+    const body = (await request.json()) as { question?: string; collection?: string };
+    const collection = body.collection ?? "libros";
+    const authority =
+      collection === "crack23" ? "opinion" : collection === "metodo" ? "propio" : "academico";
+    const grounded = !/fusi[oó]n fr[ií]a/i.test(body.question ?? "");
+    const passages = grounded
+      ? [{
+          chunk_id: 1,
+          text: "El diferencial entre el tipo de interés y el crecimiento nominal determina la senda de la deuda.",
+          title: "Banco de Espana - Documento Ocasional 1803 (ES)",
+          collection, authority, page: 12, section: "3.1", score: 0.0387,
+          cita: "Banco de Espana - Documento Ocasional 1803 (ES) · 3.1 · p. 12",
+        }]
+      : [];
+    const answer = grounded
+      ? "La deuda crece cuando el tipo efectivo supera al crecimiento nominal [1]."
+      : "El corpus no cubre esta pregunta.";
+
+    const frame = (event: string, data: unknown) =>
+      `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const enc = new TextEncoder();
+        controller.enqueue(enc.encode(frame("passages", { passages, grounded })));
+        if (grounded) {
+          for (const word of answer.split(" ")) {
+            await delay(5);
+            controller.enqueue(enc.encode(frame("delta", { text: word + " " })));
+          }
+        }
+        controller.enqueue(enc.encode(frame("done", {
+          answer, grounded,
+          provider: grounded ? "gemini" : null,
+          model: grounded ? "gemini-2.5-flash" : null,
+          error: null,
+        })));
+        controller.close();
+      },
+    });
+    return new HttpResponse(stream, {
+      headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
     });
   }),
 

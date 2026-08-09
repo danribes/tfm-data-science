@@ -92,14 +92,37 @@ describe("Biblioteca — chat con citas", () => {
     // so the evidence must be readable before the answer lands. Delaying only
     // /rag/chat reproduces that window deterministically.
     server.use(
-      http.post("http://localhost:8000/rag/chat", async () => {
-        await delay(400);
-        return HttpResponse.json({
-          vintage: "2026-07-31", computed_not_advice: true,
-          question: "x", collection: "libros",
-          answer: "La deuda crece cuando el tipo efectivo supera al crecimiento nominal [1].",
-          passages: [], grounded: true, provider: "gemini",
-          model: "gemini-2.5-flash", error: null,
+      http.post("http://localhost:8000/rag/chat/stream", () => {
+        const frame = (e: string, d: unknown) =>
+          `event: ${e}\ndata: ${JSON.stringify(d)}\n\n`;
+        const stream = new ReadableStream({
+          async start(c) {
+            const enc = new TextEncoder();
+            c.enqueue(enc.encode(frame("passages", {
+              passages: [{
+                chunk_id: 1,
+                text: "El diferencial entre el tipo y el crecimiento determina la senda de la deuda.",
+                title: "Banco de Espana - Documento Ocasional 1803 (ES)",
+                collection: "libros", authority: "academico", page: 12,
+                section: "3.1", score: 0.0387,
+                cita: "Banco de Espana - Documento Ocasional 1803 (ES) · 3.1 · p. 12",
+              }],
+              grounded: true,
+            })));
+            // Hold the answer back so the passages-only window is observable.
+            await delay(400);
+            c.enqueue(enc.encode(frame("delta", {
+              text: "La deuda crece cuando el tipo efectivo supera al crecimiento nominal [1].",
+            })));
+            c.enqueue(enc.encode(frame("done", {
+              answer: "La deuda crece cuando el tipo efectivo supera al crecimiento nominal [1].",
+              grounded: true, provider: "gemini", model: "gemini-2.5-flash", error: null,
+            })));
+            c.close();
+          },
+        });
+        return new HttpResponse(stream, {
+          headers: { "Content-Type": "text/event-stream" },
         });
       }),
     );

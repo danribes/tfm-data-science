@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { api } from "../api/client";
+import { useQuery } from "@tanstack/react-query";
+import { api, ragChatStream } from "../api/client";
 import type { Authority, Passage, RagChatResponse } from "../api/types";
 import { useScenarioStore } from "../state/scenarioStore";
 import { nf } from "../lib/fmt";
@@ -55,43 +55,55 @@ export default function Biblioteca() {
   const [passages, setPassages] = useState<Passage[]>([]);
   const [asked, setAsked] = useState("");
 
-  // Retrieval and generation are fired together rather than in sequence.
-  // Measured: retrieval ~0,8 s, generation ~4,6 s. Waiting for both before
-  // painting anything wastes the five seconds the reader could already be
-  // spending on the evidence — and the passages are the part that has to be
-  // right. The prose fills in underneath when it arrives.
-  const search = useMutation({
-    mutationFn: (q: string) => api.ragSearch({ query: q, collection, top_k: 8 }),
-    onSuccess: (r) => setPassages(r.passages),
-  });
+  const [streamed, setStreamed] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
-  const ask = useMutation({
-    mutationFn: (q: string) =>
-      api.ragChat({
-        question: q,
+  // One streamed request rather than two round trips. The server emits the
+  // passages as soon as retrieval finishes (~0,8 s) and then the answer word by
+  // word, so time-to-first-content is under a second instead of the ~5,5 s it
+  // took to wait for the whole generation.
+  const submit = (q: string) => {
+    const text = q.trim();
+    if (text.length < 2 || busy) return;
+    setQuestion(text);
+    setAsked(text);
+    setAnswer(null);
+    setPassages([]);
+    setStreamed("");
+    setFailed(false);
+    setBusy(true);
+
+    ragChatStream(
+      {
+        question: text,
         collection,
         top_k: 8,
         include_scenario: withScenario,
         levers: withScenario ? levers : undefined,
         horizon: withScenario ? horizon : undefined,
-      }),
-    onSuccess: setAnswer,
-  });
-
-  const submit = (q: string) => {
-    const text = q.trim();
-    if (text.length < 2 || ask.isPending) return;
-    setQuestion(text);
-    setAsked(text);
-    setAnswer(null);
-    setPassages([]);
-    search.mutate(text);
-    ask.mutate(text);
+      },
+      {
+        onPassages: (ps) => setPassages(ps),
+        onDelta: (piece) => setStreamed((prev) => prev + piece),
+        onDone: (final) =>
+          setAnswer({
+            vintage: "", computed_not_advice: true,
+            question: text, collection,
+            answer: final.answer, passages: [],
+            grounded: final.grounded, provider: final.provider,
+            model: final.model, error: final.error ?? null,
+          } as RagChatResponse),
+      },
+    )
+      .catch(() => setFailed(true))
+      .finally(() => setBusy(false));
   };
 
-  // Prefer the generated answer's own passages once it lands (they are the
-  // ones it actually cited); until then show what retrieval returned.
-  const shown = answer?.passages.length ? answer.passages : passages;
+  const shown = passages;
+  // While streaming, render what has arrived; once done, the final text (they
+  // agree, but `done` is authoritative if a provider died mid-stream).
+  const answerText = answer?.answer ?? streamed;
 
   const active = collections.data?.collections.find((c) => c.id === collection);
   const empty = active && active.chunks === 0;
@@ -152,8 +164,8 @@ export default function Biblioteca() {
             placeholder="¿por qué sube la deuda cuando el tipo supera al crecimiento?"
             aria-label="Pregunta"
           />
-          <button type="submit" disabled={ask.isPending || question.trim().length < 2}>
-            {ask.isPending ? "buscando…" : "preguntar"}
+          <button type="submit" disabled={busy || question.trim().length < 2}>
+            {busy ? "buscando…" : "preguntar"}
           </button>
         </form>
 
@@ -176,7 +188,7 @@ export default function Biblioteca() {
         </div>
       </div>
 
-      {ask.isError && (
+      {failed && (
         <div className="banner err">
           No se pudo consultar la biblioteca. ¿Está el índice construido y la API
           en marcha?
@@ -190,13 +202,17 @@ export default function Biblioteca() {
             {answer && !answer.grounded && <small>sin pasajes — el corpus no lo cubre</small>}
           </h4>
 
-          {answer ? (
-            <p className="biblio-answer">{answer.answer}</p>
+          {answerText ? (
+            <p className="biblio-answer" aria-live="polite">
+              {answerText}
+              {busy && <span className="biblio-caret" aria-hidden="true" />}
+            </p>
           ) : (
             <p className="biblio-pending" aria-live="polite">
               <span className="biblio-dots" aria-hidden="true" />
-              Redactando la respuesta. Los pasajes de abajo ya son los que va a
-              usar — puedes ir leyéndolos.
+              {shown.length
+                ? "Redactando la respuesta. Los pasajes de abajo ya son los que va a usar — puedes ir leyéndolos."
+                : "Buscando en el corpus…"}
             </p>
           )}
 
@@ -212,10 +228,6 @@ export default function Biblioteca() {
                 ))}
               </ol>
             </>
-          )}
-
-          {!shown.length && search.isPending && (
-            <p className="biblio-pending">Buscando en el corpus…</p>
           )}
 
           {answer && (

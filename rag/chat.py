@@ -91,6 +91,109 @@ def _call(provider: dict, messages: list[dict], max_tokens: int,
     return (r.json()["choices"][0]["message"].get("content") or "").strip()
 
 
+def _call_stream(provider: dict, messages: list[dict], max_tokens: int,
+                 timeout: float):
+    """Yield text deltas from an OpenAI-compatible SSE stream."""
+    import json as _json
+
+    import requests
+
+    key = os.environ.get(provider["key_env"], "")
+    if not key:
+        raise RuntimeError(f"{provider['key_env']} no configurada")
+    with requests.post(
+        f"{provider['base']}/chat/completions",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json"},
+        json={"model": provider["model"], "messages": messages,
+              "max_tokens": max_tokens, "temperature": 0.2, "stream": True},
+        timeout=timeout, stream=True,
+    ) as r:
+        r.raise_for_status()
+        # requests falls back to ISO-8859-1 for text/* responses without an
+        # explicit charset (an HTTP/1.1 legacy rule), which turned every
+        # accented character in the Spanish answers into mojibake — "pública"
+        # arrived as "pÃºblica". The payload is always UTF-8 JSON.
+        r.encoding = "utf-8"
+        for raw in r.iter_lines(decode_unicode=True):
+            if not raw:
+                continue
+            line = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
+            if not line.startswith("data:"):
+                continue
+            payload = line[5:].strip()
+            if payload == "[DONE]":
+                return
+            try:
+                delta = _json.loads(payload)["choices"][0].get("delta", {})
+            except (ValueError, KeyError, IndexError):
+                continue
+            piece = delta.get("content")
+            if piece:
+                yield piece
+
+
+def stream(question: str, collection: str = "libros", *,
+           top_k: int | None = None, scenario_facts: dict | None = None,
+           max_tokens: int = 900, timeout: float = 60.0):
+    """Generator of events for SSE: passages first, then answer deltas.
+
+    Retrieval finishes in well under a second while generation takes several,
+    so the passages are emitted immediately — the reader has the evidence in
+    hand before the first word of prose arrives, and the evidence is the part
+    that has to be right.
+
+    Yields (event_name, payload) tuples; the endpoint serialises them.
+    """
+    passages = retrieve.search(question, collection, top_k)
+    yield "passages", {"passages": [p.to_dict() for p in passages],
+                       "grounded": bool(passages)}
+
+    if not passages:
+        yield "done", {"answer": ("El corpus no cubre esta pregunta. Prueba a "
+                                  "reformularla o a consultar otra colección."),
+                       "grounded": False, "provider": None, "model": None}
+        return
+
+    user = f"PREGUNTA:\n{question}\n\nPASAJES:\n{_format_passages(passages)}"
+    if scenario_facts:
+        import json as _json
+        user += ("\n\nESCENARIO ACTIVO DEL USUARIO (calculado por el motor, "
+                 "no por ti — cítalo tal cual si es pertinente):\n"
+                 + _json.dumps(scenario_facts, ensure_ascii=False, indent=1)[:4000])
+    messages = [{"role": "system", "content": SYSTEM},
+                {"role": "user", "content": user}]
+
+    last: str | None = None
+    for prov in PROVIDERS:
+        parts: list[str] = []
+        try:
+            for piece in _call_stream(prov, messages, max_tokens, timeout):
+                parts.append(piece)
+                yield "delta", {"text": piece}
+        except Exception as exc:
+            if parts:
+                # Died mid-stream: the client already rendered these words, so
+                # finish with what arrived rather than silently restarting on
+                # another provider and duplicating text.
+                yield "done", {"answer": "".join(parts), "grounded": True,
+                               "provider": prov["name"], "model": prov["model"],
+                               "error": f"stream interrumpido: {type(exc).__name__}"}
+                return
+            last = f"{prov['name']}: {type(exc).__name__}"
+            continue
+        if parts:
+            yield "done", {"answer": "".join(parts), "grounded": True,
+                           "provider": prov["name"], "model": prov["model"]}
+            return
+        last = f"{prov['name']}: respuesta vacía"
+
+    yield "done", {"answer": ("No hay proveedor de lenguaje disponible ahora "
+                              "mismo. Arriba están los pasajes relevantes."),
+                   "grounded": True, "provider": None, "model": None,
+                   "error": last}
+
+
 def ask(question: str, collection: str = "libros", *, top_k: int | None = None,
         scenario_facts: dict | None = None, max_tokens: int = 900,
         timeout: float = 60.0) -> Answer:

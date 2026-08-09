@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import csv
+import json
 from dataclasses import asdict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from api.schemas import (ConstantsResponse, ConstantOut, ContributionOut,
                           CountriesResponse, CountryOut, DebtPointOut,
@@ -232,6 +234,28 @@ def rag_search(req: RagSearchRequest) -> RagSearchResponse:
     )
 
 
+def _scenario_facts(req: RagChatRequest) -> dict:
+    """The live scenario, trimmed to what the model needs.
+
+    Only a summary: the full facts blob would crowd the retrieved passages out
+    of the context window, and the passages are what the answer must rest on.
+    """
+    levers = Levers(**(req.levers or LeverValues()).model_dump())
+    f = build_facts(levers, req.horizon)
+    return {
+        "vintage": f.vintage,
+        "palancas_movidas": [
+            {"palanca": m.name, "de": m.base, "a": m.value, "unidad": m.unit}
+            for m in f.moved],
+        "resultados": [
+            {"serie": o.label, "año": o.year, "valor": o.value,
+             "delta_vs_base": o.delta, "unidad": o.unit}
+            for o in f.outcomes],
+        "lineas_rojas_cruzadas": [
+            r.label for r in f.redlines if r.status == "crossed"],
+    }
+
+
 @app.post("/rag/chat", response_model=RagChatResponse)
 def rag_chat(req: RagChatRequest) -> RagChatResponse:
     """Answer from the corpus, with citations. Never answers ungrounded."""
@@ -241,24 +265,7 @@ def rag_chat(req: RagChatRequest) -> RagChatResponse:
         raise HTTPException(status_code=422,
                             detail=f"colección desconocida: {req.collection}")
 
-    facts = None
-    if req.include_scenario:
-        levers = Levers(**(req.levers or LeverValues()).model_dump())
-        f = build_facts(levers, req.horizon)
-        # Only the summary the model needs — the full facts blob would crowd
-        # the retrieved passages out of the context window.
-        facts = {
-            "vintage": f.vintage,
-            "palancas_movidas": [
-                {"palanca": m.name, "de": m.base, "a": m.value, "unidad": m.unit}
-                for m in f.moved],
-            "resultados": [
-                {"serie": o.label, "año": o.year, "valor": o.value,
-                 "delta_vs_base": o.delta, "unidad": o.unit}
-                for o in f.outcomes],
-            "lineas_rojas_cruzadas": [
-                r.label for r in f.redlines if r.status == "crossed"],
-        }
+    facts = _scenario_facts(req) if req.include_scenario else None
 
     try:
         ans = rag_chat_mod.ask(req.question, req.collection, top_k=req.top_k,
@@ -272,6 +279,62 @@ def rag_chat(req: RagChatRequest) -> RagChatResponse:
         passages=[PassageOut(**p) for p in ans.passages],
         grounded=ans.grounded, provider=ans.provider, model=ans.model,
         error=ans.error,
+    )
+
+
+@app.post("/rag/chat/stream")
+def rag_chat_stream(req: RagChatRequest) -> StreamingResponse:
+    """Same as /rag/chat but streamed: passages first, then the answer word by word.
+
+    Time-to-first-content drops from ~5 s to under a second, because the reader
+    does not wait for generation to finish before seeing anything.
+    """
+    from rag import chat as rag_chat_mod, config as rag_config
+
+    if req.collection not in rag_config.COLLECTIONS:
+        raise HTTPException(status_code=422,
+                            detail=f"colección desconocida: {req.collection}")
+
+    facts = _scenario_facts(req) if req.include_scenario else None
+
+    # A *sync* generator handed to StreamingResponse is drained in a threadpool
+    # and its frames arrive together at the end — measured: passages landed at
+    # 4,6 s instead of 0,8 s, which silently defeated the whole feature. Running
+    # the blocking producer on its own thread and awaiting a queue makes this a
+    # true async generator, so each frame flushes as it is produced.
+    async def events():
+        import asyncio
+        import queue
+        import threading
+
+        q: queue.Queue = queue.Queue()
+        DONE = object()
+
+        def produce() -> None:
+            try:
+                for item in rag_chat_mod.stream(
+                        req.question, req.collection, top_k=req.top_k,
+                        scenario_facts=facts):
+                    q.put(item)
+            except Exception as exc:
+                q.put(("error", {"detail": f"{type(exc).__name__}: {exc}"}))
+            finally:
+                q.put(DONE)
+
+        threading.Thread(target=produce, daemon=True, name="rag-stream").start()
+        while True:
+            item = await asyncio.to_thread(q.get)
+            if item is DONE:
+                return
+            name, payload = item
+            yield f"event: {name}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        # Without this an intermediate proxy may buffer the whole stream and
+        # hand it over at the end, which would silently undo the feature.
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
