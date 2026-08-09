@@ -423,3 +423,34 @@ def test_distress_says_so_when_the_model_has_not_been_trained(monkeypatch):
     assert body["available"] is False
     assert body["spain"] is None
     assert "research.distress" in body["note"]
+
+
+# ---- /state-dependence: ¿E_R constante? ----
+
+def test_state_dependence_serves_the_committed_contrast():
+    body = client.get("/state-dependence").json()
+    assert body["available"] is True
+    assert len(body["regimes"]) == 3
+    assert body["engine_e_r"] == 0.45
+    assert len(body["diff_ci"]) == 2
+
+
+def test_state_dependence_reports_the_null_and_the_zero_r2():
+    """Both honesty markers must survive serialisation: the interval that
+    includes zero, and the R² that says the model has no out-of-country skill."""
+    body = client.get("/state-dependence").json()
+    lo, hi = body["diff_ci"]
+    assert lo < 0 < hi
+    assert body["state_dependent"] is False
+    assert body["r2_grouped"] < 0.1
+    assert "WDI" in body["spain_excluded_reason"]
+
+
+def test_state_dependence_says_so_when_not_run(monkeypatch):
+    import api.main as m
+    from pathlib import Path
+
+    monkeypatch.setattr(m, "_STATE_DEP_REPORT", Path("/nonexistent/s.json"))
+    body = client.get("/state-dependence").json()
+    assert body["available"] is False
+    assert "research.state_dependence" in body["note"]

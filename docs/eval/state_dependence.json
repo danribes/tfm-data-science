@@ -1,0 +1,72 @@
+{
+  "n": 2816,
+  "n_countries": 140,
+  "years": [
+    1981,
+    2021
+  ],
+  "r2_grouped": -0.007369100383912497,
+  "r2_std": 0.07156352629625588,
+  "regimes": [
+    {
+      "label": "deuda < 60 %",
+      "n": 1915,
+      "slope": -0.034895380503021454,
+      "se": 0.005283750382815756
+    },
+    {
+      "label": "deuda 60–90 %",
+      "n": 567,
+      "slope": -0.035162255221230475,
+      "se": 0.0034707694676359654
+    },
+    {
+      "label": "deuda > 90 %",
+      "n": 334,
+      "slope": -0.019602047731617764,
+      "se": 0.005259003811943416
+    }
+  ],
+  "engine_e_r": 0.45,
+  "horizon_years": 3,
+  "importance": [
+    {
+      "feature": "gdp_growth",
+      "label": "Crecimiento del PIB (%)",
+      "mean_abs_shap": 3.228537097554313
+    },
+    {
+      "feature": "gdp_pc_log",
+      "label": "log PIB per cápita",
+      "mean_abs_shap": 2.168086836430467
+    },
+    {
+      "feature": "cab_gdp",
+      "label": "Cuenta corriente (% PIB)",
+      "mean_abs_shap": 0.9537716162501368
+    },
+    {
+      "feature": "inflation",
+      "label": "Inflación (%)",
+      "mean_abs_shap": 0.5348753751455158
+    },
+    {
+      "feature": "d_real_rate",
+      "label": "Δ tipo de interés real (pp)",
+      "mean_abs_shap": 0.4298746919474839
+    },
+    {
+      "feature": "debt_gdp",
+      "label": "Deuda pública (% PIB)",
+      "mean_abs_shap": 0.2534385827398593
+    }
+  ],
+  "diff_ci": [
+    -0.030907397110406465,
+    0.05374454422689523
+  ],
+  "n_boot": 60,
+  "state_dependent": false,
+  "spain_excluded_reason": "la zona euro no reporta tipos de préstamo al WDI: España no tiene variable de tratamiento en este panel",
+  "seed": 42
+}

@@ -191,6 +191,24 @@ export interface DistressResponse extends ApiMeta {
   note: string;
 }
 
+export interface RegimeSlopeOut { label: string; n: number; slope: number; se: number }
+export interface EmpiricalImportanceOut { feature: string; label: string; mean_abs_shap: number }
+export interface StateDependenceResponse extends ApiMeta {
+  available: boolean;
+  n: number; n_countries: number; years: number[]; horizon_years: number;
+  /** ~0 y publicado: las pendientes describen la superficie ajustada. */
+  r2_grouped: number; r2_std: number;
+  regimes: RegimeSlopeOut[];
+  engine_e_r: number;
+  importance: EmpiricalImportanceOut[];
+  diff_ci: number[];
+  n_boot: number;
+  /** false es el hallazgo: la constante del motor no queda contradicha. */
+  state_dependent: boolean;
+  spain_excluded_reason: string;
+  note: string;
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

@@ -39,6 +39,7 @@ INDICATORS = {
     "gdp_pc":         "NY.GDP.PCAP.KD",
     "exports_gdp":    "NE.EXP.GNFS.ZS",
     "gov_debt_gdp":   "GC.DOD.TOTL.GD.ZS",
+    "real_rate":      "FR.INR.RINR",   # real interest rate (lending, deflated)
 }
 
 START, END = 1960, 2024

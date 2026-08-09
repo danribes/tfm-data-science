@@ -499,3 +499,40 @@ class DistressResponse(ApiMeta):
     importances: list[DistressFeatureOut] = []
     spain: DistressCountryOut | None = None
     note: str = ""
+
+
+# ---- Dependencia del estado: ¿E_R constante o no? ----
+
+class RegimeSlopeOut(BaseModel):
+    label: str
+    n: int
+    slope: float
+    se: float
+
+
+class EmpiricalImportanceOut(BaseModel):
+    feature: str
+    label: str
+    mean_abs_shap: float
+
+
+class StateDependenceResponse(ApiMeta):
+    available: bool
+    n: int = 0
+    n_countries: int = 0
+    years: list[int] = []
+    horizon_years: int = 3
+    #: ~0 y publicado como tal: sin poder predictivo fuera de país, las
+    #: pendientes describen la superficie ajustada, no una regla validada.
+    r2_grouped: float = 0.0
+    r2_std: float = 0.0
+    regimes: list[RegimeSlopeOut] = []
+    engine_e_r: float = 0.0
+    importance: list[EmpiricalImportanceOut] = []
+    diff_ci: list[float] = []
+    n_boot: int = 0
+    #: False es el hallazgo del corte actual: la constancia del motor NO queda
+    #: contradicha por este panel.
+    state_dependent: bool = False
+    spain_excluded_reason: str = ""
+    note: str = ""

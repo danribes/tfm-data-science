@@ -6,7 +6,7 @@ import type {
   RagChatRequest, RagChatResponse, RagCollectionsResponse,
   RagSearchRequest, RagSearchResponse,
   RedLinesResponse, ScenarioRequest,
-  ScenarioResponse, SensitivityResponse, VintageResponse,
+  ScenarioResponse, SensitivityResponse, StateDependenceResponse, VintageResponse,
 } from "./types";
 
 export const API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
@@ -56,6 +56,7 @@ export const api = {
   evidence: () => request<EvidenceResponse>("/evidence"),
   prediction: () => request<PredictionResponse>("/prediction"),
   distress: () => request<DistressResponse>("/distress"),
+  stateDependence: () => request<StateDependenceResponse>("/state-dependence"),
   ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
     request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),

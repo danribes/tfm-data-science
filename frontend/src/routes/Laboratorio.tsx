@@ -14,6 +14,7 @@ import { useScenario, useScenarioStore } from "../state/scenarioStore";
 
 import { BudgetFlowChart } from "../components/BudgetFlowChart";
 import { DebtAmortizationFlowChart } from "../components/DebtAmortizationFlowChart";
+import { EmpiricalTwin } from "../components/EmpiricalTwin";
 
 export default function Laboratorio() {
   const [seriesKey, setSeriesKey] = useState<AnySeriesKey>("b");
@@ -113,6 +114,8 @@ export default function Laboratorio() {
       {/* --- Budget & Debt Flow Sankey Diagrams --- */}
       <BudgetFlowChart levers={levers} />
       <DebtAmortizationFlowChart levers={levers} />
+
+      <EmpiricalTwin />
 
       <div className="card" style={{ marginTop: 16 }}>
         <h4>Matriz de Sensibilidad y Elasticidades Marginales <small>∂Y / ∂L en 2030 y 2050</small></h4>

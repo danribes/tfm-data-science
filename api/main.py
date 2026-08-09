@@ -27,6 +27,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           SensitivityResponse,
                           BacktestRowOut, BacktestVerdictOut, PredictionResponse,
                           DistressFeatureOut, DistressCountryOut, DistressResponse,
+                          EmpiricalImportanceOut, RegimeSlopeOut, StateDependenceResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
@@ -257,6 +258,32 @@ def distress() -> DistressResponse:
         importances=[DistressFeatureOut(**i) for i in raw["importances"]],
         spain=DistressCountryOut(**{k: v for k, v in esp.items()
                                     if k != "features"}) if esp else None,
+    )
+
+
+_STATE_DEP_REPORT = GOLD_DIR.parents[1] / "docs" / "eval" / "state_dependence.json"
+
+
+@app.get("/state-dependence", response_model=StateDependenceResponse)
+def state_dependence() -> StateDependenceResponse:
+    """Whether a rate shock hits the same at 60 % debt as at 120 %."""
+    if not _STATE_DEP_REPORT.exists():
+        return StateDependenceResponse(
+            available=False,
+            note=("El contraste de dependencia del estado no se ha ejecutado. "
+                  "Genéralo con `python -m research.state_dependence`."))
+    raw = json.loads(_STATE_DEP_REPORT.read_text(encoding="utf-8"))
+    return StateDependenceResponse(
+        available=True,
+        n=raw["n"], n_countries=raw["n_countries"], years=raw["years"],
+        horizon_years=raw["horizon_years"],
+        r2_grouped=raw["r2_grouped"], r2_std=raw["r2_std"],
+        regimes=[RegimeSlopeOut(**r) for r in raw["regimes"]],
+        engine_e_r=raw["engine_e_r"],
+        importance=[EmpiricalImportanceOut(**i) for i in raw["importance"]],
+        diff_ci=raw["diff_ci"], n_boot=raw["n_boot"],
+        state_dependent=raw["state_dependent"],
+        spain_excluded_reason=raw["spain_excluded_reason"],
     )
 
 

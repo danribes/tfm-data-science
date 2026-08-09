@@ -243,6 +243,30 @@ export const handlers = [
     }),
   ),
 
+  http.get(`${BASE}/state-dependence`, () =>
+    HttpResponse.json({
+      ...META,
+      available: true,
+      n: 2816, n_countries: 140, years: [1981, 2021], horizon_years: 3,
+      r2_grouped: -0.007, r2_std: 0.072,
+      regimes: [
+        { label: "deuda < 60 %", n: 1915, slope: -0.035, se: 0.005 },
+        { label: "deuda 60–90 %", n: 567, slope: -0.035, se: 0.003 },
+        { label: "deuda > 90 %", n: 334, slope: -0.02, se: 0.005 },
+      ],
+      engine_e_r: 0.45,
+      importance: [
+        { feature: "gdp_growth", label: "Crecimiento del PIB (%)", mean_abs_shap: 3.229 },
+        { feature: "gdp_pc_log", label: "log PIB per cápita", mean_abs_shap: 2.168 },
+        { feature: "d_real_rate", label: "Δ tipo de interés real (pp)", mean_abs_shap: 0.43 },
+      ],
+      diff_ci: [-0.031, 0.054], n_boot: 60,
+      state_dependent: false,
+      spain_excluded_reason: "la zona euro no reporta tipos de préstamo al WDI: España no tiene variable de tratamiento en este panel",
+      note: "",
+    }),
+  ),
+
   // Predicción, offline. The numbers are the real ones from
   // docs/eval/t1-dl-global.json: the page's whole job is to render a loss
   // correctly, so a fixture where the candidate wins would test the wrong path.

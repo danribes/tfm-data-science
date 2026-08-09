@@ -298,3 +298,10 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .dg-base { position: absolute; top: -3px; bottom: -3px; width: 3px; background: var(--div-neg); border-radius: 2px; }
 .dg-axis { position: relative; display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin: 4px 2px 8px; }
 .dg-axis-base { position: absolute; transform: translateX(-50%); color: var(--div-neg); font-weight: 700; }
+
+/* --- empirical twin: SHAP importance bars --- */
+.et-row { display: grid; grid-template-columns: 210px 1fr 48px; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 13px; }
+.et-lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
+.et-track { position: relative; height: 10px; background: var(--grid); border-radius: 5px; }
+.et-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--s1); }
+.et-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
