@@ -1,0 +1,116 @@
+{
+  "n": 3874,
+  "n_positive": 377,
+  "base_rate": 0.09731543624161074,
+  "n_countries": 154,
+  "auc": 0.6735751887236644,
+  "auc_std": 0.0307657962339663,
+  "pr_auc": 0.19454474836959032,
+  "pr_auc_lift": 1.9991150004875144,
+  "importances": [
+    {
+      "feature": "gdp_pc",
+      "label": "PIB per cápita (USD 2021)",
+      "mean": 0.0657526838085544,
+      "std": 0.0049200499996769126
+    },
+    {
+      "feature": "gdp_growth",
+      "label": "Crecimiento del PIB (%)",
+      "mean": 0.06045978022844896,
+      "std": 0.0029867797836699373
+    },
+    {
+      "feature": "ext_debt_gni",
+      "label": "Deuda externa (% RNB)",
+      "mean": 0.054062216268738174,
+      "std": 0.004280864886935926
+    },
+    {
+      "feature": "d_gdp_growth",
+      "label": "Δ crecimiento (3 años)",
+      "mean": 0.03779063373001038,
+      "std": 0.0032992788981981063
+    },
+    {
+      "feature": "exports_gdp",
+      "label": "Exportaciones (% PIB)",
+      "mean": 0.03365146631936887,
+      "std": 0.0018012976994414716
+    },
+    {
+      "feature": "inflation",
+      "label": "Inflación (%)",
+      "mean": 0.029905436186682212,
+      "std": 0.0028170848951195203
+    },
+    {
+      "feature": "cab_gdp",
+      "label": "Saldo por cuenta corriente (% PIB)",
+      "mean": 0.02826735155332083,
+      "std": 0.0022619467883461092
+    },
+    {
+      "feature": "reserves_mo",
+      "label": "Reservas (meses de importaciones)",
+      "mean": 0.025809010982509484,
+      "std": 0.0019474836750255772
+    },
+    {
+      "feature": "d_reserves_mo",
+      "label": "Δ reservas (3 años)",
+      "mean": 0.01156034463795803,
+      "std": 0.0012882923322771666
+    },
+    {
+      "feature": "reserves_debt",
+      "label": "Reservas (% deuda externa)",
+      "mean": 0.01019486956990041,
+      "std": 0.0010674178308616954
+    },
+    {
+      "feature": "debt_service_x",
+      "label": "Servicio de la deuda (% exportaciones)",
+      "mean": 0.009215098352585683,
+      "std": 0.0013616259684255615
+    },
+    {
+      "feature": "d_ext_debt_gni",
+      "label": "Δ deuda externa (3 años)",
+      "mean": 0.0016895876647585405,
+      "std": 0.0008374491888040135
+    }
+  ],
+  "unmapped": [
+    "Czechoslovakia",
+    "Yugoslavia"
+  ],
+  "years": [
+    1960,
+    2023
+  ],
+  "beats_chance": true,
+  "seed": 42,
+  "spain": {
+    "iso3": "ESP",
+    "year": 2024,
+    "probability": 0.0174089638599947,
+    "base_rate": 0.09731543624161074,
+    "in_label_set": false,
+    "coverage": "8/12",
+    "features": {
+      "ext_debt_gni": null,
+      "debt_service_x": null,
+      "reserves_mo": 1.8246595612095,
+      "reserves_debt": null,
+      "cab_gdp": 3.18327391138733,
+      "gdp_growth": 3.45525405630191,
+      "inflation": 2.747147886618,
+      "gdp_pc": 29245.2192451729,
+      "exports_gdp": 37.0558792721708,
+      "d_ext_debt_gni": null,
+      "d_reserves_mo": -0.20769218980805015,
+      "d_gdp_growth": -3.2278901484281004
+    }
+  }
+}
