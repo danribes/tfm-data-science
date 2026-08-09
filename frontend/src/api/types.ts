@@ -174,6 +174,23 @@ export interface PredictionResponse extends ApiMeta {
   note: string;
 }
 
+export interface DistressFeatureOut { feature: string; label: string; mean: number; std: number }
+export interface DistressCountryOut {
+  iso3: string; year: number; probability: number; base_rate: number;
+  /** false cuando el país no está en la base de impagos — el caso de España. */
+  in_label_set: boolean; coverage: string;
+}
+export interface DistressResponse extends ApiMeta {
+  available: boolean;
+  n: number; n_positive: number; base_rate: number; n_countries: number;
+  auc: number; auc_std: number; pr_auc: number; pr_auc_lift: number;
+  beats_chance: boolean;
+  years: number[];
+  importances: DistressFeatureOut[];
+  spain: DistressCountryOut | null;
+  note: string;
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

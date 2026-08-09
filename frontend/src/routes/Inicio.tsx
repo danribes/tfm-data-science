@@ -12,6 +12,7 @@ import { Stamp } from "../components/Stamp";
 import { SERIES_FORMAT, UP_IS_BAD } from "../components/KpiRow";
 import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 import { SHIPPED_IDS } from "../personas/registry";
+import { DistressGauge } from "../components/DistressGauge";
 
 const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean }[] = [
   { k: "b", lab: "Deuda", at2050: true },
@@ -219,6 +220,10 @@ export default function Inicio() {
           está por encima de ese umbral hoy, no que este escenario la haya roto.
         </Caption>
       </div>
+
+      {/* The probabilistic complement of the 7 % threshold, right after the
+          thresholds themselves so the two readings sit together. */}
+      <DistressGauge />
 
       <div className="row2">
         {(personas.data?.personas ?? [])

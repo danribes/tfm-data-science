@@ -226,6 +226,23 @@ export const handlers = [
     }),
   ),
 
+  http.get(`${BASE}/distress`, () =>
+    HttpResponse.json({
+      ...META,
+      available: true,
+      n: 3874, n_positive: 377, base_rate: 0.0973, n_countries: 154,
+      auc: 0.674, auc_std: 0.031, pr_auc: 0.195, pr_auc_lift: 2.0,
+      beats_chance: true, years: [1960, 2023],
+      importances: [
+        { feature: "gdp_pc", label: "PIB per cápita (USD 2021)", mean: 0.0658, std: 0.0049 },
+        { feature: "gdp_growth", label: "Crecimiento del PIB (%)", mean: 0.0605, std: 0.003 },
+      ],
+      spain: { iso3: "ESP", year: 2024, probability: 0.0174, base_rate: 0.0973,
+               in_label_set: false, coverage: "8/12" },
+      note: "",
+    }),
+  ),
+
   // Predicción, offline. The numbers are the real ones from
   // docs/eval/t1-dl-global.json: the page's whole job is to render a loss
   // correctly, so a fixture where the candidate wins would test the wrong path.

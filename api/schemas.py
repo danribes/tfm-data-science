@@ -462,3 +462,40 @@ class PredictionResponse(ApiMeta):
     verdict: BacktestVerdictOut | None = None
     methods: list[str] = []
     note: str = ""
+
+
+# ---- Distress: el complemento probabilístico del umbral del 7 % ----
+
+class DistressFeatureOut(BaseModel):
+    feature: str
+    label: str
+    mean: float
+    std: float
+
+
+class DistressCountryOut(BaseModel):
+    iso3: str
+    year: int
+    probability: float
+    base_rate: float
+    #: False cuando el país no está en la base de impagos — el caso de España.
+    in_label_set: bool
+    coverage: str
+
+
+class DistressResponse(ApiMeta):
+    available: bool
+    n: int = 0
+    n_positive: int = 0
+    base_rate: float = 0.0
+    n_countries: int = 0
+    auc: float = 0.0
+    auc_std: float = 0.0
+    pr_auc: float = 0.0
+    pr_auc_lift: float = 0.0
+    #: False es un resultado publicable: el modelo no distingue mejor que el azar.
+    beats_chance: bool = False
+    years: list[int] = []
+    importances: list[DistressFeatureOut] = []
+    spain: DistressCountryOut | None = None
+    note: str = ""

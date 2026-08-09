@@ -26,6 +26,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           RedLineStatusOut, ScenarioRequest, ScenarioResponse,
                           SensitivityResponse,
                           BacktestRowOut, BacktestVerdictOut, PredictionResponse,
+                          DistressFeatureOut, DistressCountryOut, DistressResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
@@ -226,6 +227,36 @@ def prediction() -> PredictionResponse:
         rows=rows,
         verdict=BacktestVerdictOut(**raw["verdict"]),
         methods=methods,
+    )
+
+
+#: Same reasoning as the T1 report: fitting the classifier and running grouped
+#: cross-validation takes ~30 s, so the evaluation is a committed artifact
+#: regenerated with `python -m research.distress`.
+_DISTRESS_REPORT = GOLD_DIR.parents[1] / "docs" / "eval" / "distress.json"
+
+
+@app.get("/distress", response_model=DistressResponse)
+def distress() -> DistressResponse:
+    """How much Spain resembles the countries that went on to default."""
+    if not _DISTRESS_REPORT.exists():
+        return DistressResponse(
+            available=False,
+            note=("El clasificador de distress no se ha entrenado en esta copia. "
+                  "Genéralo con `python -m research.distress`."))
+
+    raw = json.loads(_DISTRESS_REPORT.read_text(encoding="utf-8"))
+    esp = raw.get("spain")
+    return DistressResponse(
+        available=True,
+        n=raw["n"], n_positive=raw["n_positive"], base_rate=raw["base_rate"],
+        n_countries=raw["n_countries"],
+        auc=raw["auc"], auc_std=raw["auc_std"],
+        pr_auc=raw["pr_auc"], pr_auc_lift=raw["pr_auc_lift"],
+        beats_chance=raw["beats_chance"], years=raw["years"],
+        importances=[DistressFeatureOut(**i) for i in raw["importances"]],
+        spain=DistressCountryOut(**{k: v for k, v in esp.items()
+                                    if k != "features"}) if esp else None,
     )
 
 

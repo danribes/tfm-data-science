@@ -288,3 +288,13 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 /* --- predicción: el veredicto pre-registrado --- */
 .verdict-line { margin: 0 0 var(--sp-1); }
 .verdict-line .st { font-size: 15px; padding: 6px 14px; }
+
+/* --- distress gauge: log-scale bar against the base rate --- */
+.dg-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.dg-val { font-size: 32px; font-weight: 800; }
+.dg-ref { font-size: 14px; color: var(--muted); }
+.dg-bar { position: relative; height: 12px; border-radius: 6px; background: var(--grid); }
+.dg-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: var(--s3); }
+.dg-base { position: absolute; top: -3px; bottom: -3px; width: 3px; background: var(--div-neg); border-radius: 2px; }
+.dg-axis { position: relative; display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin: 4px 2px 8px; }
+.dg-axis-base { position: absolute; transform: translateX(-50%); color: var(--div-neg); font-weight: 700; }

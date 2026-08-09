@@ -391,3 +391,35 @@ def test_prediction_says_so_when_the_evaluation_has_not_been_run(monkeypatch):
     assert body["available"] is False
     assert body["rows"] == [] and body["verdict"] is None
     assert "research.dl_global" in body["note"]
+
+
+# ---- /distress: el complemento probabilístico del 7 % ----
+
+def test_distress_serves_the_committed_evaluation():
+    body = client.get("/distress").json()
+    assert body["available"] is True
+    assert body["n_positive"] > 300
+    assert 0.5 < body["auc"] < 1.0
+    assert body["years"] == [1960, 2023]
+    assert body["importances"][0]["label"]
+
+
+def test_distress_scores_spain_as_out_of_sample():
+    """Spain is not in the default database, and the endpoint must say so:
+    that fact is what makes the probability an honest out-of-sample number."""
+    esp = client.get("/distress").json()["spain"]
+    assert esp is not None
+    assert esp["iso3"] == "ESP"
+    assert esp["in_label_set"] is False
+    assert 0.0 < esp["probability"] < 0.5
+
+
+def test_distress_says_so_when_the_model_has_not_been_trained(monkeypatch):
+    import api.main as m
+    from pathlib import Path
+
+    monkeypatch.setattr(m, "_DISTRESS_REPORT", Path("/nonexistent/d.json"))
+    body = client.get("/distress").json()
+    assert body["available"] is False
+    assert body["spain"] is None
+    assert "research.distress" in body["note"]
