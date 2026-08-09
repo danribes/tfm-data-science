@@ -12,6 +12,8 @@ server-side.
 """
 from __future__ import annotations
 
+import re
+
 import os
 from dataclasses import dataclass
 from typing import Sequence
@@ -145,6 +147,15 @@ def stream(question: str, collection: str = "libros", *,
 
     Yields (event_name, payload) tuples; the endpoint serialises them.
     """
+    refusal = refusal_for(question)
+    if refusal:
+        # No passages at all: showing sources beside a refusal would read as
+        # evidence for advice that was just declined.
+        yield "passages", {"passages": [], "grounded": False}
+        yield "done", {"answer": refusal, "grounded": False,
+                       "provider": None, "model": None}
+        return
+
     passages = retrieve.search(question, collection, top_k)
     yield "passages", {"passages": [p.to_dict() for p in passages],
                        "grounded": bool(passages)}
@@ -194,10 +205,64 @@ def stream(question: str, collection: str = "libros", *,
                    "error": last}
 
 
+# ---- guardrail: personal advice is refused, not answered ---------------------
+
+#: The system prompt already tells the model not to give advice. A prompt is a
+#: request: it holds until a provider fails over to a weaker model, or a user
+#: phrases the question as a hypothetical, or the passages themselves read like
+#: a recommendation. The app's own footer promises "no es recomendación de
+#: compra, venta o voto" on every page, and a promise printed under a chat that
+#: can be talked into a stock tip is worth nothing. So the check runs before
+#: retrieval and does not consult a model.
+#:
+#: Deliberately narrow. It fires on a *personal* decision — first person plus a
+#: transaction — and not on the economics. "¿Es mayor el multiplicador en
+#: recesión?" and "¿Cómo afecta el Euríbor a las hipotecas?" are the questions
+#: this library exists to answer, and a guardrail that swallows them would do
+#: more damage than the one it prevents.
+_PERSONAL = re.compile(
+    r"\b(me|mis|mi|nos|nuestros?|yo)\b|\b(deber[ií]a|debo|compro|vendo|invierto)\b",
+    re.IGNORECASE)
+_TRANSACTION = re.compile(
+    r"\b(compr|vend|invert|invier|hipotec|contrat|amortiz|cartera|"
+    r"acciones|fondos?|bolsa|ahorros?|plan de pensiones)", re.IGNORECASE)
+_VOTE = re.compile(r"\b(vot(ar|o|e)|partido|elecciones)\b", re.IGNORECASE)
+_RECOMMEND = re.compile(r"\b(recomiend|aconsej|qu[eé] hago|dame una cartera)",
+                        re.IGNORECASE)
+
+REFUSAL = (
+    "No doy consejo de inversión, de compra de vivienda ni de voto — ni aquí ni "
+    "en el resto de la aplicación, que es una proyección condicional y no una "
+    "recomendación.\n\n"
+    "Lo que sí puedo hacer es explicarte el mecanismo con las fuentes del "
+    "corpus: qué dice la literatura sobre cómo se transmite un cambio de tipos "
+    "a las hipotecas, qué determina el precio de la vivienda a largo plazo, o "
+    "cómo se lee un escenario de deuda. Reformula la pregunta en esos términos "
+    "y la respondo con citas."
+)
+
+
+def refusal_for(question: str) -> str | None:
+    """The refusal text if the question asks for personal advice, else None."""
+    if _VOTE.search(question) and (_PERSONAL.search(question)
+                                   or _RECOMMEND.search(question)):
+        return REFUSAL
+    if not _TRANSACTION.search(question):
+        return None
+    if _PERSONAL.search(question) or _RECOMMEND.search(question):
+        return REFUSAL
+    return None
+
+
 def ask(question: str, collection: str = "libros", *, top_k: int | None = None,
         scenario_facts: dict | None = None, max_tokens: int = 900,
         timeout: float = 60.0) -> Answer:
     """Retrieve, then answer with citations. Never answers ungrounded."""
+    refusal = refusal_for(question)
+    if refusal:
+        return Answer(text=refusal, passages=[], provider=None, model=None,
+                      grounded=False, error=None)
+
     passages = retrieve.search(question, collection, top_k)
     if not passages:
         return Answer(

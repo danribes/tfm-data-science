@@ -97,13 +97,29 @@ MIN_SCORE = float(os.environ.get("EVO_RAG_MIN_SCORE", "0.0"))
 #: fusion sends every Spanish question to Mises regardless of topic. The
 #: embedder does bridge ES↔EN, so it gets the larger say; BM25 still earns its
 #: place on exact terminology ("Okun", "prima de riesgo").
-W_DENSE = float(os.environ.get("EVO_RAG_W_DENSE", "1.6"))
+W_DENSE = float(os.environ.get("EVO_RAG_W_DENSE", "6.0"))
 W_LEXICAL = float(os.environ.get("EVO_RAG_W_LEXICAL", "1.0"))
 
 #: No single book may take more than this many of the returned passages. Without
 #: it one 1.100-chunk volume can fill the whole answer and the citation list
 #: looks like a single-source essay.
-MAX_PER_DOCUMENT = int(os.environ.get("EVO_RAG_MAX_PER_DOC", "3"))
+#:
+#: Tightened from 3 to 2 on measurement: it is worth 3 points of hit@8 (91 % to
+#: 94 %) on its own. The reason is the same hub effect the model shows
+#: elsewhere — a handful of documents sit close to every query, and at a cap of
+#: 3 two of them can take six of the eight slots before an on-topic passage is
+#: reached. This is a retrieval fix that happens to also be a citation-quality
+#: fix, which is unusual enough to be worth stating.
+MAX_PER_DOCUMENT = int(os.environ.get("EVO_RAG_MAX_PER_DOC", "2"))
+
+#: Centring the dense vectors on the collection mean was tried and rejected.
+#:
+#: The hypothesis was good: the chunk embeddings are unit vectors whose mean has
+#: norm 0,90, so nearly the whole space points one way, and cosine scores that
+#: shared direction as much as the topic. Subtracting the mean is the standard
+#: correction. Measured on the golden set it made dense retrieval *worse* —
+#: MRR 0,63 to 0,55 — and left the fused result unchanged. Written down so the
+#: next person reads the result instead of re-deriving the idea.
 
 
 def resolve_device() -> str:

@@ -106,6 +106,18 @@ def ingest_document(con, doc: dict, *, force: bool = False) -> tuple[int, str]:
         store.delete_document(con, sha)
         raise
 
+    if not written:
+        # A document that yielded no text is not ingested, it only looks
+        # ingested: the row counts towards "473 documentos" while no search can
+        # ever reach it. Scanned PDFs with no text layer land here — every page
+        # loads and every page is empty. Dropping the row keeps the count
+        # honest and lets a later run retry the file, because the sha is what
+        # `document_exists` checks.
+        con.rollback()
+        store.delete_document(con, sha)
+        con.commit()
+        return 0, "sin-texto"
+
     con.execute("UPDATE documents SET pages=? WHERE id=?", (max_page, doc_id))
     con.commit()
     return written, "ok"
