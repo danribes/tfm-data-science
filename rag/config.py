@@ -100,6 +100,16 @@ MIN_SCORE = float(os.environ.get("EVO_RAG_MIN_SCORE", "0.0"))
 W_DENSE = float(os.environ.get("EVO_RAG_W_DENSE", "6.0"))
 W_LEXICAL = float(os.environ.get("EVO_RAG_W_LEXICAL", "1.0"))
 
+#: Weight of the English-only dense probe (see rag/glossary.py), set by sweep.
+#:
+#: 0 is the old behaviour: hit@8 94 %, MRR 0,69. It climbs to 97 % / 0,76 at 4
+#: and then flattens, so 4 is the first value on the plateau rather than the
+#: largest that scores well. The choice between 3 (MRR 0,77, top1 69 %) and 4
+#: (0,76 / 66 %) is a real trade — 3 ranks better, 4 finds more. Recall wins:
+#: a passage that never surfaces cannot be cited, while one at rank 3 still
+#: reaches the answer.
+W_DENSE_EN = float(os.environ.get("EVO_RAG_W_DENSE_EN", "4.0"))
+
 #: No single book may take more than this many of the returned passages. Without
 #: it one 1.100-chunk volume can fill the whole answer and the citation list
 #: looks like a single-source essay.

@@ -18,7 +18,7 @@ import struct
 from dataclasses import dataclass, asdict
 from typing import Sequence
 
-from rag import config, embed, store
+from rag import config, embed, glossary, store
 
 
 @dataclass(frozen=True)
@@ -59,7 +59,9 @@ def _fts_query(text: str) -> str:
 
 def _lexical(con: sqlite3.Connection, query: str, collection: str,
              limit: int) -> list[int]:
-    expr = _fts_query(query)
+    # BM25 cannot cross a language, so a Spanish question can never reach an
+    # English textbook without the English terms being in the query.
+    expr = _fts_query(glossary.expand(query))
     if not expr:
         return []
     rows = con.execute(
@@ -74,8 +76,8 @@ def _lexical(con: sqlite3.Connection, query: str, collection: str,
 
 
 def _dense(con: sqlite3.Connection, query: str, collection: str,
-           limit: int) -> list[int]:
-    vec = embed.embed_query(query)
+           limit: int, text: str | None = None) -> list[int]:
+    vec = embed.embed_query(text if text is not None else query)
     blob = struct.pack(f"{len(vec)}f", *vec)
     # Over-fetch then filter by collection: vec0 KNN cannot join in its own
     # WHERE clause, so a collection with few chunks would otherwise come back
@@ -116,12 +118,27 @@ def search(query: str, collection: str = "libros", top_k: int | None = None,
         k = top_k or config.TOP_K
         lex = _lexical(con, query, collection, config.CANDIDATES)
         den = _dense(con, query, collection, config.CANDIDATES)
-        if not lex and not den:
+
+        # A second dense probe, in English only.
+        #
+        # Appending the translation to the Spanish query does not work: fifteen
+        # Spanish tokens drown three English ones and the vector barely moves.
+        # Embedding the terminology on its own gives the English literature a
+        # full-strength ranking of its own, which fusion can then weigh against
+        # the Spanish one instead of averaging the two into neither.
+        terms = glossary.english_terms(query)
+        den_en = (_dense(con, query, collection, config.CANDIDATES,
+                         text=", ".join(terms)) if terms else [])
+
+        if not lex and not den and not den_en:
             return []
 
-        fused = _rrf([(den, config.W_DENSE), (lex, config.W_LEXICAL)])
+        fused = _rrf([(den, config.W_DENSE), (den_en, config.W_DENSE_EN),
+                      (lex, config.W_LEXICAL)])
         lex_pos = {cid: i for i, cid in enumerate(lex)}
         den_pos = {cid: i for i, cid in enumerate(den)}
+        for cid, i in ((c, i) for i, c in enumerate(den_en)):
+            den_pos.setdefault(cid, i)
         ranked = sorted(fused.items(), key=lambda kv: kv[1], reverse=True)
         if not ranked:
             return []

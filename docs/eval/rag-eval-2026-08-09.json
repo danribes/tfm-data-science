@@ -8,17 +8,17 @@
     "top_k": 8,
     "overall": {
       "n": 32,
-      "hit_rate": 0.9375,
-      "mrr": 0.6209077380952381,
-      "top1": 0.4375,
+      "hit_rate": 0.96875,
+      "mrr": 0.7615327380952381,
+      "top1": 0.65625,
       "term_recall": 1.0
     },
     "by_topic": {
       "micro": {
         "n": 4,
         "hit_rate": 1.0,
-        "mrr": 0.3482142857142857,
-        "top1": 0.0,
+        "mrr": 0.5982142857142857,
+        "top1": 0.5,
         "term_recall": 1.0
       },
       "macro-fiscal": {
@@ -30,30 +30,30 @@
       },
       "macro": {
         "n": 2,
-        "hit_rate": 0.5,
-        "mrr": 0.25,
-        "top1": 0.0,
+        "hit_rate": 1.0,
+        "mrr": 0.5833333333333334,
+        "top1": 0.5,
         "term_recall": 1.0
       },
       "dsa": {
         "n": 4,
         "hit_rate": 0.75,
-        "mrr": 0.25,
-        "top1": 0.0,
+        "mrr": 0.36904761904761907,
+        "top1": 0.25,
         "term_recall": 1.0
       },
       "econometria": {
         "n": 4,
         "hit_rate": 1.0,
-        "mrr": 0.49404761904761907,
-        "top1": 0.25,
+        "mrr": 1.0,
+        "top1": 1.0,
         "term_recall": 1.0
       },
       "espana": {
         "n": 5,
         "hit_rate": 1.0,
-        "mrr": 1.0,
-        "top1": 1.0,
+        "mrr": 0.9,
+        "top1": 0.8,
         "term_recall": 1.0
       },
       "austriaco": {
@@ -66,8 +66,8 @@
       "desarrollo": {
         "n": 2,
         "hit_rate": 1.0,
-        "mrr": 0.3333333333333333,
-        "top1": 0.0,
+        "mrr": 1.0,
+        "top1": 1.0,
         "term_recall": 1.0
       },
       "propio": {
@@ -80,13 +80,12 @@
       "opinion": {
         "n": 2,
         "hit_rate": 1.0,
-        "mrr": 1.0,
-        "top1": 1.0,
+        "mrr": 0.75,
+        "top1": 0.5,
         "term_recall": 1.0
       }
     },
     "misses": [
-      "macro-okun",
       "dsa-r-menos-g"
     ],
     "traps_hit": []
@@ -119,24 +118,24 @@
       "id": "micro-excedente",
       "topic": "micro",
       "collection": "libros",
-      "rank": 2,
+      "rank": 1,
       "hit": true,
-      "rr": 0.5,
+      "rr": 1.0,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "Mises L. - Planificacion para la Libertad (facsimile)",
-        "Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES)",
         "Mankiw G. - Principles of Economics (9th ed) (2020)",
-        "Mises L. - La Teoria del Dinero y del Credito"
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)"
       ],
-      "top_score": 0.100132
+      "top_score": 0.151091
     },
     {
       "id": "micro-incidencia-fiscal",
@@ -165,6 +164,29 @@
       "id": "micro-coste-oportunidad",
       "topic": "micro",
       "collection": "libros",
+      "rank": 1,
+      "hit": true,
+      "rr": 1.0,
+      "n_passages": 8,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)"
+      ],
+      "top_score": 0.169502
+    },
+    {
+      "id": "macro-multiplicador",
+      "topic": "macro-fiscal",
+      "collection": "libros",
       "rank": 2,
       "hit": true,
       "rr": 0.5,
@@ -173,19 +195,19 @@
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
         "Mankiw G. - Principles of Economics (9th ed) (2020)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "CORE Team - The Economy - Economics for a Changing World (2021)",
-        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
-        "CORE Team - The Economy - Economics for a Changing World (2021)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)"
+        "Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719)",
+        "IMF WP12-286 - Fiscal Multipliers and the State of the Economy",
+        "IMF WP12-286 - Fiscal Multipliers and the State of the Economy",
+        "IMF TNM1404 - Fiscal Multipliers, Size, Determinants and Use",
+        "IMF TNM1404 - Fiscal Multipliers, Size, Determinants and Use",
+        "IMF WP11-52 - How Big (Small) are Fiscal Multipliers",
+        "CORE Team - The Economy - Economics for a Changing World (2021)"
       ],
-      "top_score": 0.098361
+      "top_score": 0.173697
     },
     {
-      "id": "macro-multiplicador",
+      "id": "macro-multiplicador-recesion",
       "topic": "macro-fiscal",
       "collection": "libros",
       "rank": 1,
@@ -197,46 +219,23 @@
       "trap_hit": null,
       "titles": [
         "Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719)",
-        "Mankiw G. - Principles of Economics (9th ed) (2020)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "IMF WP12-286 - Fiscal Multipliers and the State of the Economy",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "IMF WP11-52 - How Big (Small) are Fiscal Multipliers"
-      ],
-      "top_score": 0.098361
-    },
-    {
-      "id": "macro-multiplicador-recesion",
-      "topic": "macro-fiscal",
-      "collection": "libros",
-      "rank": 2,
-      "hit": true,
-      "rr": 0.5,
-      "n_passages": 8,
-      "term_recall": 1.0,
-      "terms_missed": [],
-      "trap_hit": null,
-      "titles": [
+        "Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719)",
         "CORE Team - The Economy - Economics for a Changing World (2021)",
-        "Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719)",
-        "Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719)",
+        "IMF WP12-286 - Fiscal Multipliers and the State of the Economy",
         "Banco de Espana - Informe Anual 2023 (ES)",
         "IMF TNM1404 - Fiscal Multipliers, Size, Determinants and Use",
         "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana - Documento Ocasional 1803 (ES)",
         "Banco de Espana - Documento Ocasional 1803 (ES)"
       ],
-      "top_score": 0.098361
+      "top_score": 0.157881
     },
     {
       "id": "macro-okun",
       "topic": "macro",
       "collection": "libros",
-      "rank": 0,
-      "hit": false,
-      "rr": 0.0,
+      "rank": 6,
+      "hit": true,
+      "rr": 0.16666666666666666,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
@@ -247,42 +246,42 @@
         "AIReF - Analisis del mercado laboral (ES)",
         "Banco de Espana - Informe Anual 2023 (ES)",
         "Banco de Espana - Informe Anual 2023 (ES)",
+        "IMF WP12-286 - Fiscal Multipliers and the State of the Economy",
         "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)"
+        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)"
       ],
-      "top_score": 0.113286
+      "top_score": 0.113067
     },
     {
       "id": "macro-phillips",
       "topic": "macro",
       "collection": "libros",
-      "rank": 2,
+      "rank": 1,
       "hit": true,
-      "rr": 0.5,
+      "rr": 1.0,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
-        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
         "CORE Team - The Economy - Economics for a Changing World (2021)",
-        "Mankiw G. - Principles of Economics (9th ed) (2020)",
-        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
         "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "CORE Team - The Economy - Economics for a Changing World (2021)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
         "AIReF - Analisis del mercado laboral (ES)"
       ],
-      "top_score": 0.105681
+      "top_score": 0.178246
     },
     {
       "id": "dsa-bola-nieve",
       "topic": "dsa",
       "collection": "libros",
-      "rank": 3,
+      "rank": 7,
       "hit": true,
-      "rr": 0.3333333333333333,
+      "rr": 0.14285714285714285,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
@@ -290,14 +289,14 @@
       "titles": [
         "Banco de Espana - Documento Ocasional 1803 (ES)",
         "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
-        "Mises L. - La Teoria del Dinero y del Credito",
-        "Mises L. - Socialismo (Die Gemeinwirtschaft, 3a ed)",
-        "Mises L. - Socialismo (Die Gemeinwirtschaft, 3a ed)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "Mises L. - La Teoria del Dinero y del Credito"
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "Banerjee A., Duflo E. - Good Economics for Hard Times (2019)",
+        "Banerjee A., Duflo E. - Good Economics for Hard Times (2019)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "ECB OP185 - Debt Sustainability Analysis for Euro Area Sovereigns (2017)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)"
       ],
-      "top_score": 0.111926
+      "top_score": 0.11148
     },
     {
       "id": "dsa-r-menos-g",
@@ -311,16 +310,16 @@
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
+        "Banco de Espana - Informe Anual 2023 (ES)",
         "Mises L. - La Teoria del Dinero y del Credito",
         "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
         "Banco de Espana - Documento Ocasional 1803 (ES)",
         "Mises L. - La Teoria del Dinero y del Credito",
-        "Banco de Espana - Informe Anual 2023 (ES)",
         "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
         "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana - Documento Ocasional 1803 (ES)"
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)"
       ],
-      "top_score": 0.103838
+      "top_score": 0.108539
     },
     {
       "id": "dsa-estocastico",
@@ -338,35 +337,35 @@
         "Banco de Espana - Documento Ocasional 1803 (ES)",
         "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
         "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "AIReF - Analisis del mercado laboral (ES)",
-        "AIReF - Analisis del mercado laboral (ES)",
+        "ECB OP185 - Debt Sustainability Analysis for Euro Area Sovereigns (2017)",
+        "ECB OP185 - Debt Sustainability Analysis for Euro Area Sovereigns (2017)",
+        "IMF - Staff Guidance Note Sovereign Risk and Debt Sustainability Framework (2022)",
         "Banco de Espana - Informe Anual 2023 (ES)"
       ],
-      "top_score": 0.114754
+      "top_score": 0.13
     },
     {
       "id": "dsa-saldo-primario",
       "topic": "dsa",
       "collection": "libros",
-      "rank": 3,
+      "rank": 1,
       "hit": true,
-      "rr": 0.3333333333333333,
+      "rr": 1.0,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
-        "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
-        "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
         "ECB OP185 - Debt Sustainability Analysis for Euro Area Sovereigns (2017)",
-        "Banco de Espana - Documento Ocasional 1803 (ES)"
+        "Banco de Espana - Documento Ocasional 1803 (ES)",
+        "Banco de Espana - Documento Ocasional 1803 (ES)",
+        "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
+        "BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "EC - Debt Sustainability Monitor methodology (ip199)"
       ],
-      "top_score": 0.113745
+      "top_score": 0.144278
     },
     {
       "id": "econ-proyecciones-locales",
@@ -380,89 +379,20 @@
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
+        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)",
         "Jorda O. - Impulse Responses by Local Projections, Practical Issues",
+        "Plagborg-Moller, Wolf - Local Projections and VARs Estimate the Same IRFs",
         "Jorda O. - Impulse Responses by Local Projections, Practical Issues",
-        "Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719)",
         "Plagborg-Moller, Wolf - Local Projections and VARs Estimate the Same IRFs",
         "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)",
-        "Plagborg-Moller, Wolf - Local Projections and VARs Estimate the Same IRFs",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)"
+        "ECB WP3105 - Opening the Black Box of Local Projections (2025)",
+        "ECB WP3105 - Opening the Black Box of Local Projections (2025)"
       ],
-      "top_score": 0.112159
+      "top_score": 0.176961
     },
     {
       "id": "econ-efectos-fijos",
       "topic": "econometria",
-      "collection": "libros",
-      "rank": 7,
-      "hit": true,
-      "rr": 0.14285714285714285,
-      "n_passages": 8,
-      "term_recall": 1.0,
-      "terms_missed": [],
-      "trap_hit": null,
-      "titles": [
-        "AIReF - Analisis del mercado laboral (ES)",
-        "AIReF - Analisis del mercado laboral (ES)",
-        "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)",
-        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)"
-      ],
-      "top_score": 0.113286
-    },
-    {
-      "id": "econ-errores-agrupados",
-      "topic": "econometria",
-      "collection": "libros",
-      "rank": 2,
-      "hit": true,
-      "rr": 0.5,
-      "n_passages": 8,
-      "term_recall": 1.0,
-      "terms_missed": [],
-      "trap_hit": null,
-      "titles": [
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
-        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
-        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
-        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Mises L. - La Teoria del Dinero y del Credito",
-        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)"
-      ],
-      "top_score": 0.108437
-    },
-    {
-      "id": "econ-variable-omitida",
-      "topic": "econometria",
-      "collection": "libros",
-      "rank": 3,
-      "hit": true,
-      "rr": 0.3333333333333333,
-      "n_passages": 8,
-      "term_recall": 1.0,
-      "terms_missed": [],
-      "trap_hit": null,
-      "titles": [
-        "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
-        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
-        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
-        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES)"
-      ],
-      "top_score": 0.101934
-    },
-    {
-      "id": "esp-vivienda-riesgo",
-      "topic": "espana",
       "collection": "libros",
       "rank": 1,
       "hit": true,
@@ -472,16 +402,85 @@
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
-        "Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market",
-        "Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)",
-        "AIReF - Analisis del mercado laboral (ES)"
+        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
+        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)",
+        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
+        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
+        "AIReF - Analisis del mercado laboral (ES)",
+        "AIReF - Analisis del mercado laboral (ES)",
+        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)",
+        "Banco de Espana - Informe Anual 2023 (ES)"
       ],
-      "top_score": 0.112647
+      "top_score": 0.153816
+    },
+    {
+      "id": "econ-errores-agrupados",
+      "topic": "econometria",
+      "collection": "libros",
+      "rank": 1,
+      "hit": true,
+      "rr": 1.0,
+      "n_passages": 8,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
+        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
+        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
+        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
+        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Mises L. - La Teoria del Dinero y del Credito",
+        "Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16)"
+      ],
+      "top_score": 0.161853
+    },
+    {
+      "id": "econ-variable-omitida",
+      "topic": "econometria",
+      "collection": "libros",
+      "rank": 1,
+      "hit": true,
+      "rr": 1.0,
+      "n_passages": 8,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
+        "Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015)",
+        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
+        "Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)"
+      ],
+      "top_score": 0.176778
+    },
+    {
+      "id": "esp-vivienda-riesgo",
+      "topic": "espana",
+      "collection": "libros",
+      "rank": 2,
+      "hit": true,
+      "rr": 0.5,
+      "n_passages": 8,
+      "term_recall": 1.0,
+      "terms_missed": [],
+      "trap_hit": null,
+      "titles": [
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market",
+        "Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "The Pocketbook of Economic Indicators (2002)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)"
+      ],
+      "top_score": 0.143819
     },
     {
       "id": "esp-riqueza-familias",
@@ -500,9 +499,9 @@
         "Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES)",
         "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
         "Banco de Espana - Informe Anual 2023 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)",
-        "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)"
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)",
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)"
       ],
       "top_score": 0.110143
     },
@@ -522,10 +521,10 @@
         "Banco de Espana - Informe Anual 2023 (ES)",
         "Banco de Espana - Informe Anual 2023 (ES)",
         "AIReF - Analisis del mercado laboral (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)"
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019)"
       ],
       "top_score": 0.114754
     },
@@ -545,12 +544,12 @@
         "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
         "UNICEF - Espana pobreza infantil en medio de la abundancia, Report Card 18 (ES)",
         "UNICEF - Espana pobreza infantil en medio de la abundancia, Report Card 18 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)",
-        "UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES)"
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)"
       ],
-      "top_score": 0.111181
+      "top_score": 0.140771
     },
     {
       "id": "esp-informe-anual",
@@ -612,14 +611,14 @@
       "titles": [
         "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
         "Rothbard M. - Lo Esencial de Ludwig von Mises",
-        "Rothbard M. - Lo Esencial de Ludwig von Mises",
         "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
+        "Rothbard M. - Lo Esencial de Ludwig von Mises",
         "Mises L. - Planificacion para la Libertad (facsimile)",
         "Mises L. - Planificacion para la Libertad (facsimile)",
         "Mises L. - La Teoria del Dinero y del Credito",
         "Mises L. - La Teoria del Dinero y del Credito"
       ],
-      "top_score": 0.110663
+      "top_score": 0.112399
     },
     {
       "id": "mises-praxeologia",
@@ -648,47 +647,47 @@
       "id": "des-instituciones",
       "topic": "desarrollo",
       "collection": "libros",
-      "rank": 3,
+      "rank": 1,
       "hit": true,
-      "rr": 0.3333333333333333,
+      "rr": 1.0,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
         "White C. - Understanding Economic Development - The Global Transition from Poverty to Prosperity (2010)",
         "White C. - Understanding Economic Development - The Global Transition from Poverty to Prosperity (2010)",
         "Brouwer M. - Governmental Forms and Economic Development (2011)",
+        "Brouwer M. - Governmental Forms and Economic Development (2011)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
+        "Banco de Espana - Informe Anual 2023 (ES)",
         "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "Banco de Espana - Documento Ocasional 1803 (ES)",
-        "Mises L. - Planificacion para la Libertad (facsimile)"
+        "Banco de Espana - Documento Ocasional 1803 (ES)"
       ],
-      "top_score": 0.110288
+      "top_score": 0.175839
     },
     {
       "id": "des-inmigracion",
       "topic": "desarrollo",
       "collection": "libros",
-      "rank": 3,
+      "rank": 1,
       "hit": true,
-      "rr": 0.3333333333333333,
+      "rr": 1.0,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
+        "Banerjee A., Duflo E. - Good Economics for Hard Times (2019)",
+        "Banerjee A., Duflo E. - Good Economics for Hard Times (2019)",
+        "Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "Mankiw G. - Principles of Economics (9th ed) (2020)",
+        "CORE Team - The Economy - Economics for a Changing World (2021)",
         "Mises L. - Socialismo (Die Gemeinwirtschaft, 3a ed)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Banerjee A., Duflo E. - Good Economics for Hard Times (2019)",
-        "Banerjee A., Duflo E. - Good Economics for Hard Times (2019)",
-        "Banco de Espana - Informe Anual 2023 (ES)",
-        "Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011)",
-        "Mises L. - Planificacion para la Libertad (facsimile)",
-        "Mises L. - Planificacion para la Libertad (facsimile)"
+        "Banco de Espana - Informe Anual 2023 (ES)"
       ],
-      "top_score": 0.105339
+      "top_score": 0.159324
     },
     {
       "id": "metodo-palancas",
@@ -786,24 +785,24 @@
       "id": "crack-euribor",
       "topic": "opinion",
       "collection": "crack23",
-      "rank": 1,
+      "rank": 2,
       "hit": true,
-      "rr": 1.0,
+      "rr": 0.5,
       "n_passages": 8,
       "term_recall": 1.0,
       "terms_missed": [],
       "trap_hit": null,
       "titles": [
+        "Un_Mundo_Post-Global_fQGQ0Xi5Pxk",
         "Hipotecas_impagables_el_euribor_al_4_ahoga_a_las_familias_6PvccYH5Zdk",
-        "summary_Hipotecas_impagables_el_euribor_al_4_ahoga_a_las_familias_6PvccYH5Zdk",
-        "Abre_los_ojos_gráficas_248_W7PYs6d8QcA",
-        "Un_Mundo_de_Oro_con_Dragon_Oro_Plata_TmZEhfBghRw",
-        "Abre_los_ojos_gráficas_248_W7PYs6d8QcA",
-        "Arden_las_bolsas_con_Francisco_Llinares_-HmTR_46aJg",
+        "Las_Hipotecas_bajan_un_24_gráficas_del_día_0uNXbHeeckA",
         "Hipotecas_impagables_el_euribor_al_4_ahoga_a_las_familias_6PvccYH5Zdk",
-        "La_caída_del_precio_de_las_casas_parte_2_FBhGZeYXv3A"
+        "Abre_los_ojos_gráficas_248_W7PYs6d8QcA",
+        "Quiebra_masiva_de_bancos_en_EEUU_por_qué_54WwCZrn_ak",
+        "Abre_los_ojos_tiempos_de_guerra_h7RgUJSL5wY",
+        "Abre_los_ojos_gráficas_711_VMTIXKNO0wI"
       ],
-      "top_score": 0.109375
+      "top_score": 0.150449
     },
     {
       "id": "crack-deuda-espana",

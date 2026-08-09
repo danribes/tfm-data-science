@@ -228,3 +228,70 @@ def test_a_document_with_text_is_recorded(tmp_path, monkeypatch):
     assert status == "ok" and written > 0
     assert con.execute("SELECT COUNT(*) FROM documents").fetchone()[0] == 1
     con.close()
+
+
+# ---- the bilingual query bridge --------------------------------------------
+
+def test_glossary_keeps_phrases_whole():
+    """Deduplicating word by word turned "growth rate" + "interest rate" into
+    "growth rate interest", destroying the second term of art — the one the
+    question was about. Phrases are the unit."""
+    from rag import glossary
+
+    terms = glossary.english_terms(
+        "¿Por qué importa la diferencia entre el tipo de interés y la tasa de crecimiento?")
+    assert "growth rate" in terms
+    assert "interest rate" in terms
+
+
+def test_glossary_matches_the_longest_term_first():
+    """"tipo de interés real" must not also match "tipo de interés"."""
+    from rag import glossary
+
+    assert glossary.english_terms("el tipo de interés real") == ["real interest rate"]
+
+
+def test_glossary_ignores_accents_and_case():
+    from rag import glossary
+
+    assert glossary.english_terms("BRECHA DEL PRODUCTO") == ["output gap"]
+    assert glossary.english_terms("brecha del producto") == ["output gap"]
+
+
+def test_glossary_stays_silent_on_a_query_with_no_terms_of_art():
+    """Expanding common words would flood the lexical query with noise. An
+    unexpanded query must come back untouched, not padded."""
+    from rag import glossary
+
+    assert glossary.english_terms("¿qué opinas de todo esto?") == []
+    assert glossary.expand("¿qué opinas de todo esto?") == "¿qué opinas de todo esto?"
+    assert glossary.is_expanded("¿qué opinas de todo esto?") is False
+
+
+def test_glossary_covers_the_topics_the_golden_set_asks_about():
+    """A bridge that does not span the questions being asked is decoration."""
+    from rag import glossary
+
+    spanned = {q.id for q in golden.ANSWERABLE if glossary.english_terms(q.question)}
+    libros = {q.id for q in golden.ANSWERABLE if q.collection == "libros"}
+    assert len(spanned & libros) >= len(libros) * 0.7
+
+
+def test_english_probe_is_skipped_when_there_is_nothing_to_translate():
+    """No terms means no second embedding call — the cost only applies where
+    the bridge can do something."""
+    from unittest.mock import patch
+    from rag import retrieve
+
+    with patch.object(retrieve, "_dense", wraps=retrieve._dense) as spy:
+        retrieve.search("praxeología", "libros", 4)
+        assert spy.call_count == 1        # Spanish probe only
+
+
+def test_english_probe_runs_when_a_term_is_present():
+    from unittest.mock import patch
+    from rag import retrieve
+
+    with patch.object(retrieve, "_dense", wraps=retrieve._dense) as spy:
+        retrieve.search("¿qué es la brecha del producto?", "libros", 4)
+        assert spy.call_count == 2        # Spanish probe plus English probe
