@@ -241,6 +241,71 @@ class GenericScenarioResponse(ApiMeta):
     fiscal_space_by_year: list[FiscalSpaceOut]
 
 
+# ---- /rag (fase 3): biblioteca con citas ----
+
+class RagSearchRequest(BaseModel):
+    query: str = Field(min_length=2, max_length=1000)
+    collection: str = Field("libros")
+    top_k: int = Field(8, ge=1, le=25)
+
+
+class PassageOut(BaseModel):
+    chunk_id: int
+    text: str
+    title: str
+    collection: str
+    #: "academico" | "propio" | "opinion" — se muestra al lector; un manual y un
+    #: canal de YouTube no se citan con la misma autoridad.
+    authority: str
+    page: int | None = None
+    section: str | None = None
+    score: float
+    cita: str
+
+
+class RagSearchResponse(ApiMeta):
+    query: str
+    collection: str
+    passages: list[PassageOut]
+
+
+class RagChatRequest(BaseModel):
+    question: str = Field(min_length=2, max_length=2000)
+    collection: str = Field("libros")
+    top_k: int = Field(8, ge=1, le=25)
+    #: Cuando es true, el escenario activo viaja con la pregunta y la respuesta
+    #: puede enlazar la teoría con los números en pantalla.
+    include_scenario: bool = False
+    levers: LeverValues | None = None
+    horizon: int = Field(2050, ge=2026, le=2050)
+
+
+class RagChatResponse(ApiMeta):
+    question: str
+    collection: str
+    answer: str
+    passages: list[PassageOut]
+    grounded: bool
+    provider: str | None = None
+    model: str | None = None
+    error: str | None = None
+
+
+class RagCollectionOut(BaseModel):
+    id: str
+    label: str
+    authority: str
+    note: str
+    documents: int
+    chunks: int
+
+
+class RagCollectionsResponse(ApiMeta):
+    collections: list[RagCollectionOut]
+    total_documents: int
+    total_chunks: int
+
+
 # ---- /explain (spec §10): engine-computed facts, LLM-narrated prose ----
 
 class ExplainRequest(BaseModel):

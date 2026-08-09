@@ -7,3 +7,9 @@ __pycache__/
 .gstack/
 legacy/
 .claude/
+
+# RAG corpus — libros con copyright y su índice vectorial. Nunca al repo público.
+data/rag/
+*.db
+*.db-wal
+*.db-shm
