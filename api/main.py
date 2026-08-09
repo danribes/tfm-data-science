@@ -36,6 +36,31 @@ from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
 
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
+
+@app.on_event("startup")
+def _warm_embedder() -> None:
+    """Load the embedding model in the background at startup.
+
+    It is lazy-loaded otherwise, so the first RAG request of a session paid
+    ~23 s to bring e5-large onto the GPU — measured 28 s cold versus 5 s warm
+    for the identical query. That penalty always landed on whoever asked the
+    first question, which in a demo is the audience.
+
+    Runs on a daemon thread so the API starts serving immediately, and failures
+    are swallowed: a machine with no model cache should still serve the engine
+    endpoints, just with a slow first RAG call.
+    """
+    import threading
+
+    def _load() -> None:
+        try:
+            from rag import embed
+            embed.get_model()
+        except Exception:
+            pass
+
+    threading.Thread(target=_load, daemon=True, name="rag-warmup").start()
+
 # spec §5 conventions: CORS allows localhost + the file:// "null" origin
 app.add_middleware(
     CORSMiddleware,

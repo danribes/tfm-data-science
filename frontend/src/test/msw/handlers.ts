@@ -125,6 +125,28 @@ export const handlers = [
     }),
   ),
 
+  http.post(`${BASE}/rag/search`, async ({ request }) => {
+    const body = (await request.json()) as { query?: string; collection?: string };
+    const collection = body.collection ?? "libros";
+    const authority =
+      collection === "crack23" ? "opinion" : collection === "metodo" ? "propio" : "academico";
+    const grounded = !/fusi[oó]n fr[ií]a/i.test(body.query ?? "");
+    return HttpResponse.json({
+      ...META,
+      query: body.query ?? "",
+      collection,
+      passages: grounded
+        ? [{
+            chunk_id: 1,
+            text: "El diferencial entre el tipo de interés y el crecimiento nominal determina la senda de la deuda.",
+            title: "Banco de Espana - Documento Ocasional 1803 (ES)",
+            collection, authority, page: 12, section: "3.1", score: 0.0387,
+            cita: "Banco de Espana - Documento Ocasional 1803 (ES) · 3.1 · p. 12",
+          }]
+        : [],
+    });
+  }),
+
   http.post(`${BASE}/rag/chat`, async ({ request }) => {
     const body = (await request.json()) as { question?: string; collection?: string };
     const collection = body.collection ?? "libros";

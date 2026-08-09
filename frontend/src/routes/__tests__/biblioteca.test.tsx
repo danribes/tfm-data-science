@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { HttpResponse, delay, http } from "msw";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import Biblioteca from "../Biblioteca";
+import { server } from "../../test/msw/server";
 
 function ui() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -83,6 +85,36 @@ describe("Biblioteca — chat con citas", () => {
     await waitFor(() => expect(screen.getByText(/Documento Ocasional 1803/)).toBeInTheDocument());
     const list = screen.getByRole("list");
     expect(within(list).getByText("opinión — no es fuente académica")).toBeInTheDocument();
+  });
+
+  it("shows retrieved passages while the prose is still being written", async () => {
+    // The latency fix: retrieval (~0,8 s) and generation (~4,6 s) fire together,
+    // so the evidence must be readable before the answer lands. Delaying only
+    // /rag/chat reproduces that window deterministically.
+    server.use(
+      http.post("http://localhost:8000/rag/chat", async () => {
+        await delay(400);
+        return HttpResponse.json({
+          vintage: "2026-07-31", computed_not_advice: true,
+          question: "x", collection: "libros",
+          answer: "La deuda crece cuando el tipo efectivo supera al crecimiento nominal [1].",
+          passages: [], grounded: true, provider: "gemini",
+          model: "gemini-2.5-flash", error: null,
+        });
+      }),
+    );
+    ui();
+    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await userEvent.click(screen.getAllByRole("button", { name: /multiplicador fiscal/ })[0]);
+
+    // Passages first, with the interim wording…
+    await waitFor(() => expect(screen.getByText(/Pasajes recuperados/)).toBeInTheDocument());
+    expect(screen.getByText(/Redactando la respuesta/)).toBeInTheDocument();
+    expect(screen.getByText(/Documento Ocasional 1803/)).toBeInTheDocument();
+
+    // …then the prose replaces the placeholder.
+    await waitFor(() => expect(screen.getByText(/La deuda crece cuando/)).toBeInTheDocument());
+    expect(screen.queryByText(/Redactando la respuesta/)).not.toBeInTheDocument();
   });
 
   it("the scenario toggle is off by default", async () => {
