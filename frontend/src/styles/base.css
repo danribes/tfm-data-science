@@ -258,3 +258,19 @@ code { font: 0.75em ui-monospace, Consolas, monospace; background: var(--code); 
 .biblio-pending { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); margin: 0 0 var(--sp-1); }
 .biblio-dots { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: exp-pulse 1s ease-in-out infinite; flex: none; }
 .biblio-caret { display: inline-block; width: 6px; height: 1em; background: var(--accent); margin-left: 2px; vertical-align: text-bottom; animation: exp-pulse .9s ease-in-out infinite; }
+
+/* --- evidencia: calibrado vs estimado --- */
+.ev-t td { vertical-align: top; }
+.ev-t td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ev-lab { font-size: 8.5px; line-height: 1.3; margin-top: 2px; }
+.ev-band { width: 150px; min-width: 120px; }
+.band { padding: 6px 0 2px; }
+.band-track { position: relative; display: block; height: 8px; background: var(--surface); border-radius: 4px; }
+.band-ci { position: absolute; top: 0; bottom: 0; background: var(--accent); opacity: .3; border-radius: 4px; }
+.band-est { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); }
+.band-cal { position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; }
+.band-cal.ok { background: var(--good); }
+.band-cal.bad { background: var(--st-crossed); }
+.ev-sub td { font-size: 9px; padding-top: 2px; padding-bottom: 2px; }
+.ev-sub .band { padding: 3px 0 1px; }
+.ev-sub .band-track { height: 6px; }

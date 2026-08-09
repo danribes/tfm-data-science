@@ -228,3 +228,47 @@ def test_generic_scenario_invalid_allocation_shares_returns_422(monkeypatch):
         expected_detail = str(exc)
     assert expected_detail is not None
     assert r.json()["detail"] == expected_detail
+
+
+# ---- /evidence: la calibración frente a los datos ----
+
+def test_evidence_shape():
+    r = client.get("/evidence")
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body) == {"vintage", "computed_not_advice", "comparisons",
+                         "fiscal_persistence", "identifiable", "engine_version"}
+    assert body["comparisons"]
+    row = body["comparisons"][0]
+    assert set(row) == {"name", "coef", "se", "n", "n_units", "ci_low", "ci_high",
+                        "significant", "constant", "label", "calibrated", "source",
+                        "compatible", "verdict", "subperiods"}
+
+
+def test_evidence_reports_a_calibration_outside_its_band_as_such():
+    """The point of the endpoint: it must be able to say no. If every constant
+    came back compatible, the page would be decoration."""
+    body = client.get("/evidence").json()
+    by_const = {c["constant"]: c for c in body["comparisons"]}
+    ipv = by_const["IPV_LR"]
+    assert ipv["compatible"] is False
+    assert "fuera de la banda" in ipv["verdict"]
+    assert not (ipv["ci_low"] <= ipv["calibrated"] <= ipv["ci_high"])
+
+
+def test_evidence_ships_the_housing_windows_with_disjoint_signs():
+    body = client.get("/evidence").json()
+    by_const = {c["constant"]: c for c in body["comparisons"]}
+    subs = by_const["IPV_LR"]["subperiods"]
+    assert len(subs) == 2
+    assert subs[0]["coef"] < 0 < subs[1]["coef"]
+    assert by_const["IPV_REV"]["subperiods"] == []
+
+
+def test_evidence_publishes_what_it_cannot_estimate():
+    body = client.get("/evidence").json()
+    blocked = {k for k, v in body["identifiable"].items() if v.startswith("no")}
+    assert {"MULT", "OKUN"} <= blocked
+    # Every blocker states a reason; "no" on its own would be an excuse.
+    assert all(len(v) > len("no — ") for k, v in body["identifiable"].items()
+               if k in blocked)

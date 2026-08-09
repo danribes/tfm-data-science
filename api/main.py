@@ -9,8 +9,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-from api.schemas import (ConstantsResponse, ConstantOut, ContributionOut,
+from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
+                          ContributionOut,
                           CountriesResponse, CountryOut, DebtPointOut,
+                          EstimateOut, EvidenceResponse,
                           ExplainRequest, ExplainResponse, FiscalSpaceOut,
                           LeverValues,
                           GenericScenarioRequest, GenericScenarioResponse,
@@ -185,6 +187,30 @@ def scenario_generic(iso3: str, req: GenericScenarioRequest) -> GenericScenarioR
         inflation_path_pct=result.inflation_path_pct,
         nominal_wage_growth_path_pct=result.nominal_wage_growth_path_pct,
         fiscal_space_by_year=[FiscalSpaceOut(**asdict(fs)) for fs in result.fiscal_space_by_year],
+    )
+
+
+@app.get("/evidence", response_model=EvidenceResponse)
+def evidence() -> EvidenceResponse:
+    """The engine's calibrated constants confronted with the frozen panels.
+
+    Cheap enough to compute per request (a few thousand rows, closed-form OLS),
+    so there is no cache to go stale against a new vintage.
+    """
+    from research import validate as research_validate
+
+    try:
+        out = research_validate.run_all()
+    except Exception as exc:
+        raise HTTPException(status_code=503,
+                            detail=f"capa empírica no disponible: {exc}") from exc
+
+    return EvidenceResponse(
+        comparisons=[ComparisonOut(**row) for row in out["comparisons"]],
+        fiscal_persistence=(EstimateOut(**out["fiscal_persistence"])
+                            if out["fiscal_persistence"] else None),
+        identifiable=out["identifiable"],
+        engine_version=out["engine_version"],
     )
 
 

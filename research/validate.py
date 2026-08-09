@@ -17,6 +17,27 @@ from engine import constants as c
 from research import estimate, panel
 
 
+#: Sub-windows for the housing panel. The split is 2013q4/2014q1 because that
+#: is where the national house-price index turns, not because it flatters
+#: anything: the full-sample estimate averages a crash and a recovery into one
+#: number, and a single number invites the reader to believe the average is a
+#: description of either half. It is a description of neither.
+IPV_WINDOWS: tuple[tuple[str, int, int], ...] = (
+    ("2007–2013 · ajuste", 2007, 2013),
+    ("2014–2026 · recuperación", 2014, 2026),
+)
+
+
+@dataclass(frozen=True)
+class Subperiod:
+    """One estimate restricted to a window, for showing sample dependence."""
+    label: str
+    estimate: estimate.Estimate
+
+    def to_dict(self) -> dict:
+        return {"label": self.label, **self.estimate.to_dict()}
+
+
 @dataclass(frozen=True)
 class Comparison:
     constant: str
@@ -24,6 +45,8 @@ class Comparison:
     calibrated: float
     estimate: estimate.Estimate
     source: str
+    #: Same estimator, narrower windows. Empty when splitting is not meaningful.
+    subperiods: tuple[Subperiod, ...] = ()
 
     @property
     def compatible(self) -> bool:
@@ -41,21 +64,38 @@ class Comparison:
             "constant": self.constant, "label": self.label,
             "calibrated": self.calibrated, "source": self.source,
             "compatible": self.compatible, "verdict": self.verdict,
+            "subperiods": [s.to_dict() for s in self.subperiods],
             **self.estimate.to_dict(),
         }
 
 
 def compare_ipv_growth() -> Comparison | None:
-    """IPV_LR — the long-run house-price growth the engine reverts towards."""
+    """IPV_LR — the long-run house-price growth the engine reverts towards.
+
+    Reported for the whole panel and for each sub-window. The full sample
+    starts in 2007 and therefore contains the entire Spanish housing bust; a
+    calibration drawn from a longer history is not thereby wrong, it is
+    answering a different question. Showing the halves is what lets a reader
+    tell those two things apart.
+    """
     p = panel.yoy(panel.housing_panel(), "ipv", periods=4)   # 4 quarters = a year
     est = estimate.pooled_mean(p.rows, "ipv_yoy", "ccaa",
                                name="crecimiento anual del IPV (% a/a)")
     if not est:
         return None
+
+    subs: list[Subperiod] = []
+    for label, y0, y1 in IPV_WINDOWS:
+        window = [r for r in p.rows if y0 <= r["year"] <= y1]
+        sub = estimate.pooled_mean(window, "ipv_yoy", "ccaa", name=label)
+        if sub:
+            subs.append(Subperiod(label=label, estimate=sub))
+
     return Comparison(
         constant="IPV_LR", label="Crecimiento a largo plazo del precio de la vivienda",
         calibrated=c.IPV_LR, estimate=est,
         source="gold_ccaa_trimestral.csv · 20 CCAA × 2007-2026",
+        subperiods=tuple(subs),
     )
 
 
@@ -132,13 +172,15 @@ def run_all() -> dict:
 
 
 if __name__ == "__main__":
-    import json
     out = run_all()
     for row in out["comparisons"]:
         print(f"{row['constant']:9} calibrado {row['calibrated']:.2f} | "
               f"estimado {row['coef']:.2f} "
               f"[{row['ci_low']:.2f}, {row['ci_high']:.2f}] "
               f"n={row['n']} ({row['n_units']} unidades) → {row['verdict']}")
+        for sub in row.get("subperiods", []):
+            print(f"{'':11} {sub['label']:26} {sub['coef']:6.2f} "
+                  f"[{sub['ci_low']:.2f}, {sub['ci_high']:.2f}] n={sub['n']}")
     if out["fiscal_persistence"]:
         f = out["fiscal_persistence"]
         print(f"{'saldo':9} persistencia {f['coef']:.2f} "

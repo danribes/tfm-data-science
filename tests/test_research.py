@@ -139,6 +139,42 @@ def test_ipv_growth_is_estimated_from_the_regional_panel():
     assert math.isfinite(cmp_.estimate.coef)
 
 
+def test_ipv_growth_is_split_into_windows_that_partition_the_panel():
+    """The sub-windows exist to expose sample dependence, so they must really
+    be sub-samples: disjoint, smaller than the whole, and adding up to it."""
+    cmp_ = validate.compare_ipv_growth()
+    assert cmp_ is not None
+    assert len(cmp_.subperiods) == len(validate.IPV_WINDOWS)
+    ns = [s.estimate.n for s in cmp_.subperiods]
+    assert sum(ns) == cmp_.estimate.n
+    assert all(n < cmp_.estimate.n for n in ns)
+    # The bust and the recovery must not land on the same number; if they did,
+    # splitting would be decoration rather than information.
+    coefs = [s.estimate.coef for s in cmp_.subperiods]
+    assert coefs[0] < 0 < coefs[1]
+
+
+def test_subperiods_survive_serialisation_with_their_own_bands():
+    cmp_ = validate.compare_ipv_growth()
+    assert cmp_ is not None
+    subs = cmp_.to_dict()["subperiods"]
+    assert len(subs) == 2
+    for s in subs:
+        assert s["label"]
+        assert s["ci_low"] < s["coef"] < s["ci_high"]
+        # A window carries no calibrated value of its own — the API must not
+        # hand the frontend a parent verdict it could mistake for the window's.
+        assert "calibrated" not in s and "verdict" not in s
+
+
+def test_a_comparison_without_windows_serialises_an_empty_list():
+    """Absent windows must be an empty list, not a missing key: the frontend
+    maps over it unconditionally."""
+    cmp_ = validate.compare_ipv_reversion()
+    assert cmp_ is not None
+    assert cmp_.to_dict()["subperiods"] == []
+
+
 def test_ipv_reversion_is_the_complement_of_persistence():
     cmp_ = validate.compare_ipv_reversion()
     assert cmp_ is not None

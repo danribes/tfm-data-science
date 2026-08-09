@@ -83,6 +83,38 @@ export interface ExplainResponse extends ApiMeta {
   headline_year: number;
 }
 
+// ---- Evidencia: la calibración frente a los datos ----
+
+export interface EstimateOut {
+  name: string;
+  coef: number;
+  se: number;
+  n: number;
+  n_units: number;
+  ci_low: number;
+  ci_high: number;
+  significant: boolean;
+}
+export interface SubperiodOut extends EstimateOut { label: string }
+export interface ComparisonOut extends EstimateOut {
+  constant: string;
+  label: string;
+  calibrated: number;
+  source: string;
+  /** false no es un fallo: es un hallazgo, y se muestra como tal. */
+  compatible: boolean;
+  verdict: string;
+  /** El mismo estimador sobre ventanas más cortas, para enseñar que la cifra
+   *  depende de la muestra. Vacío cuando partir no aporta. */
+  subperiods: SubperiodOut[];
+}
+export interface EvidenceResponse extends ApiMeta {
+  comparisons: ComparisonOut[];
+  fiscal_persistence: EstimateOut | null;
+  identifiable: Record<string, string>;
+  engine_version: string;
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

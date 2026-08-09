@@ -12,6 +12,7 @@ import { Warnings } from "./components/Warnings";
 import { SHIPPED_IDS } from "./personas/registry";
 import Biblioteca from "./routes/Biblioteca";
 import ComoFunciona from "./routes/ComoFunciona";
+import Evidencia from "./routes/Evidencia";
 import Inicio from "./routes/Inicio";
 import Laboratorio from "./routes/Laboratorio";
 import Metodologia from "./routes/Metodologia";
@@ -50,6 +51,7 @@ function Shell() {
           ))}
           <NavLink to="/laboratorio">Laboratorio</NavLink>
           <NavLink to="/biblioteca">Biblioteca</NavLink>
+          <NavLink to="/evidencia">Evidencia</NavLink>
           <NavLink to="/como-funciona">Cómo funciona</NavLink>
           <NavLink to="/metodologia">Datos y método</NavLink>
         </nav>
@@ -70,6 +72,7 @@ function Shell() {
               <Route path="/laboratorio" element={<Laboratorio />} />
             </Route>
             <Route path="/biblioteca" element={<Biblioteca />} />
+            <Route path="/evidencia" element={<Evidencia />} />
             <Route path="/como-funciona" element={<ComoFunciona />} />
             <Route path="/metodologia" element={<Metodologia />} />
           </Routes>

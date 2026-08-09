@@ -101,6 +101,46 @@ export const handlers = [
     });
   }),
 
+  // Evidencia, offline: shapes only. The real numbers come from the frozen
+  // panels and belong to the Python suite; what the UI must get right is the
+  // compatible / not-compatible rendering and the unidentifiable list.
+  http.get(`${BASE}/evidence`, () =>
+    HttpResponse.json({
+      ...META,
+      engine_version: "1.0.0",
+      comparisons: [
+        { constant: "IPV_LR", label: "Crecimiento a largo plazo del precio de la vivienda",
+          calibrated: 3.0, source: "gold_ccaa_trimestral.csv · 20 CCAA",
+          compatible: false, verdict: "fuera de la banda (por encima)",
+          name: "crecimiento anual del IPV (% a/a)", coef: 1.23, se: 0.18,
+          n: 1460, n_units: 20, ci_low: 0.93, ci_high: 1.53, significant: true,
+          subperiods: [
+            { label: "2007–2013 · ajuste", name: "2007–2013 · ajuste",
+              coef: -6.48, se: 0.35, n: 480, n_units: 20,
+              ci_low: -7.05, ci_high: -5.9, significant: true },
+            { label: "2014–2026 · recuperación", name: "2014–2026 · recuperación",
+              coef: 5.0, se: 0.25, n: 980, n_units: 20,
+              ci_low: 4.59, ci_high: 5.41, significant: true },
+          ] },
+        { constant: "IPV_REV", label: "Reversión anual del IPV hacia su tendencia",
+          calibrated: 0.6, source: "gold_ccaa_trimestral.csv · AR(1)",
+          compatible: false, verdict: "fuera de la banda (por encima)",
+          name: "reversión (1 - phi)", coef: 0.2, se: 0.012,
+          n: 1380, n_units: 20, ci_low: 0.18, ci_high: 0.22, significant: true,
+          subperiods: [] },
+      ],
+      fiscal_persistence: {
+        name: "persistencia del saldo (proxy)", coef: 0.87, se: 0.04,
+        n: 931, n_units: 18, ci_low: 0.81, ci_high: 0.94, significant: true,
+      },
+      identifiable: {
+        IPV_LR: "sí — crecimiento medio del IPV en el panel CCAA",
+        MULT: "no — haría falta un shock fiscal identificado",
+        OKUN: "no — el vintage no trae paro regional",
+      },
+    }),
+  ),
+
   // --- RAG, offline ---
   // The corpus itself cannot ship to the browser (copyrighted textbooks), so
   // the mock serves a small fixed set of passages with the real response shape.

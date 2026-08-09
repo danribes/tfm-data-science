@@ -1,5 +1,5 @@
 import type {
-  ConstantsResponse, ExplainRequest, ExplainResponse, HealthResponse,
+  ConstantsResponse, EvidenceResponse, ExplainRequest, ExplainResponse, HealthResponse,
   MonteCarloRequest, MonteCarloResponse,
   Passage,
   PersonasResponse, PresetsResponse,
@@ -47,6 +47,7 @@ export const api = {
     request<MonteCarloResponse>("/scenario/montecarlo", { method: "POST", body: JSON.stringify(body), signal }),
   explain: (body: ExplainRequest, signal?: AbortSignal) =>
     request<ExplainResponse>("/explain", { method: "POST", body: JSON.stringify(body), signal }),
+  evidence: () => request<EvidenceResponse>("/evidence"),
   ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
     request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),

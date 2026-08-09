@@ -241,6 +241,47 @@ class GenericScenarioResponse(ApiMeta):
     fiscal_space_by_year: list[FiscalSpaceOut]
 
 
+# ---- /evidence (fase 3): la calibración frente a los datos ----
+
+class EstimateOut(BaseModel):
+    name: str
+    coef: float
+    se: float
+    n: int
+    n_units: int
+    ci_low: float
+    ci_high: float
+    significant: bool
+
+
+class SubperiodOut(EstimateOut):
+    label: str
+
+
+class ComparisonOut(EstimateOut):
+    constant: str
+    label: str
+    calibrated: float
+    source: str
+    #: True cuando el valor calibrado cae dentro de la banda estimada. False no
+    #: es un fallo: es un hallazgo, y se muestra como tal.
+    compatible: bool
+    verdict: str
+    #: El mismo estimador sobre ventanas más cortas. La media de toda la muestra
+    #: mezcla el pinchazo y la recuperación; publicando las mitades el lector ve
+    #: que la cifra depende de la ventana, en vez de tener que preguntarlo.
+    subperiods: list[SubperiodOut] = []
+
+
+class EvidenceResponse(ApiMeta):
+    comparisons: list[ComparisonOut]
+    fiscal_persistence: EstimateOut | None = None
+    #: Qué constantes NO puede juzgar el vintage y por qué. Se publica junto a
+    #: los resultados: omitirlo daría una impresión de cobertura que no existe.
+    identifiable: dict[str, str]
+    engine_version: str
+
+
 # ---- /rag (fase 3): biblioteca con citas ----
 
 class RagSearchRequest(BaseModel):
