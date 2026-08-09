@@ -101,6 +101,61 @@ export const handlers = [
     });
   }),
 
+  // --- RAG, offline ---
+  // The corpus itself cannot ship to the browser (copyrighted textbooks), so
+  // the mock serves a small fixed set of passages with the real response shape.
+  // What the tests exercise is the contract: authority tags, citations, and the
+  // ungrounded path — not retrieval quality, which belongs in the Python suite.
+  http.get(`${BASE}/rag/collections`, () =>
+    HttpResponse.json({
+      ...META,
+      collections: [
+        { id: "libros", label: "Manuales de economía", authority: "academico",
+          note: "Textos con copyright — nunca salen de la máquina local.",
+          documents: 43, chunks: 13316 },
+        { id: "metodo", label: "Método y diseño del propio modelo", authority: "propio",
+          note: "Specs, Metodología y Cómo funciona de esta app.",
+          documents: 10, chunks: 267 },
+        { id: "crack23", label: "Canal crack23", authority: "opinion",
+          note: "Transcripciones y resúmenes. Es opinión, no fuente académica.",
+          documents: 420, chunks: 3586 },
+      ],
+      total_documents: 473,
+      total_chunks: 17169,
+    }),
+  ),
+
+  http.post(`${BASE}/rag/chat`, async ({ request }) => {
+    const body = (await request.json()) as { question?: string; collection?: string };
+    const collection = body.collection ?? "libros";
+    const authority =
+      collection === "crack23" ? "opinion" : collection === "metodo" ? "propio" : "academico";
+    // A question about something the corpus cannot cover exercises the
+    // ungrounded branch, which must never fabricate an answer.
+    const grounded = !/fusi[oó]n fr[ií]a/i.test(body.question ?? "");
+    return HttpResponse.json({
+      ...META,
+      question: body.question ?? "",
+      collection,
+      answer: grounded
+        ? "La deuda crece cuando el tipo efectivo supera al crecimiento nominal [1]."
+        : "El corpus no cubre esta pregunta.",
+      passages: grounded
+        ? [{
+            chunk_id: 1,
+            text: "El diferencial entre el tipo de interés y el crecimiento nominal determina la senda de la deuda.",
+            title: "Banco de Espana - Documento Ocasional 1803 (ES)",
+            collection, authority, page: 12, section: "3.1", score: 0.0387,
+            cita: "Banco de Espana - Documento Ocasional 1803 (ES) · 3.1 · p. 12",
+          }]
+        : [],
+      grounded,
+      provider: grounded ? "gemini" : null,
+      model: grounded ? "gemini-2.5-flash" : null,
+      error: null,
+    });
+  }),
+
   // The explanation, offline. The decomposition runs the real TS engine one
   // lever at a time — same method as the Python `explain.facts.decompose` — so
   // the mocked numbers are the engine's, not canned. Only the prose is a

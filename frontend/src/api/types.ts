@@ -83,6 +83,65 @@ export interface ExplainResponse extends ApiMeta {
   headline_year: number;
 }
 
+// ---- RAG: la biblioteca con citas ----
+
+export type Authority = "academico" | "propio" | "opinion";
+
+export interface RagCollection {
+  id: string;
+  label: string;
+  /** Se muestra al lector: un manual y un canal de YouTube no se citan igual. */
+  authority: Authority;
+  note: string;
+  documents: number;
+  chunks: number;
+}
+export interface RagCollectionsResponse extends ApiMeta {
+  collections: RagCollection[];
+  total_documents: number;
+  total_chunks: number;
+}
+
+export interface Passage {
+  chunk_id: number;
+  text: string;
+  title: string;
+  collection: string;
+  authority: Authority;
+  page: number | null;
+  section: string | null;
+  score: number;
+  cita: string;
+}
+
+export interface RagSearchRequest { query: string; collection?: string; top_k?: number }
+export interface RagSearchResponse extends ApiMeta {
+  query: string;
+  collection: string;
+  passages: Passage[];
+}
+
+export interface RagChatRequest {
+  question: string;
+  collection?: string;
+  top_k?: number;
+  /** Manda el escenario activo con la pregunta: teoría citada + números en pantalla. */
+  include_scenario?: boolean;
+  levers?: Partial<Levers>;
+  horizon?: number;
+}
+export interface RagChatResponse extends ApiMeta {
+  question: string;
+  collection: string;
+  answer: string;
+  passages: Passage[];
+  /** false cuando no se recuperó nada: el chat lo dice en vez de inventar. */
+  grounded: boolean;
+  provider: string | null;
+  model: string | null;
+  error: string | null;
+}
+
 export interface MonteCarloRequest {
   levers?: Partial<Levers>;
   seed?: number;

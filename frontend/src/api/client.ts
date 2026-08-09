@@ -1,7 +1,10 @@
 import type {
   ConstantsResponse, ExplainRequest, ExplainResponse, HealthResponse,
   MonteCarloRequest, MonteCarloResponse,
-  PersonasResponse, PresetsResponse, RedLinesResponse, ScenarioRequest,
+  PersonasResponse, PresetsResponse,
+  RagChatRequest, RagChatResponse, RagCollectionsResponse,
+  RagSearchRequest, RagSearchResponse,
+  RedLinesResponse, ScenarioRequest,
   ScenarioResponse, VintageResponse,
 } from "./types";
 
@@ -43,4 +46,9 @@ export const api = {
     request<MonteCarloResponse>("/scenario/montecarlo", { method: "POST", body: JSON.stringify(body), signal }),
   explain: (body: ExplainRequest, signal?: AbortSignal) =>
     request<ExplainResponse>("/explain", { method: "POST", body: JSON.stringify(body), signal }),
+  ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
+  ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
+    request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),
+  ragChat: (body: RagChatRequest, signal?: AbortSignal) =>
+    request<RagChatResponse>("/rag/chat", { method: "POST", body: JSON.stringify(body), signal }),
 };

@@ -210,3 +210,46 @@ code { font: 0.75em ui-monospace, Consolas, monospace; background: var(--code); 
 .macromicro { margin: 0 0 var(--sp-1); padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 .macromicro li { font-size: 11.5px; line-height: 1.55; color: var(--ink-2); }
 .macromicro b { color: var(--ink); }
+
+/* --- biblioteca (RAG) --- */
+.biblio { display: flex; flex-direction: column; gap: var(--sp-2); }
+.biblio-intro { font-size: 11.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 var(--sp-1); }
+
+.biblio-colls { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
+.coll { display: flex; align-items: center; gap: 6px; border: 1px solid var(--grid); background: var(--surface); color: var(--ink-2); border-radius: var(--rad-chip); padding: 3px 9px; font-size: 10px; cursor: pointer; font-family: inherit; }
+.coll:hover { border-color: var(--accent); }
+.coll.on { border-color: var(--accent); background: var(--chip); color: var(--ink); font-weight: 700; }
+.coll-auth { font-size: 8px; text-transform: uppercase; letter-spacing: .4px; padding: 0 4px; border-radius: 3px; }
+.coll-auth.academico, .psg-auth.academico { background: var(--st-safe-bg); color: var(--good); }
+.coll-auth.propio, .psg-auth.propio { background: var(--chip-lab); color: var(--lab); }
+.coll-auth.opinion, .psg-auth.opinion { background: var(--st-near-bg); color: var(--warn); }
+.coll-n { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 9px; }
+.biblio-note { font-size: 9.5px; color: var(--muted); margin: 0 0 var(--sp-1); }
+
+.biblio-form { display: flex; gap: 6px; margin: var(--sp-1) 0 5px; }
+.biblio-form input { flex: 1; border: 1px solid var(--grid); background: var(--surface); color: var(--ink); border-radius: var(--rad-chip); padding: 6px 10px; font-size: 12px; font-family: inherit; }
+.biblio-form input:focus { outline: none; border-color: var(--accent); }
+.biblio-form button { border: 1px solid var(--accent); background: var(--accent); color: var(--page); border-radius: var(--rad-chip); padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.biblio-form button:disabled { opacity: .5; cursor: default; }
+
+.biblio-scn { display: flex; gap: 6px; align-items: flex-start; font-size: 10px; color: var(--ink-2); line-height: 1.45; margin-bottom: var(--sp-1); cursor: pointer; }
+.biblio-eg { display: flex; gap: 5px; flex-wrap: wrap; }
+.biblio-eg button { border: 1px dashed var(--grid); background: none; color: var(--muted); border-radius: var(--rad-chip); padding: 2px 8px; font-size: 9.5px; cursor: pointer; font-family: inherit; text-align: left; }
+.biblio-eg button:hover { border-color: var(--accent); color: var(--accent); }
+
+.biblio-answer { font-size: 12.5px; line-height: 1.6; color: var(--ink); margin: 0 0 var(--sp-1); white-space: pre-wrap; }
+.biblio-src { margin-top: var(--sp-1); }
+.biblio-prov { font-size: 9px; color: var(--muted); margin: var(--sp-1) 0 0; }
+
+.psg-list { list-style: none; margin: 5px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.psg { border-left: 3px solid var(--grid); border-radius: 0 6px 6px 0; background: var(--surface); padding: 6px 9px; }
+.psg.academico { border-left-color: var(--good); }
+.psg.propio { border-left-color: var(--lab); }
+.psg.opinion { border-left-color: var(--warn); }
+.psg-head { display: flex; gap: 7px; align-items: baseline; flex-wrap: wrap; font-size: 10px; }
+.psg-n { font-weight: 800; color: var(--accent); }
+.psg-cite { color: var(--ink); font-weight: 700; }
+.psg-auth { font-size: 8px; text-transform: uppercase; letter-spacing: .4px; padding: 0 4px; border-radius: 3px; margin-left: auto; }
+.psg-text { font-size: 10.5px; line-height: 1.5; color: var(--ink-2); margin: 4px 0 0; max-height: 3.2em; overflow: hidden; }
+.psg-text.open { max-height: none; }
+.psg-more { border: 0; background: none; padding: 0; margin-top: 3px; font-size: 9.5px; color: var(--accent); cursor: pointer; font-family: inherit; }

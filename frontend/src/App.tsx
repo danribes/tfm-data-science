@@ -10,6 +10,7 @@ import { LeverRail } from "./components/LeverRail";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Warnings } from "./components/Warnings";
 import { SHIPPED_IDS } from "./personas/registry";
+import Biblioteca from "./routes/Biblioteca";
 import ComoFunciona from "./routes/ComoFunciona";
 import Inicio from "./routes/Inicio";
 import Laboratorio from "./routes/Laboratorio";
@@ -48,6 +49,7 @@ function Shell() {
             <NavLink key={c.id} to={`/persona/${c.id}`}>{c.pill}</NavLink>
           ))}
           <NavLink to="/laboratorio">Laboratorio</NavLink>
+          <NavLink to="/biblioteca">Biblioteca</NavLink>
           <NavLink to="/como-funciona">Cómo funciona</NavLink>
           <NavLink to="/metodologia">Datos y método</NavLink>
         </nav>
@@ -67,6 +69,7 @@ function Shell() {
               <Route path="/persona/:id" element={<Persona />} />
               <Route path="/laboratorio" element={<Laboratorio />} />
             </Route>
+            <Route path="/biblioteca" element={<Biblioteca />} />
             <Route path="/como-funciona" element={<ComoFunciona />} />
             <Route path="/metodologia" element={<Metodologia />} />
           </Routes>
