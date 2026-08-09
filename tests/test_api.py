@@ -7,6 +7,12 @@ from api.main import app
 client = TestClient(app)
 
 
+def test_root_redirects_to_docs():
+    r = client.get("/", follow_redirects=False)
+    assert r.status_code in (302, 307)
+    assert r.headers["location"] == "/docs"
+
+
 def test_health_shape():
     r = client.get("/health")
     assert r.status_code == 200
@@ -130,6 +136,24 @@ def test_montecarlo_horizon_truncates_years():
     assert all(len(v) == len(body["years"]) for v in body["percentiles"].values())
 
 
+def test_sensitivity_matrix_endpoints():
+    # GET /scenario/sensitivity
+    r_get = client.get("/scenario/sensitivity")
+    assert r_get.status_code == 200
+    body_get = r_get.json()
+    assert body_get["horizons"] == [2030, 2050]
+    assert len(body_get["target_series"]) == 6
+    assert "r" in body_get["matrix"]
+
+    # POST /scenario/sensitivity with custom levers
+    r_post = client.post("/scenario/sensitivity", json={"levers": {"r": 4.0, "sp": 1.0}})
+    assert r_post.status_code == 200
+    body_post = r_post.json()
+    assert body_post["horizons"] == [2030, 2050]
+    assert "matrix" in body_post
+
+
+
 def test_cors_allows_null_and_localhost_origins():
     r = client.get("/health", headers={"Origin": "null"})
     assert r.headers.get("access-control-allow-origin") == "null"
@@ -139,6 +163,7 @@ def test_cors_allows_null_and_localhost_origins():
 
 # ---- Task 13: generic-country layer (no network: monkeypatched) ----
 import json as _json
+import pytest
 from pathlib import Path as _Path
 
 from data.live.models import FetchResult
@@ -297,3 +322,38 @@ def test_evidence_impulse_response_contradicts_the_calibrated_reversion():
     engine_last = irf["engine_path"][-1]["coef"]
     assert engine_last < anchor["coef"]
     assert last["ci_low"] > 0          # and it is distinguishable from nothing
+
+
+# ---- sensitivity: comparable across levers, or not comparable at all -------
+
+def test_sensitivity_reports_both_the_raw_derivative_and_a_comparable_effect():
+    body = client.get("/scenario/sensitivity").json()
+    row = body["matrix"]["r"]
+    assert set(row) == {"lever_id", "lever_name", "unit", "sensitivities",
+                        "lever_span", "span_effects"}
+    assert row["lever_span"] > 0
+    # span_effect is the derivative scaled by the lever's own range.
+    for year in body["horizons"]:
+        y = str(year)
+        for k, v in row["sensitivities"][y].items():
+            assert row["span_effects"][y][k] == pytest.approx(
+                v * row["lever_span"], rel=1e-3, abs=1e-3)
+
+
+def test_raw_derivatives_rank_differently_from_comparable_effects():
+    """The reason the second column exists. On the raw derivative demographic
+    pressure dwarfs the interest rate; moved end to end, the rate matters more.
+    Ranking mixed units is the misreading, not a detail of presentation."""
+    m = client.get("/scenario/sensitivity").json()["matrix"]
+    raw_r, raw_dem = m["r"]["sensitivities"]["2050"]["b"], m["dem"]["sensitivities"]["2050"]["b"]
+    eff_r, eff_dem = m["r"]["span_effects"]["2050"]["b"], m["dem"]["span_effects"]["2050"]["b"]
+    assert abs(raw_dem) > abs(raw_r)        # what the raw column says
+    assert abs(eff_r) > abs(eff_dem)        # what the comparable column says
+
+
+def test_every_lever_has_a_span_so_no_row_is_silently_unrankable():
+    m = client.get("/scenario/sensitivity").json()["matrix"]
+    assert len(m) == 10
+    for lid, row in m.items():
+        assert row["lever_span"] > 0, lid
+        assert row["span_effects"], lid

@@ -216,3 +216,27 @@ def test_narration_failure_falls_back_rather_than_erroring(monkeypatch):
     assert body["source"] == "deterministic"
     assert "ANTHROPIC_API_KEY" in body["fallback_reason"]
     assert body["resumen"].strip()
+
+
+def test_generate_policy_brief_html():
+    from explain.report import generate_policy_brief_html
+    html_text = generate_policy_brief_html(RATE_UP, horizon=2050)
+    assert "<!DOCTYPE html>" in html_text
+    assert "España en Escenarios" in html_text
+    assert "Deuda Pública" in html_text
+    assert "2026-07-31" in html_text
+
+
+def test_scenario_report_endpoints():
+    # GET /scenario/report
+    r_get = client.get("/scenario/report")
+    assert r_get.status_code == 200
+    assert "text/html" in r_get.headers["content-type"]
+    assert "España en Escenarios" in r_get.text
+
+    # POST /scenario/report
+    r_post = client.post("/scenario/report", json={"levers": {"r": 4.8, "sp": 1.0}, "horizon": 2040})
+    assert r_post.status_code == 200
+    assert "text/html" in r_post.headers["content-type"]
+    assert "2040" in r_post.text
+

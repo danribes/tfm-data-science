@@ -36,7 +36,7 @@
 
   /* --- motion (spec §5; v16's single transition was .18s) --- */
   --dur: 180ms;
-  --rail-w: 300px;
+  --rail-w: 380px;
   color-scheme: light;
 }
 

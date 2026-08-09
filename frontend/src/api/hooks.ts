@@ -38,6 +38,17 @@ export function useMonteCarlo(levers: Levers, enabled: boolean) {
   });
 }
 
+export function useSensitivity(levers?: Levers) {
+  const debouncedLevers = useDebounced(levers, 400);
+  return useQuery({
+    queryKey: ["sensitivity", debouncedLevers],
+    queryFn: ({ signal }) =>
+      api.sensitivity(debouncedLevers ? { levers: debouncedLevers } : undefined, signal),
+    staleTime: Infinity,
+    placeholderData: keepPreviousData,
+  });
+}
+
 /** Narrated explanation of the current scenario.
  *
  *  Debounced at 400 ms like the Monte Carlo fan, for the same reason and one

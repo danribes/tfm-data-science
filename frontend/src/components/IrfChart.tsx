@@ -38,13 +38,13 @@ export function IrfChart({ irf, height = 260 }: { irf: IrfOut; height?: number }
           <XAxis dataKey="years" type="number" domain={[0, "dataMax"]}
             ticks={[0, 1, 2, 3]}
             tickFormatter={(v: number) => `${nf(v, 0)} a`}
-            tick={{ fontSize: 9.5, fill: "var(--ink-2)" }}
+            tick={{ fontSize: 13.5, fill: "var(--ink-2)" }}
             tickLine={false} axisLine={{ stroke: "var(--grid)" }} />
-          <YAxis width={56} tick={{ fontSize: 9.5, fill: "var(--ink-2)" }} tickLine={false}
+          <YAxis width={64} tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false}
             axisLine={false} tickFormatter={(v: number) => nf(v, 2)} domain={["auto", "auto"]} />
           <ReferenceLine y={0} stroke="var(--grid)" />
           <ReferenceLine x={anchorYears} stroke="var(--grid)" strokeDasharray="2 3"
-            label={{ value: "ancla", fontSize: 8.5, fill: "var(--ink-2)", position: "top" }} />
+            label={{ value: "ancla", fontSize: 13.5, fill: "var(--ink-2)", position: "top" }} />
           <Tooltip
             formatter={(v, name) =>
               Array.isArray(v) ? `${nf(Number(v[0]), 2)} … ${nf(Number(v[1]), 2)}`

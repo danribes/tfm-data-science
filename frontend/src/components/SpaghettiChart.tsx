@@ -46,17 +46,17 @@ export function SpaghettiChart({
           <CartesianGrid stroke="var(--grid)" vertical={false} />
           <XAxis
             dataKey="year"
-            tick={{ fontSize: 9, fill: "var(--muted)" }}
+            tick={{ fontSize: 13.5, fill: "var(--muted)" }}
             tickLine={false}
             axisLine={{ stroke: "var(--grid)" }}
             interval="preserveStartEnd"
             minTickGap={40}
           />
           <YAxis
-            tick={{ fontSize: 9, fill: "var(--muted)" }}
+            tick={{ fontSize: 13.5, fill: "var(--muted)" }}
             tickLine={false}
             axisLine={false}
-            width={44}
+            width={56}
             tickFormatter={(v: number) => nf(v, 0)}
           />
           {thresholds.map((t) => (
@@ -70,7 +70,7 @@ export function SpaghettiChart({
                 value: t.label,
                 position: "insideTopLeft",
                 fill: "var(--st-crossed)",
-                fontSize: 8,
+                fontSize: 13.5,
               }}
             />
           ))}
@@ -84,6 +84,7 @@ export function SpaghettiChart({
               strokeOpacity={0.22}
               dot={false}
               isAnimationActive={false}
+              tooltipType="none"
             />
           ))}
           {median && (
@@ -101,13 +102,16 @@ export function SpaghettiChart({
               background: "var(--card)",
               border: "1px solid var(--grid)",
               borderRadius: 6,
-              fontSize: 10,
+              fontSize: 13.5,
+              padding: "8px 12px",
             }}
             labelFormatter={(y) => `año ${y}`}
-            formatter={(v, name) => [
-              `${nf(Number(v), 1)} %PIB`,
-              name === "med" ? "mediana" : "una trayectoria",
-            ]}
+            formatter={(v, name) => {
+              if (name === "med") {
+                return [`${nf(Number(v), 1)} %PIB`, "mediana Monte Carlo"];
+              }
+              return [undefined, undefined];
+            }}
           />
         </LineChart>
       </ResponsiveContainer>

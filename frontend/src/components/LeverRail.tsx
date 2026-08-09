@@ -67,7 +67,7 @@ export function LeverRail({ hotIds = [] }: { hotIds?: string[] }) {
   const commitLever = useThrottledLeverSet(setLever);
   return (
     <aside className="rail" aria-label="Palancas del escenario">
-      <h4 style={{ margin: 0, fontSize: 12 }}>Palancas · variables independientes</h4>
+      <h4 style={{ margin: 0, fontSize: 16 }}>Palancas · variables independientes</h4>
       <PresetBar />
       <div className="levers">
         {LEVER_SPECS.map((s) => (

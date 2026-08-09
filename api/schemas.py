@@ -403,3 +403,29 @@ class ExplainResponse(ApiMeta):
     joint_delta: float
     headline_key: str
     headline_year: int
+
+
+class SensitivityTargetOut(BaseModel):
+    key: str
+    label: str
+    unit: str
+
+
+class SensitivityItemOut(BaseModel):
+    lever_id: str
+    lever_name: str
+    unit: str
+    #: dY/dL en las unidades propias de cada palanca. NO comparable entre filas.
+    sensitivities: dict[str, dict[str, float]]
+    lever_span: float
+    #: dY/dL x el recorrido completo de la palanca: la misma pregunta para todas
+    #: («¿qué pasa si la muevo de tope a tope?»), y por tanto la única columna
+    #: que se puede ordenar.
+    span_effects: dict[str, dict[str, float]]
+
+
+class SensitivityResponse(ApiMeta):
+    horizons: list[int]
+    target_series: list[SensitivityTargetOut]
+    matrix: dict[str, SensitivityItemOut]
+

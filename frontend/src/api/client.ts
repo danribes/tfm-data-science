@@ -6,7 +6,7 @@ import type {
   RagChatRequest, RagChatResponse, RagCollectionsResponse,
   RagSearchRequest, RagSearchResponse,
   RedLinesResponse, ScenarioRequest,
-  ScenarioResponse, VintageResponse,
+  ScenarioResponse, SensitivityResponse, VintageResponse,
 } from "./types";
 
 export const API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
@@ -45,6 +45,12 @@ export const api = {
     request<ScenarioResponse>("/scenario", { method: "POST", body: JSON.stringify(body), signal }),
   montecarlo: (body: MonteCarloRequest, signal?: AbortSignal) =>
     request<MonteCarloResponse>("/scenario/montecarlo", { method: "POST", body: JSON.stringify(body), signal }),
+  sensitivity: (body?: ScenarioRequest, signal?: AbortSignal) =>
+    request<SensitivityResponse>("/scenario/sensitivity", {
+      method: body ? "POST" : "GET",
+      body: body ? JSON.stringify(body) : undefined,
+      signal,
+    }),
   explain: (body: ExplainRequest, signal?: AbortSignal) =>
     request<ExplainResponse>("/explain", { method: "POST", body: JSON.stringify(body), signal }),
   evidence: () => request<EvidenceResponse>("/evidence"),

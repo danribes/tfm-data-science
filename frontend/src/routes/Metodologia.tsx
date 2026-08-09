@@ -7,7 +7,6 @@ const KNOWN_GAPS = [
   "Bases de cotización del RETA: sin API pública — la senda de la cuota de autónomo no está modelada.",
   "WGI control de la corrupción: API archivada — descarga manual en govindicators.org.",
   "Contratos menores · adjudicación: la señal vive a nivel de contrato, sin serie pública.",
-  "Personas 04, 05, 07–12: configuración pendiente (el renderizador ya es genérico).",
 ];
 
 export default function Metodologia() {
@@ -25,7 +24,7 @@ export default function Metodologia() {
 
       <div className="card">
         <h4>Vintage <small>congelado — la app nunca mezcla fechas</small></h4>
-        <p style={{ fontSize: 12 }}>
+        <p style={{ fontSize: 14.5 }}>
           Datos congelados el <b>{health.data?.vintage ?? "…"}</b>
           {vintage.data ? <> ({nf(vintage.data.n_files, 0)} ficheros fuente)</> : null}.
           {days !== null && (days > STALE_LIMIT_DAYS
@@ -36,14 +35,14 @@ export default function Metodologia() {
 
       <div className="card">
         <h4>Paridad de motores <small>el mismo número en Python y en el navegador</small></h4>
-        <p style={{ fontSize: 12 }}>
+        <p style={{ fontSize: 14.5 }}>
           El motor TypeScript de esta página pasa el mismo fixture de anclas que el motor Python
           (tests/fixtures/engine_anchors.json, vintage {health.data?.vintage ?? "…"}): senda central de
           deuda 2026/2030/2035/2050 (±10⁻⁶), cuota 2026 (±0,01), 8 presets × 7 series en 2035/2050
           (±10⁻⁶), sonda con las 10 palancas (±10⁻⁶) e identidad contable base (±10⁻⁹). Al arrancar,
           la app además cruza su cálculo local contra POST /scenario y muestra un aviso si difieren.
         </p>
-        <p style={{ fontSize: 12 }}>
+        <p style={{ fontSize: 14.5 }}>
           Monte Carlo se calcula <b>solo</b> en el servidor: los sorteos NumPy PCG64 no son
           reproducibles en JS, así que los pines de semilla 42 del fixture atan al motor Python y la
           regla de aceptación del abanico es la envolvente dorada ±2 pp en 2030/2050/2070.
@@ -53,7 +52,7 @@ export default function Metodologia() {
       <div className="card">
         <h4>Constantes del motor <small>calibración v16 — defaults declarados, no estimaciones</small></h4>
         {constants.isSuccess ? (
-          <table style={{ fontSize: 11, borderCollapse: "collapse" }}>
+          <table style={{ fontSize: 13.5, borderCollapse: "collapse" }}>
             <thead><tr><th style={{ textAlign: "left" }}>nombre</th><th>valor</th><th style={{ textAlign: "left" }}>unidad</th><th style={{ textAlign: "left" }}>procedencia</th></tr></thead>
             <tbody>
               {constants.data.constants.map((c) => (
@@ -78,7 +77,7 @@ export default function Metodologia() {
       <div className="card">
         <h4>Líneas rojas globales <small>umbrales v12, con fuente empírica</small></h4>
         {redlines.isSuccess ? (
-          <ul style={{ fontSize: 12, margin: 0, paddingLeft: 18 }}>
+          <ul style={{ fontSize: 14.5, margin: 0, paddingLeft: 18 }}>
             {redlines.data.redlines.map((rl) => (
               <li key={rl.id}><b>{rl.label}</b> — serie <code>{rl.series}</code>, umbral {nf(rl.threshold, 1)} · {rl.source}</li>
             ))}
@@ -86,7 +85,7 @@ export default function Metodologia() {
         ) : redlines.isError ? (
           <div className="banner err">Líneas rojas no disponibles</div>
         ) : null}
-        <p style={{ fontSize: 12 }}>
+        <p style={{ fontSize: 14.5 }}>
           Los semáforos de cada perfil usan umbrales de <b>presentación</b> propios y nunca se mezclan
           con estas líneas globales. Ejemplo: la fila «Sobrecarga &gt; 40 % renta» del perfil 🔑 evalúa
           la serie <code>sobre</code> contra {nf(15.0, 1)} — el 40 % es la definición Eurostat de
@@ -97,11 +96,11 @@ export default function Metodologia() {
 
       <div className="card">
         <h4>Cómo se generan las explicaciones <small>quién escribe qué</small></h4>
-        <p style={{ fontSize: 12 }}>
+        <p style={{ fontSize: 14.5 }}>
           El panel «Qué está pasando» separa deliberadamente dos cosas: <b>los
           números</b> y <b>las palabras</b>.
         </p>
-        <ul style={{ fontSize: 12, margin: 0, paddingLeft: 18 }}>
+        <ul style={{ fontSize: 14.5, margin: 0, paddingLeft: 18 }}>
           <li>
             <b>Los números los calcula el motor.</b> El endpoint <code>/explain</code>{" "}
             vuelve a correr <code>engine/spain.py</code> — el mismo motor que fija
@@ -130,7 +129,7 @@ export default function Metodologia() {
             de una llamada de red para poder explicarse.
           </li>
         </ul>
-        <p style={{ fontSize: 12 }}>
+        <p style={{ fontSize: 14.5 }}>
           Consecuencia para quien revise este trabajo: cualquier cifra que
           aparezca en un texto explicativo es trazable al motor y reproducible
           desactivando la narración (<code>narrate: false</code>). La redacción
@@ -140,7 +139,7 @@ export default function Metodologia() {
 
       <div className="card">
         <h4>Huecos conocidos <small>lo que falta se declara, no se rellena</small></h4>
-        <ul style={{ fontSize: 12, margin: 0, paddingLeft: 18 }}>
+        <ul style={{ fontSize: 14.5, margin: 0, paddingLeft: 18 }}>
           {KNOWN_GAPS.map((g) => <li key={g}>{g}</li>)}
         </ul>
       </div>

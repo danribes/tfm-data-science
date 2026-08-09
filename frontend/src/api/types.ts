@@ -60,6 +60,23 @@ export interface ScenarioResponse extends ApiMeta {
   redlines: RedLineStatusOut[];
 }
 
+export interface SensitivityTargetOut { key: string; label: string; unit: string }
+export interface SensitivityItemOut {
+  lever_id: string;
+  lever_name: string;
+  unit: string;
+  /** dY/dL en unidades de cada palanca. No comparable entre filas. */
+  sensitivities: Record<string, Record<string, number>>;
+  lever_span: number;
+  /** Efecto de mover la palanca de tope a tope: comparable entre filas. */
+  span_effects: Record<string, Record<string, number>>;
+}
+export interface SensitivityResponse extends ApiMeta {
+  horizons: number[];
+  target_series: SensitivityTargetOut[];
+  matrix: Record<string, SensitivityItemOut>;
+}
+
 export interface ExplainRequest {
   levers?: Partial<Levers>;
   horizon?: number;

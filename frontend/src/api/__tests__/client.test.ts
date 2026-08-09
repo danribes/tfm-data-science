@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { api, ApiError } from "../client";
 import { server } from "../../test/msw/server";
 import { http, HttpResponse } from "msw";
+import { SHIPPED_IDS } from "../../personas/registry";
 
 describe("typed API client against MSW", () => {
   it("GET /health carries vintage and the no-advice flag", async () => {
@@ -26,7 +27,9 @@ describe("typed API client against MSW", () => {
 
   it("GET /personas returns cards 01/02/03/06 with outs and reds", async () => {
     const pe = await api.personas();
-    expect(pe.personas.map((c) => c.id)).toEqual(["01", "02", "03", "06"]);
+    // Derived, not literal: the fixture is generated from the engine's own
+    // PERSONAS, so a persona added server-side must not need this edited.
+    expect(pe.personas.map((c) => c.id)).toEqual(SHIPPED_IDS);
     const p02 = pe.personas[1];
     expect(p02.pill).toBe("🏦 Banca");
     expect(p02.reds[0].k).toBe("ipvreal");

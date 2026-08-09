@@ -69,17 +69,17 @@ export function DebtVsGdpChart({
           <CartesianGrid stroke="var(--grid)" vertical={false} />
           <XAxis
             dataKey="year"
-            tick={{ fontSize: 9, fill: "var(--muted)" }}
+            tick={{ fontSize: 13.5, fill: "var(--muted)" }}
             tickLine={false}
             axisLine={{ stroke: "var(--grid)" }}
             interval="preserveStartEnd"
             minTickGap={40}
           />
           <YAxis
-            tick={{ fontSize: 9, fill: "var(--muted)" }}
+            tick={{ fontSize: 13.5, fill: "var(--muted)" }}
             tickLine={false}
             axisLine={false}
-            width={44}
+            width={56}
             tickFormatter={(v: number) => nf(v, 0)}
           />
           <Area
@@ -119,13 +119,13 @@ export function DebtVsGdpChart({
             isAnimationActive={false}
             name="Deuda total (índice)"
           />
-          <Legend wrapperStyle={{ fontSize: 9 }} iconSize={8} />
+          <Legend wrapperStyle={{ fontSize: 13.5 }} iconSize={12} />
           <Tooltip
             contentStyle={{
               background: "var(--card)",
               border: "1px solid var(--grid)",
               borderRadius: 6,
-              fontSize: 10,
+              fontSize: 13.5,
             }}
             labelFormatter={(y) => `año ${y}`}
             formatter={(v, name) => [nf(Number(v), 0), String(name)]}

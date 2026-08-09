@@ -288,6 +288,21 @@ GOLDEN: tuple[Question, ...] = (
         expect_docs=("deuda", "ESPAÑA", "España"),
         expect_terms=(("deuda", "debt"),),
     ),
+    # ---- TFM defense & methodology collection ----
+    Question(
+        id="defensa-doble-motor",
+        question="¿Cómo se garantiza que el motor Python y el motor TypeScript no diverjan?",
+        collection="defensa_tfm", topic="defensa",
+        expect_docs=("DEFENSA_TFM", "README", "v16-engine-extract"),
+        expect_terms=(("anclas", "fixture"), ("paridad", "doble motor")),
+    ),
+    Question(
+        id="defensa-monte-carlo-semilla",
+        question="¿Por qué se fija la semilla en 42 para la simulación Monte Carlo?",
+        collection="defensa_tfm", topic="defensa",
+        expect_docs=("DEFENSA_TFM", "README"),
+        expect_terms=(("semilla", "seed"), ("reproducibilidad", "reproducible")),
+    ),
     # ---- what the corpus cannot answer ----
     Question(
         id="fuera-cuota-autonomos",

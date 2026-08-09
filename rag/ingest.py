@@ -58,7 +58,15 @@ def _metodo() -> Iterator[dict]:
                 yield {"path": f, "title": f.stem, "collection": "metodo", "meta": {}}
 
 
-SOURCES = {"libros": _books, "crack23": _crack23, "metodo": _metodo}
+def _defensa_tfm() -> Iterator[dict]:
+    """The TFM defense guide and methodological Q&A collection."""
+    repo = Path(__file__).resolve().parents[1]
+    p = repo / "docs" / "DEFENSA_TFM.md"
+    if p.is_file():
+        yield {"path": p, "title": p.stem, "collection": "defensa_tfm", "meta": {"topic": "defensa"}}
+
+
+SOURCES = {"libros": _books, "crack23": _crack23, "metodo": _metodo, "defensa_tfm": _defensa_tfm}
 
 
 def ingest_document(con, doc: dict, *, force: bool = False) -> tuple[int, str]:

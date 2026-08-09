@@ -175,8 +175,9 @@ def test_search_all_keeps_sources_separated(db, monkeypatch):
 def test_collections_endpoint_lists_all_three_with_authority():
     body = client.get("/rag/collections").json()
     ids = {c["id"]: c for c in body["collections"]}
-    assert set(ids) == {"libros", "metodo", "crack23"}
+    assert set(ids) == {"libros", "metodo", "defensa_tfm", "crack23"}
     assert ids["libros"]["authority"] == "academico"
+    assert ids["defensa_tfm"]["authority"] == "defensa"
     assert ids["crack23"]["authority"] == "opinion"
 
 

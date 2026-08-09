@@ -58,7 +58,7 @@ export default function Inicio() {
             Monte Carlo no disponible — el resto de la página sigue funcionando.
           </div>
         )}
-        {mc.isPending && !mc.data && <p style={{ fontSize: 12 }}>Calculando trayectorias…</p>}
+        {mc.isPending && !mc.data && <p style={{ fontSize: 14 }}>Calculando trayectorias…</p>}
         {mc.data && (
           <SpaghettiChart
             years={mc.data.years}
@@ -226,7 +226,7 @@ export default function Inicio() {
           .map((c) => (
             <Link key={c.id} to={`/persona/${c.id}`} className="card" style={{ textDecoration: "none", color: "inherit" }}>
               <h4>{c.pill}</h4>
-              <span style={{ fontSize: 12, color: "var(--ink-2)" }}>{c.h1}</span>
+              <span style={{ fontSize: 14.5, color: "var(--ink-2)" }}>{c.h1}</span>
             </Link>
           ))}
         {personas.isError && <div className="banner err">Personas no disponibles</div>}

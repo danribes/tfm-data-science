@@ -28,14 +28,14 @@ export function ProjectionChart({ years, baseline, scenario, redLines = [], unit
         <LineChart data={data} margin={{ top: 12, right: 12, bottom: 4, left: 0 }}>
           <CartesianGrid stroke="var(--grid)" vertical={false} />
           <XAxis dataKey="year" ticks={[xs[0], xs[Math.floor((xs.length - 1) / 2)], xs[xs.length - 1]]}
-            tick={{ fontSize: 9.5, fill: "var(--ink-2)" }} tickLine={false} axisLine={{ stroke: "var(--grid)" }} />
-          <YAxis width={56} tick={{ fontSize: 9.5, fill: "var(--ink-2)" }} tickLine={false}
+            tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false} axisLine={{ stroke: "var(--grid)" }} />
+          <YAxis width={64} tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false}
             axisLine={false} tickFormatter={(v: number) => nf(v, dec)}
             domain={["auto", "auto"]} />
           <Tooltip formatter={(v) => `${nf(Number(v), dec)} ${unit}`} labelFormatter={(y) => (labels ? String(y) : `año ${y}`)} />
           {redLines.map((rl) => (
             <ReferenceLine key={rl.label} y={rl.value} stroke="var(--div-neg)" strokeDasharray="4 3"
-              label={{ value: rl.label, fontSize: 9, fill: "var(--div-neg)", position: "insideTopRight" }} />
+              label={{ value: rl.label, fontSize: 13.5, fill: "var(--div-neg)", position: "insideTopRight" }} />
           ))}
           <Line type="linear" dataKey="base" stroke="var(--baseline)" strokeWidth={1.6}
             strokeDasharray="5 4" dot={false} isAnimationActive={false} name="base" />

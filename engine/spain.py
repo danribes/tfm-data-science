@@ -8,8 +8,10 @@ gold_escenarios_deuda.csv (central). Variable names mirror the JS on purpose.
 """
 from __future__ import annotations
 
+from dataclasses import fields
+
 from engine import constants as c
-from engine.levers import Levers
+from engine.levers import LEVER_SPECS, Levers
 
 Y0 = 2026
 Y1 = 2050
@@ -293,3 +295,118 @@ def persona_dependents(scenario: dict[str, list[float]]) -> dict[str, dict]:
         out[p["id"]] = {"pill": p["pill"], "headline": p["headline"],
                         "series": {k: scenario[k] for k in seen}}
     return out
+
+
+def sensitivity_matrix(
+    base_levers: Levers | None = None,
+    target_series: list[str] | None = None,
+    horizons: list[int] | None = None,
+) -> dict:
+    """Compute numerical marginal sensitivity matrix (elasticities) for outcome series across horizons.
+
+    Evaluates dY / dL_k ≈ (R(L + δ_k) - R(L - δ_k)) / (2 * δ_k) for specified horizons.
+    """
+    if base_levers is None:
+        base_levers = Levers()
+    if target_series is None:
+        target_series = ["b", "u", "pi", "g", "esf", "saldo"]
+    if horizons is None:
+        horizons = [2030, 2050]
+
+    steps = {
+        "r": 0.25,
+        "prima": 25.0,
+        "sp": 0.25,
+        "lam": 0.25,
+        "pm": 5.0,
+        "tau": 0.5,
+        "z": 0.25,
+        "ext": 0.5,
+        "dem": 0.1,
+        "idx": 0.25,
+    }
+
+    labels = {
+        "b": {"label": "Deuda pública", "unit": "% PIB"},
+        "u": {"label": "Paro total", "unit": "%"},
+        "pi": {"label": "Inflación IPCA", "unit": "%"},
+        "g": {"label": "PIB real", "unit": "%"},
+        "esf": {"label": "Esfuerzo de compra de vivienda", "unit": "%"},
+        "saldo": {"label": "Saldo público", "unit": "% PIB"},
+        "bono": {"label": "Bono 10A España", "unit": "%"},
+        "wrealIdx": {"label": "Salario real acumulado", "unit": "índice"},
+        "arop": {"label": "AROP infantil (<16)", "unit": "%"},
+    }
+
+    target_info = [
+        {"key": k, "label": labels.get(k, {}).get("label", k), "unit": labels.get(k, {}).get("unit", "")}
+        for k in target_series
+    ]
+
+    h_indices = {h: h - Y0 for h in horizons if Y0 <= h <= Y1}
+    matrix: dict[str, dict] = {}
+
+    for spec in LEVER_SPECS:
+        lid = spec["id"]
+        val = getattr(base_levers, lid)
+        step = steps.get(lid, 0.1)
+
+        val_plus = min(spec["max"], val + step)
+        val_minus = max(spec["min"], val - step)
+        d_lever = val_plus - val_minus
+
+        if d_lever <= 1e-9:
+            d_lever = 1.0
+
+        kwargs_plus = {f.name: getattr(base_levers, f.name) for f in fields(Levers)}
+        kwargs_plus[lid] = val_plus
+        l_plus = Levers(**kwargs_plus)
+
+        kwargs_minus = {f.name: getattr(base_levers, f.name) for f in fields(Levers)}
+        kwargs_minus[lid] = val_minus
+        l_minus = Levers(**kwargs_minus)
+
+        res_plus = run_scenario(l_plus)
+        res_minus = run_scenario(l_minus)
+
+        sensitivities_by_year: dict[str, dict[str, float]] = {}
+        for h, idx in h_indices.items():
+            sens_at_h: dict[str, float] = {}
+            for k in target_series:
+                if k in res_plus and k in res_minus and idx < len(res_plus[k]):
+                    dy = res_plus[k][idx] - res_minus[k][idx]
+                    sens_at_h[k] = round(dy / d_lever, 4)
+            sensitivities_by_year[str(h)] = sens_at_h
+
+        # The raw derivative is per one unit of the lever, and the levers are
+        # not in the same units: `r` moves in percentage points, `prima` in
+        # basis points, `dem` is a dimensionless multiplier. Read down a column
+        # and +96,88 for dem sits next to +34,24 for r, which invites the
+        # conclusion that demography matters three times more. It does not
+        # follow — the two numbers answer different questions.
+        #
+        # `span` is what makes a column comparable: the derivative times the
+        # lever's own declared range is the effect of moving that lever from
+        # one end of its slider to the other, which is the same question for
+        # every lever. Both are reported; only the second may be ranked.
+        span = float(spec["max"]) - float(spec["min"])
+        span_by_year = {
+            str(h): {k: round(v * span, 4) for k, v in sens.items()}
+            for h, sens in ((h, sensitivities_by_year[str(h)]) for h in h_indices)
+        }
+
+        matrix[lid] = {
+            "lever_id": lid,
+            "lever_name": spec["nm"],
+            "unit": spec["unit"],
+            "sensitivities": sensitivities_by_year,
+            "lever_span": round(span, 4),
+            "span_effects": span_by_year,
+        }
+
+    return {
+        "horizons": list(h_indices.keys()),
+        "target_series": target_info,
+        "matrix": matrix,
+    }
+

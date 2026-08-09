@@ -26,8 +26,8 @@ export function FanChart({ years, percentiles, height = 260 }: {
         <ComposedChart data={data} margin={{ top: 12, right: 12, bottom: 4, left: 0 }}>
           <CartesianGrid stroke="var(--grid)" vertical={false} />
           <XAxis dataKey="year" ticks={[years[0], 2050, years[years.length - 1]]}
-            tick={{ fontSize: 9.5, fill: "var(--ink-2)" }} tickLine={false} axisLine={{ stroke: "var(--grid)" }} />
-          <YAxis width={56} tick={{ fontSize: 9.5, fill: "var(--ink-2)" }} tickLine={false}
+            tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false} axisLine={{ stroke: "var(--grid)" }} />
+          <YAxis width={64} tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false}
             axisLine={false} tickFormatter={(v: number) => nf(v, 0)} domain={["auto", "auto"]} />
           <Tooltip formatter={(v) =>
             Array.isArray(v) ? `${nf(Number(v[0]), 1)} – ${nf(Number(v[1]), 1)}` : nf(Number(v), 1)}

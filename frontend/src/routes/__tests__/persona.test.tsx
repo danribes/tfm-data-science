@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import Persona from "../Persona";
 import { queryClient } from "../../api/hooks";
 import { useScenarioStore } from "../../state/scenarioStore";
+import { SHIPPED_IDS } from "../../personas/registry";
 
 const ui = (id: string) =>
   render(
@@ -21,7 +22,7 @@ describe("Persona — generic renderer over the API card", () => {
     useScenarioStore.getState().resetAll();
   });
 
-  it.each(["01", "02", "03", "06"])("persona %s renders h1, 5 gauges, 3 reds, chains, narrative", async (id) => {
+  it.each(SHIPPED_IDS)("persona %s renders h1, gauges, reds, chains, narrative", async (id) => {
     ui(id);
     await waitFor(() => expect(document.querySelectorAll(".out")).toHaveLength(5));
     expect(document.querySelectorAll(".rl-item")).toHaveLength(3);

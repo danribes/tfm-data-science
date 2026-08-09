@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import Inicio from "../Inicio";
 import { queryClient } from "../../api/hooks";
 import { useScenarioStore } from "../../state/scenarioStore";
+import { SHIPPED_IDS } from "../../personas/registry";
 
 const ui = () =>
   render(
@@ -39,7 +40,7 @@ describe("Inicio — headline figures + global semaphore + persona cards", () =>
     expect(deuda105.querySelector(".st")!.className).toContain("cross");
   });
 
-  it("links to the four shipped personas", async () => {
+  it("links to every shipped persona, whatever that set is", async () => {
     ui();
     await waitFor(() => expect(screen.getByText(/💼 Bonista/)).toBeInTheDocument());
     // Scoped to the persona *cards*: the macro-to-micro section also links to
@@ -47,8 +48,11 @@ describe("Inicio — headline figures + global semaphore + persona cards", () =>
     const cards = screen
       .getAllByRole("link")
       .filter((a) => a.getAttribute("href")?.startsWith("/persona/") && a.classList.contains("card"));
-    expect(cards.map((a) => a.getAttribute("href"))).toEqual([
-      "/persona/01", "/persona/02", "/persona/03", "/persona/06",
-    ]);
+    // Derived from SHIPPED_IDS rather than a literal list. The literal version
+    // of this test kept passing under the name "the four shipped personas" for
+    // as long as the mock stayed four personas behind the app.
+    expect(cards.map((a) => a.getAttribute("href")))
+      .toEqual(SHIPPED_IDS.map((id) => `/persona/${id}`));
+    expect(cards.length).toBeGreaterThanOrEqual(12);
   });
 });

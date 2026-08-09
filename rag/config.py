@@ -32,6 +32,11 @@ COLLECTIONS = {
         "authority": "propio",
         "note": "Specs, Metodología y Cómo funciona de esta app.",
     },
+    "defensa_tfm": {
+        "label": "Defensa del TFM (Pregúntale al TFM)",
+        "authority": "defensa",
+        "note": "Defensa metodológica: derivaciones de las 10 palancas, Okun, Phillips, Monte Carlo y calibración.",
+    },
     "crack23": {
         "label": "Canal crack23",
         "authority": "opinion",

@@ -81,15 +81,8 @@ export const handlers = [
     const horizon = body.horizon ?? 2070;
     const years = Array.from({ length: horizon - 2026 + 1 }, (_, i) => 2026 + i);
     const pct = mockPercentiles(years);
-    const nShow = body.n_show ?? 60;
-    // Spaghetti strands for the offline build: deterministic pseudo-paths
-    // spread across the mocked p5–p95 envelope. No RNG — a fixed hash of
-    // (strand, year) keeps the smoke test and the mock build reproducible.
-    const paths = Array.from({ length: nShow }, (_, j) =>
-      years.map((_, i) => {
-        const wobble = Math.sin((j + 1) * 12.9898 + i * 78.233) * 0.5 + 0.5;
-        return pct.p5[i] + (pct.p95[i] - pct.p5[i]) * wobble;
-      }),
+    const paths = Array.from({ length: Math.min(body.n_show ?? 80, 80) }, () =>
+      years.map((_, i) => 106.32 + i * 0.4),
     );
     return HttpResponse.json({
       ...META,
@@ -100,6 +93,77 @@ export const handlers = [
       paths,
     });
   }),
+
+  http.get(`${BASE}/scenario/sensitivity`, () =>
+    HttpResponse.json({
+      ...META,
+      horizons: [2030, 2050],
+      target_series: [
+        { key: "b", label: "Deuda pública", unit: "% PIB" },
+        { key: "u", label: "Paro total", unit: "%" },
+        { key: "pi", label: "Inflación IPCA", unit: "%" },
+        { key: "g", label: "PIB real", unit: "%" },
+        { key: "esf", label: "Esfuerzo de compra de vivienda", unit: "%" },
+        { key: "saldo", label: "Saldo público", unit: "% PIB" },
+      ],
+      matrix: Object.fromEntries(
+        LEVER_SPECS.map((s) => [
+          s.id,
+          {
+            lever_id: s.id,
+            lever_name: s.nm,
+            unit: s.unit,
+            sensitivities: {
+              "2030": { b: 2.45, u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+              "2050": { b: 8.12, u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+            },
+            lever_span: s.max - s.min,
+            span_effects: {
+              "2030": { b: 2.45 * (s.max - s.min), u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+              "2050": { b: 8.12 * (s.max - s.min), u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+            },
+          },
+        ]),
+      ),
+    }),
+  ),
+
+  http.post(`${BASE}/scenario/sensitivity`, () =>
+    HttpResponse.json({
+      ...META,
+      horizons: [2030, 2050],
+      target_series: [
+        { key: "b", label: "Deuda pública", unit: "% PIB" },
+        { key: "u", label: "Paro total", unit: "%" },
+        { key: "pi", label: "Inflación IPCA", unit: "%" },
+        { key: "g", label: "PIB real", unit: "%" },
+        { key: "esf", label: "Esfuerzo de compra de vivienda", unit: "%" },
+        { key: "saldo", label: "Saldo público", unit: "% PIB" },
+      ],
+      matrix: Object.fromEntries(
+        LEVER_SPECS.map((s) => [
+          s.id,
+          {
+            lever_id: s.id,
+            lever_name: s.nm,
+            unit: s.unit,
+            sensitivities: {
+              "2030": { b: 2.45, u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+              "2050": { b: 8.12, u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+            },
+            lever_span: s.max - s.min,
+            span_effects: {
+              "2030": { b: 2.45 * (s.max - s.min), u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+              "2050": { b: 8.12 * (s.max - s.min), u: 0.31, pi: 0.12, g: 0.45, esf: 1.2, saldo: -0.5 },
+            },
+          },
+        ]),
+      ),
+    }),
+  ),
+
+  http.get(`${BASE}/scenario/report`, () => HttpResponse.html("<!DOCTYPE html><html><body>Policy Brief</body></html>")),
+  http.post(`${BASE}/scenario/report`, () => HttpResponse.html("<!DOCTYPE html><html><body>Policy Brief</body></html>")),
 
   // Evidencia, offline: shapes only. The real numbers come from the frozen
   // panels and belong to the Python suite; what the UI must get right is the

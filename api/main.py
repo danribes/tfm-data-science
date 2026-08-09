@@ -7,7 +7,7 @@ from dataclasses import asdict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 
 from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           ContributionOut,
@@ -24,21 +24,29 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           RagCollectionsResponse, RagSearchRequest,
                           RagSearchResponse, RedLineOut, RedLinesResponse,
                           RedLineStatusOut, ScenarioRequest, ScenarioResponse,
+                          SensitivityResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
 from explain.narrate import NarrationUnavailable, narrate
+from explain.report import generate_policy_brief_html
 from data.live import country_list, panel_builder
 from engine import generic
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
                                load_kpis)
-from engine.levers import PRESETS, Levers
+from engine.levers import PRESETS, Levers, validate_levers
 from engine.montecarlo import run_montecarlo
 from engine.redlines import RED_LINES, evaluate_redlines
 from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
-                           persona_dependents, run_scenario)
+                           persona_dependents, run_scenario, sensitivity_matrix)
 
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
+
+
+@app.get("/")
+def root():
+    """Redirect root access to interactive API documentation."""
+    return RedirectResponse(url="/docs")
 
 
 @app.on_event("startup")
@@ -142,6 +150,40 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
         seed=mc.seed,
         paths=[p[:n] for p in mc.paths],
     )
+
+
+@app.get("/scenario/sensitivity", response_model=SensitivityResponse)
+def scenario_sensitivity_base() -> SensitivityResponse:
+    raw = sensitivity_matrix()
+    return SensitivityResponse(**raw)
+
+
+@app.post("/scenario/sensitivity", response_model=SensitivityResponse)
+def scenario_sensitivity_custom(req: ScenarioRequest) -> SensitivityResponse:
+    levers = Levers(**req.levers.model_dump())
+    errors = validate_levers(levers)
+    if errors:
+        raise HTTPException(status_code=422, detail={"errors": errors})
+    raw = sensitivity_matrix(base_levers=levers)
+    return SensitivityResponse(**raw)
+
+
+@app.get("/scenario/report", response_class=HTMLResponse)
+def scenario_report_base(horizon: int = 2050) -> HTMLResponse:
+    """Generate 1-Page Policy Brief HTML report for the baseline scenario (S0)."""
+    html_content = generate_policy_brief_html(Levers(), horizon=horizon)
+    return HTMLResponse(content=html_content)
+
+
+@app.post("/scenario/report", response_class=HTMLResponse)
+def scenario_report_custom(req: ScenarioRequest) -> HTMLResponse:
+    """Generate 1-Page Policy Brief HTML report for a custom scenario."""
+    levers = Levers(**req.levers.model_dump())
+    errors = validate_levers(levers)
+    if errors:
+        raise HTTPException(status_code=422, detail={"errors": errors})
+    html_content = generate_policy_brief_html(levers, horizon=req.horizon)
+    return HTMLResponse(content=html_content)
 
 
 @app.get("/countries", response_model=CountriesResponse)

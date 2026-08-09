@@ -248,3 +248,20 @@ def test_persona_base_pins(pid, key, k, expected):
 def test_persona_moved_lever_pins(pid, moved, key, k, expected):
     deps = persona_dependents(run_scenario(Levers(**moved)))
     assert deps[pid]["series"][key][k] == pytest.approx(expected, abs=1e-3)
+
+
+def test_sensitivity_matrix_structure_and_signs():
+    from engine.spain import sensitivity_matrix
+    res = sensitivity_matrix()
+    assert res["horizons"] == [2030, 2050]
+    assert len(res["target_series"]) == 6
+    assert set(res["matrix"]) == {"r", "prima", "sp", "lam", "pm", "tau", "z", "ext", "dem", "idx"}
+
+    # Sensitivity of primary balance (sp) on debt (b) must be negative (improving primary balance reduces debt)
+    db_dsp_2050 = res["matrix"]["sp"]["sensitivities"]["2050"]["b"]
+    assert db_dsp_2050 < 0.0
+
+    # Sensitivity of Euribor (r) on debt (b) must be positive (higher rates increase debt service)
+    db_dr_2050 = res["matrix"]["r"]["sensitivities"]["2050"]["b"]
+    assert db_dr_2050 > 0.0
+
