@@ -236,7 +236,7 @@ def test_evidence_shape():
     r = client.get("/evidence")
     assert r.status_code == 200
     body = r.json()
-    assert set(body) == {"vintage", "computed_not_advice", "comparisons",
+    assert set(body) == {"vintage", "computed_not_advice", "comparisons", "irf",
                          "fiscal_persistence", "identifiable", "engine_version"}
     assert body["comparisons"]
     row = body["comparisons"][0]
@@ -272,3 +272,28 @@ def test_evidence_publishes_what_it_cannot_estimate():
     # Every blocker states a reason; "no" on its own would be an excuse.
     assert all(len(v) > len("no — ") for k, v in body["identifiable"].items()
                if k in blocked)
+
+
+def test_evidence_ships_the_impulse_response_with_the_engine_on_the_same_axis():
+    body = client.get("/evidence").json()
+    irf = body["irf"]
+    assert irf is not None
+    assert len(irf["horizons"]) == len(irf["engine_path"])
+    anchor = irf["anchor_h"]
+    # Null before the anchor is the contract the chart relies on to leave a gap
+    # rather than draw the engine's line down to zero.
+    assert all(p["coef"] is None for p in irf["engine_path"] if p["h"] < anchor)
+    assert all(p["coef"] is not None for p in irf["engine_path"] if p["h"] >= anchor)
+    assert irf["unit"] and irf["note"]
+
+
+def test_evidence_impulse_response_contradicts_the_calibrated_reversion():
+    """The finding, asserted so a change of sign cannot pass silently: in the
+    regional panel the shock keeps building while the engine assumes decay."""
+    irf = client.get("/evidence").json()["irf"]
+    at = {p["h"]: p for p in irf["horizons"]}
+    anchor, last = at[irf["anchor_h"]], irf["horizons"][-1]
+    assert last["coef"] > anchor["coef"]
+    engine_last = irf["engine_path"][-1]["coef"]
+    assert engine_last < anchor["coef"]
+    assert last["ci_low"] > 0          # and it is distinguishable from nothing

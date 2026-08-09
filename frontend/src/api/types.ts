@@ -108,8 +108,24 @@ export interface ComparisonOut extends EstimateOut {
    *  depende de la muestra. Vacío cuando partir no aporta. */
   subperiods: SubperiodOut[];
 }
+export interface IrfPointOut extends EstimateOut { h: number; years: number }
+export interface EnginePathPointOut {
+  h: number;
+  years: number;
+  /** null antes del ancla: la regla del motor es anual. */
+  coef: number | null;
+}
+export interface IrfOut {
+  horizons: IrfPointOut[];
+  engine_path: EnginePathPointOut[];
+  anchor_h: number;
+  unit: string;
+  note: string;
+}
+
 export interface EvidenceResponse extends ApiMeta {
   comparisons: ComparisonOut[];
+  irf: IrfOut | null;
   fiscal_persistence: EstimateOut | null;
   identifiable: Record<string, string>;
   engine_version: string;

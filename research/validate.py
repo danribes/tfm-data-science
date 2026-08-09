@@ -11,6 +11,7 @@ if it had been measured.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from engine import constants as c
@@ -22,6 +23,10 @@ from research import estimate, panel
 #: anything: the full-sample estimate averages a crash and a recovery into one
 #: number, and a single number invites the reader to believe the average is a
 #: description of either half. It is a description of neither.
+#: Quarters in a year. The impulse response is anchored here because IPV_REV
+#: is an annual rule and a cumulative projection is zero at h = 0.
+ANNUAL_H = 4
+
 IPV_WINDOWS: tuple[tuple[str, int, int], ...] = (
     ("2007–2013 · ajuste", 2007, 2013),
     ("2014–2026 · recuperación", 2014, 2026),
@@ -133,6 +138,79 @@ def compare_ipv_reversion() -> Comparison | None:
     )
 
 
+def ipv_shock_response(horizons: int = 12) -> dict | None:
+    """How long a regional house-price shock lasts, horizon by horizon.
+
+    The shock is a region's year-on-year house-price growth *minus the average
+    across regions in the same quarter*. Subtracting the quarter mean removes
+    whatever hit the whole country at once — rates, the cycle, a national
+    policy — and leaves the part that is specific to one region. That is what
+    makes this estimable at all: the panel is regional, so only regional
+    variation is identified. It is a statement about persistence, not a
+    structural multiplier, and it is labelled as one.
+
+    The response is demeaned the same way — a region's log price minus the
+    average log price across regions that quarter — so shock and response are
+    the same kind of object. Without that, the common national trend sits in
+    the residual and every band widens until nothing is distinguishable.
+
+    B_h is therefore the % gap in the level after a one-point idiosyncratic
+    surge in annual growth. The engine's own assumption is returned on the same
+    axis: it shrinks a deviation by IPV_REV per year, so (1 - IPV_REV)^((h-4)/4)
+    of the one-year response should survive to quarter h. The anchor is h = 4
+    and not h = 0 because a cumulative-change projection is zero at h = 0 by
+    construction; one year is also the period IPV_REV is quoted in.
+    """
+    p = panel.yoy(panel.housing_panel(), "ipv", periods=4)
+
+    growth_at: dict[int, list[float]] = {}
+    level_at: dict[int, list[float]] = {}
+    for r in p.rows:
+        if r["ipv_yoy"] is not None:
+            growth_at.setdefault(r["t"], []).append(r["ipv_yoy"])
+        if r["ipv"]:
+            level_at.setdefault(r["t"], []).append(math.log(r["ipv"]) * 100.0)
+    mean_growth = {t: sum(v) / len(v) for t, v in growth_at.items() if v}
+    mean_level = {t: sum(v) / len(v) for t, v in level_at.items() if v}
+
+    rows: list[dict] = []
+    for r in p.rows:
+        if r["ipv_yoy"] is None or not r["ipv"] or r["t"] not in mean_growth:
+            continue
+        rows.append({
+            "ccaa": r["ccaa"], "t": r["t"],
+            "shock": r["ipv_yoy"] - mean_growth[r["t"]],
+            "dev": math.log(r["ipv"]) * 100.0 - mean_level[r["t"]],
+        })
+
+    irf = estimate.local_projection(rows, "dev", "shock", "ccaa", "t",
+                                    horizons=horizons)
+    if len(irf) <= ANNUAL_H:
+        return None
+
+    anchor = irf[ANNUAL_H].coef
+    return {
+        "horizons": [
+            {"h": h, "years": h / 4.0, **est.to_dict()}
+            for h, est in enumerate(irf)
+        ],
+        "engine_path": [
+            # Undefined before the anchor: the engine's rule is annual, and
+            # extrapolating it back to sub-year horizons would invent a claim
+            # the constant does not make.
+            {"h": h, "years": h / 4.0,
+             "coef": (anchor * (1.0 - c.IPV_REV) ** ((h - ANNUAL_H) / 4.0)
+                      if h >= ANNUAL_H else None)}
+            for h in range(len(irf))
+        ],
+        "anchor_h": ANNUAL_H,
+        "unit": "% de desviación del precio por punto de choque",
+        "note": ("choque idiosincrásico regional: crecimiento del IPV menos la "
+                 "media de las CCAA en ese trimestre, con la respuesta "
+                 "descontada de la misma media"),
+    }
+
+
 def fiscal_persistence() -> estimate.Estimate | None:
     """How persistent the revenue-minus-spending balance is across countries.
 
@@ -162,6 +240,7 @@ def run_all() -> dict:
     fp = fiscal_persistence()
     return {
         "comparisons": [x.to_dict() for x in comparisons],
+        "irf": ipv_shock_response(),
         "fiscal_persistence": fp.to_dict() if fp else None,
         # Reported alongside the results on purpose: a reader should see what
         # was not estimable at the same time as what was.

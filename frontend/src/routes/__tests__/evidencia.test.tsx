@@ -60,9 +60,41 @@ describe("Evidencia — calibrado frente a estimado", () => {
 
   it("does not invent windows for a constant that has none", async () => {
     const { container } = ui();
-    await waitFor(() => expect(screen.getByText("IPV_REV")).toBeInTheDocument());
+    await waitFor(() => expect(container.querySelector("tbody tr")).toBeTruthy());
     // Only IPV_LR carries windows in the fixture; IPV_REV must stay a bare row.
+    expect(container.querySelectorAll("tbody tr").length).toBe(4);
     expect(container.querySelectorAll("tr.ev-sub").length).toBe(2);
+  });
+
+  it("puts the estimated impulse response next to the engine's assumption", async () => {
+    ui();
+    await waitFor(() => expect(screen.getByText(/Cuánto dura un choque/)).toBeInTheDocument());
+    const s = screen.getByText(/Cuánto dura un choque/).closest("section")!;
+    const legend = s.querySelector(".legend")!;
+    expect(within(legend as HTMLElement).getByText(/estimado en el panel/)).toBeInTheDocument();
+    expect(within(legend as HTMLElement).getByText(/supuesto del motor/)).toBeInTheDocument();
+    expect(within(legend as HTMLElement).getByText(/banda 90 %/)).toBeInTheDocument();
+    // The reversion rate in the prose comes from the payload, not a literal.
+    expect(within(s).getByText(/60 % cada año/)).toBeInTheDocument();
+  });
+
+  it("says the shock builds when the data says it builds", async () => {
+    ui();
+    await waitFor(() => expect(screen.getByText(/Cuánto dura un choque/)).toBeInTheDocument());
+    const s = screen.getByText(/Cuánto dura un choque/).closest("section")!;
+    // Fixture rises 0,342 → 0,566 while the engine decays to 0,055. The verdict
+    // is computed from those numbers, so a vintage that reverses the sign
+    // reverses the sentence instead of leaving a stale claim on the page.
+    expect(within(s).getByText(/0,57/)).toBeInTheDocument();
+    expect(within(s).getByText(/inercia, no reversión/)).toBeInTheDocument();
+    expect(within(s).queryByText(/La respuesta decae/)).not.toBeInTheDocument();
+  });
+
+  it("calls the impulse response persistence rather than causality", async () => {
+    ui();
+    await waitFor(() => expect(screen.getByText(/Cuánto dura un choque/)).toBeInTheDocument());
+    const s = screen.getByText(/Cuánto dura un choque/).closest("section")!;
+    expect(within(s).getByText(/no causalidad estructural/)).toBeInTheDocument();
   });
 
   it("reports the fiscal persistence that bears on the sp lever", async () => {

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
+import { IrfChart } from "../components/IrfChart";
 import type { ComparisonOut } from "../api/types";
 import { nf, sg } from "../lib/fmt";
 
@@ -162,6 +163,54 @@ export default function Evidencia() {
             </p>
           </section>
 
+          {q.data.irf && (() => {
+            const irf = q.data.irf;
+            const last = irf.horizons[irf.horizons.length - 1];
+            const anchor = irf.horizons.find((p) => p.h === irf.anchor_h);
+            const engineLast = irf.engine_path[irf.engine_path.length - 1]?.coef;
+            // Same payload as the curve, so the sentence cannot drift from it.
+            const rev = q.data.comparisons.find((x) => x.constant === "IPV_REV")
+              ?.calibrated ?? 0;
+            // Read off the data, not asserted in prose: if a future vintage
+            // reverses the sign, the sentence reverses with it.
+            const builds = anchor ? last.coef > anchor.coef : false;
+            return (
+              <section className="card guide-s">
+                <h2>Cuánto dura un choque de vivienda</h2>
+                <p>
+                  <code>IPV_REV</code> es una afirmación sobre dinámica: el
+                  motor supone que una desviación del precio se deshace un{" "}
+                  {nf(rev * 100, 0)} % cada año. Esta es la versión de los
+                  datos. {irf.note}, estimado horizonte a horizonte.
+                </p>
+                <IrfChart irf={irf} />
+                <p>
+                  A los {nf(last.years, 0)} años la desviación estimada es de{" "}
+                  <strong>{nf(last.coef, 2)}</strong>{" "}
+                  <span className="dim">
+                    [{nf(last.ci_low, 2)} … {nf(last.ci_high, 2)}]
+                  </span>{" "}
+                  {irf.unit}
+                  {engineLast != null && (
+                    <> frente a {nf(engineLast, 2)} bajo el supuesto del motor</>
+                  )}
+                  .{" "}
+                  {builds
+                    ? "La respuesta no se deshace: sigue creciendo. En el panel regional, un choque de precios tiene inercia, no reversión."
+                    : "La respuesta decae, en línea con lo que supone el motor."}
+                </p>
+                <p className="caption">
+                  Es persistencia, no causalidad estructural: identifica la
+                  parte del choque específica de una comunidad, no un
+                  experimento. Y mide desviaciones entre CCAA — un choque que
+                  suba el precio en toda España a la vez desaparece al restar la
+                  media del trimestre, que es precisamente lo que permite
+                  estimar el resto.
+                </p>
+              </section>
+            );
+          })()}
+
           {q.data.fiscal_persistence && (
             <section className="card guide-s">
               <h2>Cuánto cuesta mover el saldo público</h2>
@@ -227,9 +276,13 @@ export default function Evidencia() {
               </li>
               <li>
                 <strong>Los números se mueven con el vintage.</strong> Los tests
-                fijan la maquinaria — que los efectos fijos recuperan una
-                pendiente conocida, que agrupar ensancha la banda — y no los
-                resultados, que son propiedad del corte de datos.
+                fijan sobre todo la maquinaria: que los efectos fijos recuperan
+                una pendiente conocida, que agrupar ensancha la banda. Dos
+                fijan además el signo de lo que se ve aquí — que la calibración
+                del IPV queda fuera de su banda, que el choque no se deshace —
+                para que un cambio de corte tenga que revisarse a mano en vez de
+                pasar callando. Los coeficientes en sí son propiedad del corte
+                de datos.
               </li>
             </ul>
           </section>

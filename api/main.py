@@ -12,7 +12,7 @@ from fastapi.responses import StreamingResponse
 from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           ContributionOut,
                           CountriesResponse, CountryOut, DebtPointOut,
-                          EstimateOut, EvidenceResponse,
+                          EstimateOut, EvidenceResponse, IrfOut,
                           ExplainRequest, ExplainResponse, FiscalSpaceOut,
                           LeverValues,
                           GenericScenarioRequest, GenericScenarioResponse,
@@ -207,6 +207,7 @@ def evidence() -> EvidenceResponse:
 
     return EvidenceResponse(
         comparisons=[ComparisonOut(**row) for row in out["comparisons"]],
+        irf=IrfOut(**out["irf"]) if out["irf"] else None,
         fiscal_persistence=(EstimateOut(**out["fiscal_persistence"])
                             if out["fiscal_persistence"] else None),
         identifiable=out["identifiable"],

@@ -273,8 +273,31 @@ class ComparisonOut(EstimateOut):
     subperiods: list[SubperiodOut] = []
 
 
+class IrfPointOut(EstimateOut):
+    h: int
+    years: float
+
+
+class EnginePathPointOut(BaseModel):
+    h: int
+    years: float
+    #: None antes del ancla: la regla del motor es anual y extrapolarla a
+    #: horizontes intranuales inventaría una afirmación que la constante no hace.
+    coef: float | None = None
+
+
+class IrfOut(BaseModel):
+    horizons: list[IrfPointOut]
+    engine_path: list[EnginePathPointOut]
+    anchor_h: int
+    unit: str
+    note: str
+
+
 class EvidenceResponse(ApiMeta):
     comparisons: list[ComparisonOut]
+    #: Respuesta dinámica a un choque regional, frente a lo que supone el motor.
+    irf: IrfOut | None = None
     fiscal_persistence: EstimateOut | None = None
     #: Qué constantes NO puede juzgar el vintage y por qué. Se publica junto a
     #: los resultados: omitirlo daría una impresión de cobertura que no existe.

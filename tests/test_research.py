@@ -193,6 +193,51 @@ def test_verdict_names_the_side_when_the_calibration_falls_outside():
     assert inside.compatible and inside.verdict == "compatible"
 
 
+def test_impulse_response_starts_at_zero_and_is_estimated_at_every_horizon():
+    """A cumulative-change projection is zero at h=0 by construction. That is
+    why the engine comparison is anchored at one year, not at impact."""
+    irf = validate.ipv_shock_response(horizons=8)
+    assert irf is not None
+    hs = irf["horizons"]
+    assert [row["h"] for row in hs] == list(range(9))
+    assert hs[0]["coef"] == pytest.approx(0.0, abs=1e-9)
+    assert all(math.isfinite(row["coef"]) for row in hs)
+    # Sample shrinks with the horizon: each h loses one period per region.
+    assert hs[-1]["n"] < hs[0]["n"]
+
+
+def test_engine_path_is_silent_before_its_anchor():
+    """IPV_REV is an annual rule. Extrapolating it to sub-year horizons would
+    put a claim on the chart that the constant does not make."""
+    irf = validate.ipv_shock_response(horizons=8)
+    assert irf is not None
+    anchor = irf["anchor_h"]
+    before = [p for p in irf["engine_path"] if p["h"] < anchor]
+    after = [p for p in irf["engine_path"] if p["h"] >= anchor]
+    assert before and all(p["coef"] is None for p in before)
+    assert all(p["coef"] is not None for p in after)
+    # At the anchor the two curves meet, so the chart compares decay, not level.
+    at_anchor = next(p for p in irf["horizons"] if p["h"] == anchor)
+    assert after[0]["coef"] == pytest.approx(at_anchor["coef"])
+    # And from there the engine's path only shrinks.
+    coefs = [p["coef"] for p in after]
+    assert all(b < a for a, b in zip(coefs, coefs[1:]))
+
+
+def test_impulse_response_uses_idiosyncratic_variation_only():
+    """The shock is a region's growth minus the cross-region mean that quarter,
+    so it must sum to roughly zero within each period — otherwise a common
+    national movement is still in it and the estimate is not identified."""
+    p = panel.yoy(panel.housing_panel(), "ipv", periods=4)
+    by_t: dict[int, list[float]] = {}
+    for r in p.rows:
+        if r["ipv_yoy"] is not None:
+            by_t.setdefault(r["t"], []).append(r["ipv_yoy"])
+    for t, vals in by_t.items():
+        m = sum(vals) / len(vals)
+        assert sum(v - m for v in vals) == pytest.approx(0.0, abs=1e-9), t
+
+
 def test_fiscal_balance_is_highly_persistent():
     """Bears on the `sp` lever: a balance that is hard to move is hard to hold."""
     est = validate.fiscal_persistence()

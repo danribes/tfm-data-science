@@ -129,6 +129,27 @@ export const handlers = [
           n: 1380, n_units: 20, ci_low: 0.18, ci_high: 0.22, significant: true,
           subperiods: [] },
       ],
+      irf: {
+        anchor_h: 4,
+        unit: "% de desviación del precio por punto de choque",
+        note: "choque idiosincrásico regional",
+        horizons: [
+          { h: 0, years: 0, name: "h=0", coef: 0, se: 0, n: 1460, n_units: 20,
+            ci_low: 0, ci_high: 0, significant: false },
+          { h: 4, years: 1, name: "h=4", coef: 0.342, se: 0.052, n: 1380, n_units: 20,
+            ci_low: 0.257, ci_high: 0.427, significant: true },
+          { h: 8, years: 2, name: "h=8", coef: 0.479, se: 0.085, n: 1300, n_units: 20,
+            ci_low: 0.34, ci_high: 0.619, significant: true },
+          { h: 12, years: 3, name: "h=12", coef: 0.566, se: 0.124, n: 1220, n_units: 20,
+            ci_low: 0.362, ci_high: 0.769, significant: true },
+        ],
+        engine_path: [
+          { h: 0, years: 0, coef: null },
+          { h: 4, years: 1, coef: 0.342 },
+          { h: 8, years: 2, coef: 0.137 },
+          { h: 12, years: 3, coef: 0.055 },
+        ],
+      },
       fiscal_persistence: {
         name: "persistencia del saldo (proxy)", coef: 0.87, se: 0.04,
         n: 931, n_units: 18, ci_low: 0.81, ci_high: 0.94, significant: true,
