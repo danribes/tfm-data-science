@@ -1,6 +1,6 @@
 ---
 title: España en escenarios · API
-emoji: 🇪🇸
+emoji: 📊
 colorFrom: red
 colorTo: yellow
 sdk: docker
