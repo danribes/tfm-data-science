@@ -1,0 +1,71 @@
+# Sync the API to a Hugging Face Space on every push to main.
+#
+# The workflow creates the Space if it does not exist yet, so the only manual
+# step in the whole pipeline is adding the HF_TOKEN secret once (a write token
+# from https://huggingface.co/settings/tokens):
+#
+#   gh secret set HF_TOKEN --repo danribes/tfm-data-science
+#
+# The Space is a curated subset assembled by deploy/hf/assemble.sh, not a
+# mirror of the repo — see that script for what ships and why.
+name: deploy-hf-space
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - "engine/**"
+      - "explain/**"
+      - "research/**"
+      - "rag/**"
+      - "data/**"
+      - "docs/eval/**"
+      - "requirements-deploy.txt"
+      - "deploy/hf/**"
+      - ".github/workflows/deploy-hf-space.yml"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Assemble the Space content
+        run: ./deploy/hf/assemble.sh /tmp/hf-stage
+      - name: Push to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "::error::Falta el secreto HF_TOKEN. Créalo con un token de" \
+                 "escritura de https://huggingface.co/settings/tokens y:" \
+                 "gh secret set HF_TOKEN --repo ${{ github.repository }}"
+            exit 1
+          fi
+          pip install -q "huggingface_hub>=0.24"
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          owner = api.whoami()["name"]
+          repo_id = f"{owner}/evo-espana-api"
+
+          api.create_repo(repo_id, repo_type="space", space_sdk="docker",
+                          exist_ok=True)
+          # delete_patterns mirrors removals: a file dropped from the staging
+          # dir must also leave the Space, or stale code serves forever.
+          api.upload_folder(repo_id=repo_id, repo_type="space",
+                            folder_path="/tmp/hf-stage",
+                            delete_patterns=["**"],
+                            commit_message=f"sync {os.environ['GITHUB_SHA'][:9]}")
+
+          url = f"https://{owner}-evo-espana-api.hf.space"
+          print(f"::notice::Space actualizado: https://huggingface.co/spaces/{repo_id}")
+          print(f"::notice::API en {url} — si difiere de la variable API_BASE, "
+                f"actualízala y relanza deploy-pages.")
+          PY
