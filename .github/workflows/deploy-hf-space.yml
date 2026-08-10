@@ -55,8 +55,20 @@ jobs:
           owner = api.whoami()["name"]
           repo_id = f"{owner}/evo-espana-api"
 
-          api.create_repo(repo_id, repo_type="space", space_sdk="docker",
-                          exist_ok=True)
+          try:
+              api.create_repo(repo_id, repo_type="space", space_sdk="docker",
+                              exist_ok=True)
+          except Exception as exc:
+              if "402" in str(exc):
+                  # Discovered live on 2026-08-10: Docker Spaces on free CPU now
+                  # require an HF PRO subscription. The sync degrades to a
+                  # skip-with-notice instead of a red X on every push; the
+                  # committed render.yaml is the free path.
+                  print("::warning::HF exige PRO para Spaces Docker (402). "
+                        "Sync omitido; usa el blueprint de Render (render.yaml) "
+                        "o suscribe PRO y relanza.")
+                  raise SystemExit(0)
+              raise
           # delete_patterns mirrors removals: a file dropped from the staging
           # dir must also leave the Space, or stale code serves forever.
           api.upload_folder(repo_id=repo_id, repo_type="space",
