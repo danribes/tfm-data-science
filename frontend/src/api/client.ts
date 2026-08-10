@@ -1,5 +1,5 @@
 import type {
-  ConstantsResponse, DistressResponse, EvidenceResponse, ExplainRequest, ExplainResponse, HealthResponse,
+  ConstantsResponse, DemographyResponse, DistressResponse, EvidenceResponse, ExplainRequest, ExplainResponse, HealthResponse,
   MonteCarloRequest, MonteCarloResponse,
   Passage,
   PersonasResponse, PredictionResponse, PresetsResponse,
@@ -61,6 +61,7 @@ export const api = {
   ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
   ragEval: () => request<RagEvalResponse>("/rag/eval"),
   regimes: () => request<RegimesResponse>("/regimes"),
+  demography: () => request<DemographyResponse>("/demography"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
     request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),
   ragChat: (body: RagChatRequest, signal?: AbortSignal) =>

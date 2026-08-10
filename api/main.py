@@ -30,6 +30,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           EmpiricalImportanceOut, RegimeSlopeOut, StateDependenceResponse,
                           RagEvalResponse,
                           RegimeEpisodeOut, RegimeSeriesOut, RegimesResponse,
+                          DemographyVariantOut, DemographyResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
@@ -39,7 +40,7 @@ from data.live import country_list, panel_builder
 from engine import generic
 from research import backtest as research_backtest
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
-                               load_kpis)
+                               load_kpis, load_olddep_variants)
 from engine.levers import PRESETS, Levers, validate_levers
 from engine.montecarlo import run_montecarlo
 from engine.redlines import RED_LINES, evaluate_redlines
@@ -339,6 +340,32 @@ def regimes() -> RegimesResponse:
 
     return RegimesResponse(available=True, fiscal=series("fiscal"),
                            housing=series("housing"), method=raw["method"])
+
+
+#: Spanish names for the Eurostat EUROPOP variants in the frozen vintage.
+_VARIANT_LABELS = {
+    "BSL": "Base", "HMIGR": "Migración alta", "LMIGR": "Migración baja",
+    "NMIGR": "Sin migración", "LFRT": "Fecundidad baja", "LMRT": "Mortalidad baja",
+}
+
+
+@app.get("/demography", response_model=DemographyResponse)
+def demography() -> DemographyResponse:
+    """Each EUROPOP variant expressed as the dem-lever value that reproduces
+    its dependency growth over the engine horizon. Exact at the endpoints,
+    approximate in between; the engine itself is untouched."""
+    variants = load_olddep_variants()
+    bsl = variants["BSL"]
+    g_bsl = bsl[Y1] / bsl[Y0] - 1.0
+    out = []
+    for vid, path in sorted(variants.items()):
+        g = path[Y1] / path[Y0] - 1.0
+        out.append(DemographyVariantOut(
+            id=vid, label=_VARIANT_LABELS.get(vid, vid),
+            olddep_start=round(path[Y0], 1), olddep_end=round(path[Y1], 1),
+            dem_equivalent=round(g / g_bsl - 1.0, 3)))
+    return DemographyResponse(year_start=Y0, year_end=Y1,
+                              baseline_variant="BSL", variants=out)
 
 
 @app.get("/countries", response_model=CountriesResponse)

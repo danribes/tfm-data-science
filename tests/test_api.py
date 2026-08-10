@@ -508,3 +508,44 @@ def test_regimes_says_so_when_not_generated(monkeypatch):
     body = client.get("/regimes").json()
     assert body["available"] is False
     assert "research.regimes" in body["note"]
+
+
+# ---- /demography: variantes EUROPOP como valores de la palanca dem ----
+
+def test_demography_maps_every_vintage_variant_to_a_dem_value():
+    body = client.get("/demography").json()
+    ids = {v["id"] for v in body["variants"]}
+    assert ids == {"BSL", "HMIGR", "LMIGR", "NMIGR", "LFRT", "LMRT"}
+    by_id = {v["id"]: v for v in body["variants"]}
+    # The baseline maps to the lever's resting value by construction.
+    assert by_id["BSL"]["dem_equivalent"] == 0.0
+    # More ageing pressure → higher dem; the ordering is the sanity check.
+    assert by_id["HMIGR"]["dem_equivalent"] < 0 < by_id["NMIGR"]["dem_equivalent"]
+    assert by_id["NMIGR"]["dem_equivalent"] > by_id["LMIGR"]["dem_equivalent"]
+
+
+def test_demography_equivalents_fit_inside_the_lever_bounds():
+    """A chip that sets the lever outside its own slider would be rejected by
+    validation and read as a bug. If a future vintage breaks this, the mapping
+    needs a clamp and a caption, not silence."""
+    body = client.get("/demography").json()
+    for v in body["variants"]:
+        assert -1.0 <= v["dem_equivalent"] <= 1.0, v["id"]
+
+
+def test_demography_equivalent_reproduces_the_variant_growth():
+    """The claim the tooltip makes: setting dem to the equivalent gives the
+    engine the variant's dependency growth over the horizon, exactly at the
+    endpoint."""
+    from engine.constants import load_olddep_variants
+    from engine.spain import Y0, Y1
+
+    body = client.get("/demography").json()
+    variants = load_olddep_variants()
+    bsl = variants["BSL"]
+    for v in body["variants"]:
+        path = variants[v["id"]]
+        target_growth = path[Y1] / path[Y0] - 1.0
+        # The engine's rule: dep growth scales as (1 + dem) times BSL growth.
+        engine_growth = (bsl[Y1] / bsl[Y0] - 1.0) * (1.0 + v["dem_equivalent"])
+        assert engine_growth == pytest.approx(target_growth, abs=2e-3), v["id"]

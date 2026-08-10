@@ -89,6 +89,18 @@ def load_central() -> dict[int, dict[str, float]]:
 
 
 @lru_cache(maxsize=1)
+def load_olddep_variants() -> dict[str, dict[int, float]]:
+    """Old-age dependency per Eurostat EUROPOP variant, Spain."""
+    out: dict[str, dict[int, float]] = {}
+    with (GOLD_DIR / "gold_projections.csv").open(encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            if row["geo"] == "ES":
+                out.setdefault(row["variant"], {})[int(float(row["year"]))] = \
+                    float(row["olddep"])
+    return out
+
+
+@lru_cache(maxsize=1)
 def load_olddep() -> dict[int, float]:
     out: dict[int, float] = {}
     with (GOLD_DIR / "gold_projections.csv").open(encoding="utf-8") as fh:

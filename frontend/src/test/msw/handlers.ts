@@ -337,6 +337,19 @@ export const handlers = [
     }),
   ),
 
+  http.get(`${BASE}/demography`, () =>
+    HttpResponse.json({
+      ...META,
+      year_start: 2026, year_end: 2050, baseline_variant: "BSL",
+      variants: [
+        { id: "BSL", label: "Base", olddep_start: 32.6, olddep_end: 59.0, dem_equivalent: 0.0 },
+        { id: "HMIGR", label: "Migración alta", olddep_start: 32.3, olddep_end: 55.1, dem_equivalent: -0.128 },
+        { id: "LMIGR", label: "Migración baja", olddep_start: 33.0, olddep_end: 63.6, dem_equivalent: 0.145 },
+        { id: "NMIGR", label: "Sin migración", olddep_start: 33.4, olddep_end: 71.3, dem_equivalent: 0.401 },
+      ],
+    }),
+  ),
+
   // --- RAG, offline ---
   // The corpus itself cannot ship to the browser (copyrighted textbooks), so
   // the mock serves a small fixed set of passages with the real response shape.

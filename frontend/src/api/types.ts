@@ -237,6 +237,21 @@ export interface RegimesResponse extends ApiMeta {
   note: string;
 }
 
+export interface DemographyVariantOut {
+  id: string;
+  label: string;
+  olddep_start: number;
+  olddep_end: number;
+  /** El valor de dem que reproduce esta variante. Azúcar sobre la palanca. */
+  dem_equivalent: number;
+}
+export interface DemographyResponse extends ApiMeta {
+  year_start: number;
+  year_end: number;
+  baseline_variant: string;
+  variants: DemographyVariantOut[];
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

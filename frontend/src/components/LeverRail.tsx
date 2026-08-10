@@ -1,5 +1,7 @@
 import { useCallback, useRef } from "react";
-import { nf } from "../lib/fmt";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../api/client";
+import { nf, sg } from "../lib/fmt";
 import { LEVER_SPECS, isMoved, type LeverId } from "../engine/levers";
 import { VINTAGE } from "../engine/vintage";
 import { HORIZON_YEARS, useScenarioStore } from "../state/scenarioStore";
@@ -58,6 +60,31 @@ function useThrottledLeverSet(setLever: (id: LeverId, value: number) => void, wa
   );
 }
 
+/** The EUROPOP variants as one-click values for the dem lever.
+ *
+ *  Sugar over the existing lever, not a second input path into the engine:
+ *  each chip sets `dem` to the value that reproduces that variant's
+ *  dependency growth over the engine horizon. Exact at the endpoints,
+ *  approximate in between — the tooltip carries the mapping.
+ */
+function DemVariantChips({ value, onPick }: { value: number; onPick: (v: number) => void }) {
+  const q = useQuery({ queryKey: ["demography"], queryFn: api.demography, staleTime: Infinity });
+  if (!q.data) return null;
+  return (
+    <div className="dem-variants">
+      {q.data.variants.map((v) => (
+        <button key={v.id} type="button"
+          className={Math.abs(value - v.dem_equivalent) < 0.005 ? "dv on" : "dv"}
+          title={`dependencia ${nf(v.olddep_start, 1)} → ${nf(v.olddep_end, 1)} · dem ${sg(v.dem_equivalent, 3)}`}
+          onClick={() => onPick(v.dem_equivalent)}>
+          {v.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+
 export function LeverRail({ hotIds = [] }: { hotIds?: string[] }) {
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
@@ -89,6 +116,7 @@ export function LeverRail({ hotIds = [] }: { hotIds?: string[] }) {
               onChange={(e) => commitLever(s.id, Number.parseFloat(e.target.value))}
             />
             <div className="src">{s.src}</div>
+            {s.id === "dem" && <DemVariantChips value={levers.dem} onPick={(v) => setLever("dem", v)} />}
           </div>
         ))}
       </div>

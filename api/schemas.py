@@ -587,3 +587,23 @@ class RegimesResponse(ApiMeta):
     housing: RegimeSeriesOut | None = None
     method: str = ""
     note: str = ""
+
+
+# ---- Demografía: las variantes EUROPOP como valores de la palanca dem ----
+
+class DemographyVariantOut(BaseModel):
+    id: str
+    label: str
+    olddep_start: float
+    olddep_end: float
+    #: El valor de la palanca dem que reproduce el crecimiento de dependencia
+    #: de esta variante en el horizonte del motor. El selector es azúcar sobre
+    #: la palanca existente — no hay una segunda vía de entrada al motor.
+    dem_equivalent: float
+
+
+class DemographyResponse(ApiMeta):
+    year_start: int
+    year_end: int
+    baseline_variant: str
+    variants: list[DemographyVariantOut]
