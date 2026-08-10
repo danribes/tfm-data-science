@@ -1,0 +1,16 @@
+# Slim requirements for the public API deploy (Render free tier, 512 MB).
+#
+# Everything the engine, the committed research artifacts and the report
+# endpoints need — and nothing the RAG stack needs. The corpus holds
+# copyrighted books that never leave the local machine, so the deployed API
+# answers the /rag/* routes with a clean 503 explaining exactly that, and
+# torch + sentence-transformers (~2 GB) stay out of the image.
+#
+# pandas is here for one reason: /prediction reads the pre-registered origins
+# from research/backtest.py, which builds its grid with pd.period_range.
+fastapi>=0.115
+uvicorn>=0.30
+requests>=2.32
+numpy>=1.26
+pandas>=2.2
+pyyaml>=6.0

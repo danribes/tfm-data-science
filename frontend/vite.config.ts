@@ -5,6 +5,9 @@ import path from "node:path";
 const dirname = import.meta.dirname;
 
 export default defineConfig({
+  // GitHub Pages serves the app under /<repo>/, so the asset base is
+  // configurable at build time. Local dev and tests keep "/".
+  base: process.env.VITE_BASE ?? "/",
   plugins: [react()],
   resolve: {
     alias: {

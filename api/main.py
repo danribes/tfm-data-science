@@ -47,6 +47,18 @@ from engine.redlines import RED_LINES, evaluate_redlines
 from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
                            persona_dependents, run_scenario, sensitivity_matrix)
 
+
+def _rag_unavailable(exc: Exception) -> HTTPException:
+    """The public deploy ships without the RAG stack on purpose: the corpus
+    holds copyrighted books that never leave the local machine, and the
+    embedding model would not fit the free tier anyway. Absent pieces answer
+    503 with the reason instead of a traceback."""
+    return HTTPException(
+        status_code=503,
+        detail=("La biblioteca no está disponible en este despliegue: el corpus "
+                "con derechos de autor y su índice vectorial viven sólo en la "
+                f"máquina local. ({type(exc).__name__})"))
+
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
 
@@ -83,7 +95,9 @@ def _warm_embedder() -> None:
 # spec §5 conventions: CORS allows localhost + the file:// "null" origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["null"],
+    # The deployed frontend lives on GitHub Pages; localhost covers dev and
+    # the file:// "null" origin covers opening the built HTML directly.
+    allow_origins=["null", "https://danribes.github.io"],
     allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["*"],
     allow_headers=["*"],
@@ -442,7 +456,10 @@ def evidence() -> EvidenceResponse:
 @app.get("/rag/collections", response_model=RagCollectionsResponse)
 def rag_collections() -> RagCollectionsResponse:
     """What the library holds. Empty counts mean the corpus is not ingested yet."""
-    from rag import config as rag_config, store as rag_store
+    try:
+        from rag import config as rag_config, store as rag_store
+    except ImportError as exc:
+        raise _rag_unavailable(exc) from exc
 
     try:
         con = rag_store.connect()
@@ -469,7 +486,10 @@ def rag_collections() -> RagCollectionsResponse:
 @app.post("/rag/search", response_model=RagSearchResponse)
 def rag_search(req: RagSearchRequest) -> RagSearchResponse:
     """Hybrid retrieval, no generation — the passages on their own."""
-    from rag import config as rag_config, retrieve as rag_retrieve
+    try:
+        from rag import config as rag_config, retrieve as rag_retrieve
+    except ImportError as exc:
+        raise _rag_unavailable(exc) from exc
 
     if req.collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
@@ -510,7 +530,10 @@ def _scenario_facts(req: RagChatRequest) -> dict:
 @app.post("/rag/chat", response_model=RagChatResponse)
 def rag_chat(req: RagChatRequest) -> RagChatResponse:
     """Answer from the corpus, with citations. Never answers ungrounded."""
-    from rag import chat as rag_chat_mod, config as rag_config
+    try:
+        from rag import chat as rag_chat_mod, config as rag_config
+    except ImportError as exc:
+        raise _rag_unavailable(exc) from exc
 
     if req.collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,

@@ -99,3 +99,23 @@ aceptación en el lado TS es la envolvente dorada ±2 pp.
 - **Banda "near" del semáforo/gauge es 10 % en todo el front**, igual que
   `engine/redlines.py` (spec §4.5); el extracto de v16 usaba 12 %. Una sola
   tolerancia, una sola regla de honestidad.
+
+
+## Despliegue público
+
+| Pieza | Dónde | Cómo |
+|---|---|---|
+| Frontend | GitHub Pages — <https://danribes.github.io/tfm-data-science/> | `.github/workflows/deploy-pages.yml`, se publica en cada push a `main` |
+| API | Render (capa gratuita) | `render.yaml` — en el panel de Render: *New → Blueprint* sobre este repo |
+| RAG | **Sólo local, a propósito** | el corpus contiene libros con derechos de autor y nunca sale de la máquina; el despliegue responde 503 con esa explicación |
+
+La instancia gratuita de Render se duerme tras 15 min sin uso y tarda ~1 min
+en despertar; el frontend lo sabe — la sonda de salud reintenta durante dos
+minutos y muestra «Despertando el servidor…» mientras tanto.
+
+Si Render asigna otra URL distinta de `https://evo-espana-api.onrender.com`,
+define la variable de repositorio `API_BASE` con la URL asignada y relanza el
+workflow `deploy-pages`.
+
+El despliegue de la API es adelgazado (`requirements-deploy.txt`): motor,
+artefactos de investigación y informes, sin torch ni el índice vectorial.

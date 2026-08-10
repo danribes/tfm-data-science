@@ -33,12 +33,13 @@ describe("App shell", () => {
     expect(localStorage.getItem("theme")).toBe("dark");
   });
 
-  it("API down → blocking screen with URL and start command, never a blank page", async () => {
+  it("API down → wake-up screen while retrying, then the blocking screen", async () => {
     server.use(http.get("http://localhost:8000/health", () => HttpResponse.error()));
     render(<App />);
-    // queryClient (Task 6) sets retry: 1 with exponential backoff, so the health
-    // query needs ~1s past the two failed attempts before isError flips — give
-    // this assertion more headroom than RTL's 1000ms default to avoid flaking.
+    // While the health probe retries, the visitor sees the wake-up screen —
+    // the deployed API sleeps on the free tier, and a cold start is not an
+    // outage. Only after the retry budget is spent does the down screen show.
+    expect(await screen.findByText(/despertando el servidor/i)).toBeInTheDocument();
     expect(await screen.findByText(/no se puede conectar con la API/i, {}, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.getByText(/http:\/\/localhost:8000/)).toBeInTheDocument();
     expect(screen.getByText(/uvicorn api\.main:app --reload --port 8000/)).toBeInTheDocument();

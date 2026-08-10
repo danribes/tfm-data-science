@@ -8,7 +8,18 @@ export const queryClient = new QueryClient({
 });
 
 const STATIC = { staleTime: Infinity } as const;
-export const useHealth = () => useQuery({ queryKey: ["health"], queryFn: api.health, ...STATIC });
+// Health retries hard on purpose: the deployed API sleeps on the free tier
+// and takes ~1 min to wake. Giving up after three attempts would show every
+// cold visitor the API-down screen for a server that was merely waking.
+export const useHealth = () =>
+  useQuery({
+    queryKey: ["health"], queryFn: api.health, ...STATIC,
+    // Two minutes of patience in production, milliseconds in tests: the
+    // API-down screen is still a real state the suite has to be able to reach.
+    retry: import.meta.env.MODE === "test" ? 2 : 24,
+    retryDelay: (attempt) =>
+      import.meta.env.MODE === "test" ? 5 : Math.min(1500 * (attempt + 1), 5000),
+  });
 export const useVintage = () => useQuery({ queryKey: ["vintage"], queryFn: api.vintage, ...STATIC });
 export const useConstants = () => useQuery({ queryKey: ["constants"], queryFn: api.constants, ...STATIC });
 export const usePersonas = () => useQuery({ queryKey: ["personas"], queryFn: api.personas, ...STATIC });

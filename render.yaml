@@ -1,0 +1,20 @@
+# Render blueprint: the public API on the free tier.
+#
+# One click from the Render dashboard ("New → Blueprint" on this repo) creates
+# the service. Free instances sleep after 15 min idle and wake in ~1 min; the
+# frontend's health probe retries through the wake-up and says so on screen.
+#
+# If Render assigns a different URL than https://evo-espana-api.onrender.com
+# (the name was taken), set the repository variable API_BASE to the assigned
+# URL and re-run the "deploy-pages" workflow so the frontend points at it.
+services:
+  - type: web
+    name: evo-espana-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6

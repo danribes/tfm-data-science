@@ -37,7 +37,19 @@ function Shell() {
     if (health.isSuccess) void crossCheckEngine();
   }, [health.isSuccess]);
 
-  if (health.isPending) return <div className="blocking"><div className="card"><h4>Cargando…</h4></div></div>;
+  if (health.isPending) {
+    return (
+      <div className="blocking">
+        <div className="card">
+          <h4>Despertando el servidor…</h4>
+          <p style={{ fontSize: 13.5, color: "var(--ink-2)" }}>
+            La API duerme cuando nadie la usa (alojamiento gratuito) y tarda
+            hasta un minuto en arrancar. Esta pantalla reintenta sola.
+          </p>
+        </div>
+      </div>
+    );
+  }
   if (health.isError) return <ApiDownScreen error={health.error} />;
 
   const cards = (personas.data?.personas ?? []).filter((c) => SHIPPED_IDS.includes(c.id));
@@ -94,7 +106,7 @@ function Shell() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Shell />
       </BrowserRouter>
     </QueryClientProvider>
