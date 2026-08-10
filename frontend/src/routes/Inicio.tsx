@@ -12,6 +12,7 @@ import { Stamp } from "../components/Stamp";
 import { SERIES_FORMAT, UP_IS_BAD } from "../components/KpiRow";
 import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 import { SHIPPED_IDS } from "../personas/registry";
+import { RegimeChart } from "../components/RegimeChart";
 import { DistressGauge } from "../components/DistressGauge";
 
 const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean }[] = [
@@ -145,6 +146,8 @@ export default function Inicio() {
           en el coste, pero también que, una vez dentro, tarde años en salir.
         </Caption>
       </div>
+
+      <RegimeChart />
 
       <div className="card">
         <h4>De la macro a tu bolsillo <small>el mismo número, visto desde abajo</small></h4>

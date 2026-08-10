@@ -476,3 +476,35 @@ def test_rag_eval_says_so_when_artifacts_are_missing(monkeypatch):
     body = client.get("/rag/eval").json()
     assert body["available"] is False
     assert "rag.eval_chat" in body["note"]
+
+
+# ---- /regimes: crisis detectadas por el HMM ----
+
+def test_regimes_serves_both_series_with_aligned_arrays():
+    body = client.get("/regimes").json()
+    assert body["available"] is True
+    for k in ("fiscal", "housing"):
+        s = body[k]
+        assert len(s["periods"]) == len(s["values"]) == len(s["p_crisis"])
+        assert s["episodes"]
+        # The wire format uses "from", which pydantic can only carry via alias.
+        assert set(s["episodes"][0]) == {"from", "to"}
+
+
+def test_regimes_finds_the_history_everyone_can_check():
+    fiscal = client.get("/regimes").json()["fiscal"]
+    spans = [(e["from"], e["to"]) for e in fiscal["episodes"]]
+    assert any(a <= 1945 <= b for a, b in spans)     # posguerra civil
+    assert any(a <= 2012 <= b for a, b in spans)     # la Gran Recesión
+    housing = client.get("/regimes").json()["housing"]
+    assert str(housing["episodes"][0]["from"]).startswith("2008")
+
+
+def test_regimes_says_so_when_not_generated(monkeypatch):
+    import api.main as m
+    from pathlib import Path
+
+    monkeypatch.setattr(m, "_REGIMES_REPORT", Path("/nonexistent/r.json"))
+    body = client.get("/regimes").json()
+    assert body["available"] is False
+    assert "research.regimes" in body["note"]

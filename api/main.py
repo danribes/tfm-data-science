@@ -29,6 +29,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           DistressFeatureOut, DistressCountryOut, DistressResponse,
                           EmpiricalImportanceOut, RegimeSlopeOut, StateDependenceResponse,
                           RagEvalResponse,
+                          RegimeEpisodeOut, RegimeSeriesOut, RegimesResponse,
                           VintageFileOut, VintageResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
@@ -315,6 +316,29 @@ def rag_eval() -> RagEvalResponse:
         fidelity_supported=cht["fidelity_supported"],
         fidelity_checked=cht["fidelity_checked"],
     )
+
+
+_REGIMES_REPORT = GOLD_DIR.parents[1] / "docs" / "eval" / "regimes.json"
+
+
+@app.get("/regimes", response_model=RegimesResponse)
+def regimes() -> RegimesResponse:
+    """Crisis episodes detected by the two-state HMM, from the committed artifact."""
+    if not _REGIMES_REPORT.exists():
+        return RegimesResponse(
+            available=False,
+            note="Sin artefacto de regímenes. Genéralo con `python -m research.regimes`.")
+    raw = json.loads(_REGIMES_REPORT.read_text(encoding="utf-8"))
+
+    def series(k: str) -> RegimeSeriesOut:
+        d = raw[k]
+        return RegimeSeriesOut(
+            periods=d["periods"], values=d["values"], p_crisis=d["p_crisis"],
+            episodes=[RegimeEpisodeOut(**e) for e in d["episodes"]],
+            mu=d["mu"], var=d["var"], unit=d["unit"])
+
+    return RegimesResponse(available=True, fiscal=series("fiscal"),
+                           housing=series("housing"), method=raw["method"])
 
 
 @app.get("/countries", response_model=CountriesResponse)

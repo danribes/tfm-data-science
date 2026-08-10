@@ -310,6 +310,33 @@ export const handlers = [
     }),
   ),
 
+  http.get(`${BASE}/regimes`, () =>
+    HttpResponse.json({
+      ...META,
+      available: true,
+      method: "HMM gaussiano de 2 estados, EM en numpy, sin librería.",
+      note: "",
+      housing: null,
+      fiscal: {
+        unit: "saldo (ingresos − gastos), % PIB",
+        mu: [-1.2, -6.5], var: [1.1, 8.4],
+        periods: Array.from({ length: 176 }, (_, i) => 1850 + i),
+        values: Array.from({ length: 176 }, (_, i) => {
+          const y = 1850 + i;
+          return (y >= 1940 && y <= 1950) || (y >= 2008 && y <= 2023) ? -7 : -1;
+        }),
+        p_crisis: Array.from({ length: 176 }, (_, i) => {
+          const y = 1850 + i;
+          return (y >= 1940 && y <= 1950) || (y >= 2008 && y <= 2023) ? 0.97 : 0.03;
+        }),
+        episodes: [
+          { from: 1940, to: 1950 },
+          { from: 2008, to: 2023 },
+        ],
+      },
+    }),
+  ),
+
   // --- RAG, offline ---
   // The corpus itself cannot ship to the browser (copyrighted textbooks), so
   // the mock serves a small fixed set of passages with the real response shape.

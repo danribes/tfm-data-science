@@ -4,6 +4,7 @@ import type {
   Passage,
   PersonasResponse, PredictionResponse, PresetsResponse,
   RagChatRequest, RagChatResponse, RagCollectionsResponse, RagEvalResponse,
+  RegimesResponse,
   RagSearchRequest, RagSearchResponse,
   RedLinesResponse, ScenarioRequest,
   ScenarioResponse, SensitivityResponse, StateDependenceResponse, VintageResponse,
@@ -59,6 +60,7 @@ export const api = {
   stateDependence: () => request<StateDependenceResponse>("/state-dependence"),
   ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
   ragEval: () => request<RagEvalResponse>("/rag/eval"),
+  regimes: () => request<RegimesResponse>("/regimes"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
     request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),
   ragChat: (body: RagChatRequest, signal?: AbortSignal) =>

@@ -219,6 +219,24 @@ export interface RagEvalResponse extends ApiMeta {
   note: string;
 }
 
+export interface RegimeEpisodeOut { from: number | string; to: number | string }
+export interface RegimeSeriesOut {
+  periods: (number | string)[];
+  values: number[];
+  p_crisis: number[];
+  episodes: RegimeEpisodeOut[];
+  mu: number[];
+  var: number[];
+  unit: string;
+}
+export interface RegimesResponse extends ApiMeta {
+  available: boolean;
+  fiscal: RegimeSeriesOut | null;
+  housing: RegimeSeriesOut | null;
+  method: string;
+  note: string;
+}
+
 // ---- RAG: la biblioteca con citas ----
 
 export type Authority = "academico" | "propio" | "opinion";

@@ -559,3 +559,31 @@ class RagEvalResponse(ApiMeta):
     fidelity_supported: int = 0
     fidelity_checked: int = 0
     note: str = ""
+
+
+# ---- Regímenes: crisis y calma, detectadas y no anotadas a mano ----
+
+class RegimeEpisodeOut(BaseModel):
+    #: int (año fiscal) o str ("2008T1") según la serie.
+    from_: int | str = Field(alias="from")
+    to: int | str
+
+    model_config = {"populate_by_name": True}
+
+
+class RegimeSeriesOut(BaseModel):
+    periods: list[int | str]
+    values: list[float]
+    p_crisis: list[float]
+    episodes: list[RegimeEpisodeOut]
+    mu: list[float]
+    var: list[float]
+    unit: str
+
+
+class RegimesResponse(ApiMeta):
+    available: bool
+    fiscal: RegimeSeriesOut | None = None
+    housing: RegimeSeriesOut | None = None
+    method: str = ""
+    note: str = ""
