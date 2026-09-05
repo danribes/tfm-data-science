@@ -47,6 +47,9 @@ Provenance logged to `manifest.csv` (same pattern as `refresh_vintage.py`).
 | `ext_debt_share` | float | External debt / total debt % | WB |
 | `democracy` | float | Polity5 score –10…+10 | INSCR |
 | `trade_openness` | float | (X+M) / GDP % | WB |
+| `tfp_growth_5y` | float | 5yr trailing avg TFP growth % | Penn World Table (already project source) |
+| `labor_prod_growth_5y` | float | 5yr trailing avg GDP-per-worker growth % | WB |
+| `r_minus_g` | float | Derived: `interest_rate_10y − gdp_growth` (Blanchard condition) | computed |
 
 **Coverage target:** ≥120 countries, 1980–2023. Rows with missing `debt_gdp`
 or `primary_balance_gdp` are dropped. ESP rows are included in the file but
@@ -68,12 +71,18 @@ normalised query vector is comparable). Shape:
 
 ### 2.1 Query vector
 
-Six macro variables extracted from the existing `/scenario` year-1 output:
+Seven macro variables extracted from the existing `/scenario` year-1 output:
 
 ```
 q = [debt_gdp, primary_balance_gdp, interest_rate_10y,
-     gdp_growth, unemployment, inflation]
+     gdp_growth, unemployment, inflation, r_minus_g]
 ```
+
+`r_minus_g` = `interest_rate_10y − gdp_growth`. Blanchard condition: when
+r < g the debt/GDP ratio falls automatically even at zero primary balance;
+when r > g a primary surplus is required. Including it in the query vector
+ensures episodes are matched on debt-sustainability regime, not just on
+individual macro variables that could cancel out.
 
 Normalised with the stats file z-scores.
 
@@ -100,11 +109,12 @@ remains the primary driver.
 
 Top 3 matches sorted by score ascending (lower = closer). Each match carries:
 - Identity: `iso3`, `year`, `country_name`
-- Match snapshot: 6 macro values at match year
-- Outcome trajectory: `debt_gdp`, `gdp_growth`, `primary_balance_gdp`
-  for t+1 … t+horizon (each point has `truncated: bool`)
-- Structural features: 6 diff columns
+- Match snapshot: 7 macro values at match year (including `r_minus_g`)
+- Outcome trajectory: `debt_gdp`, `gdp_growth`, `primary_balance_gdp`,
+  `r_minus_g` for t+1 … t+horizon (each point has `truncated: bool`)
+- Structural features: 8 diff columns (including TFP and labor productivity)
 - `dominant_lever`: lever key that drove the bonus
+- `debt_payable_verdict`: `"auto"` (r<g, debt self-liquidates), `"requires_surplus"` (r>g), or `"borderline"` (|r−g|<0.5pp) — computed from the match-year `r_minus_g`
 
 ### 2.6 Panel loading
 
@@ -129,6 +139,7 @@ class AnalogOutcomePoint(BaseModel):
     debt_gdp: float | None
     gdp_growth: float | None
     primary_balance_gdp: float | None
+    r_minus_g: float | None   # interest_rate_10y − gdp_growth
     truncated: bool
 
 class StructuralDiff(BaseModel):
@@ -145,11 +156,12 @@ class AnalogMatch(BaseModel):
     match_year: int
     distance: float
     dominant_lever: str
-    match_snapshot: dict[str, float]
+    match_snapshot: dict[str, float]   # 7 values including r_minus_g
     outcome: list[AnalogOutcomePoint]
     outcome_truncated: bool
-    diffs: list[StructuralDiff]
-    narrative: str | None     # None on public deploy
+    diffs: list[StructuralDiff]        # 8 dimensions
+    debt_payable_verdict: str          # "auto" | "requires_surplus" | "borderline"
+    narrative: str | None              # None on public deploy
 
 class AnalogResponse(ApiMeta):
     horizon: int
@@ -190,6 +202,8 @@ Six dimensions, computed deterministically in `engine/analog.py`:
 | `democracy` | `diverge` if analog Polity5 <6 (reform capacity and credibility differ) |
 | `trade_openness` | `neutral` if within ±15pp; `converge`/`diverge` outside |
 | `debt_maturity` | Proxied by ext_debt_share; `diverge` if analog had materially shorter maturity |
+| `tfp_trend` | `diverge` if analog's 5yr TFP growth was >1pp above/below Spain's projected; positive TFP expands the r<g corridor | 
+| `labor_productivity` | `diverge` if analog's labor productivity growth differed >1.5pp; drives the structural growth rate underpinning debt payability |
 
 `direction` semantics: `converge` → structural similarity makes historical
 outcome more transferable; `diverge` → gap that likely changed the trajectory;
@@ -232,9 +246,12 @@ Closed by default. Header: "Análogos históricos".
 ├─────────────────────────────────────────────────┤
 │ SITUACIÓN EN EL MOMENTO                         │
 │  Deuda 86%  │  Saldo –8.1%  │  Paro 14.1%      │
+│  r−g = +1.8pp → requiere superávit primario     │
+│  [badge: AUTO-LIQUIDABLE / REQUIERE SUPERÁVIT / LÍMITE]  │
 ├─────────────────────────────────────────────────┤
 │ TRAYECTORIA (N años)                            │
-│  [ProjectionChart: outcome vs Spain scenario]   │
+│  [ProjectionChart: debt_gdp + r_minus_g band    │
+│   outcome vs Spain scenario]                    │
 ├─────────────────────────────────────────────────┤
 │ DIFERENCIAS ESTRUCTURALES                       │
 │  ✓ Zona euro: Sí / Sí → converge               │
@@ -269,6 +286,10 @@ offline.
 | `test_analog_endpoint_smoke` | `POST /scenario/analog` with defaults → 200, 3 matches |
 | `test_analog_narrative_none_without_rag` | RAG mocked unavailable → `narrative=None`, no exception |
 | `test_dominant_lever_bonus` | Moving `tip` far shifts ranking toward high-yield episodes |
+| `test_r_minus_g_in_outcome` | Every `AnalogOutcomePoint` carries `r_minus_g` (or `None` if truncated) |
+| `test_debt_payable_verdict_auto` | Match with r<g by >0.5pp → verdict `"auto"` |
+| `test_debt_payable_verdict_surplus` | Match with r>g by >0.5pp → verdict `"requires_surplus"` |
+| `test_tfp_diff_present` | All matches include `tfp_trend` and `labor_productivity` in `diffs` |
 
 ### 6.2 Frontend (Vitest + MSW)
 
