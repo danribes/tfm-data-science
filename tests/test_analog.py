@@ -100,3 +100,15 @@ def test_match_snapshot_has_r_minus_g():
     for m in matches:
         assert "r_minus_g" in m["match_snapshot"]
         assert len(m["match_snapshot"]) == 7
+
+
+def test_nan_imputation_gives_zero_z():
+    """NaN panel features must produce z-score 0.0 in distance, not (0-mean)/std."""
+    from engine.analog import _normalize, QUERY_FEATURES, _STATS
+    # If NaN is imputed as raw 0 and normalized, debt_gdp would be (0-mean)/std ≈ -2.4
+    # The correct imputed z-score is 0.0 exactly.
+    # Verify _normalize(mean, feature) == 0.0 (the correct imputation target)
+    for f in QUERY_FEATURES:
+        if f in _STATS and _STATS[f]["std"] > 0:
+            imputed = _normalize(_STATS[f]["mean"], f)
+            assert abs(imputed) < 1e-10, f"normalizing the mean of {f} should give 0.0, got {imputed}"

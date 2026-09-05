@@ -347,15 +347,19 @@ def find_analogs(levers: Levers, horizon: int = 10) -> list[dict]:
         if row["year"] > 2020:
             continue
 
-        # Build normalized row vector; NaN → 0.0 (z-score = mean)
+        # Build normalized row vector; NaN → z-score 0.0 (neutral/average)
         row_vals = []
+        nan_mask = []
         for f in QUERY_FEATURES:
             v = row.get(f)
-            row_vals.append(
-                0.0 if (v is None or (isinstance(v, float) and np.isnan(v)))
-                else float(v)
-            )
-        row_norm = np.array([_normalize(v, f) for v, f in zip(row_vals, QUERY_FEATURES)])
+            is_nan = v is None or (isinstance(v, float) and np.isnan(v))
+            nan_mask.append(is_nan)
+            row_vals.append(0.0 if is_nan else float(v))
+
+        row_norm = np.array([
+            0.0 if is_nan else _normalize(v, f)
+            for is_nan, v, f in zip(nan_mask, row_vals, QUERY_FEATURES)
+        ])
 
         dist = _distance(q_norm, row_norm)
 
