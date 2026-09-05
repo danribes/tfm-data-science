@@ -15,3 +15,7 @@ ECB SDW,https://data-api.ecb.europa.eu/service/data/IRS/M.DE.L.L40.CI.0000.EUR.N
 ECB SDW,https://data-api.ecb.europa.eu/service/data/FM/M.U2.EUR.RT.MM.EURIBOR1YD_.HSTA,2026-07-31,117628,ecb_euribor12m.csv,ecb_euribor12m.csv
 INE Tempus3,https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC251856?nult=400,2026-07-31,40559,ine_ipc_general.json,ine_ipc_general.csv
 World Bank,https://api.worldbank.org/v2/country/ES/indicator/SL.EMP.SELF.ZS,2026-07-31,16544,wb_self_employment.json,wb_self_employment.csv
+analog_panel,WB+IMF-WEO+PWT,2026-09-06,518887,,gold_analog_panel.csv
+analog_stats,derived,2026-09-06,551,,gold_analog_panel_stats.json
+analog_panel,WB+IMF-WEO+PWT,2026-09-06,525272,,gold_analog_panel.csv
+analog_stats,derived,2026-09-06,551,,gold_analog_panel_stats.json

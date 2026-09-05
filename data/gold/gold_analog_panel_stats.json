@@ -1,0 +1,30 @@
+{
+  "debt_gdp": {
+    "mean": 55.513343799058084,
+    "std": 42.40040268151811
+  },
+  "primary_balance_gdp": {
+    "mean": -2.6312628743463797,
+    "std": 13.556727920966795
+  },
+  "interest_rate_10y": {
+    "mean": null,
+    "std": null
+  },
+  "gdp_growth": {
+    "mean": 3.5883514745716414,
+    "std": 5.875693049764265
+  },
+  "unemployment": {
+    "mean": 7.880218375771807,
+    "std": 5.879201158152158
+  },
+  "inflation": {
+    "mean": 7.134649873104901,
+    "std": 20.716744746251496
+  },
+  "r_minus_g": {
+    "mean": null,
+    "std": null
+  }
+}
