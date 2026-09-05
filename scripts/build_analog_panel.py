@@ -90,6 +90,7 @@ def _fetch_wb() -> pd.DataFrame:
         "NE.TRD.GNFS.ZS": "trade_openness",   # (X+M)/GDP
         "DT.DOD.DECT.GD.ZS": "ext_debt_share", # external debt / GNI (proxy)
         "SL.GDP.PCAP.EM.KD.ZG": "labor_prod_growth", # GDP per worker growth
+        "FR.INR.LEND": "interest_rate_10y",  # proxy: lending rate (2-5pp above sovereign 10y yield on average; covers 170+ countries)
     }
     frames = []
     for code, name in indicators.items():
