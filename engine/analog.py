@@ -5,11 +5,14 @@ Loaded once at import time. find_analogs() is the public API.
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 from engine.constants import GOLD_DIR, VINTAGE
 from engine.levers import LEVER_SPECS, Levers
@@ -17,18 +20,32 @@ from engine.spain import Y0, run_scenario
 
 # ── Query features (order matters — covariance matrix built in this order) ──
 QUERY_FEATURES = [
-    "debt_gdp", "primary_balance_gdp", "interest_rate_10y",
-    "gdp_growth", "unemployment", "inflation", "r_minus_g",
+    "debt_gdp", "overall_balance_gdp", "interest_rate_10y",
+    "gdp_growth", "unemployment", "inflation",
 ]
 
 # ── Series-key → panel-column mapping ───────────────────────────────────────
 _SERIES_TO_PANEL: dict[str, str] = {
     "b":    "debt_gdp",
-    "pb":   "primary_balance_gdp",
+    "pb":   "overall_balance_gdp",
     "bono": "interest_rate_10y",
     "g":    "gdp_growth",
     "u":    "unemployment",
     "pi":   "inflation",
+}
+
+# ── Lever-id → panel-column mapping (for dominant lever bonus) ──────────────
+_LEVER_TO_PANEL: dict[str, str] = {
+    "r":     "interest_rate_10y",
+    "prima": "interest_rate_10y",
+    "sp":    "overall_balance_gdp",
+    "lam":   "gdp_growth",
+    "pm":    "inflation",
+    "tau":   "overall_balance_gdp",
+    "z":     "unemployment",
+    "ext":   "gdp_growth",
+    "dem":   "unemployment",
+    "idx":   "inflation",
 }
 
 # ── Country display names (Spanish) ─────────────────────────────────────────
@@ -85,6 +102,8 @@ def _load() -> tuple[pd.DataFrame, dict, np.ndarray | None, bool]:
     feat_data = panel[QUERY_FEATURES].dropna()
     cov = np.cov(feat_data.values.T)
     cond = float(np.linalg.cond(cov))
+    logger.info("analog: cov cond=%.2e; metric=%s", cond,
+                "euclidean" if cond > 1e12 else "mahalanobis")
     if cond > 1e12:
         return panel, stats, None, True  # use_euclidean=True
     cov_inv = np.linalg.inv(cov)
@@ -163,7 +182,7 @@ def _outcome_trajectory(
                 "year_offset": offset,
                 "debt_gdp": None,
                 "gdp_growth": None,
-                "primary_balance_gdp": None,
+                "overall_balance_gdp": None,
                 "r_minus_g": None,
                 "truncated": True,
             })
@@ -175,12 +194,12 @@ def _outcome_trajectory(
                 # Compute from component fields when direct value is NaN
                 ir = _maybe(r, "interest_rate_10y")
                 g = _maybe(r, "gdp_growth")
-                r_minus_g_val = float(ir - g) if ir is not None and g is not None else 0.0
+                r_minus_g_val = float(ir - g) if ir is not None and g is not None else None
             pts.append({
                 "year_offset": offset,
                 "debt_gdp": _maybe(r, "debt_gdp"),
                 "gdp_growth": _maybe(r, "gdp_growth"),
-                "primary_balance_gdp": _maybe(r, "primary_balance_gdp"),
+                "overall_balance_gdp": _maybe(r, "overall_balance_gdp"),
                 "r_minus_g": r_minus_g_val,
                 "truncated": False,
             })
@@ -216,39 +235,55 @@ def structural_diffs(analog_row: "pd.Series") -> list[dict]:
     })
 
     # 3. External debt share (gap > 20pp → diverge)
-    ext_a = float(analog_row.get("ext_debt_share") or 0)
+    _raw_ext = analog_row.get("ext_debt_share")
+    _ext_missing = _raw_ext is None or (isinstance(_raw_ext, float) and np.isnan(float(_raw_ext)))
+    ext_a = None if _ext_missing else float(_raw_ext)
     ext_s = _SPAIN_STRUCT["ext_debt_share"]
-    gap_ext = abs(ext_a - ext_s)
+    gap_ext: float | None = None if ext_a is None else abs(ext_a - ext_s)
     diffs.append({
         "dimension": "ext_debt_share",
         "label": _DIFF_LABELS["ext_debt_share"],
         "spain_value": f"{ext_s:.0f}%",
-        "analog_value": f"{ext_a:.0f}%",
-        "direction": "diverge" if gap_ext > 20 else "neutral",
+        "analog_value": "sin datos" if ext_a is None else f"{ext_a:.0f}%",
+        "direction": "neutral" if ext_a is None else ("diverge" if gap_ext > 20 else "neutral"),
     })
 
     # 4. Democracy (Polity5 < 6 → diverge)
-    dem_a = float(analog_row.get("democracy") or 9)
+    _raw_dem = analog_row.get("democracy")
+    _dem_missing = _raw_dem is None or (isinstance(_raw_dem, float) and np.isnan(float(_raw_dem)))
     dem_s = _SPAIN_STRUCT["democracy"]
-    diffs.append({
-        "dimension": "democracy",
-        "label": _DIFF_LABELS["democracy"],
-        "spain_value": str(int(dem_s)),
-        "analog_value": str(int(dem_a)),
-        "direction": "diverge" if dem_a < 6 else "converge",
-    })
+    if _dem_missing:
+        diffs.append({
+            "dimension": "democracy",
+            "label": _DIFF_LABELS["democracy"],
+            "spain_value": str(int(dem_s)),
+            "analog_value": "sin datos",
+            "direction": "neutral",
+        })
+    else:
+        dem_a = float(_raw_dem)
+        diffs.append({
+            "dimension": "democracy",
+            "label": _DIFF_LABELS["democracy"],
+            "spain_value": str(int(dem_s)),
+            "analog_value": str(int(dem_a)),
+            "direction": "diverge" if dem_a < 6 else "converge",
+        })
 
     # 5. Trade openness (within ±15pp → neutral)
-    trd_a = float(analog_row.get("trade_openness") or 0)
+    _raw_trd = analog_row.get("trade_openness")
+    _trd_missing = _raw_trd is None or (isinstance(_raw_trd, float) and np.isnan(float(_raw_trd)))
+    trd_a = None if _trd_missing else float(_raw_trd)
     trd_s = _SPAIN_STRUCT["trade_openness"]
-    gap_trd = abs(trd_a - trd_s)
+    gap_trd: float | None = None if trd_a is None else abs(trd_a - trd_s)
     diffs.append({
         "dimension": "trade_openness",
         "label": _DIFF_LABELS["trade_openness"],
         "spain_value": f"{trd_s:.0f}%",
-        "analog_value": f"{trd_a:.0f}%",
-        "direction": "neutral" if gap_trd <= 15
-                     else ("converge" if trd_a >= trd_s else "diverge"),
+        "analog_value": "sin datos" if trd_a is None else f"{trd_a:.0f}%",
+        "direction": "neutral" if trd_a is None else (
+            "neutral" if gap_trd <= 15 else ("converge" if trd_a >= trd_s else "diverge")
+        ),
     })
 
     # 6. Debt maturity proxy (via ext_debt_share; >20pp → diverge)
@@ -256,32 +291,36 @@ def structural_diffs(analog_row: "pd.Series") -> list[dict]:
         "dimension": "debt_maturity",
         "label": _DIFF_LABELS["debt_maturity"],
         "spain_value": "largo plazo",
-        "analog_value": "largo plazo" if gap_ext <= 20 else "más corto",
-        "direction": "diverge" if gap_ext > 20 else "neutral",
+        "analog_value": "sin datos" if gap_ext is None else ("largo plazo" if gap_ext <= 20 else "más corto"),
+        "direction": "neutral" if gap_ext is None else ("diverge" if gap_ext > 20 else "neutral"),
     })
 
     # 7. TFP trend (gap > 1pp → diverge)
-    tfp_a = float(analog_row.get("tfp_growth_5y") or 0)
+    _raw_tfp = analog_row.get("tfp_growth_5y")
+    _tfp_missing = _raw_tfp is None or (isinstance(_raw_tfp, float) and np.isnan(float(_raw_tfp)))
+    tfp_a = None if _tfp_missing else float(_raw_tfp)
     tfp_s = _SPAIN_STRUCT["tfp_growth_5y"]
-    gap_tfp = abs(tfp_a - tfp_s)
+    gap_tfp: float | None = None if tfp_a is None else abs(tfp_a - tfp_s)
     diffs.append({
         "dimension": "tfp_trend",
         "label": _DIFF_LABELS["tfp_trend"],
         "spain_value": f"{tfp_s:+.1f}%/a",
-        "analog_value": f"{tfp_a:+.1f}%/a",
-        "direction": "diverge" if gap_tfp > 1.0 else "neutral",
+        "analog_value": "sin datos" if tfp_a is None else f"{tfp_a:+.1f}%/a",
+        "direction": "neutral" if tfp_a is None else ("diverge" if gap_tfp > 1.0 else "neutral"),
     })
 
     # 8. Labor productivity (gap > 1.5pp → diverge)
-    lp_a = float(analog_row.get("labor_prod_growth_5y") or 0)
+    _raw_lp = analog_row.get("labor_prod_growth_5y")
+    _lp_missing = _raw_lp is None or (isinstance(_raw_lp, float) and np.isnan(float(_raw_lp)))
+    lp_a = None if _lp_missing else float(_raw_lp)
     lp_s = _SPAIN_STRUCT["labor_prod_growth_5y"]
-    gap_lp = abs(lp_a - lp_s)
+    gap_lp: float | None = None if lp_a is None else abs(lp_a - lp_s)
     diffs.append({
         "dimension": "labor_productivity",
         "label": _DIFF_LABELS["labor_productivity"],
         "spain_value": f"{lp_s:+.1f}%/a",
-        "analog_value": f"{lp_a:+.1f}%/a",
-        "direction": "diverge" if gap_lp > 1.5 else "neutral",
+        "analog_value": "sin datos" if lp_a is None else f"{lp_a:+.1f}%/a",
+        "direction": "neutral" if lp_a is None else ("diverge" if gap_lp > 1.5 else "neutral"),
     })
 
     return diffs
@@ -316,15 +355,24 @@ def find_analogs(levers: Levers, horizon: int = 10) -> list[dict]:
     run = run_scenario(levers)
     q_raw = _query_vector(run)
 
-    # Normalize query vector (NaN → z-score 0 via _normalize with stats mean)
-    q_norm = np.array([_normalize(q_raw[f], f) for f in QUERY_FEATURES])
+    # Normalize query vector (NaN → z-score 0)
+    q_vals, q_nan_mask = [], []
+    for f in QUERY_FEATURES:
+        v = q_raw.get(f)
+        is_nan = v is None or (isinstance(v, float) and np.isnan(v))
+        q_nan_mask.append(is_nan)
+        q_vals.append(0.0 if is_nan else float(v))
+    q_norm = np.array([
+        0.0 if is_nan else _normalize(v, f)
+        for is_nan, v, f in zip(q_nan_mask, q_vals, QUERY_FEATURES)
+    ])
 
     # Exclude ESP rows; aggregate codes already removed at load time
     panel = ANALOG_PANEL[ANALOG_PANEL["iso3"] != "ESP"].copy()
 
     # Dominant lever bonus: which lever deviated most from baseline?
     dom_lever = _dominant_lever(levers)
-    dom_panel_col: str | None = _SERIES_TO_PANEL.get(dom_lever or "", None)
+    dom_panel_col: str | None = _LEVER_TO_PANEL.get(dom_lever or "", None)
 
     # Precompute rolling stats for dominant lever bonus (keyed by (iso3, year))
     _rolling_stats: dict[tuple[str, int], tuple[float, float]] = {}
@@ -391,6 +439,9 @@ def find_analogs(levers: Levers, horizon: int = 10) -> list[dict]:
                 0.0 if (v is None or (isinstance(v, float) and np.isnan(v)))
                 else float(v)
             )
+        # Also include r_minus_g in snapshot (computed, not used for distance)
+        rmg = row.get("r_minus_g")
+        snapshot["r_minus_g"] = 0.0 if (rmg is None or (isinstance(rmg, float) and np.isnan(float(rmg)))) else float(rmg)
         outcome, any_trunc = _outcome_trajectory(iso3, match_year, horizon)
         diffs = structural_diffs(row)
         r_g_val = snapshot.get("r_minus_g", 0.0)
@@ -401,7 +452,7 @@ def find_analogs(levers: Levers, horizon: int = 10) -> list[dict]:
             "country_name": _NAMES.get(iso3, iso3),
             "match_year": match_year,
             "distance": round(scores[rank - 1][0], 4),
-            "dominant_lever": dom_lever or "none",
+            "dominant_lever": dom_lever,   # None if no lever dominated
             "match_snapshot": snapshot,
             "outcome": outcome,
             "outcome_truncated": any_trunc,

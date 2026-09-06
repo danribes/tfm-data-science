@@ -544,7 +544,7 @@ class AnalogOutcomePoint(BaseModel):
     year_offset: int
     debt_gdp: float | None = None
     gdp_growth: float | None = None
-    primary_balance_gdp: float | None = None
+    overall_balance_gdp: float | None = None
     r_minus_g: float | None = None
     truncated: bool
 

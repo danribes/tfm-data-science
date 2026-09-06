@@ -179,7 +179,7 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
 @app.post("/scenario/analog", response_model=AnalogResponse)
 def scenario_analog(req: ScenarioRequest) -> AnalogResponse:
     levers = Levers(**req.levers.model_dump())
-    horizon = min(req.horizon - Y0, 24)
+    horizon = max(1, min(req.horizon - Y0, 24))
     matches_raw = find_analogs(levers, horizon=horizon)
 
     matches_out: list[AnalogMatch] = []
@@ -204,7 +204,7 @@ def scenario_analog(req: ScenarioRequest) -> AnalogResponse:
     run = run_scenario(levers)
     q_snap = {
         "debt_gdp":            run["b"][0],
-        "primary_balance_gdp": run["pb"][0],
+        "overall_balance_gdp": run["pb"][0],
         "interest_rate_10y":   run["bono"][0],
         "gdp_growth":          run["g"][0],
         "unemployment":        run["u"][0],

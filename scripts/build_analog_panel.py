@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GOLD = ROOT / "data" / "gold"
 VINTAGE = "2026-07-31"
 QUERY_FEATURES = [
-    "debt_gdp", "primary_balance_gdp", "interest_rate_10y",
+    "debt_gdp", "overall_balance_gdp", "interest_rate_10y",
     "gdp_growth", "unemployment", "inflation", "r_minus_g",
 ]
 
@@ -132,12 +132,26 @@ def _fetch_weo() -> pd.DataFrame:
         return pd.DataFrame(rows)
 
     debt_df = _datamapper("GGXWDG_NGDP")
-    pb_df = _datamapper("GGXCNL_NGDP")
+
+    # Try primary balance (GGXONLB_NGDP) first; fall back to overall balance
+    # (GGXCNL_NGDP) if coverage is thin.  The column is named overall_balance_gdp
+    # in both cases so the engine's _SERIES_TO_PANEL stays consistent.
+    pb_df = _datamapper("GGXONLB_NGDP")
+    pb_indicator = "GGXONLB_NGDP"
+    if pb_df.empty or pb_df[pb_indicator].isna().mean() > 0.80 if pb_indicator in pb_df.columns else True:
+        print(
+            f"  [warn] {pb_indicator} has <20% coverage — falling back to "
+            "GGXCNL_NGDP (overall balance). Column will be named "
+            "overall_balance_gdp.",
+            file=sys.stderr,
+        )
+        pb_df = _datamapper("GGXCNL_NGDP")
+        pb_indicator = "GGXCNL_NGDP"
 
     pivot = debt_df.merge(pb_df, on=["iso3", "year"], how="outer")
     pivot.rename(columns={
         "GGXWDG_NGDP": "debt_gdp",
-        "GGXCNL_NGDP": "primary_balance_gdp",
+        pb_indicator: "overall_balance_gdp",
     }, inplace=True)
     # Keep only historical years (1980-2023)
     pivot = pivot[(pivot["year"] >= 1980) & (pivot["year"] <= 2023)]
@@ -239,8 +253,9 @@ def main() -> None:
     df = _add_structural(df)
 
     # Ensure columns exist that may be absent if a source fetch failed.
-    # interest_rate_10y has no data source in this build; ext_debt_share
-    # and labor_prod_growth may fail due to transient WB API issues.
+    # interest_rate_10y is populated from FR.INR.LEND (WB lending rate proxy,
+    # ~3,400 rows across 170+ countries); ext_debt_share and labor_prod_growth
+    # may fail due to transient WB API issues.
     for _col in ("interest_rate_10y", "ext_debt_share"):
         if _col not in df.columns:
             df[_col] = np.nan
@@ -256,7 +271,7 @@ def main() -> None:
     df = df.drop(columns=["labor_prod_growth"], errors="ignore")
 
     out_cols = [
-        "iso3", "year", "debt_gdp", "primary_balance_gdp", "interest_rate_10y",
+        "iso3", "year", "debt_gdp", "overall_balance_gdp", "interest_rate_10y",
         "gdp_growth", "unemployment", "inflation", "emu_member", "fx_regime",
         "ext_debt_share", "democracy", "trade_openness", "tfp_growth_5y",
         "labor_prod_growth_5y", "r_minus_g",

@@ -1,4 +1,4 @@
-iso3,year,debt_gdp,primary_balance_gdp,interest_rate_10y,gdp_growth,unemployment,inflation,emu_member,fx_regime,ext_debt_share,democracy,trade_openness,tfp_growth_5y,labor_prod_growth_5y,r_minus_g
+iso3,year,debt_gdp,overall_balance_gdp,interest_rate_10y,gdp_growth,unemployment,inflation,emu_member,fx_regime,ext_debt_share,democracy,trade_openness,tfp_growth_5y,labor_prod_growth_5y,r_minus_g
 ABW,1995,55.1,-0.8,10.6,2.54714368704694,,3.36139107320898,0,float,,5.0,171.362098138748,,,8.05285631295306
 ABW,1996,54.8,-2.3,10.375,1.18578851134656,,3.22528797213979,0,float,,5.0,175.344129554656,,,9.18921148865344
 ABW,1997,51.1,-2.1,10.25,7.04687499241221,,2.99994809778412,0,float,,5.0,168.781911013858,,,3.20312500758779

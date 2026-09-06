@@ -80,7 +80,7 @@ const MOCK_MATCHES: AnalogMatch[] = [1, 2, 3].map((rank) => ({
   dominant_lever: "prima",
   match_snapshot: {
     debt_gdp: 100,
-    primary_balance_gdp: -4,
+    overall_balance_gdp: -4,
     interest_rate_10y: 5,
     gdp_growth: 1,
     unemployment: 10,
@@ -92,7 +92,7 @@ const MOCK_MATCHES: AnalogMatch[] = [1, 2, 3].map((rank) => ({
       year_offset: 1,
       debt_gdp: 105,
       gdp_growth: 1.2,
-      primary_balance_gdp: -3,
+      overall_balance_gdp: -3,
       r_minus_g: 3.8,
       truncated: false,
     },

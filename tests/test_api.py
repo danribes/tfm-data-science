@@ -576,7 +576,5 @@ def test_analog_narrative_none_without_rag():
     r = client.post("/scenario/analog", json={})
     assert r.status_code == 200
     body = r.json()
-    # When rag_available is False, narrative on each match may be None
     assert body["rag_available"] is False
-    for m in body["matches"]:
-        assert m["narrative"] is None or body["rag_available"] is False
+    assert all(m["narrative"] is None for m in body["matches"])

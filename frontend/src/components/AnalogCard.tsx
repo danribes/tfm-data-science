@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { AnalogMatch } from "../api/types";
 import { ProjectionChart } from "./ProjectionChart";
 import { AnalogDiffRow } from "./AnalogDiffRow";
+import { LEVER_SPECS } from "../engine/levers";
 
 const VERDICT_LABEL: Record<string, { text: string; color: string }> = {
   auto:              { text: "AUTO-LIQUIDABLE",   color: "#22c55e" },
@@ -18,9 +19,10 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
   if (!matches.length) return null;
   const m = matches[active];
 
-  const outcomeYears = m.outcome.map((pt) => m.match_year + pt.year_offset);
-  const debtOutcome  = m.outcome.map((pt) => pt.debt_gdp ?? 0);
-  const rmgOutcome   = m.outcome.map((pt) => pt.r_minus_g ?? 0);
+  const validOutcome = m.outcome.filter((pt) => !pt.truncated);
+  const outcomeYears = validOutcome.map((pt) => m.match_year + pt.year_offset);
+  const debtOutcome  = validOutcome.map((pt) => pt.debt_gdp ?? 0);
+  const rmgOutcome   = validOutcome.map((pt) => pt.r_minus_g ?? 0);
 
   const verd = VERDICT_LABEL[m.debt_payable_verdict] ?? { text: m.debt_payable_verdict, color: "inherit" };
   const snap = m.match_snapshot;
@@ -62,7 +64,9 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
         <div>
           <h4 style={{ margin: 0 }}>{m.country_name} · {m.match_year}</h4>
           <span className="meta" style={{ fontSize: 12 }}>
-            distancia: {m.distance.toFixed(2)} · palanca dominante: {m.dominant_lever}
+            distancia: {m.distance.toFixed(2)} · palanca dominante: {m.dominant_lever
+              ? (LEVER_SPECS.find(s => s.id === m.dominant_lever)?.nm ?? m.dominant_lever)
+              : "—"}
           </span>
         </div>
         <span
@@ -84,7 +88,7 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
       <div style={{ display: "flex", gap: 16, marginTop: 10, flexWrap: "wrap" }}>
         {[
           ["Deuda", snap.debt_gdp, "%PIB"],
-          ["Saldo primario", snap.primary_balance_gdp, "%PIB"],
+          ["Saldo total", snap.overall_balance_gdp, "%PIB"],
           ["Bono 10A", snap.interest_rate_10y, "%"],
           ["Crec. real", snap.gdp_growth, "%"],
           ["Paro", snap.unemployment, "%"],

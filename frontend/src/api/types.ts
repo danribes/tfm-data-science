@@ -335,7 +335,7 @@ export interface AnalogOutcomePoint {
   year_offset: number;
   debt_gdp: number | null;
   gdp_growth: number | null;
-  primary_balance_gdp: number | null;
+  overall_balance_gdp: number | null;
   r_minus_g: number | null;
   truncated: boolean;
 }
