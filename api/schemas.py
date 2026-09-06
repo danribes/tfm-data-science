@@ -538,6 +538,44 @@ class StateDependenceResponse(ApiMeta):
     note: str = ""
 
 
+# ---- Análogos históricos ----
+
+class AnalogOutcomePoint(BaseModel):
+    year_offset: int
+    debt_gdp: float | None = None
+    gdp_growth: float | None = None
+    primary_balance_gdp: float | None = None
+    r_minus_g: float | None = None
+    truncated: bool
+
+class StructuralDiff(BaseModel):
+    dimension: str
+    label: str
+    spain_value: str
+    analog_value: str
+    direction: str  # "converge" | "diverge" | "neutral"
+
+class AnalogMatch(BaseModel):
+    rank: int
+    iso3: str
+    country_name: str
+    match_year: int
+    distance: float
+    dominant_lever: str | None = None
+    match_snapshot: dict[str, float]
+    outcome: list[AnalogOutcomePoint]
+    outcome_truncated: bool
+    diffs: list[StructuralDiff]
+    debt_payable_verdict: str
+    narrative: str | None = None
+
+class AnalogResponse(ApiMeta):
+    horizon: int
+    query_snapshot: dict[str, float]
+    matches: list[AnalogMatch]
+    rag_available: bool
+
+
 # ---- La biblioteca, evaluada: resumen de las dos capas ----
 
 class RagEvalResponse(ApiMeta):

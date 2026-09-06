@@ -31,7 +31,9 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           RagEvalResponse,
                           RegimeEpisodeOut, RegimeSeriesOut, RegimesResponse,
                           DemographyVariantOut, DemographyResponse,
-                          VintageFileOut, VintageResponse)
+                          VintageFileOut, VintageResponse,
+                          AnalogOutcomePoint, StructuralDiff, AnalogMatch,
+                          AnalogResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
 from explain.narrate import NarrationUnavailable, narrate
@@ -42,6 +44,7 @@ from research import backtest as research_backtest
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
                                load_kpis, load_olddep_variants)
 from engine.levers import PRESETS, Levers, validate_levers
+from engine.analog import find_analogs
 from engine.montecarlo import run_montecarlo
 from engine.redlines import RED_LINES, evaluate_redlines
 from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
@@ -170,6 +173,52 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
         n_paths=mc.n_paths,
         seed=mc.seed,
         paths=[p[:n] for p in mc.paths],
+    )
+
+
+@app.post("/scenario/analog", response_model=AnalogResponse)
+def scenario_analog(req: ScenarioRequest) -> AnalogResponse:
+    levers = Levers(**req.levers.model_dump())
+    horizon = min(req.horizon - Y0, 24)
+    matches_raw = find_analogs(levers, horizon=horizon)
+
+    matches_out: list[AnalogMatch] = []
+    for m in matches_raw:
+        outcome = [AnalogOutcomePoint(**pt) for pt in m["outcome"]]
+        diffs = [StructuralDiff(**d) for d in m["diffs"]]
+        matches_out.append(AnalogMatch(
+            rank=m["rank"],
+            iso3=m["iso3"],
+            country_name=m["country_name"],
+            match_year=m["match_year"],
+            distance=m["distance"],
+            dominant_lever=m["dominant_lever"],
+            match_snapshot=m["match_snapshot"],
+            outcome=outcome,
+            outcome_truncated=m["outcome_truncated"],
+            diffs=diffs,
+            debt_payable_verdict=m["debt_payable_verdict"],
+            narrative=m["narrative"],
+        ))
+
+    run = run_scenario(levers)
+    q_snap = {
+        "debt_gdp":            run["b"][0],
+        "primary_balance_gdp": run["pb"][0],
+        "interest_rate_10y":   run["bono"][0],
+        "gdp_growth":          run["g"][0],
+        "unemployment":        run["u"][0],
+        "inflation":           run["pi"][0],
+        "r_minus_g":           run["bono"][0] - run["g"][0],
+    }
+
+    return AnalogResponse(
+        vintage=VINTAGE,
+        computed_not_advice=True,
+        horizon=horizon,
+        query_snapshot=q_snap,
+        matches=matches_out,
+        rag_available=False,
     )
 
 

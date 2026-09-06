@@ -549,3 +549,34 @@ def test_demography_equivalent_reproduces_the_variant_growth():
         # The engine's rule: dep growth scales as (1 + dem) times BSL growth.
         engine_growth = (bsl[Y1] / bsl[Y0] - 1.0) * (1.0 + v["dem_equivalent"])
         assert engine_growth == pytest.approx(target_growth, abs=2e-3), v["id"]
+
+
+# ---- Analog endpoint ----
+
+def test_analog_endpoint_smoke():
+    r = client.post("/scenario/analog", json={})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["computed_not_advice"] is True
+    assert len(body["matches"]) == 3
+    for m in body["matches"]:
+        assert m["iso3"]
+        assert m["country_name"]
+        assert isinstance(m["rank"], int)
+        assert isinstance(m["distance"], float)
+        assert isinstance(m["match_snapshot"], dict)
+        assert isinstance(m["outcome"], list)
+        assert isinstance(m["diffs"], list)
+        assert m["debt_payable_verdict"]
+    assert isinstance(body["query_snapshot"], dict)
+    assert body["rag_available"] is False
+
+
+def test_analog_narrative_none_without_rag():
+    r = client.post("/scenario/analog", json={})
+    assert r.status_code == 200
+    body = r.json()
+    # When rag_available is False, narrative on each match may be None
+    assert body["rag_available"] is False
+    for m in body["matches"]:
+        assert m["narrative"] is None or body["rag_available"] is False
