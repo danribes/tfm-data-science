@@ -151,4 +151,58 @@ describe("Biblioteca — chat con citas", () => {
     await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
     expect(screen.getByRole("button", { name: "preguntar" })).toBeDisabled();
   });
+
+  // The public deploy ships without the RAG stack on purpose (copyrighted corpus,
+  // local-only index). The API says so with a 503 + detail; the page must relay
+  // that reason instead of asking whether the index is built.
+  const DETAIL_503 =
+    "La biblioteca no está disponible en este despliegue: el corpus con derechos " +
+    "de autor y su índice vectorial viven sólo en la máquina local. (ModuleNotFoundError)";
+
+  it("explains the library is local-only when /rag/collections answers 503", async () => {
+    server.use(
+      http.get("http://localhost:8000/rag/collections", () =>
+        HttpResponse.json({ detail: DETAIL_503 }, { status: 503 }),
+      ),
+    );
+    ui();
+    await waitFor(() =>
+      expect(screen.getByText(/sólo está disponible en el despliegue local/i)).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/ModuleNotFoundError/)).toBeInTheDocument();
+    expect(screen.queryByText(/¿Está el índice construido/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Pregunta")).toBeDisabled();
+  });
+
+  it("surfaces the server's reason when the chat stream answers 503", async () => {
+    server.use(
+      http.post("http://localhost:8000/rag/chat/stream", () =>
+        HttpResponse.json({ detail: DETAIL_503 }, { status: 503 }),
+      ),
+    );
+    ui();
+    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await userEvent.type(screen.getByLabelText("Pregunta"), "por qué sube la deuda");
+    await userEvent.click(screen.getByRole("button", { name: "preguntar" }));
+
+    await waitFor(() =>
+      expect(screen.getByText(/sólo está disponible en el despliegue local/i)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/¿Está el índice construido/)).not.toBeInTheDocument();
+  });
+
+  it("keeps the generic message for a non-503 failure but shows the HTTP status", async () => {
+    server.use(
+      http.post("http://localhost:8000/rag/chat/stream", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    ui();
+    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await userEvent.type(screen.getByLabelText("Pregunta"), "por qué sube la deuda");
+    await userEvent.click(screen.getByRole("button", { name: "preguntar" }));
+
+    await waitFor(() => expect(screen.getByText(/No se pudo consultar la biblioteca/)).toBeInTheDocument());
+    expect(screen.getByText(/boom/)).toBeInTheDocument();
+  });
 });

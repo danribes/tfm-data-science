@@ -39,12 +39,28 @@ const EXAMPLES = [
   "¿qué son las proyecciones locales y para qué sirven?",
 ];
 
+type Failure = { status?: number; detail: string };
+
+/** Normalise whatever the request layer threw into status + human reason. */
+function toFailure(e: unknown): Failure {
+  const err = e as { status?: number; detail?: string; message?: string } | null;
+  return {
+    status: err?.status,
+    detail: err?.detail ?? err?.message ?? String(e),
+  };
+}
+
 export default function Biblioteca() {
   const collections = useQuery({
     queryKey: ["rag", "collections"],
     queryFn: api.ragCollections,
     staleTime: Infinity,
   });
+  // 503 is the API's deliberate answer on the public deploy: the copyrighted
+  // corpus and its index never leave the local machine. Anything else is a
+  // real outage.
+  const collFailure = collections.isError ? toFailure(collections.error) : null;
+  const unavailable = collFailure?.status === 503;
 
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
@@ -58,7 +74,7 @@ export default function Biblioteca() {
 
   const [streamed, setStreamed] = useState("");
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<Failure | null>(null);
 
   // One streamed request rather than two round trips. The server emits the
   // passages as soon as retrieval finishes (~0,8 s) and then the answer word by
@@ -66,13 +82,13 @@ export default function Biblioteca() {
   // took to wait for the whole generation.
   const submit = (q: string) => {
     const text = q.trim();
-    if (text.length < 2 || busy) return;
+    if (text.length < 2 || busy || unavailable) return;
     setQuestion(text);
     setAsked(text);
     setAnswer(null);
     setPassages([]);
     setStreamed("");
-    setFailed(false);
+    setFailure(null);
     setBusy(true);
 
     ragChatStream(
@@ -97,7 +113,7 @@ export default function Biblioteca() {
           } as RagChatResponse),
       },
     )
-      .catch(() => setFailed(true))
+      .catch((e: unknown) => setFailure(toFailure(e)))
       .finally(() => setBusy(false));
   };
 
@@ -116,7 +132,9 @@ export default function Biblioteca() {
         <span className="meta">
           {collections.isSuccess
             ? `${nf(collections.data.total_documents, 0)} documentos · ${nf(collections.data.total_chunks, 0)} pasajes indexados`
-            : "cargando el índice…"}
+            : collections.isError
+              ? "índice no disponible en este despliegue"
+              : "cargando el índice…"}
         </span>
       </div>
 
@@ -164,8 +182,9 @@ export default function Biblioteca() {
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="¿por qué sube la deuda cuando el tipo supera al crecimiento?"
             aria-label="Pregunta"
+            disabled={unavailable}
           />
-          <button type="submit" disabled={busy || question.trim().length < 2}>
+          <button type="submit" disabled={unavailable || busy || question.trim().length < 2}>
             {busy ? "buscando…" : "preguntar"}
           </button>
         </form>
@@ -182,17 +201,31 @@ export default function Biblioteca() {
 
         <div className="biblio-eg">
           {EXAMPLES.map((q) => (
-            <button key={q} type="button" onClick={() => submit(q)}>
+            <button key={q} type="button" onClick={() => submit(q)} disabled={unavailable}>
               {q}
             </button>
           ))}
         </div>
       </div>
 
-      {failed && (
+      {(unavailable || failure?.status === 503) && (
+        <div className="banner">
+          <strong>La biblioteca sólo está disponible en el despliegue local.</strong>{" "}
+          El corpus tiene derechos de autor y su índice vectorial no se publica;
+          esta instancia pública sirve el motor pero no la biblioteca. Motivo del
+          servidor: <em>{(failure ?? collFailure)?.detail}</em>
+        </div>
+      )}
+      {collFailure && !unavailable && (
         <div className="banner err">
-          No se pudo consultar la biblioteca. ¿Está el índice construido y la API
-          en marcha?
+          No se pudo cargar el índice de la biblioteca ({collFailure.detail}).
+          ¿Está la API en marcha?
+        </div>
+      )}
+      {failure && failure.status !== 503 && (
+        <div className="banner err">
+          No se pudo consultar la biblioteca ({failure.detail}). ¿Está el índice
+          construido y la API en marcha?
         </div>
       )}
 

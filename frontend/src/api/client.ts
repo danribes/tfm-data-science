@@ -14,11 +14,35 @@ export const API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localho
 
 export class ApiError extends Error {
   endpoint: string;
-  constructor(endpoint: string, detail: string, options?: { cause?: unknown }) {
-    super(`API ${endpoint}: ${detail}`, options);
+  /** HTTP status when the server answered; undefined for network failures. */
+  status?: number;
+  /** The server's own reason (FastAPI `detail`), when it sent one. */
+  detail: string;
+  constructor(
+    endpoint: string,
+    detail: string,
+    options?: { cause?: unknown; status?: number },
+  ) {
+    super(`API ${endpoint}: ${detail}`, options?.cause ? { cause: options.cause } : undefined);
     this.name = "ApiError";
     this.endpoint = endpoint;
+    this.status = options?.status;
+    this.detail = detail;
   }
+}
+
+/** Build the error for a non-2xx response, keeping the server's `detail` when
+ *  it sent JSON — a 503 that says *why* the library is missing must not be
+ *  flattened into "HTTP 503". */
+async function failure(endpoint: string, res: Response): Promise<ApiError> {
+  let detail = `HTTP ${res.status}`;
+  try {
+    const body = (await res.json()) as { detail?: unknown };
+    if (typeof body?.detail === "string" && body.detail.trim()) detail = body.detail;
+  } catch {
+    /* non-JSON body: keep the status line */
+  }
+  return new ApiError(endpoint, detail, { status: res.status });
 }
 
 async function request<T>(endpoint: string, init?: RequestInit): Promise<T> {
@@ -31,7 +55,7 @@ async function request<T>(endpoint: string, init?: RequestInit): Promise<T> {
   } catch (cause) {
     throw new ApiError(endpoint, "sin conexión", { cause });
   }
-  if (!res.ok) throw new ApiError(endpoint, `HTTP ${res.status}`);
+  if (!res.ok) throw await failure(endpoint, res);
   return (await res.json()) as T;
 }
 
@@ -97,7 +121,8 @@ export async function ragChatStream(
     body: JSON.stringify(body),
     signal,
   });
-  if (!res.ok || !res.body) throw new ApiError("/rag/chat/stream", `HTTP ${res.status}`);
+  if (!res.ok) throw await failure("/rag/chat/stream", res);
+  if (!res.body) throw new ApiError("/rag/chat/stream", "respuesta sin cuerpo", { status: res.status });
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
