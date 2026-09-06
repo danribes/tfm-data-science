@@ -328,3 +328,46 @@ export interface MonteCarloResponse extends ApiMeta {
   /** Individual paths — the spaghetti. Deterministic given the seed. */
   paths: number[][];
 }
+
+// ---- Análogos históricos ----
+
+export interface AnalogOutcomePoint {
+  year_offset: number;
+  debt_gdp: number | null;
+  gdp_growth: number | null;
+  primary_balance_gdp: number | null;
+  r_minus_g: number | null;
+  truncated: boolean;
+}
+
+export interface StructuralDiff {
+  dimension: string;
+  label: string;
+  spain_value: string;
+  analog_value: string;
+  direction: "converge" | "diverge" | "neutral";
+}
+
+export interface AnalogMatch {
+  rank: number;
+  iso3: string;
+  country_name: string;
+  match_year: number;
+  distance: number;
+  dominant_lever: string | null;
+  match_snapshot: Record<string, number>;
+  outcome: AnalogOutcomePoint[];
+  outcome_truncated: boolean;
+  diffs: StructuralDiff[];
+  debt_payable_verdict: "auto" | "requires_surplus" | "borderline";
+  narrative: string | null;
+}
+
+export interface AnalogResponse extends ApiMeta {
+  horizon: number;
+  query_snapshot: Record<string, number>;
+  matches: AnalogMatch[];
+  rag_available: boolean;
+}
+
+export type AnalogRequest = ScenarioRequest;

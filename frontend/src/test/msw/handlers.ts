@@ -5,7 +5,7 @@ import type { SeriesKey } from "../../engine/spain";
 import { SERIES_KEYS, YEARS, baseline, runScenario } from "../../engine/spain";
 import { evaluateRedlines } from "../../engine/redlines";
 import { CONSTANTS_META } from "../../engine/constants";
-import type { ExplainRequest, MonteCarloRequest, ScenarioRequest } from "../../api/types";
+import type { AnalogResponse, ExplainRequest, MonteCarloRequest, ScenarioRequest } from "../../api/types";
 import {
   MOCK_VINTAGE,
   mockKpis,
@@ -18,6 +18,143 @@ import {
 
 const META = { vintage: MOCK_VINTAGE, computed_not_advice: true };
 const BASE = "http://localhost:8000";
+
+const OUTCOME_IRL: AnalogResponse["matches"][number]["outcome"] = Array.from(
+  { length: 10 },
+  (_, i) => ({
+    year_offset: i + 1,
+    debt_gdp: 86.0 + i * 4.2,
+    gdp_growth: -1.8 + i * 0.6,
+    primary_balance_gdp: -8.1 + i * 1.1,
+    r_minus_g: 1.8 - i * 0.1,
+    truncated: false,
+  }),
+);
+
+const MOCK_ANALOG: AnalogResponse = {
+  vintage: MOCK_VINTAGE,
+  computed_not_advice: true,
+  horizon: 10,
+  query_snapshot: {
+    debt_gdp: 106.3,
+    primary_balance_gdp: -4.2,
+    interest_rate_10y: 3.42,
+    gdp_growth: 1.8,
+    unemployment: 10.1,
+    inflation: 3.0,
+    r_minus_g: 1.62,
+  },
+  rag_available: false,
+  matches: [
+    {
+      rank: 1,
+      iso3: "IRL",
+      country_name: "Irlanda",
+      match_year: 2010,
+      distance: 0.42,
+      dominant_lever: "prima",
+      match_snapshot: {
+        debt_gdp: 86.0,
+        primary_balance_gdp: -8.1,
+        interest_rate_10y: 5.9,
+        gdp_growth: -0.4,
+        unemployment: 14.1,
+        inflation: 0.9,
+        r_minus_g: 1.8,
+      },
+      outcome: OUTCOME_IRL,
+      outcome_truncated: false,
+      diffs: [
+        { dimension: "emu_member", label: "Zona euro", spain_value: "Sí", analog_value: "Sí", direction: "converge" },
+        { dimension: "fx_regime", label: "Régimen cambiario", spain_value: "fixed", analog_value: "fixed", direction: "converge" },
+        { dimension: "ext_debt_share", label: "Deuda externa / deuda total", spain_value: "51%", analog_value: "78%", direction: "diverge" },
+        { dimension: "democracy", label: "Calidad institucional (Polity5)", spain_value: "9", analog_value: "10", direction: "converge" },
+        { dimension: "trade_openness", label: "Apertura comercial (X+M/PIB)", spain_value: "72%", analog_value: "194%", direction: "diverge" },
+        { dimension: "debt_maturity", label: "Vencimiento deuda (proxy ext_debt_share)", spain_value: "largo plazo", analog_value: "más corto", direction: "diverge" },
+        { dimension: "tfp_trend", label: "Tendencia TFP (media 5 años)", spain_value: "+0.2%/a", analog_value: "+1.8%/a", direction: "diverge" },
+        { dimension: "labor_productivity", label: "Productividad laboral (media 5 años)", spain_value: "+0.8%/a", analog_value: "+2.1%/a", direction: "diverge" },
+      ],
+      debt_payable_verdict: "requires_surplus",
+      narrative: null,
+    },
+    {
+      rank: 2,
+      iso3: "PRT",
+      country_name: "Portugal",
+      match_year: 2011,
+      distance: 0.67,
+      dominant_lever: "prima",
+      match_snapshot: {
+        debt_gdp: 111.0,
+        primary_balance_gdp: -4.3,
+        interest_rate_10y: 10.2,
+        gdp_growth: -1.8,
+        unemployment: 12.7,
+        inflation: 3.6,
+        r_minus_g: 2.4,
+      },
+      outcome: Array.from({ length: 10 }, (_, i) => ({
+        year_offset: i + 1,
+        debt_gdp: 111.0 + i * 2.8,
+        gdp_growth: -1.8 + i * 0.5,
+        primary_balance_gdp: -4.3 + i * 0.9,
+        r_minus_g: 2.4 - i * 0.2,
+        truncated: false,
+      })),
+      outcome_truncated: false,
+      diffs: [
+        { dimension: "emu_member", label: "Zona euro", spain_value: "Sí", analog_value: "Sí", direction: "converge" },
+        { dimension: "fx_regime", label: "Régimen cambiario", spain_value: "fixed", analog_value: "fixed", direction: "converge" },
+        { dimension: "ext_debt_share", label: "Deuda externa / deuda total", spain_value: "51%", analog_value: "62%", direction: "diverge" },
+        { dimension: "democracy", label: "Calidad institucional (Polity5)", spain_value: "9", analog_value: "9", direction: "converge" },
+        { dimension: "trade_openness", label: "Apertura comercial (X+M/PIB)", spain_value: "72%", analog_value: "78%", direction: "neutral" },
+        { dimension: "debt_maturity", label: "Vencimiento deuda (proxy ext_debt_share)", spain_value: "largo plazo", analog_value: "más corto", direction: "diverge" },
+        { dimension: "tfp_trend", label: "Tendencia TFP (media 5 años)", spain_value: "+0.2%/a", analog_value: "-0.3%/a", direction: "diverge" },
+        { dimension: "labor_productivity", label: "Productividad laboral (media 5 años)", spain_value: "+0.8%/a", analog_value: "+0.6%/a", direction: "neutral" },
+      ],
+      debt_payable_verdict: "requires_surplus",
+      narrative: null,
+    },
+    {
+      rank: 3,
+      iso3: "BEL",
+      country_name: "Bélgica",
+      match_year: 1993,
+      distance: 0.91,
+      dominant_lever: "sp",
+      match_snapshot: {
+        debt_gdp: 134.0,
+        primary_balance_gdp: 4.1,
+        interest_rate_10y: 7.4,
+        gdp_growth: -1.0,
+        unemployment: 8.9,
+        inflation: 2.8,
+        r_minus_g: 8.4,
+      },
+      outcome: Array.from({ length: 10 }, (_, i) => ({
+        year_offset: i + 1,
+        debt_gdp: 134.0 - i * 3.5,
+        gdp_growth: -1.0 + i * 0.4,
+        primary_balance_gdp: 4.1 + i * 0.2,
+        r_minus_g: 8.4 - i * 0.8,
+        truncated: false,
+      })),
+      outcome_truncated: false,
+      diffs: [
+        { dimension: "emu_member", label: "Zona euro", spain_value: "Sí", analog_value: "No (pre-EMU)", direction: "diverge" },
+        { dimension: "fx_regime", label: "Régimen cambiario", spain_value: "fixed", analog_value: "peg", direction: "diverge" },
+        { dimension: "ext_debt_share", label: "Deuda externa / deuda total", spain_value: "51%", analog_value: "40%", direction: "neutral" },
+        { dimension: "democracy", label: "Calidad institucional (Polity5)", spain_value: "9", analog_value: "10", direction: "converge" },
+        { dimension: "trade_openness", label: "Apertura comercial (X+M/PIB)", spain_value: "72%", analog_value: "143%", direction: "diverge" },
+        { dimension: "debt_maturity", label: "Vencimiento deuda (proxy ext_debt_share)", spain_value: "largo plazo", analog_value: "largo plazo", direction: "neutral" },
+        { dimension: "tfp_trend", label: "Tendencia TFP (media 5 años)", spain_value: "+0.2%/a", analog_value: "+0.8%/a", direction: "neutral" },
+        { dimension: "labor_productivity", label: "Productividad laboral (media 5 años)", spain_value: "+0.8%/a", analog_value: "+1.4%/a", direction: "neutral" },
+      ],
+      debt_payable_verdict: "requires_surplus",
+      narrative: null,
+    },
+  ],
+};
 
 export const handlers = [
   http.get(`${BASE}/health`, () => HttpResponse.json({ ...META, status: "ok", engine_version: "1.0.0" })),
@@ -479,6 +616,8 @@ export const handlers = [
   // lever at a time — same method as the Python `explain.facts.decompose` — so
   // the mocked numbers are the engine's, not canned. Only the prose is a
   // shortened stand-in for the server's deterministic templates.
+  http.post(`${BASE}/scenario/analog`, () => HttpResponse.json(MOCK_ANALOG)),
+
   http.post(`${BASE}/explain`, async ({ request }) => {
     const body = (await request.json()) as ExplainRequest;
     const levers = { ...BASE_LEVERS, ...(body.levers ?? {}) };
