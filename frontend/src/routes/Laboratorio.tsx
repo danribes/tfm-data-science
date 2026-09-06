@@ -15,11 +15,13 @@ import { useScenario, useScenarioStore } from "../state/scenarioStore";
 import { BudgetFlowChart } from "../components/BudgetFlowChart";
 import { DebtAmortizationFlowChart } from "../components/DebtAmortizationFlowChart";
 import { EmpiricalTwin } from "../components/EmpiricalTwin";
+import { AnalogPanel } from "../components/AnalogPanel";
 
 export default function Laboratorio() {
   const [seriesKey, setSeriesKey] = useState<AnySeriesKey>("b");
   const scn = useScenario();
   const levers = useScenarioStore((s) => s.levers);
+  const horizon = useScenarioStore((s) => s.horizon);
   const redlines = useRedlines();
   const mc = useMonteCarlo(levers, true);
   const sens = useSensitivity(levers);
@@ -116,6 +118,8 @@ export default function Laboratorio() {
       <DebtAmortizationFlowChart levers={levers} />
 
       <EmpiricalTwin />
+
+      <AnalogPanel levers={levers} horizon={horizon} />
 
       <div className="card" style={{ marginTop: 16 }}>
         <h4>Matriz de Sensibilidad y Elasticidades Marginales <small>∂Y / ∂L en 2030 y 2050</small></h4>
