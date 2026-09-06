@@ -26,21 +26,20 @@ function ui(children: React.ReactNode) {
 }
 
 describe("AnalogPanel", () => {
-  it("renders closed by default — button visible, card content hidden", () => {
+  it("renders open by default — header toggle and search button both visible", () => {
     ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
     expect(screen.getByRole("button", { name: /análogos históricos/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /buscar análogo histórico/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /buscar análogo histórico/i })).toBeInTheDocument();
   });
 
-  it("expands on header click — search button and description visible", () => {
+  it("collapses on header click — search button hidden", () => {
     ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
     fireEvent.click(screen.getByRole("button", { name: /análogos históricos/i }));
-    expect(screen.getByRole("button", { name: /buscar análogo histórico/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /buscar análogo histórico/i })).toBeNull();
   });
 
   it("calls API and shows cards after clicking search button", async () => {
     ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
-    fireEvent.click(screen.getByRole("button", { name: /análogos históricos/i }));
     fireEvent.click(screen.getByRole("button", { name: /buscar análogo histórico/i }));
     await waitFor(() => expect(screen.getByText("Irlanda · 2010")).toBeInTheDocument());
     expect(screen.getByText(/Portugal.*2011/)).toBeInTheDocument();
@@ -49,7 +48,6 @@ describe("AnalogPanel", () => {
 
   it("shows deterministic template when rag_available is false", async () => {
     ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
-    fireEvent.click(screen.getByRole("button", { name: /análogos históricos/i }));
     fireEvent.click(screen.getByRole("button", { name: /buscar análogo histórico/i }));
     await waitFor(() =>
       expect(
@@ -63,7 +61,6 @@ describe("AnalogPanel", () => {
       http.post("*/scenario/analog", () => HttpResponse.error()),
     );
     ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
-    fireEvent.click(screen.getByRole("button", { name: /análogos históricos/i }));
     fireEvent.click(screen.getByRole("button", { name: /buscar análogo histórico/i }));
     await waitFor(() =>
       expect(screen.getByText(/error al buscar análogos/i)).toBeInTheDocument(),

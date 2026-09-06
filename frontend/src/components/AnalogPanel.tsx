@@ -22,7 +22,7 @@ export function AnalogPanel({
   levers: Partial<Levers>;
   horizon: number;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const mut = useMutation({
     mutationFn: () => fetchAnalog({ levers, horizon }),

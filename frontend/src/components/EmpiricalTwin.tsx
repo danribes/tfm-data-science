@@ -32,14 +32,19 @@ export function EmpiricalTwin() {
         <small>{nf(d.n, 0)} país-año · {nf(d.n_countries, 0)} países · {d.years[0]}–{d.years[1]}</small>
       </h4>
 
-      <p style={{ fontSize: 14.5, margin: "4px 0 10px" }}>
-        El motor supone que no importa: <code>E_R = {nf(d.engine_e_r, 2)}</code>{" "}
-        puntos de PIB por punto de tipo, constante por diseño.{" "}
-        <a href="/evidencia">Evidencia</a> declara esa constante no identificable
-        con el vintage congelado. Aquí se le hace la pregunta <em>dinámica</em>{" "}
-        con paneles externos: proyección local potenciada con árboles + SHAP,
-        pendiente del efecto del tipo dentro de cada régimen de deuda.
-      </p>
+      <details style={{ marginBottom: 10 }}>
+        <summary style={{ fontSize: 13, color: "var(--muted)", cursor: "pointer", userSelect: "none" }}>
+          Metodología ▸
+        </summary>
+        <p style={{ fontSize: 13.5, margin: "6px 0 0" }}>
+          El motor supone que no importa: <code>E_R = {nf(d.engine_e_r, 2)}</code>{" "}
+          puntos de PIB por punto de tipo, constante por diseño.{" "}
+          <a href="/evidencia">Evidencia</a> declara esa constante no identificable
+          con el vintage congelado. Aquí se le hace la pregunta <em>dinámica</em>{" "}
+          con paneles externos: proyección local potenciada con árboles + SHAP,
+          pendiente del efecto del tipo dentro de cada régimen de deuda.
+        </p>
+      </details>
 
       <div className="row2">
         <div>
@@ -68,14 +73,19 @@ export function EmpiricalTwin() {
                 : "no distinguible — la constante del motor sobrevive"}
             </span>
           </p>
-          <Caption>
-            Diferencia alta−baja deuda: [{sg(d.diff_ci[0] ?? 0, 3)},{" "}
-            {sg(d.diff_ci[1] ?? 0, 3)}] al 90 %, bootstrap por país
-            ({nf(d.n_boot, 0)} réplicas). El intervalo incluye el cero: con
-            estos datos no se puede afirmar que el efecto del tipo cambie con
-            la deuda. El supuesto del motor no queda validado — queda{" "}
-            <em>no contradicho</em>, que es menos y se dice tal cual.
-          </Caption>
+          <details>
+            <summary style={{ fontSize: 12, color: "var(--muted)", cursor: "pointer", userSelect: "none" }}>
+              IC bootstrap ▸
+            </summary>
+            <Caption>
+              Diferencia alta−baja deuda: [{sg(d.diff_ci[0] ?? 0, 3)},{" "}
+              {sg(d.diff_ci[1] ?? 0, 3)}] al 90 %, bootstrap por país
+              ({nf(d.n_boot, 0)} réplicas). El intervalo incluye el cero: con
+              estos datos no se puede afirmar que el efecto del tipo cambie con
+              la deuda. El supuesto del motor no queda validado — queda{" "}
+              <em>no contradicho</em>, que es menos y se dice tal cual.
+            </Caption>
+          </details>
         </div>
 
         <div>
@@ -93,23 +103,33 @@ export function EmpiricalTwin() {
               <span className="et-val">{nf(i.mean_abs_shap, 2)}</span>
             </div>
           ))}
-          <Caption>
-            La inercia del propio crecimiento y el nivel de renta dominan; el
-            tipo de interés y la deuda quedan detrás. Es atribución histórica,
-            no palancas de un escenario: por eso vive junto a la matriz de
-            sensibilidad y no dentro de «Qué está pasando».
-          </Caption>
+          <details>
+            <summary style={{ fontSize: 12, color: "var(--muted)", cursor: "pointer", userSelect: "none" }}>
+              Nota ▸
+            </summary>
+            <Caption>
+              La inercia del propio crecimiento y el nivel de renta dominan; el
+              tipo de interés y la deuda quedan detrás. Es atribución histórica,
+              no palancas de un escenario: por eso vive junto a la matriz de
+              sensibilidad y no dentro de «Qué está pasando».
+            </Caption>
+          </details>
         </div>
       </div>
 
-      <p className="src" style={{ whiteSpace: "normal" }}>
-        R² fuera de país {nf(d.r2_grouped, 3)} ± {nf(d.r2_std, 3)}: el modelo no
-        predice el crecimiento a tres años de un país que no ha visto, así que
-        estas pendientes describen la superficie ajustada, no una regla
-        validada. España no puntúa aquí: {d.spain_excluded_reason}. No es
-        causalidad — los bancos centrales suben tipos en expansión — y el
-        contraste entre regímenes es lo único que se defiende, no los niveles.
-      </p>
+      <details>
+        <summary style={{ fontSize: 12, color: "var(--muted)", cursor: "pointer", userSelect: "none" }}>
+          R² y caveats ▸
+        </summary>
+        <p className="src" style={{ whiteSpace: "normal" }}>
+          R² fuera de país {nf(d.r2_grouped, 3)} ± {nf(d.r2_std, 3)}: el modelo no
+          predice el crecimiento a tres años de un país que no ha visto, así que
+          estas pendientes describen la superficie ajustada, no una regla
+          validada. España no puntúa aquí: {d.spain_excluded_reason}. No es
+          causalidad — los bancos centrales suben tipos en expansión — y el
+          contraste entre regímenes es lo único que se defiende, no los niveles.
+        </p>
+      </details>
     </div>
   );
 }

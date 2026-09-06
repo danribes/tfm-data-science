@@ -96,7 +96,7 @@ export default function Laboratorio() {
         </div>
         <div className="card">
           <h4>Palancas en crudo <small>vector actual vs base congelada</small></h4>
-          <table style={{ fontSize: 13.5, borderCollapse: "collapse", width: "100%" }}>
+          <table style={{ fontSize: 15, borderCollapse: "collapse", width: "100%" }}>
             <thead>
               <tr><th style={{ textAlign: "left" }}>palanca</th><th>actual</th><th>base</th></tr>
             </thead>
@@ -125,7 +125,7 @@ export default function Laboratorio() {
         <h4>Matriz de Sensibilidad y Elasticidades Marginales <small>∂Y / ∂L en 2030 y 2050</small></h4>
         {sens.isPending && <p style={{ fontSize: 14 }}>Calculando derivadas numéricas del escenario…</p>}
         {sens.data && (
-          <table style={{ fontSize: 13.5, borderCollapse: "collapse", width: "100%" }}>
+          <table style={{ fontSize: 15, borderCollapse: "collapse", width: "100%" }}>
             <thead>
               <tr>
                 <th style={{ textAlign: "left" }}>Palanca (L_k)</th>
