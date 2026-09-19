@@ -240,3 +240,33 @@ def test_scenario_report_endpoints():
     assert "text/html" in r_post.headers["content-type"]
     assert "2040" in r_post.text
 
+
+
+def test_fallback_names_the_headline_series_not_always_the_debt():
+    """A non-debt headline must be called by its own name.
+
+    The summary printed the headline series' values under the fixed label «la
+    deuda pública», so asking about the mortgage effort produced a sentence
+    that read as a debt figure and was wrong by a factor of ten. Plausible and
+    wrong is the failure mode worth a test.
+    """
+    facts = build_facts(RATE_UP, 2040, headline="esf")
+    blocks = fallback_narration(facts)
+    whole = " ".join(blocks.values())
+
+    esf = next(o for o in facts.outcomes if o.key == "esf")
+    assert esf.label in blocks["resumen"]
+    # The word may still appear when debt is listed among the other outcomes,
+    # but never as the subject of the headline sentence.
+    assert "la deuda pública queda" not in whole
+    assert f"La deuda pública sube de {nf(esf.base, esf.dec)}" not in whole
+    assert f"La deuda pública baja de {nf(esf.base, esf.dec)}" not in whole
+
+
+def test_fallback_decomposition_uses_the_headline_unit():
+    """The decomposition line hardcoded %PIB, which is wrong for a % series."""
+    facts = build_facts(RATE_UP, 2040, headline="esf")
+    mech = fallback_narration(facts)["mecanismo"]
+    if facts.contributions:
+        esf = next(o for o in facts.outcomes if o.key == "esf")
+        assert f"Descomposición del movimiento de {esf.label.lower()}" in mech

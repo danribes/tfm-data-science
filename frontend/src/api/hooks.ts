@@ -68,13 +68,24 @@ export function useSensitivity(levers?: Levers) {
  *  more: dragging a slider must not fire one billed LLM call per pixel. The
  *  query key is the lever vector, so React Query serves a repeat of any
  *  scenario the user has already seen from cache with no request at all. */
-export function useExplain(levers: Levers, horizon: number, enabled = true) {
+/** `headline` picks the series the narration is about. The shell explainer
+ *  leaves it at the server default (debt); an answer panel passes the series
+ *  its question resolves to, so the prose is about the number on screen. */
+export function useExplain(
+  levers: Levers,
+  horizon: number,
+  enabled = true,
+  headline?: string,
+) {
   const debouncedLevers = useDebounced(levers, 400);
   const debouncedHorizon = useDebounced(horizon, 400);
   return useQuery({
-    queryKey: ["explain", debouncedLevers, debouncedHorizon],
+    queryKey: ["explain", debouncedLevers, debouncedHorizon, headline ?? null],
     queryFn: ({ signal }) =>
-      api.explain({ levers: debouncedLevers, horizon: debouncedHorizon }, signal),
+      api.explain(
+        { levers: debouncedLevers, horizon: debouncedHorizon, ...(headline ? { headline } : {}) },
+        signal,
+      ),
     enabled,
     staleTime: Infinity,
     placeholderData: keepPreviousData,

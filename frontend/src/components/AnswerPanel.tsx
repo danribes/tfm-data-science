@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { usePrediction } from "../api/hooks";
+import { useExplain, usePrediction } from "../api/hooks";
+import { useScenarioStore } from "../state/scenarioStore";
 import { seriesOf } from "../engine/derived";
 import type { Scenario } from "../engine/spain";
 import { YEARS } from "../engine/spain";
@@ -47,6 +48,10 @@ export function AnswerPanel({
   estimated?: { name: string; value: number; ci_low: number; ci_high: number; calibrated_v16: number | null }[];
 }) {
   const prediction = usePrediction();
+  const levers = useScenarioStore((s) => s.levers);
+  // Narrated over the series this question resolves to, so the prose is about
+  // the number on screen. facts come from the engine; the model only writes.
+  const explain = useExplain(levers, year, true, q.series);
 
   const value = seriesOf(scn, q.series)[k];
   const baseValue = seriesOf(base, q.series)[k];
@@ -96,6 +101,33 @@ export function AnswerPanel({
       <div className="layers">
         <Layer tag="motor" title="Cómo se calcula este número">
           <p>{q.mechanism}</p>
+          {explain.isSuccess && (
+            <>
+              <p>{explain.data.mecanismo}</p>
+              {explain.data.contributions.length > 0 && (
+                <>
+                  <p className="layer-note">
+                    De cuánto responde cada palanca en el movimiento de este año:
+                  </p>
+                  <ul className="layer-list">
+                    {explain.data.contributions
+                      .filter((ct) => Math.abs(ct.share) > 0.01)
+                      .map((ct) => (
+                        <li key={ct.lever_id}>
+                          {ct.lever_name}: {nf(ct.delta, 2)}{" "}
+                          <span className="muted">({nf(ct.share * 100, 0)} %)</span>
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              )}
+              <p className="layer-note">
+                {explain.data.source === "llm"
+                  ? `Texto redactado por ${explain.data.model} sobre las cifras del motor; el modelo escribe, no calcula.`
+                  : "Texto generado con plantillas deterministas sobre las cifras del motor."}
+              </p>
+            </>
+          )}
           <p className="layer-note">
             Es un escenario condicionado a las palancas, no una predicción: el
             motor responde «si el tipo fuera X, esto saldría Y», no «esto va a pasar».
@@ -166,6 +198,9 @@ export function AnswerPanel({
         </Layer>
 
         <Layer tag="límites" title="Qué no sabe este número">
+          {explain.isSuccess && explain.data.advertencia && (
+            <p>{explain.data.advertencia}</p>
+          )}
           <ul className="layer-list">
             <li>
               Es un escenario condicional. Nadie, ni este motor ni un modelo de

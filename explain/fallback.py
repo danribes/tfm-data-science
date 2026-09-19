@@ -44,7 +44,7 @@ def _resumen(f: ExplanationFacts) -> str:
     if not f.moved:
         if head is None:
             return "Escenario sin cambios respecto a la línea base."
-        return (f"Sin mover ninguna palanca, en {head.year} la deuda pública "
+        return (f"Sin mover ninguna palanca, en {head.year} {head.label.lower()} "
                 f"queda en {nf(head.value, head.dec)} {head.unit} según la senda "
                 "central del vintage.")
 
@@ -54,8 +54,11 @@ def _resumen(f: ExplanationFacts) -> str:
 
     if head is not None:
         verb = "sube" if head.delta > 0 else "baja" if head.delta < 0 else "no se mueve"
+        # head.label, not a fixed string: the headline is whichever series the
+        # caller asked about, and naming it «deuda pública» while printing
+        # another series' values is the worst kind of wrong — plausible.
         parts.append(
-            f"La deuda pública {verb} de {nf(head.base, head.dec)} a "
+            f"{head.label} {verb} de {nf(head.base, head.dec)} a "
             f"{nf(head.value, head.dec)} {head.unit} en {head.year} "
             f"({_signed(head.delta, head.dec)} puntos).")
 
@@ -86,24 +89,31 @@ def _mecanismo(f: ExplanationFacts) -> str:
         lines.append(f"{m.symbol} · {m.name} → {chain}.")
 
     if f.contributions:
+        hd = next((o for o in f.outcomes if o.key == f.headline_key), None)
+        what = hd.label.lower() if hd else "la serie"
+        unit = hd.unit if hd else ""
         lines.append(
-            f"Descomposición del movimiento de la deuda en {f.headline_year} "
-            f"({_signed(f.joint_delta, 1)} %PIB en total), volviendo a correr el "
+            f"Descomposición del movimiento de {what} en {f.headline_year} "
+            f"({_signed(f.joint_delta, 1)} {unit} en total), volviendo a correr el "
             "motor con una sola palanca cada vez:")
         for ct in f.contributions:
             lines.append(
-                f"  · {ct.lever_name}: {_signed(ct.delta, 1)} %PIB por sí sola "
+                f"  · {ct.lever_name}: {_signed(ct.delta, 1)} {unit} por sí sola "
                 f"({nf(ct.share * 100, 0)} % del movimiento bruto).")
         if abs(f.interaction) > 0.05:
             lines.append(
-                f"  · Interacción entre palancas: {_signed(f.interaction, 1)} %PIB. "
+                f"  · Interacción entre palancas: {_signed(f.interaction, 1)} {unit}. "
                 "El motor no es lineal, así que las palancas por separado no suman "
                 "el efecto conjunto — esta diferencia es real, no un error de "
                 "redondeo.")
 
-    lines.append("La identidad que cierra el círculo es b(t+1) = b(t)·(1+r−g) − sp: "
-                 "la deuda crece con el tipo, baja con el crecimiento y con el "
-                 "superávit primario.")
+    # Only where it is the mechanism. Under «¿qué parte de mi sueldo se irá en
+    # la hipoteca?» the debt identity is true and irrelevant, and a paragraph
+    # of irrelevant truth is how an explanation stops being read.
+    if f.headline_key in {"b", "int", "saldo", "pb", "ief", "bono", "spread"}:
+        lines.append("La identidad que cierra el círculo es b(t+1) = b(t)·(1+r−g) − sp: "
+                     "la deuda crece con el tipo, baja con el crecimiento y con el "
+                     "superávit primario.")
     return "\n".join(lines)
 
 
