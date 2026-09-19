@@ -28,6 +28,18 @@ export const useRedlines = () => useQuery({ queryKey: ["redlines"], queryFn: api
 export const usePrediction = () => useQuery({ queryKey: ["prediction"], queryFn: api.prediction, ...STATIC });
 export const useEvidence = () => useQuery({ queryKey: ["evidence"], queryFn: api.evidence, ...STATIC });
 
+/** Corpus passages for a concept. `enabled` is the point: the corpus is absent
+ *  from the public deploy and answers 503 there, so this only fires when a
+ *  reader actually opens the sources drawer rather than on every answer. */
+export const useRagSearch = (query: string | undefined, enabled: boolean) =>
+  useQuery({
+    queryKey: ["rag", "search", query],
+    queryFn: ({ signal }) => api.ragSearch({ query: query!, collection: "libros", top_k: 4 }, signal),
+    enabled: enabled && !!query && query.length > 2,
+    staleTime: Infinity,
+    retry: false,   // a missing corpus is a stable fact, not a blip
+  });
+
 /** Debounced value: trails `value` by `ms` (spec §3: MC debounced 400 ms). */
 export function useDebounced<T>(value: T, ms: number): T {
   const [debounced, setDebounced] = useState(value);

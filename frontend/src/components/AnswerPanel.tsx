@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useExplain, usePrediction } from "../api/hooks";
+import { useExplain, usePrediction, useRagSearch } from "../api/hooks";
 import { useScenarioStore } from "../state/scenarioStore";
 import { seriesOf } from "../engine/derived";
 import type { Scenario } from "../engine/spain";
@@ -31,6 +31,70 @@ function Layer({ title, tag, children }: {
         <span className="layer-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && <div className="layer-body">{children}</div>}
+    </div>
+  );
+}
+
+/** What the literature says about the concept behind this question.
+ *
+ *  Its own component because it must not query until opened: the corpus is
+ *  copyrighted, lives only on the machine that holds the index, and answers 503
+ *  everywhere else. Firing it on every answer would be a failed request per
+ *  question for every reader of the public deploy.
+ *
+ *  An absent corpus is stated, not hidden. A sources drawer that quietly shows
+ *  nothing reads as "no sources exist", which is the opposite of true. */
+function CorpusLayer({ concept }: { concept: string }) {
+  const [open, setOpen] = useState(false);
+  const corpus = useRagSearch(concept, open);
+  const status = corpus.error as { status?: number } | null;
+  const unavailable = status?.status === 503;
+
+  return (
+    <div className={open ? "layer open" : "layer"}>
+      <button type="button" className="layer-head" onClick={() => setOpen((v) => !v)}>
+        <span className="layer-tag">fuentes</span>
+        <span className="layer-title">Qué dice la literatura sobre «{concept}»</span>
+        <span className="layer-caret">{open ? "▾" : "▸"}</span>
+      </button>
+      {open && (
+        <div className="layer-body">
+          {corpus.isPending && <p className="muted">Buscando en el corpus…</p>}
+          {unavailable && (
+            <p className="layer-note">
+              El corpus son manuales con derechos de autor y vive sólo en la
+              máquina local, así que no se consulta desde este despliegue. El
+              número de arriba no depende de él: lo calcula el motor.
+            </p>
+          )}
+          {corpus.isError && !unavailable && (
+            <p className="layer-note">No se ha podido consultar el corpus.</p>
+          )}
+          {corpus.isSuccess && corpus.data.passages.length === 0 && (
+            <p className="layer-note">
+              El corpus no cubre este concepto. Prefiero decirlo a devolver un
+              pasaje que no viene a cuento.
+            </p>
+          )}
+          {corpus.isSuccess && corpus.data.passages.length > 0 && (
+            <>
+              <ol className="layer-list">
+                {corpus.data.passages.map((p, i) => (
+                  <li key={i}>
+                    <span className="psg-cite">{p.cita}</span>
+                    <span className={`psg-auth ${p.authority}`}>{p.authority}</span>
+                    <p className="psg-text">{p.text.slice(0, 320)}…</p>
+                  </li>
+                ))}
+              </ol>
+              <p className="layer-note">
+                Pasajes recuperados del corpus, no generados. Contexto sobre el
+                concepto: no son la fuente de la cifra, que sale del motor.
+              </p>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -154,6 +218,8 @@ export function AnswerPanel({
             </p>
           </Layer>
         )}
+
+        {q.concept && <CorpusLayer concept={q.concept} />}
 
         <Layer tag="modelo" title="Qué dice el modelo de aprendizaje profundo">
           {prediction.isSuccess && prediction.data.available ? (
