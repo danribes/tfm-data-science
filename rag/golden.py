@@ -340,6 +340,42 @@ GOLDEN: tuple[Question, ...] = (
         collection="libros", topic="fuera-de-alcance", unanswerable=True,
         note="No es que falte la fuente: la pregunta no tiene respuesta comprobable.",
     ),
+    # ---- expectativas: el hueco que este conjunto no miraba ----
+    # «¿Qué son las expectativas racionales?» devolvía «el corpus no contiene
+    # información» y nada lo medía: macro tenía dos entradas y ninguna sobre
+    # formación de expectativas. Es la literatura detrás de OMEGA, de modo que
+    # el motor implementaba un mecanismo que su propio corpus no respaldaba.
+    Question(
+        id="exp-racionales-vs-adaptativas",
+        question="¿Qué son las expectativas racionales y en qué se diferencian de las adaptativas?",
+        collection="libros", topic="expectativas",
+        expect_docs=("Expectativas de inflacion", "Formation of Expectations",
+                     "dinamica reciente de la inflacion"),
+        expect_terms=(("racionales", "rational"), ("expectativas", "expectations")),
+    ),
+    Question(
+        id="exp-hibrida-omega",
+        question="¿Qué peso tienen las expectativas retrospectivas frente a las ancladas en la curva de Phillips?",
+        collection="libros", topic="expectativas",
+        expect_docs=("Inflation Dynamics", "Hybrid New Keynesian",
+                     "Formation of Expectations", "curva de Phillips"),
+        expect_terms=(("phillips",), ("backward", "retrospectiv", "adaptativ", "rezagada")),
+    ),
+    Question(
+        id="exp-gali-gertler",
+        question="¿Cómo estiman Galí y Gertler la fracción de empresas que fijan precios mirando al pasado?",
+        collection="libros", topic="expectativas",
+        expect_docs=("Inflation Dynamics", "Hybrid New Keynesian"),
+        expect_terms=(("gmm", "estimat", "estimac"), ("marginal", "coste", "cost")),
+    ),
+    Question(
+        id="exp-anclaje",
+        question="¿Qué significa que las expectativas de inflación estén ancladas al objetivo del banco central?",
+        collection="libros", topic="expectativas",
+        expect_docs=("dinamica reciente de la inflacion", "Expectativas de inflacion",
+                     "IPC usos"),
+        expect_terms=(("anclad", "anchor", "objetivo"), ("inflacion", "inflation")),
+    ),
 )
 
 
