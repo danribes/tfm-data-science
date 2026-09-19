@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, NavLink, Outlet, Route, Routes } from "react-router-dom";
 import { queryClient, useHealth, usePersonas } from "./api/hooks";
+import { API_BASE, DEFAULT_API_BASE, setApiBase } from "./api/client";
 import { crossCheckEngine } from "./state/appHealth";
 import { useScenarioStore } from "./state/scenarioStore";
 import { ApiDownScreen } from "./components/ApiDownScreen";
@@ -30,6 +31,31 @@ function WithExplainer() {
   );
 }
 
+/** Escape hatch out of a local-corpus tunnel that has stopped answering.
+ *
+ *  The health check gates the whole app, so a stale override in localStorage
+ *  would otherwise lock the reader out of the very screen that could clear it. */
+function ResetApiBase() {
+  if (API_BASE === DEFAULT_API_BASE) return null;
+  return (
+    <p style={{ fontSize: 12, marginTop: 10 }}>
+      <button
+        type="button"
+        className="link-btn"
+        onClick={() => {
+          setApiBase(null);
+          location.reload();
+        }}
+      >
+        Volver a la API pública
+      </button>{" "}
+      <span style={{ color: "var(--muted)" }}>
+        (estás apuntando a una máquina local que no responde)
+      </span>
+    </p>
+  );
+}
+
 function Shell() {
   const health = useHealth();
   const personas = usePersonas();
@@ -47,6 +73,10 @@ function Shell() {
             La API duerme cuando nadie la usa (alojamiento gratuito) y tarda
             hasta un minuto en arrancar. Esta pantalla reintenta sola.
           </p>
+          <p style={{ fontSize: 12, color: "var(--muted)" }}>
+            Conectando con <code>{API_BASE}</code>
+          </p>
+          <ResetApiBase />
         </div>
       </div>
     );
