@@ -612,7 +612,10 @@ def rag_chat_stream(req: RagChatRequest) -> StreamingResponse:
     Time-to-first-content drops from ~5 s to under a second, because the reader
     does not wait for generation to finish before seeing anything.
     """
-    from rag import chat as rag_chat_mod, config as rag_config
+    try:
+        from rag import chat as rag_chat_mod, config as rag_config
+    except ImportError as exc:
+        raise _rag_unavailable(exc) from exc
 
     if req.collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,

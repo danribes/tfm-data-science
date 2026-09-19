@@ -124,9 +124,15 @@ export default function Consulta() {
 
         {failure && (
           <div className="banner err">
-            {unavailable
-              ? "El corpus no está disponible en este despliegue — sólo funciona en local."
-              : `Error: ${failure.detail}`}
+            {unavailable ? (
+              <>
+                La biblioteca no está disponible en este despliegue público: el
+                corpus con derechos de autor y su índice vectorial viven sólo en
+                la máquina local. Ejecuta la app en local para consultarlo.
+              </>
+            ) : (
+              `Error: ${failure.detail}`
+            )}
           </div>
         )}
 
