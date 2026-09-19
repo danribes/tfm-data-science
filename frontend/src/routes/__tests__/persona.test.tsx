@@ -16,6 +16,14 @@ const ui = (id: string) =>
     </QueryClientProvider>,
   );
 
+/** Every profile now opens on its question set, so the gauges, semaphore and
+ *  chains these tests assert live behind the toggle. */
+async function openFullPanel() {
+  const showAll = document.querySelector<HTMLButtonElement>(".show-all");
+  if (showAll) fireEvent.click(showAll);
+  await waitFor(() => expect(document.querySelectorAll(".out").length).toBeGreaterThan(0));
+}
+
 describe("Persona — generic renderer over the API card", () => {
   beforeEach(() => {
     queryClient.clear();
@@ -27,8 +35,7 @@ describe("Persona — generic renderer over the API card", () => {
     // Profiles with a question set open on the question, not the full panel;
     // this asserts the generic renderer, so open it where that toggle exists.
     await waitFor(() => expect(document.querySelector(".head h1")).not.toBeNull());
-    const showAll = document.querySelector<HTMLButtonElement>(".show-all");
-    if (showAll) fireEvent.click(showAll);
+    await openFullPanel();
     await waitFor(() => expect(document.querySelectorAll(".out")).toHaveLength(5));
     expect(document.querySelectorAll(".rl-item")).toHaveLength(3);
     expect(document.querySelectorAll(".ch").length).toBeGreaterThanOrEqual(3);
@@ -40,6 +47,7 @@ describe("Persona — generic renderer over the API card", () => {
     ui("01");
     await waitFor(() =>
       expect(screen.getByText("💼 Inversor en bonos: ¿me pagarán los 10 años?")).toBeInTheDocument());
+    await openFullPanel();
     expect(screen.getByText("Bono 10A España")).toBeInTheDocument();
     // Appears twice by design: the head's provenance line lists all 6 sources for the
     // card, and the historical-chart caption cites the one source behind that series.
@@ -48,6 +56,8 @@ describe("Persona — generic renderer over the API card", () => {
 
   it("persona 02's ipvreal red evaluates without crashing (handoff note 3: 12,8 − 3,0 = 9,8 → cerca)", async () => {
     ui("02");
+    await waitFor(() => expect(document.querySelector(".head h1")).not.toBeNull());
+    await openFullPanel();
     await waitFor(() => expect(screen.getByText(/IPV real a\/a > 10 %/)).toBeInTheDocument());
     const row = screen.getByText(/IPV real a\/a > 10 %/).closest(".rl-item")!;
     expect(row.querySelector(".st")!.className).toContain("near");
