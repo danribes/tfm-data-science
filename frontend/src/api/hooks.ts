@@ -25,6 +25,8 @@ export const useConstants = () => useQuery({ queryKey: ["constants"], queryFn: a
 export const usePersonas = () => useQuery({ queryKey: ["personas"], queryFn: api.personas, ...STATIC });
 export const usePresets = () => useQuery({ queryKey: ["presets"], queryFn: api.presets, ...STATIC });
 export const useRedlines = () => useQuery({ queryKey: ["redlines"], queryFn: api.redlines, ...STATIC });
+export const usePrediction = () => useQuery({ queryKey: ["prediction"], queryFn: api.prediction, ...STATIC });
+export const useEvidence = () => useQuery({ queryKey: ["evidence"], queryFn: api.evidence, ...STATIC });
 
 /** Debounced value: trails `value` by `ms` (spec §3: MC debounced 400 ms). */
 export function useDebounced<T>(value: T, ms: number): T {

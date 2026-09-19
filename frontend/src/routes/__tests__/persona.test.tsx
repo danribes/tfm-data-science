@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -24,6 +24,11 @@ describe("Persona — generic renderer over the API card", () => {
 
   it.each(SHIPPED_IDS)("persona %s renders h1, gauges, reds, chains, narrative", async (id) => {
     ui(id);
+    // Profiles with a question set open on the question, not the full panel;
+    // this asserts the generic renderer, so open it where that toggle exists.
+    await waitFor(() => expect(document.querySelector(".head h1")).not.toBeNull());
+    const showAll = document.querySelector<HTMLButtonElement>(".show-all");
+    if (showAll) fireEvent.click(showAll);
     await waitFor(() => expect(document.querySelectorAll(".out")).toHaveLength(5));
     expect(document.querySelectorAll(".rl-item")).toHaveLength(3);
     expect(document.querySelectorAll(".ch").length).toBeGreaterThanOrEqual(3);

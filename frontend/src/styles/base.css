@@ -363,3 +363,49 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .tunnel-err { font-size: 12.5px; color: var(--div-neg); line-height: 1.5; margin: 0; }
 .tunnel-note code { font-size: 12px; word-break: break-all; }
 @media (max-width: 640px) { .tunnel-row { flex-direction: column; } }
+
+/* --- persona: ask-first layout --- */
+.ask-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: var(--sp-2); }
+.ask-hint { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0 0 var(--sp-2); max-width: 62ch; }
+.example-chip.on { border-style: solid; border-color: var(--accent); color: var(--accent); }
+.show-all { display: block; margin: var(--sp-2) 0; border: none; background: none; padding: 0; font: inherit; font-size: 13px; color: var(--muted); cursor: pointer; }
+.show-all:hover { color: var(--accent); }
+
+/* --- the answer --- */
+.answer { display: flex; flex-direction: column; gap: var(--sp-2); }
+.answer-headline { display: flex; flex-direction: column; gap: 4px; }
+.answer-q { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 700; }
+.answer-value { font-size: 40px; font-weight: 800; line-height: 1.1; color: var(--ink); }
+.answer-value small { font-size: 15px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+.answer-delta { font-size: 14px; color: var(--ink-2); margin: 0; }
+.answer-charts { display: grid; grid-template-columns: 1fr; gap: var(--sp-2); }
+.answer-charts.two { grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { .answer-charts.two { grid-template-columns: 1fr; } }
+
+/* --- evidence layers --- */
+.layers { display: flex; flex-direction: column; gap: 6px; }
+.layer { border: 1px solid var(--grid); border-radius: var(--rad-chip); overflow: hidden; }
+.layer.open { border-color: var(--accent); }
+.layer-head { width: 100%; display: flex; align-items: center; gap: 10px; background: var(--surface); border: none; padding: 10px 14px; cursor: pointer; font-family: inherit; text-align: left; }
+.layer-tag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--page); background: var(--muted); border-radius: var(--rad-pill); padding: 2px 8px; flex: none; }
+.layer.open .layer-tag { background: var(--accent); }
+.layer-title { flex: 1; font-size: 14px; font-weight: 600; color: var(--ink); }
+.layer-caret { color: var(--muted); font-size: 12px; }
+.layer-body { padding: 12px 14px 14px; font-size: 13.5px; line-height: 1.65; color: var(--ink-2); border-top: 1px solid var(--grid); }
+.layer-body p { margin: 0 0 8px; }
+.layer-body p:last-child { margin: 0; }
+.layer-note { font-size: 12.5px; color: var(--muted); }
+.layer-warn { font-size: 13px; color: var(--div-neg); line-height: 1.6; }
+.layer-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.layer-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.layer-table th { text-align: right; font-weight: 700; color: var(--muted); padding: 3px 8px; border-bottom: 1px solid var(--grid); }
+.layer-table th:first-child { text-align: left; }
+.layer-table td { text-align: right; padding: 3px 8px; }
+.layer-table td:first-child { text-align: left; }
+.layer-table td.ok { color: var(--div-pos); font-weight: 700; }
+.layer-table td.bad { color: var(--div-neg); font-weight: 700; }
+.muted { color: var(--muted); }
+
+/* --- follow-ups --- */
+.followups { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.followups-lab { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
