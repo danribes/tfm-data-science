@@ -409,3 +409,4 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 /* --- follow-ups --- */
 .followups { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .followups-lab { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.ask-nomatch { font-size: 13.5px; color: var(--div-neg); line-height: 1.6; margin: 0; }

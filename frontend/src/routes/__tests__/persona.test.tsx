@@ -75,3 +75,32 @@ describe("Persona — generic renderer over the API card", () => {
     expect(await screen.findByText(/perfil no disponible/i)).toBeInTheDocument();
   });
 });
+
+describe("Persona — the free-text box", () => {
+  beforeEach(() => {
+    queryClient.clear();
+    useScenarioStore.getState().resetAll();
+  });
+
+  it("answers a question typed without accents", async () => {
+    ui("03");
+    await waitFor(() => expect(document.querySelector(".consulta-input")).not.toBeNull());
+    // «cuanto» must reach «¿Cuánto…»: Spanish is routinely typed unaccented.
+    fireEvent.change(document.querySelector(".consulta-input")!, {
+      target: { value: "cuanto pagare de hipoteca" },
+    });
+    fireEvent.submit(document.querySelector(".consulta-form")!);
+    await waitFor(() => expect(document.querySelector(".answer-value")).not.toBeNull());
+  });
+
+  it("says so when it cannot answer, instead of doing nothing", async () => {
+    ui("03");
+    await waitFor(() => expect(document.querySelector(".consulta-input")).not.toBeNull());
+    fireEvent.change(document.querySelector(".consulta-input")!, {
+      target: { value: "quien ganara las elecciones" },
+    });
+    fireEvent.submit(document.querySelector(".consulta-form")!);
+    await waitFor(() => expect(document.querySelector(".ask-nomatch")).not.toBeNull());
+    expect(document.querySelector(".answer-value")).toBeNull();
+  });
+});

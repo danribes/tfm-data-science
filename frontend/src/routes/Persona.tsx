@@ -16,6 +16,10 @@ import { SHIPPED_IDS, getPersonaModule } from "../personas/registry";
 import { questionsFor } from "../personas/questions";
 import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 
+/** Lowercase and strip diacritics, so «cuánto» and «cuanto» are one word. */
+const norm = (s: string): string =>
+  s.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
 export default function Persona() {
   const { id } = useParams<{ id: string }>();
   const personas = usePersonas();
@@ -33,11 +37,12 @@ export default function Persona() {
   const [askedId, setAskedId] = useState<string | null>(null);
   const [typed, setTyped] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [noMatch, setNoMatch] = useState(false);
   const asked = questions.find((q) => q.id === askedId) ?? null;
 
   // A new profile is a new conversation; carrying the previous answer over
   // would attach it to a persona whose question set may not contain it.
-  useEffect(() => { setAskedId(null); setTyped(""); setShowAll(false); }, [id]);
+  useEffect(() => { setAskedId(null); setTyped(""); setShowAll(false); setNoMatch(false); }, [id]);
 
   useEffect(() => {
     // When a question is on screen, the levers it names are the ones worth
@@ -82,18 +87,31 @@ export default function Persona() {
 
   /** Match free text to the question set. Nothing is answered that was not
    *  bound to a series: a scenario engine cannot answer an arbitrary question,
-   *  and guessing is how a tool starts making things up. */
+   *  and guessing is how a tool starts making things up.
+   *
+   *  Accents are stripped on both sides. Spanish is routinely typed without
+   *  them, and «cuanto costara» failing to match «¿Cuánto costará…» is the
+   *  normal case, not an edge one. */
   const submitTyped = () => {
-    const t = typed.trim().toLowerCase();
+    const t = norm(typed);
     if (t.length < 3) return;
-    const words = t.split(/\s+/).filter((w) => w.length > 3);
+    const words = t.split(/\s+/).filter((w) => w.length > 2);
     let best: { id: string; score: number } | null = null;
     for (const q of questions) {
-      const hay = `${q.text} ${q.concept ?? ""}`.toLowerCase();
+      const hay = norm(`${q.text} ${q.concept ?? ""} ${q.mechanism}`);
       const score = words.reduce((n, w) => n + (hay.includes(w) ? 1 : 0), 0);
       if (score > 0 && (!best || score > best.score)) best = { id: q.id, score };
     }
-    if (best) { setAskedId(best.id); setTyped(""); }
+    if (best) {
+      setAskedId(best.id);
+      setTyped("");
+      setNoMatch(false);
+    } else {
+      // Saying nothing looks identical to a broken button. The reader has to
+      // learn that this box answers a bounded set, and the only honest moment
+      // to teach that is when their question falls outside it.
+      setNoMatch(true);
+    }
   };
 
   // Profiles without a question set keep the original full page.
@@ -116,20 +134,27 @@ export default function Persona() {
             <input
               className="consulta-input"
               value={typed}
-              onChange={(e) => setTyped(e.target.value)}
+              onChange={(e) => { setTyped(e.target.value); setNoMatch(false); }}
               placeholder={`Pregunta sobre ${card.h1.toLowerCase()}…`}
             />
             <button type="submit" className="consulta-btn" disabled={typed.trim().length < 3}>
               Preguntar
             </button>
           </form>
+          {noMatch && (
+            <p className="ask-nomatch">
+              No sé responder a eso con este motor. Calcula escenarios sobre un
+              conjunto acotado de series, así que sólo puedo contestar a lo que
+              sale de él — elige una de estas:
+            </p>
+          )}
           <ul className="consulta-examples">
             {questions.map((q) => (
               <li key={q.id}>
                 <button
                   type="button"
                   className={q.id === askedId ? "example-chip on" : "example-chip"}
-                  onClick={() => setAskedId(q.id)}
+                  onClick={() => { setAskedId(q.id); setNoMatch(false); }}
                 >
                   {q.text}
                 </button>
