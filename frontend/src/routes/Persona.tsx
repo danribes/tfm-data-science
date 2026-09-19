@@ -13,8 +13,10 @@ import { ProjectionChart } from "../components/ProjectionChart";
 import { Semaphore } from "../components/Semaphore";
 import { Stamp } from "../components/Stamp";
 import { SHIPPED_IDS, getPersonaModule } from "../personas/registry";
-import { matchQuestion, questionsFor } from "../personas/questions";
+import { matchQuestion, questionsFor, type PersonaQuestion } from "../personas/questions";
+import { api } from "../api/client";
 import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
+import type { LeverId } from "../engine/levers";
 
 export default function Persona() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +28,8 @@ export default function Persona() {
   const horizon = useScenarioStore((s) => s.horizon);
   const setHotIds = useScenarioStore((s) => s.setHotIds);
   const setChartsHidden = useScenarioStore((s) => s.setChartsHidden);
+  const setHorizon = useScenarioStore((s) => s.setHorizon);
+  const setLever = useScenarioStore((s) => s.setLever);
   const card = personas.data?.personas.find((c) => c.id === id);
   const mod = id ? getPersonaModule(id) : undefined;
 
@@ -34,11 +38,18 @@ export default function Persona() {
   const [typed, setTyped] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [noMatch, setNoMatch] = useState(false);
-  const asked = questions.find((q) => q.id === askedId) ?? null;
+  const [asking, setAsking] = useState(false);
+  const [refusal, setRefusal] = useState<string | null>(null);
+  //: A question the resolver answered with a series no canned question covers.
+  const [adHoc, setAdHoc] = useState<PersonaQuestion | null>(null);
+  const asked = askedId === "adhoc" ? adHoc : (questions.find((q) => q.id === askedId) ?? null);
 
   // A new profile is a new conversation; carrying the previous answer over
   // would attach it to a persona whose question set may not contain it.
-  useEffect(() => { setAskedId(null); setTyped(""); setShowAll(false); setNoMatch(false); }, [id]);
+  useEffect(() => {
+    setAskedId(null); setTyped(""); setShowAll(false);
+    setNoMatch(false); setRefusal(null); setAdHoc(null);
+  }, [id]);
 
   useEffect(() => {
     // When a question is on screen, the levers it names are the ones worth
@@ -81,17 +92,12 @@ export default function Persona() {
     calibrated_v16: cmp.calibrated,
   }));
 
-  /** Match free text to the question set. Nothing is answered that was not
-   *  bound to a series: a scenario engine cannot answer an arbitrary question,
-   *  and guessing is how a tool starts making things up.
-   *
-   *  Accents are stripped on both sides. Spanish is routinely typed without
-   *  them, and «cuanto costara» failing to match «¿Cuánto costará…» is the
-   *  normal case, not an edge one. */
-  const submitTyped = () => {
-    const hit = matchQuestion(typed, questions);
+  /** Keyword matching, which is the floor this never drops below. */
+  const submitLocal = (text: string) => {
+    const hit = matchQuestion(text, questions);
     if (hit) {
       setAskedId(hit.id);
+      setAdHoc(null);
       setTyped("");
       setNoMatch(false);
     } else {
@@ -100,6 +106,54 @@ export default function Persona() {
       // to teach that is when their question falls outside it.
       setNoMatch(true);
     }
+  };
+
+  const submitTyped = () => {
+    const text = typed.trim();
+    if (text.length < 3) return;
+    setAsking(true);
+    setRefusal(null);
+    setNoMatch(false);
+
+    api.ask({ question: text })
+      .then((res) => {
+        if (!res.series) {
+          // A refusal is an answer. Show the model's own sentence rather than
+          // the generic note: it says what specifically cannot be computed.
+          setRefusal(res.refusal ?? "Eso queda fuera de lo que calcula el motor.");
+          setAskedId(null);
+          setAdHoc(null);
+          return;
+        }
+        // The question may name a year and a scenario, not just a subject.
+        // Applying them is the point: the reader asked about 2040 at a 5 %
+        // Euríbor, so that is the scenario the answer should be computed on.
+        if (res.year) setHorizon(res.year);
+        for (const [id, value] of Object.entries(res.levers ?? {})) {
+          setLever(id as LeverId, value);
+        }
+        const canned = questions.find((q) => q.series === res.series);
+        if (canned) {
+          setAskedId(canned.id);
+          setAdHoc(null);
+        } else {
+          // No canned question covers this series. Answer anyway: /explain
+          // narrates whichever series it is handed, so the mechanism drawer is
+          // filled from the engine rather than left blank.
+          setAdHoc({
+            id: "adhoc",
+            text,
+            series: res.series as AnySeriesKey,
+            mechanism: "",
+            levers: Object.keys(res.levers ?? {}) as PersonaQuestion["levers"],
+            followUps: [],
+          });
+          setAskedId("adhoc");
+        }
+        setTyped("");
+      })
+      .catch(() => submitLocal(text))   // 503, offline, anything: use the floor
+      .finally(() => setAsking(false));
   };
 
   // Profiles without a question set keep the original full page.
@@ -122,13 +176,15 @@ export default function Persona() {
             <input
               className="consulta-input"
               value={typed}
-              onChange={(e) => { setTyped(e.target.value); setNoMatch(false); }}
+              onChange={(e) => { setTyped(e.target.value); setNoMatch(false); setRefusal(null); }}
               placeholder={`Pregunta sobre ${card.h1.toLowerCase()}…`}
             />
-            <button type="submit" className="consulta-btn" disabled={typed.trim().length < 3}>
-              Preguntar
+            <button type="submit" className="consulta-btn"
+                    disabled={asking || typed.trim().length < 3}>
+              {asking ? "…" : "Preguntar"}
             </button>
           </form>
+          {refusal && <p className="ask-nomatch">{refusal}</p>}
           {noMatch && (
             <p className="ask-nomatch">
               No sé responder a eso con este motor. Calcula escenarios sobre un
@@ -142,7 +198,7 @@ export default function Persona() {
                 <button
                   type="button"
                   className={q.id === askedId ? "example-chip on" : "example-chip"}
-                  onClick={() => { setAskedId(q.id); setNoMatch(false); }}
+                  onClick={() => { setAskedId(q.id); setAdHoc(null); setNoMatch(false); setRefusal(null); }}
                 >
                   {q.text}
                 </button>

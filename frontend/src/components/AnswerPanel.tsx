@@ -100,7 +100,7 @@ export function AnswerPanel({
 
       <div className="layers">
         <Layer tag="motor" title="Cómo se calcula este número">
-          <p>{q.mechanism}</p>
+          {q.mechanism && <p>{q.mechanism}</p>}
           {explain.isSuccess && (
             <>
               <p>{explain.data.mecanismo}</p>

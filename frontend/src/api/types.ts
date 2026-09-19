@@ -371,3 +371,15 @@ export interface AnalogResponse extends ApiMeta {
 }
 
 export type AnalogRequest = ScenarioRequest;
+
+// ---- /ask: free text -> a query the engine can run, or a refusal ----
+export interface AskRequest { question: string }
+export interface AskResponse extends ApiMeta {
+  /** null when nothing in the engine answers the question. */
+  series: string | null;
+  year: number | null;
+  levers: Record<string, number>;
+  /** Present when the engine cannot answer, and shown instead of a number. */
+  refusal: string | null;
+  model?: string | null;
+}

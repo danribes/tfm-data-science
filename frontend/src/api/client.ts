@@ -3,6 +3,7 @@ import type {
   MonteCarloRequest, MonteCarloResponse,
   Passage,
   PersonasResponse, PredictionResponse, PresetsResponse,
+  AskRequest, AskResponse,
   RagChatRequest, RagChatResponse, RagCollectionsResponse, RagEvalResponse,
   RegimesResponse,
   RagSearchRequest, RagSearchResponse,
@@ -134,6 +135,8 @@ export const api = {
     }),
   explain: (body: ExplainRequest, signal?: AbortSignal) =>
     request<ExplainResponse>("/explain", { method: "POST", body: JSON.stringify(body), signal }),
+  ask: (body: AskRequest, signal?: AbortSignal) =>
+    request<AskResponse>("/ask", { method: "POST", body: JSON.stringify(body), signal }),
   evidence: () => request<EvidenceResponse>("/evidence"),
   prediction: () => request<PredictionResponse>("/prediction"),
   distress: () => request<DistressResponse>("/distress"),
