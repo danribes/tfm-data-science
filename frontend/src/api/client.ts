@@ -10,7 +10,42 @@ import type {
   ScenarioResponse, SensitivityResponse, StateDependenceResponse, VintageResponse,
 } from "./types";
 
-export const API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+/** Where this build points by default: the public API, or localhost in dev. */
+const BUILD_API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+
+const API_OVERRIDE_KEY = "evo.apiBase";
+
+function readOverride(): string | null {
+  try {
+    const v = localStorage.getItem(API_OVERRIDE_KEY);
+    return v && v.trim() ? v.trim().replace(/\/+$/, "") : null;
+  } catch {
+    return null; // private mode / blocked storage
+  }
+}
+
+/** Live binding: importers see reassignments made by `setApiBase`.
+ *
+ *  The copyrighted corpus never ships to the public deploy, so the only way to
+ *  query it from the published frontend is to point this at a tunnel to the
+ *  machine that holds the index. The URL of a cloudflared quick tunnel is new
+ *  on every run, which is why this is runtime state and not a build-time env. */
+export let API_BASE: string = readOverride() ?? BUILD_API_BASE;
+
+/** Repoint every API call. `null` restores the build-time default. */
+export function setApiBase(url: string | null): void {
+  const clean = url?.trim().replace(/\/+$/, "") || null;
+  try {
+    if (clean) localStorage.setItem(API_OVERRIDE_KEY, clean);
+    else localStorage.removeItem(API_OVERRIDE_KEY);
+  } catch {
+    /* storage unavailable — the override still applies for this page view */
+  }
+  API_BASE = clean ?? BUILD_API_BASE;
+}
+
+/** The build-time target, for telling the reader what "restore" would mean. */
+export const DEFAULT_API_BASE = BUILD_API_BASE;
 
 export class ApiError extends Error {
   endpoint: string;

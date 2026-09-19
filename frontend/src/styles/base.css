@@ -344,3 +344,18 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .passages-list { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .consulta-err { color: var(--div-neg); font-size: 13.5px; margin: 0; }
 @media (max-width: 640px) { .consulta-form { flex-direction: column; } .consulta-btn { width: 100%; } }
+
+/* --- local-corpus tunnel --- */
+.link-btn { background: none; border: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+.tunnel { border: 1px dashed var(--grid); border-radius: var(--rad-chip); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.tunnel.on { border-style: solid; border-color: var(--accent); }
+.tunnel-lab { font-size: 12.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.tunnel-row { display: flex; gap: 8px; }
+.tunnel-input { flex: 1; border: 1px solid var(--grid); background: var(--surface); color: var(--ink); border-radius: var(--rad-chip); padding: 8px 12px; font-size: 13.5px; font-family: ui-monospace, monospace; }
+.tunnel-input:focus { outline: none; border-color: var(--accent); }
+.tunnel-btn { border: 1px solid var(--accent); background: var(--accent); color: var(--page); border-radius: var(--rad-chip); padding: 8px 16px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.tunnel-btn:disabled { opacity: .5; cursor: default; }
+.tunnel-btn.off { background: none; color: var(--muted); border-color: var(--grid); }
+.tunnel-note { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
+.tunnel-note code { font-size: 12px; word-break: break-all; }
+@media (max-width: 640px) { .tunnel-row { flex-direction: column; } }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ragChatStream } from "../api/client";
+import { ragChatStream, setApiBase, API_BASE, DEFAULT_API_BASE } from "../api/client";
 import type { Passage, RagChatResponse } from "../api/types";
 
 type Failure = { status?: number; detail: string };
@@ -31,6 +31,28 @@ export default function Consulta() {
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<Failure | null>(null);
   const answerRef = useRef<HTMLDivElement>(null);
+
+  const [tunnel, setTunnel] = useState(
+    API_BASE === DEFAULT_API_BASE ? "" : API_BASE,
+  );
+  const [linked, setLinked] = useState(API_BASE !== DEFAULT_API_BASE);
+  const [showLink, setShowLink] = useState(false);
+
+  const connect = () => {
+    const url = tunnel.trim().replace(/\/+$/, "");
+    if (!url) return;
+    setApiBase(url);
+    setTunnel(url);
+    setLinked(true);
+    setFailure(null);
+  };
+
+  const disconnect = () => {
+    setApiBase(null);
+    setTunnel("");
+    setLinked(false);
+    setFailure(null);
+  };
 
   const answerText = answer?.answer ?? streamed;
 
@@ -128,11 +150,66 @@ export default function Consulta() {
               <>
                 La biblioteca no está disponible en este despliegue público: el
                 corpus con derechos de autor y su índice vectorial viven sólo en
-                la máquina local. Ejecuta la app en local para consultarlo.
+                la máquina local.{" "}
+                <button
+                  type="button"
+                  className="link-btn"
+                  onClick={() => setShowLink(true)}
+                >
+                  Conectar con la máquina local
+                </button>{" "}
+                si tienes la dirección del túnel.
               </>
             ) : (
               `Error: ${failure.detail}`
             )}
+          </div>
+        )}
+
+        {(showLink || linked) && (
+          <div className={linked ? "tunnel on" : "tunnel"}>
+            <label className="tunnel-lab" htmlFor="tunnel-url">
+              Corpus local — dirección del túnel
+            </label>
+            <div className="tunnel-row">
+              <input
+                id="tunnel-url"
+                className="tunnel-input"
+                value={tunnel}
+                onChange={(e) => setTunnel(e.target.value)}
+                placeholder="https://algo-aleatorio.trycloudflare.com"
+                spellCheck={false}
+              />
+              {linked ? (
+                <button type="button" className="tunnel-btn off" onClick={disconnect}>
+                  Desconectar
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="tunnel-btn"
+                  onClick={connect}
+                  disabled={!tunnel.trim()}
+                >
+                  Conectar
+                </button>
+              )}
+            </div>
+            <p className="tunnel-note">
+              {linked ? (
+                <>
+                  Conectado a <code>{API_BASE}</code>. El corpus se sirve desde
+                  la máquina local y sólo responde mientras el túnel esté
+                  abierto.
+                </>
+              ) : (
+                <>
+                  Los libros tienen derechos de autor y no se publican: se
+                  consultan a través de un túnel temporal a la máquina donde
+                  vive el índice.
+                </>
+              )}
+            </p>
           </div>
         )}
 
