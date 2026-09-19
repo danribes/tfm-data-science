@@ -15,7 +15,28 @@ const BUILD_API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localhos
 
 const API_OVERRIDE_KEY = "evo.apiBase";
 
+/** `?api=reset` clears the override before anything renders.
+ *
+ *  The in-app button cannot be the only way out. The health check gates the
+ *  whole app, so once an override stops answering, every escape that depends on
+ *  the app rendering is already gone — the reader is left on a retry screen
+ *  with no way back. A URL they can type always works. */
+function consumeResetParam(): boolean {
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get("api") !== "reset") return false;
+    localStorage.removeItem(API_OVERRIDE_KEY);
+    params.delete("api");
+    const qs = params.toString();
+    history.replaceState(null, "", location.pathname + (qs ? `?${qs}` : "") + location.hash);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function readOverride(): string | null {
+  if (consumeResetParam()) return null;
   try {
     const v = localStorage.getItem(API_OVERRIDE_KEY);
     return v && v.trim() ? v.trim().replace(/\/+$/, "") : null;
