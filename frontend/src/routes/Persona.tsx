@@ -13,12 +13,8 @@ import { ProjectionChart } from "../components/ProjectionChart";
 import { Semaphore } from "../components/Semaphore";
 import { Stamp } from "../components/Stamp";
 import { SHIPPED_IDS, getPersonaModule } from "../personas/registry";
-import { questionsFor } from "../personas/questions";
+import { matchQuestion, questionsFor } from "../personas/questions";
 import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
-
-/** Lowercase and strip diacritics, so «cuánto» and «cuanto» are one word. */
-const norm = (s: string): string =>
-  s.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
 export default function Persona() {
   const { id } = useParams<{ id: string }>();
@@ -93,17 +89,9 @@ export default function Persona() {
    *  them, and «cuanto costara» failing to match «¿Cuánto costará…» is the
    *  normal case, not an edge one. */
   const submitTyped = () => {
-    const t = norm(typed);
-    if (t.length < 3) return;
-    const words = t.split(/\s+/).filter((w) => w.length > 2);
-    let best: { id: string; score: number } | null = null;
-    for (const q of questions) {
-      const hay = norm(`${q.text} ${q.concept ?? ""} ${q.mechanism}`);
-      const score = words.reduce((n, w) => n + (hay.includes(w) ? 1 : 0), 0);
-      if (score > 0 && (!best || score > best.score)) best = { id: q.id, score };
-    }
-    if (best) {
-      setAskedId(best.id);
+    const hit = matchQuestion(typed, questions);
+    if (hit) {
+      setAskedId(hit.id);
       setTyped("");
       setNoMatch(false);
     } else {

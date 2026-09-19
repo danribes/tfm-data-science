@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PERSONA_QUESTIONS, questionsFor } from "../questions";
+import { PERSONA_QUESTIONS, matchQuestion, questionsFor } from "../questions";
 import { SHIPPED_IDS } from "../registry";
 import { ALL_SERIES_KEYS } from "../../engine/derived";
 import { LEVER_SPECS } from "../../engine/levers";
@@ -45,5 +45,41 @@ describe("persona question sets", () => {
       expect(q.mechanism.length, `${pid}/${q.id}: mechanism too short`).toBeGreaterThan(40);
       expect(q.text.endsWith("?"), `${pid}/${q.id}: not a question`).toBe(true);
     }
+  });
+});
+
+describe("matchQuestion", () => {
+  const q01 = questionsFor("01");
+
+  it("resolves an unaccented paraphrase to the right question", () => {
+    expect(matchQuestion("cuanto llega la deuda publica", q01)?.id).toBe("deuda");
+    expect(matchQuestion("que cupon me pagara el bono", q01)?.id).toBe("cupon");
+    expect(matchQuestion("cuanto se va en intereses", q01)?.id).toBe("intereses");
+  });
+
+  it("refuses questions this profile cannot answer", () => {
+    // Each of these used to answer the bond-coupon question, because a
+    // stopword like «cuando» or «que» appears in some mechanism sentence and
+    // a single hit was enough to win.
+    for (const q of [
+      "cuando bajara el paro",
+      "que pasa con las pensiones",
+      "cuanto costara una vivienda",
+      "habra recesion en españa",
+      "me conviene comprar bonos ahora",
+    ]) {
+      expect(matchQuestion(q, q01), q).toBeNull();
+    }
+  });
+
+  it("ignores stopword-only input", () => {
+    expect(matchQuestion("que pasa con esto", q01)).toBeNull();
+    expect(matchQuestion("   ", q01)).toBeNull();
+  });
+
+  it("does not let the mechanism outvote the question's own wording", () => {
+    // «deuda» is in the deuda question's title and in the cupon question's
+    // mechanism; the title has to win.
+    expect(matchQuestion("deuda publica", q01)?.id).toBe("deuda");
   });
 });

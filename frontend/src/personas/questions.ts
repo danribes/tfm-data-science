@@ -599,3 +599,57 @@ export const PERSONA_QUESTIONS: Record<string, PersonaQuestion[]> = {
 
 export const questionsFor = (id: string): PersonaQuestion[] =>
   PERSONA_QUESTIONS[id] ?? [];
+
+/** Lowercase and strip diacritics: Spanish is routinely typed unaccented. */
+export const norm = (s: string): string =>
+  s.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+/** Words that carry no topic. Matching on these is worse than not matching:
+ *  «cuando» appears in a mechanism sentence about spread feedback, so a
+ *  question about unemployment scored a hit on the bond-coupon question and
+ *  answered it. A wrong answer that looks confident beats no answer only for
+ *  whoever is measuring engagement. */
+const STOPWORDS = new Set([
+  "que", "qué", "como", "cuando", "cuanto", "cuanta", "cuantos", "cuantas",
+  "donde", "quien", "cual", "cuales", "por", "para", "con", "sin", "del",
+  "las", "los", "una", "uno", "unos", "unas", "the", "esta", "este", "esto",
+  "estos", "estas", "ese", "esa", "eso", "mas", "menos", "muy", "hay",
+  "ser", "soy", "son", "sera", "seran", "tiene", "tengo", "voy", "vas",
+  "pasa", "pasara", "sale", "saldra", "queda", "quedara", "sigue", "año",
+  "anos", "años", "ano", "pero", "and", "yo", "mi", "me", "te", "se", "lo",
+  "la", "el", "en", "de", "al", "un", "es", "si", "no", "ya", "hasta",
+]);
+
+const content = (s: string): string[] =>
+  norm(s).split(/[^a-z0-9ñ]+/).filter((w) => w.length > 2 && !STOPWORDS.has(w));
+
+/** Resolve free text to a bound question, or null when nothing fits.
+ *
+ *  The question's own wording counts for most, the concept next, the mechanism
+ *  least — the mechanism is engine prose and shares vocabulary with every other
+ *  question in the set, so letting it decide picks whichever question happens
+ *  to be first. A single weak hit is not enough to answer on. */
+export function matchQuestion(
+  text: string,
+  questions: PersonaQuestion[],
+): PersonaQuestion | null {
+  const words = content(text);
+  if (!words.length) return null;
+
+  let best: { q: PersonaQuestion; score: number } | null = null;
+  for (const q of questions) {
+    const inText = new Set(content(q.text));
+    const inConcept = new Set(content(q.concept ?? ""));
+    const inMech = new Set(content(q.mechanism));
+    let score = 0;
+    for (const w of words) {
+      if (inText.has(w)) score += 3;
+      else if (inConcept.has(w)) score += 2;
+      else if (inMech.has(w)) score += 1;
+    }
+    if (score > (best?.score ?? 0)) best = { q, score };
+  }
+  // 3 = one solid hit on the question's own wording, or a concept hit plus a
+  // mechanism one. Below that the match is coincidence.
+  return best && best.score >= 3 ? best.q : null;
+}
