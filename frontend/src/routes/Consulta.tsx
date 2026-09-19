@@ -101,6 +101,14 @@ export default function Consulta() {
         <span className="meta">
           Respondo con los textos del corpus de referencia — con cita o sin respuesta.
         </span>
+        <button
+          type="button"
+          className={linked ? "corpus-pill on" : "corpus-pill"}
+          onClick={() => setShowLink((v) => !v)}
+          title={linked ? API_BASE : "Conectar con el corpus de la máquina local"}
+        >
+          {linked ? "● corpus local" : "○ corpus no conectado"}
+        </button>
       </div>
 
       <div className="card consulta-card">

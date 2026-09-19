@@ -347,6 +347,9 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 
 /* --- local-corpus tunnel --- */
 .link-btn { background: none; border: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+.corpus-pill { margin-left: auto; border: 1px solid var(--grid); background: var(--surface); color: var(--muted); border-radius: var(--rad-pill); padding: 4px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.corpus-pill:hover { border-color: var(--accent); color: var(--accent); }
+.corpus-pill.on { border-color: var(--accent); color: var(--accent); }
 .tunnel { border: 1px dashed var(--grid); border-radius: var(--rad-chip); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .tunnel.on { border-style: solid; border-color: var(--accent); }
 .tunnel-lab { font-size: 12.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
