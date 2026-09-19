@@ -11,6 +11,7 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import { Warnings } from "./components/Warnings";
 import { SHIPPED_IDS } from "./personas/registry";
 import Biblioteca from "./routes/Biblioteca";
+import Consulta from "./routes/Consulta";
 import ComoFunciona from "./routes/ComoFunciona";
 import Evidencia from "./routes/Evidencia";
 import Prediccion from "./routes/Prediccion";
@@ -64,6 +65,7 @@ function Shell() {
           ))}
           <NavLink to="/laboratorio">Laboratorio</NavLink>
           <NavLink to="/biblioteca">Biblioteca</NavLink>
+          <NavLink to="/consulta">Consulta</NavLink>
           <NavLink to="/evidencia">Evidencia</NavLink>
           <NavLink to="/prediccion">Predicción</NavLink>
           <NavLink to="/como-funciona">Cómo funciona</NavLink>
@@ -86,6 +88,7 @@ function Shell() {
               <Route path="/laboratorio" element={<Laboratorio />} />
             </Route>
             <Route path="/biblioteca" element={<Biblioteca />} />
+            <Route path="/consulta" element={<Consulta />} />
             <Route path="/evidencia" element={<Evidencia />} />
             <Route path="/prediccion" element={<Prediccion />} />
             <Route path="/como-funciona" element={<ComoFunciona />} />

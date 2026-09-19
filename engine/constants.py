@@ -48,6 +48,19 @@ E_IPV_G = 1.1    # IPV response to the growth deviation
 RJUV = 2.317     # youth/total unemployment ratio (stable in the 5y series)
 PM_DECAY = 0.45  # geometric decay of the import-price Phillips term (extract L116)
 
+# ---- Expectations regime (see engine/spain.py run_scenario) ----
+# OMEGA: adaptive-expectations weight in the hybrid Phillips curve.
+#   1.0 = pure adaptive (current v16 calibration, default — no behaviour change)
+#   0.0 = fully anchored (ECB target fully credible; inflation always mean-reverts)
+#   0.5 = Galí-Gertler (1999) split: half backward, half anchored
+# ALPHA_SPREAD: endogenous sovereign-spread sensitivity to debt excess.
+#   0.0 = exogenous spread (current default — no behaviour change)
+#   0.04 = ≈4 bp per pp of debt above B_CRIT (Spain 2010-12 episode calibration)
+# B_CRIT: debt/GDP threshold (% PIB) above which spread feedback activates.
+OMEGA         = 1.0    # adaptive weight (1.0 = pure adaptive, default unchanged)
+ALPHA_SPREAD  = 0.0    # pp bono per pp debt excess (0.0 = off, default unchanged)
+B_CRIT        = 110.0  # debt/GDP trigger for spread feedback (% PIB)
+
 # ---- Monte Carlo DSA calibration (fitted against gold_escenarios_deuda_mc.csv;
 #      seed-42 / 4000-path verification: max |dev| vs gold p5/p50/p95 at
 #      2030/2050/2070 = 1.399 pp — see Task 8 / tests/test_anchors.py A5) ----
@@ -179,6 +192,9 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "E_IPV_G", "value": E_IPV_G, "unit": "pp IPV / pp growth", "provenance": _V16},
     {"name": "RJUV", "value": RJUV, "unit": "x", "provenance": _V16 + " · youth/total unemployment ratio, 5y series"},
     {"name": "PM_DECAY", "value": PM_DECAY, "unit": "x", "provenance": _V16 + " · import-price shock decay"},
+    {"name": "OMEGA", "value": OMEGA, "unit": "x", "provenance": "expectations regime: 1.0=adaptive (default), 0.0=anchored — Galí-Gertler (1999) hybrid NKPC"},
+    {"name": "ALPHA_SPREAD", "value": ALPHA_SPREAD, "unit": "pp bono / pp debt", "provenance": "endogenous spread: 0.0=off (default), 0.04=Spain 2010-12 calibration"},
+    {"name": "B_CRIT", "value": B_CRIT, "unit": "% PIB", "provenance": "debt/GDP threshold above which spread feedback activates"},
     {"name": "CAL_SALARIO_MES", "value": CAL_SALARIO_MES, "unit": "EUR/mes", "provenance": "kpis_perfiles.json salario_medio 24497 / 14 (build_v16 calib)"},
     {"name": "GENERIC_OKUN", "value": OKUN_COEFFICIENT, "unit": "pp u / pp GDP", "provenance": "engine.generic.OKUN_COEFFICIENT (generic engine calibrated default, literature 0.3-0.5), NOT country-specific — distinct from Spain's 0.48"},
     {"name": "GENERIC_PHILLIPS", "value": PHILLIPS_SLOPE, "unit": "pp pi / pp gap", "provenance": "engine.generic.PHILLIPS_SLOPE (generic engine calibrated default, NOT country-specific — distinct from Spain's 0.22)"},

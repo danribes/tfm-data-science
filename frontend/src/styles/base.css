@@ -320,3 +320,27 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .dv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: var(--rad-pill); border: 1px solid var(--grid); background: var(--surface); color: var(--ink-2); cursor: pointer; }
 .dv:hover { border-color: var(--lab); color: var(--lab); }
 .dv.on { background: var(--lab); color: #fff; border-color: var(--lab); }
+
+/* --- /consulta --- */
+.consulta { display: flex; flex-direction: column; gap: var(--sp-2); }
+.consulta-card { display: flex; flex-direction: column; gap: var(--sp-1); }
+.consulta-form { display: flex; gap: 10px; }
+.consulta-input { flex: 1; border: 1px solid var(--grid); background: var(--surface); color: var(--ink); border-radius: var(--rad-chip); padding: 12px 16px; font-size: 15.5px; font-family: inherit; }
+.consulta-input:focus { outline: none; border-color: var(--accent); }
+.consulta-btn { border: 1px solid var(--accent); background: var(--accent); color: var(--page); border-radius: var(--rad-chip); padding: 12px 24px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.consulta-btn:disabled { opacity: .5; cursor: default; }
+.consulta-examples { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.example-chip { border: 1px dashed var(--grid); background: none; color: var(--muted); border-radius: var(--rad-chip); padding: 7px 14px; font-size: 13.5px; cursor: pointer; font-family: inherit; text-align: left; transition: border-color .15s, color .15s; }
+.example-chip:hover { border-color: var(--accent); color: var(--accent); }
+.consulta-thread { display: flex; flex-direction: column; gap: var(--sp-1); }
+.consulta-q { font-size: 15px; font-weight: 600; color: var(--ink-2); margin: 0; }
+.consulta-a { font-size: 16px; line-height: 1.75; color: var(--ink); }
+.consulta-a p { margin: 0 0 8px; }
+.consulta-a p:last-child { margin: 0; }
+.thinking { color: var(--muted); font-size: 14px; }
+.cursor { animation: exp-pulse .8s ease-in-out infinite; }
+.consulta-passages { margin-top: 6px; font-size: 13.5px; }
+.consulta-passages summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+.passages-list { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.consulta-err { color: var(--div-neg); font-size: 13.5px; margin: 0; }
+@media (max-width: 640px) { .consulta-form { flex-direction: column; } .consulta-btn { width: 100%; } }

@@ -34,12 +34,45 @@ def french(principal: float, annual_rate_pct: float, n_months: int) -> float:
     return principal * i / (1 - (1 + i) ** (-n_months))
 
 
-def run_scenario(levers: Levers) -> dict[str, list[float]]:
+def run_scenario(
+    levers: Levers,
+    *,
+    omega: float | None = None,
+    alpha_spread: float | None = None,
+    b_crit: float | None = None,
+) -> dict[str, list[float]]:
+    """Run the Spain semi-structural engine.
+
+    Optional keyword-only arguments override the module-level expectations
+    constants without touching the default calibration:
+
+    omega        – adaptive-expectations weight in the hybrid Phillips curve.
+                   1.0 (default) = pure adaptive (v16 baseline, unchanged).
+                   0.0 = fully anchored to the 2 % ECB target.
+                   Intermediate values follow Galí-Gertler (1999): fraction
+                   omega of firms are backward-looking, (1-omega) are anchored.
+                   Effective inertia = omega * THETA.
+
+    alpha_spread – endogenous sovereign spread sensitivity (pp bono per pp of
+                   debt above b_crit).  0.0 (default) = exogenous spread
+                   (v16 baseline, unchanged).  0.04 replicates the Spain
+                   2010-12 episode (≈4 bp per pp of debt above the threshold).
+
+    b_crit       – debt/GDP threshold (% PIB) that activates spread feedback.
+                   Default: c.B_CRIT = 110.0.
+    """
     L, B, V0 = levers, c.BASE_LEVERS, c.V0
     central, olddep = c.load_central(), c.load_olddep()
     R: dict[str, list[float]] = {k: [] for k in SERIES_KEYS}
 
-    bono = L.r + c.TERM + L.prima / 100
+    # Expectations-regime parameters (fall back to module constants)
+    _omega        = c.OMEGA        if omega        is None else omega
+    _alpha_spread = c.ALPHA_SPREAD if alpha_spread is None else alpha_spread
+    _b_crit       = c.B_CRIT      if b_crit       is None else b_crit
+
+    # Effective Phillips inertia: omega=1 → THETA (pure adaptive, unchanged)
+    _theta_eff = _omega * c.THETA
+
     shock = (-(L.sp - B["sp"]) - c.E_R * (L.r - B["r"])
              + c.E_EXT * (L.ext - B["ext"]) - c.E_PM * (L.pm - B["pm"]))
     u_star_dev = c.A_Z * L.z + c.A_TAU * L.tau - c.A_LAM * (L.lam - B["lam"])
@@ -56,11 +89,18 @@ def run_scenario(levers: Levers) -> dict[str, list[float]]:
         lvl = c.RHO * lvl + (1 - c.RHO) * c.MULT * shock       # GDP level deviation (%)
         gap_u = c.OKUN * lvl                                    # slack: u below u*
         u = V0["u"] + u_star_dev - gap_u
-        pi_dev = (c.THETA * pi_dev + c.KAPPA * gap_u
+        # Hybrid Phillips: omega=1 → pure adaptive (v16 baseline);
+        # omega<1 → anchored fraction pulls pi_dev toward 0 (ECB target).
+        pi_dev = (_theta_eff * pi_dev + c.KAPPA * gap_u
                   + c.GAMMA * (L.pm - B["pm"]) * c.PM_DECAY ** k)
         pi = V0["pi"] + pi_dev
         g = V0["g"] + (lvl - prev) + (L.lam - B["lam"])
         gnom = gc["g_nominal"] + (g - V0["g"]) + pi_dev
+
+        # Endogenous sovereign spread: alpha_spread=0 → exogenous (v16 baseline).
+        # Uses b from the *previous* year so the loop stays one-pass (no iteration).
+        _spread_addon = _alpha_spread * max(0.0, b - _b_crit) / 100
+        bono = L.r + c.TERM + L.prima / 100 + _spread_addon
 
         # debt identity b_t = b_{t-1}(1+i)/(1+g) − sp, with 14 %/yr refinancing
         di = di + c.REFI * ((bono - V0["bono"]) - di)
@@ -117,7 +157,7 @@ def run_scenario(levers: Levers) -> dict[str, list[float]]:
         R["auton"].append(V0["auton"] + 0.12 * (u - V0["u"]) - 0.40 * (g - V0["g"]))
         R["hip"].append(max(0.0, V0["hip"] * (1 - 1.6 * (esf / (V0["cuota"] / V0["salmes"] * 100) - 1))))
         R["sobre"].append(V0["sobre"] + 0.18 * (esf - V0["cuota"] / V0["salmes"] * 100))
-        R["bono"].append(bono); R["spread"].append(L.prima); R["r"].append(L.r)
+        R["bono"].append(bono); R["spread"].append(L.prima + _spread_addon * 100); R["r"].append(L.r)
         R["vida"].append(V0["vida"])
     return R
 
