@@ -38,9 +38,41 @@ export default function Consulta() {
   const [linked, setLinked] = useState(API_BASE !== DEFAULT_API_BASE);
   const [showLink, setShowLink] = useState(false);
 
+  /** Why a URL cannot work from *this* page, or null when it can.
+   *
+   *  Both rejections are failures the browser reports as an opaque network
+   *  error, so catching them here is the difference between a clear sentence
+   *  and a reader staring at a retry screen. */
+  const rejectReason = (raw: string): string | null => {
+    let u: URL;
+    try {
+      u = new URL(raw);
+    } catch {
+      return "No parece una dirección válida. Debe empezar por https://";
+    }
+    if (location.protocol === "https:" && u.protocol === "http:") {
+      return "Esta página va por HTTPS y el navegador bloquea las llamadas a http:// (contenido mixto). Usa la dirección https:// del túnel.";
+    }
+    if (
+      /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(u.hostname) &&
+      !/^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname)
+    ) {
+      return "localhost apunta al ordenador de quien mira la página, no al tuyo. Necesitas la dirección pública del túnel.";
+    }
+    return null;
+  };
+
+  const [linkErr, setLinkErr] = useState<string | null>(null);
+
   const connect = () => {
     const url = tunnel.trim().replace(/\/+$/, "");
     if (!url) return;
+    const bad = rejectReason(url);
+    if (bad) {
+      setLinkErr(bad);
+      return;
+    }
+    setLinkErr(null);
     setApiBase(url);
     setTunnel(url);
     setLinked(true);
@@ -52,6 +84,7 @@ export default function Consulta() {
     setTunnel("");
     setLinked(false);
     setFailure(null);
+    setLinkErr(null);
   };
 
   const answerText = answer?.answer ?? streamed;
@@ -203,6 +236,7 @@ export default function Consulta() {
                 </button>
               )}
             </div>
+            {linkErr && <p className="tunnel-err">{linkErr}</p>}
             <p className="tunnel-note">
               {linked ? (
                 <>
