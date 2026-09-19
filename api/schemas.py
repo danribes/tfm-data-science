@@ -645,3 +645,21 @@ class DemographyResponse(ApiMeta):
     year_end: int
     baseline_variant: str
     variants: list[DemographyVariantOut]
+
+
+# ---- /ask (fase 2): pregunta libre -> consulta ejecutable ----
+class AskRequest(BaseModel):
+    question: str = Field(min_length=3, max_length=500)
+
+
+class AskResponse(ApiMeta):
+    """What the engine should compute, or why it cannot.
+
+    `series` null with a `refusal` is a valid, expected answer: the reader
+    asked something outside the model, and saying so is the correct output.
+    """
+    series: str | None
+    year: int | None
+    levers: dict[str, float]
+    refusal: str | None
+    model: str | None = None

@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           ContributionOut,
                           CountriesResponse, CountryOut, DebtPointOut,
+                          AskRequest, AskResponse,
                           EstimateOut, EvidenceResponse, IrfOut,
                           ExplainRequest, ExplainResponse, FiscalSpaceOut,
                           LeverValues,
@@ -36,6 +37,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           AnalogResponse)
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
+from explain.intent import IntentUnavailable, resolve_intent
 from explain.narrate import NarrationUnavailable, narrate
 from explain.report import generate_policy_brief_html
 from data.live import country_list, panel_builder
@@ -698,4 +700,23 @@ def explain(req: ExplainRequest) -> ExplainResponse:
         joint_delta=facts.joint_delta,
         headline_key=facts.headline_key,
         headline_year=facts.headline_year,
+    )
+
+
+@app.post("/ask", response_model=AskResponse)
+def ask(req: AskRequest) -> AskResponse:
+    """Resolve a typed question into a runnable query, or a refusal.
+
+    503 when the resolver cannot run, so the caller can fall back to its own
+    deterministic matcher rather than showing the reader an error: this route
+    improves question handling, it is not load-bearing for it.
+    """
+    try:
+        intent = resolve_intent(req.question)
+    except IntentUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    return AskResponse(
+        series=intent.series, year=intent.year, levers=intent.levers,
+        refusal=intent.refusal, model=intent.model,
     )
