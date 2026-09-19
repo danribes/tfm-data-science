@@ -18,6 +18,32 @@ from dataclasses import dataclass
 from engine import constants as c
 from explain.facts import ExplanationFacts
 
+_ENV_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+
+
+def _load_env_file() -> None:
+    """Read KEY=value lines from a gitignored .env, without adding a dependency.
+
+    Only fills names that are not already set, so a real environment variable
+    and the Space's secret both win over the file. Deploys set the variable
+    directly and never ship a .env.
+    """
+    try:
+        with open(_ENV_FILE, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                name, _, value = line.partition("=")
+                name = name.strip()
+                if name.startswith("export "):
+                    name = name[len("export "):].strip()
+                value = value.strip().strip('"').strip("'")
+                if name and name not in os.environ:
+                    os.environ[name] = value
+    except OSError:
+        pass  # no file is the normal case in a deploy
+
 #: Overridable so a demo can run on a cheaper model without a code change.
 MODEL = os.environ.get("EVO_EXPLAIN_MODEL", "claude-opus-5")
 EFFORT = os.environ.get("EVO_EXPLAIN_EFFORT", "low")
@@ -138,6 +164,7 @@ def narrate(facts: ExplanationFacts, *, timeout: float = 30.0) -> NarrationResul
     Raises NarrationUnavailable on any failure — missing SDK, missing key,
     network error, refusal, or a response that isn't the expected shape.
     """
+    _load_env_file()
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise NarrationUnavailable("ANTHROPIC_API_KEY not set")
 

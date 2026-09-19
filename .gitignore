@@ -13,3 +13,8 @@ data/rag/
 *.db
 *.db-wal
 *.db-shm
+
+# Secrets — never committed. ANTHROPIC_API_KEY lives here for local runs.
+.env
+.env.*
+!.env.example
