@@ -14,3 +14,7 @@ requests>=2.32
 numpy>=1.26
 pandas>=2.2
 pyyaml>=6.0
+# /explain narration. Small (httpx + pydantic, both already pulled in by
+# FastAPI). Without it the endpoint still answers from the deterministic
+# templates, so this only decides whether the LLM path can run at all.
+anthropic>=0.116
