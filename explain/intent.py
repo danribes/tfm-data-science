@@ -65,19 +65,28 @@ ANSWERABLE: dict[str, str] = {
 _LEVER_DOC = {s["id"]: f'{s["nm"]} [{s["min"]}, {s["max"]}]' for s in LEVER_SPECS}
 _RANGES = {s["id"]: (float(s["min"]), float(s["max"])) for s in LEVER_SPECS}
 
+#: Sentinel rather than null. The API rejects an enum whose values do not all
+#: match a nullable union type ("Enum value 'b' does not match declared type
+#: ['string','null']"), so "no series fits" is a value in the enum.
+NONE_SERIES = "ninguna"
+
 SCHEMA = {
     "type": "object",
     "properties": {
-        "series": {"type": ["string", "null"], "enum": [*ANSWERABLE, None]},
-        "year": {"type": ["integer", "null"], "minimum": Y0, "maximum": Y1},
+        "series": {"type": "string", "enum": [*ANSWERABLE, NONE_SERIES]},
+        "year": {"type": "integer", "minimum": Y0, "maximum": Y1},
         "levers": {
             "type": "object",
             "properties": {k: {"type": "number"} for k in _RANGES},
             "additionalProperties": False,
         },
-        "refusal": {"type": ["string", "null"]},
+        "refusal": {"type": "string"},
     },
-    "required": ["series", "year", "levers", "refusal"],
+    # Only `series` is required. `year`, `levers` and `refusal` are omitted when
+    # they do not apply, which keeps every field a plain type: the API rejects a
+    # nullable union alongside an enum, and mixing the two styles invites the
+    # same 400 in a field that happens not to have an enum today.
+    "required": ["series"],
     "additionalProperties": False,
 }
 
@@ -98,8 +107,8 @@ esta serie saldría Y».
 
 ## Reglas
 - `series`: la que responde a la pregunta. Sólo de la lista. Si ninguna encaja, \
-`series: null` y explica por qué en `refusal`.
-- `year`: si la pregunta menciona un año, úsalo. Si no, `null`.
+pon `"{NONE_SERIES}"` y explica por qué en `refusal`.
+- `year`: si la pregunta menciona un año, úsalo. Si no, omite el campo.
 - `levers`: sólo si la pregunta plantea un supuesto explícito («si el Euríbor \
 sube al 5 %», «con una consolidación de 2 puntos»). Usa el valor absoluto que \
 tendría la palanca, no el incremento. Si no hay supuesto, `{{}}`.
@@ -177,6 +186,8 @@ def resolve_intent(question: str, *, timeout: float = 20.0) -> Intent:
         raise IntentUnavailable(f"unparseable response: {exc}") from exc
 
     series = raw.get("series")
+    if series == NONE_SERIES:
+        series = None
     if series is not None and series not in ANSWERABLE:
         # Schema should prevent this; treat a breach as a refusal rather than
         # passing an unknown key to the engine.

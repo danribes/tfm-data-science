@@ -45,8 +45,11 @@ def _load_env_file() -> None:
         pass  # no file is the normal case in a deploy
 
 #: Overridable so a demo can run on a cheaper model without a code change.
-MODEL = os.environ.get("EVO_EXPLAIN_MODEL", "claude-opus-5")
-EFFORT = os.environ.get("EVO_EXPLAIN_EFFORT", "low")
+MODEL = os.environ.get("EVO_EXPLAIN_MODEL", "claude-haiku-4-5-20251001")
+#: Empty by default: `effort` is an Opus-family control and sending it to a
+#: model that does not take it is a 400, which degrades to templates silently.
+#: Set it explicitly alongside EVO_EXPLAIN_MODEL when moving back to Opus.
+EFFORT = os.environ.get("EVO_EXPLAIN_EFFORT", "")
 MAX_TOKENS = 4000  # headroom: on Opus 5 thinking counts against this too
 
 OUTPUT_SCHEMA = {
@@ -188,7 +191,7 @@ def narrate(facts: ExplanationFacts, *, timeout: float = 30.0) -> NarrationResul
                 "cache_control": {"type": "ephemeral"},
             }],
             output_config={
-                "effort": EFFORT,
+                **({"effort": EFFORT} if EFFORT else {}),
                 "format": {"type": "json_schema", "schema": OUTPUT_SCHEMA},
             },
             messages=[{

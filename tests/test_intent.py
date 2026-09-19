@@ -24,9 +24,18 @@ def test_every_answerable_series_exists_in_the_engine():
         assert key in SERIES_KEYS, key
 
 
-def test_schema_enumerates_exactly_the_answerable_series():
-    enum = [x for x in it.SCHEMA["properties"]["series"]["enum"] if x is not None]
-    assert set(enum) == set(it.ANSWERABLE)
+def test_schema_enumerates_the_answerable_series_plus_the_none_sentinel():
+    """A sentinel, not null: the API rejects an enum alongside a nullable
+    union type, so «no series fits» has to be a value in the enum."""
+    enum = set(it.SCHEMA["properties"]["series"]["enum"])
+    assert enum == set(it.ANSWERABLE) | {it.NONE_SERIES}
+    assert it.NONE_SERIES not in it.ANSWERABLE
+
+
+def test_no_schema_field_uses_a_nullable_union():
+    """One 400 of this shape already reached production; pin the whole shape."""
+    for name, spec in it.SCHEMA["properties"].items():
+        assert isinstance(spec.get("type"), str), name
 
 
 def test_schema_year_is_bounded_to_the_projection():
