@@ -25,6 +25,11 @@ export interface PersonaQuestion {
   levers: LeverKey[];
   /** Concept to look up in the corpus, when it is reachable. */
   concept?: string;
+  /** Other words a reader may use for the same thing, weighted like the title.
+   *  «rendimiento» is the ordinary Spanish for a bond yield and appears in no
+   *  question text; without it, the most natural phrasing of the question the
+   *  set does answer gets refused. */
+  synonyms?: string[];
   /** Questions to offer next — ids in the same set. */
   followUps: string[];
 }
@@ -41,6 +46,7 @@ export const Q03: PersonaQuestion[] = [
       "dato de partida, corregido por el tipo de interés y por la desviación del PIB.",
     levers: ["r", "lam"],
     concept: "determinantes del precio de la vivienda",
+    synonyms: ["piso", "casa", "inmueble", "vivienda", "precio del metro"],
     followUps: ["esfuerzo", "cuota", "euribor"],
   },
   {
@@ -53,6 +59,7 @@ export const Q03: PersonaQuestion[] = [
       "diferencial hipotecario estimado (DIFF).",
     levers: ["r", "lam"],
     concept: "esfuerzo hipotecario de los hogares",
+    synonyms: ["hipoteca", "mensualidad", "letra", "pago mensual"],
     followUps: ["esfuerzo", "precio", "euribor"],
   },
   {
@@ -65,6 +72,7 @@ export const Q03: PersonaQuestion[] = [
       "denominador, la curva de salarios (π + λ + φ·holgura).",
     levers: ["r", "lam", "z"],
     concept: "regla del 35 % de esfuerzo hipotecario",
+    synonyms: ["esfuerzo", "porcentaje del sueldo", "parte del salario"],
     followUps: ["euribor", "salarios", "precio"],
   },
   {
@@ -77,6 +85,7 @@ export const Q03: PersonaQuestion[] = [
       "abarata el precio (E_IPV_R). El efecto neto sobre el esfuerzo es la suma.",
     levers: ["r"],
     concept: "transmisión de la política monetaria a la vivienda",
+    synonyms: ["euribor", "subida de tipos", "bce"],
     followUps: ["esfuerzo", "cuota", "precio"],
   },
   {
@@ -89,6 +98,7 @@ export const Q03: PersonaQuestion[] = [
       "no toca la cuota, que depende del tipo y del precio.",
     levers: ["lam", "z"],
     concept: "crecimiento de los salarios reales",
+    synonyms: ["sueldo", "nomina", "salario"],
     followUps: ["esfuerzo", "cuota"],
   },
 ];
@@ -106,6 +116,7 @@ export const Q01: PersonaQuestion[] = [
       "la deuda supera el umbral B_CRIT.",
     levers: ["r", "prima"],
     concept: "determinantes de la prima de riesgo soberana",
+    synonyms: ["rendimiento", "rentabilidad", "yield", "tir", "tipo del bono", "interes del bono"],
     followUps: ["deuda", "intereses", "adverso"],
   },
   {
@@ -119,6 +130,7 @@ export const Q01: PersonaQuestion[] = [
       "de nieve empuja sola.",
     levers: ["sp", "r", "prima"],
     concept: "sostenibilidad de la deuda pública r menos g",
+    synonyms: ["endeudamiento", "pasivo", "ratio de deuda", "bola de nieve"],
     followUps: ["intereses", "cupon", "adverso"],
   },
   {
@@ -131,6 +143,7 @@ export const Q01: PersonaQuestion[] = [
       "de mercado al ritmo de refinanciación (REFI, 14 % al año).",
     levers: ["r", "prima", "sp"],
     concept: "carga de intereses de la deuda pública",
+    synonyms: ["coste de la deuda", "servicio de la deuda", "pago de intereses"],
     followUps: ["deuda", "cupon"],
   },
   {
@@ -144,6 +157,7 @@ export const Q01: PersonaQuestion[] = [
       "efecto tarda años en verse entero: sólo se refinancia el 14 % anual.",
     levers: ["prima", "r"],
     concept: "episodios de tensión en la deuda soberana",
+    synonyms: ["spread", "rescate", "tension financiera", "crisis de deuda"],
     followUps: ["deuda", "intereses", "cupon"],
   },
 ];
@@ -160,6 +174,7 @@ export const Q02: PersonaQuestion[] = [
       "el denominador; por encima del 35 % la regla prudencial se considera rota.",
     levers: ["r", "lam"],
     concept: "esfuerzo hipotecario y capacidad de pago",
+    synonyms: ["esfuerzo", "carga hipotecaria", "ratio de endeudamiento"],
     followUps: ["mora", "colateral"],
   },
   {
@@ -172,6 +187,7 @@ export const Q02: PersonaQuestion[] = [
       "desviación del PIB. La mora bancaria en sí no está en el corte de datos.",
     levers: ["z", "lam", "sp"],
     concept: "determinantes de la morosidad hipotecaria",
+    synonyms: ["mora", "morosidad", "impago", "npl", "default"],
     followUps: ["esfuerzo", "colateral"],
   },
   {
@@ -185,6 +201,7 @@ export const Q02: PersonaQuestion[] = [
       "severidad si hay impago.",
     levers: ["r", "lam"],
     concept: "precio de la vivienda como colateral bancario",
+    synonyms: ["colateral", "garantia", "ltv", "tasacion", "valor del inmueble"],
     followUps: ["esfuerzo", "mora"],
   },
 ];
@@ -202,6 +219,7 @@ export const Q04: PersonaQuestion[] = [
       "diferencia de ese nivel año a año.",
     levers: ["ext", "sp", "lam"],
     concept: "determinantes del crecimiento del PIB",
+    synonyms: ["economia", "pib", "crecimiento", "recesion", "actividad"],
     followUps: ["financiacion", "costes", "demanda"],
   },
   {
@@ -215,6 +233,7 @@ export const Q04: PersonaQuestion[] = [
       "vía E_R.",
     levers: ["r"],
     concept: "coste de capital e inversión empresarial",
+    synonyms: ["credito", "prestamo", "financiacion", "euribor"],
     followUps: ["crecimiento", "costes"],
   },
   {
@@ -227,6 +246,7 @@ export const Q04: PersonaQuestion[] = [
       "precios importados (GAMMA), que decae geométricamente año a año.",
     levers: ["pm", "lam"],
     concept: "traspaso de precios de importación a la inflación",
+    synonyms: ["inflacion", "ipc", "precios", "energia", "costes"],
     followUps: ["crecimiento", "demanda"],
   },
   {
@@ -239,6 +259,7 @@ export const Q04: PersonaQuestion[] = [
       "PIB; Okun lo convierte en paro con un retardo.",
     levers: ["ext"],
     concept: "demanda externa y ciclo económico",
+    synonyms: ["exportaciones", "demanda externa", "clientes", "mercado exterior"],
     followUps: ["crecimiento", "costes"],
   },
 ];
@@ -256,6 +277,7 @@ export const Q05: PersonaQuestion[] = [
       "pierde poder de compra.",
     levers: ["idx", "pm"],
     concept: "indexación salarial e inflación",
+    synonyms: ["sueldo", "nomina", "poder adquisitivo", "subida salarial"],
     followUps: ["masa", "saldo"],
   },
   {
@@ -268,6 +290,7 @@ export const Q05: PersonaQuestion[] = [
       "fiscal y con el denominador: crecer más rebaja la ratio sin tocar la nómina.",
     levers: ["sp", "lam"],
     concept: "consolidación fiscal y gasto en personal",
+    synonyms: ["recortes", "plantilla", "empleo publico", "masa salarial"],
     followUps: ["poder", "saldo"],
   },
   {
@@ -280,6 +303,7 @@ export const Q05: PersonaQuestion[] = [
       "deuda heredada, y la parte que el presupuesto no elige.",
     levers: ["sp", "r", "dem"],
     concept: "saldo público y espacio fiscal",
+    synonyms: ["deficit", "superavit", "cuentas publicas", "presupuesto"],
     followUps: ["masa", "poder"],
   },
 ];
@@ -296,6 +320,7 @@ export const Q06: PersonaQuestion[] = [
       "de la deuda y la presión demográfica. No hacer nada también es un escenario.",
     levers: ["sp", "r", "dem"],
     concept: "sostenibilidad fiscal a largo plazo",
+    synonyms: ["deuda", "endeudamiento", "sostenibilidad"],
     followUps: ["coste", "espacio", "consolidar"],
   },
   {
@@ -308,6 +333,7 @@ export const Q06: PersonaQuestion[] = [
       "(1,40) al nivel del PIB y de ahí a Okun. El paro es la factura.",
     levers: ["sp"],
     concept: "multiplicador fiscal y coste del ajuste",
+    synonyms: ["ajuste", "recortes", "austeridad", "consolidacion"],
     followUps: ["deuda", "coste", "espacio"],
   },
   {
@@ -320,6 +346,7 @@ export const Q06: PersonaQuestion[] = [
       "tipo efectivo. Cuanto mayores, menor la parte del presupuesto que se decide.",
     levers: ["r", "prima", "sp"],
     concept: "espacio fiscal y carga de intereses",
+    synonyms: ["margen", "espacio fiscal", "intereses"],
     followUps: ["deuda", "consolidar"],
   },
   {
@@ -332,6 +359,7 @@ export const Q06: PersonaQuestion[] = [
       "paro estructural por instituciones, cuña fiscal y productividad.",
     levers: ["sp", "z", "lam"],
     concept: "ley de Okun y desempleo",
+    synonyms: ["paro", "desempleo", "empleo", "parados"],
     followUps: ["consolidar", "deuda"],
   },
 ];
@@ -349,6 +377,7 @@ export const Q07: PersonaQuestion[] = [
       "la defienda.",
     levers: ["sp", "dem"],
     concept: "inversión pública y contratación",
+    synonyms: ["obra publica", "licitacion", "contratos", "inversion"],
     followUps: ["intermedio", "subvenciones"],
   },
   {
@@ -361,6 +390,7 @@ export const Q07: PersonaQuestion[] = [
       "discrecionalidad por contrato y la menos visible en el agregado.",
     levers: ["sp"],
     concept: "consumo intermedio y contratación pública",
+    synonyms: ["gasto corriente", "compras", "proveedores", "contratos"],
     followUps: ["inversion", "subvenciones"],
   },
   {
@@ -373,6 +403,7 @@ export const Q07: PersonaQuestion[] = [
       "como cuota del PIB; quién las recibe no está en ningún CSV de este corte.",
     levers: ["sp", "dem"],
     concept: "subvenciones y transferencias públicas",
+    synonyms: ["ayudas", "subvenciones", "transferencias"],
     followUps: ["inversion", "intermedio"],
   },
 ];
@@ -389,6 +420,7 @@ export const Q08: PersonaQuestion[] = [
       "empleo. La línea roja de presentación está en el 30 %.",
     levers: ["z", "lam", "sp"],
     concept: "pobreza infantil y empleo de los hogares",
+    synonyms: ["pobreza", "exclusion", "ninos", "menores", "arop"],
     followUps: ["educacion", "herencia"],
   },
   {
@@ -402,6 +434,7 @@ export const Q08: PersonaQuestion[] = [
       "el otro extremo de la pirámide.",
     levers: ["sp", "dem"],
     concept: "gasto público en educación",
+    synonyms: ["educacion", "colegios", "escuela", "ensenanza"],
     followUps: ["pobreza", "herencia"],
   },
   {
@@ -414,6 +447,7 @@ export const Q08: PersonaQuestion[] = [
       "tasa de dependencia que para entonces casi se duplica respecto a 2026.",
     levers: ["sp", "dem", "r"],
     concept: "equidad intergeneracional y deuda",
+    synonyms: ["herencia", "deuda", "generaciones", "futuro"],
     followUps: ["pobreza", "educacion"],
   },
 ];
@@ -430,6 +464,7 @@ export const Q09: PersonaQuestion[] = [
       "menos inflación. Por debajo de 100, la pensión compra menos que hoy.",
     levers: ["idx", "pm"],
     concept: "revalorización de las pensiones e inflación",
+    synonyms: ["pension", "jubilacion", "poder adquisitivo", "revalorizacion", "ipc"],
     followUps: ["gasto", "demografia"],
   },
   {
@@ -442,6 +477,7 @@ export const Q09: PersonaQuestion[] = [
       "escenario y con la indexación elegida; son dos palancas distintas.",
     levers: ["dem", "idx"],
     concept: "gasto en pensiones y envejecimiento",
+    synonyms: ["coste de las pensiones", "gasto en pensiones", "sostenibilidad"],
     followUps: ["demografia", "poder"],
   },
   {
@@ -455,6 +491,7 @@ export const Q09: PersonaQuestion[] = [
       "una palanca del motor.",
     levers: ["dem"],
     concept: "tasa de dependencia demográfica",
+    synonyms: ["cotizantes", "dependencia", "envejecimiento", "piramide"],
     followUps: ["gasto", "poder"],
   },
 ];
@@ -471,6 +508,7 @@ export const Q10: PersonaQuestion[] = [
       "(RJUV = 2,3 en la serie de los últimos cinco años). Sube y baja con él.",
     levers: ["z", "tau", "lam"],
     concept: "desempleo juvenil en España",
+    synonyms: ["paro juvenil", "empleo joven", "trabajo", "encontrar trabajo"],
     followUps: ["temporal", "vivienda"],
   },
   {
@@ -483,6 +521,7 @@ export const Q10: PersonaQuestion[] = [
       "laborales, las dos palancas que desplazan el paro estructural.",
     levers: ["tau", "z"],
     concept: "temporalidad y dualidad del mercado laboral",
+    synonyms: ["temporal", "contrato", "precariedad", "fijo"],
     followUps: ["paro", "vivienda"],
   },
   {
@@ -495,6 +534,7 @@ export const Q10: PersonaQuestion[] = [
       "sube con el IPV estimado y el salario con la curva de salarios.",
     levers: ["r", "lam"],
     concept: "emancipación juvenil y coste de la vivienda",
+    synonyms: ["emancipacion", "alquiler", "independizarse", "irse de casa"],
     followUps: ["paro", "temporal"],
   },
 ];
@@ -511,6 +551,7 @@ export const Q11: PersonaQuestion[] = [
       "inflación, acumulado desde 2026 en base 100. Lo que decide es λ, no π.",
     levers: ["lam", "pm"],
     concept: "salarios reales y productividad",
+    synonyms: ["sueldo real", "poder adquisitivo", "salario real"],
     followUps: ["salario", "empleo"],
   },
   {
@@ -523,6 +564,7 @@ export const Q11: PersonaQuestion[] = [
       "desde el dato de partida del vintage.",
     levers: ["lam", "pm"],
     concept: "evolución del salario medio",
+    synonyms: ["sueldo", "salario", "nomina", "cuanto ganare"],
     followUps: ["real", "empleo"],
   },
   {
@@ -535,6 +577,7 @@ export const Q11: PersonaQuestion[] = [
       "estructural por instituciones, cuña fiscal y productividad.",
     levers: ["z", "lam", "sp"],
     concept: "determinantes del desempleo",
+    synonyms: ["paro", "despido", "empleo", "perder el trabajo"],
     followUps: ["real", "salario"],
   },
 ];
@@ -551,6 +594,7 @@ export const Q12: PersonaQuestion[] = [
       "externa con persistencia; el crecimiento es su variación anual.",
     levers: ["ext", "sp"],
     concept: "ciclo económico y trabajo autónomo",
+    synonyms: ["actividad", "facturacion", "clientes", "negocio"],
     followUps: ["costes", "cuota", "financiacion"],
   },
   {
@@ -563,6 +607,7 @@ export const Q12: PersonaQuestion[] = [
       "con peso GAMMA y decae geométricamente año a año.",
     levers: ["pm"],
     concept: "costes de insumos e inflación",
+    synonyms: ["costes", "inflacion", "precios", "suministros"],
     followUps: ["actividad", "financiacion"],
   },
   {
@@ -575,6 +620,7 @@ export const Q12: PersonaQuestion[] = [
       "el motor no modela la decisión del BCE, sólo sus efectos.",
     levers: ["r"],
     concept: "acceso a financiación de autónomos",
+    synonyms: ["credito", "prestamo", "financiacion", "banco"],
     followUps: ["actividad", "costes"],
   },
   {
@@ -588,6 +634,7 @@ export const Q12: PersonaQuestion[] = [
       "cuenta ajena, y el motor no las separa.",
     levers: ["ext", "z", "tau"],
     concept: "autoempleo y mercado laboral",
+    synonyms: ["autonomos", "autoempleo", "freelance", "cuenta propia"],
     followUps: ["actividad", "costes"],
   },
 ];
@@ -620,8 +667,22 @@ const STOPWORDS = new Set([
   "la", "el", "en", "de", "al", "un", "es", "si", "no", "ya", "hasta",
 ]);
 
+/** Crude Spanish plural stripping, enough that «bonos» reaches «bono».
+ *
+ *  Not a stemmer. A real one would need a dictionary, and the failure this
+ *  fixes is almost always the plural: a reader asks about «los bonos» or «las
+ *  pensiones» and the question is titled in the singular. */
+const stem = (w: string): string => {
+  if (w.length > 5 && w.endsWith("es")) return w.slice(0, -2);
+  if (w.length > 4 && w.endsWith("s")) return w.slice(0, -1);
+  return w;
+};
+
 const content = (s: string): string[] =>
-  norm(s).split(/[^a-z0-9ñ]+/).filter((w) => w.length > 2 && !STOPWORDS.has(w));
+  norm(s)
+    .split(/[^a-z0-9ñ]+/)
+    .filter((w) => w.length > 2 && !STOPWORDS.has(w))
+    .map(stem);
 
 /** Resolve free text to a bound question, or null when nothing fits.
  *
@@ -639,11 +700,17 @@ export function matchQuestion(
   let best: { q: PersonaQuestion; score: number } | null = null;
   for (const q of questions) {
     const inText = new Set(content(q.text));
+    const inSyn = new Set(content((q.synonyms ?? []).join(" ")));
     const inConcept = new Set(content(q.concept ?? ""));
     const inMech = new Set(content(q.mechanism));
     let score = 0;
     for (const w of words) {
-      if (inText.has(w)) score += 3;
+      // The title outranks the synonyms so that two questions sharing a word
+      // are separated by where it appears, not by which comes first in the
+      // array. Ties resolved by position are how one question ends up
+      // answering everything.
+      if (inText.has(w)) score += 4;
+      else if (inSyn.has(w)) score += 3;
       else if (inConcept.has(w)) score += 2;
       else if (inMech.has(w)) score += 1;
     }

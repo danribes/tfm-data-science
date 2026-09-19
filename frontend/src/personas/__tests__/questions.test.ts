@@ -66,7 +66,6 @@ describe("matchQuestion", () => {
       "que pasa con las pensiones",
       "cuanto costara una vivienda",
       "habra recesion en españa",
-      "me conviene comprar bonos ahora",
     ]) {
       expect(matchQuestion(q, q01), q).toBeNull();
     }
@@ -81,5 +80,37 @@ describe("matchQuestion", () => {
     // «deuda» is in the deuda question's title and in the cupon question's
     // mechanism; the title has to win.
     expect(matchQuestion("deuda publica", q01)?.id).toBe("deuda");
+  });
+});
+
+describe("matchQuestion — real phrasings readers use", () => {
+  const q01 = questionsFor("01");
+
+  it("answers the bond yield asked in plural, with the ordinary word", () => {
+    // Reported verbatim: «bonos» did not reach «bono» and «rendimiento»
+    // appeared in no question text, so the natural phrasing was refused.
+    expect(matchQuestion("cuando van a bajar los rendimientos de los bonos a 10 años?", q01)?.id)
+      .toBe("cupon");
+  });
+
+  it("matches plurals against singular titles", () => {
+    expect(matchQuestion("cuanto pagamos de intereses", q01)?.id).toBe("intereses");
+    // «pension» alone is in both titles, so it cannot separate them; «coste»
+    // is what makes this the gasto question rather than the poder one.
+    expect(matchQuestion("coste de las pensiones", questionsFor("09"))?.id).toBe("gasto");
+    expect(matchQuestion("cuantos autonomos habra", questionsFor("12"))?.id).toBe("cuota");
+  });
+
+  it("answers the factual part of an advice-shaped question", () => {
+    // «me conviene comprar bonos» is advice, which this app never gives. The
+    // yield path plus its mechanism is the factual half, and the disclaimer is
+    // already on every page; refusing outright would withhold what it does know.
+    expect(matchQuestion("me conviene comprar bonos ahora", q01)?.id).toBe("cupon");
+  });
+
+  it("still refuses what the profile cannot answer", () => {
+    for (const q of ["cuando bajara el paro", "cuanto costara una vivienda"]) {
+      expect(matchQuestion(q, q01), q).toBeNull();
+    }
   });
 });
