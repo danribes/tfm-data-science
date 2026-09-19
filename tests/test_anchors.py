@@ -6,7 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from engine.constants import GOLD_DIR, load_central
+from engine.constants import GOLD_DIR, IPV_LR_V16, IPV_REV_V16, load_central
+
+#: The v16 housing pair the committed fixture was generated with.
+_V16_HOUSING = {"ipv_lr": IPV_LR_V16, "ipv_rev": IPV_REV_V16}
 from engine.levers import LEVER_SPECS, Levers, PRESETS, preset_levers
 from engine.montecarlo import run_montecarlo
 from engine.spain import SERIES_KEYS, Y0, run_scenario
@@ -77,7 +80,10 @@ def test_committed_fixture_matches_regenerated_values():
     # The committed fixture is the phase-2 JS engine contract; it must never
     # drift from what the Python engine actually computes.
     committed = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    base = run_scenario(Levers())
+    # The fixture is the v16 JS contract, so it is checked against the v16
+    # housing pair. The engine's own default is the panel estimate, which moves
+    # cuota and esf by design — test_housing_default_is_the_panel_estimate.
+    base = run_scenario(Levers(), **_V16_HOUSING)
     central = load_central()
     for y in ANCHOR_YEARS:
         entry = committed["debt_central"][str(y)]
@@ -97,7 +103,7 @@ def test_committed_fixture_matches_regenerated_values():
     # pens, saldo} at 2035/2050 must match a fresh run_scenario(preset_levers(...)).
     for preset in PRESETS:
         pid = preset["id"]
-        run = run_scenario(preset_levers(pid))
+        run = run_scenario(preset_levers(pid), **_V16_HOUSING)
         for y in ("2035", "2050"):
             entry = committed["presets_series_2035_2050"][pid][y]
             for k in PINNED_SERIES:
@@ -105,7 +111,7 @@ def test_committed_fixture_matches_regenerated_values():
 
     # probe_bundle: all ten levers moved at once (same PROBE deltas as A3),
     # pinning the same series plus debt "b" at 2035/2050.
-    probe_run = run_scenario(Levers(**PROBE))
+    probe_run = run_scenario(Levers(**PROBE), **_V16_HOUSING)
     for y in ("2035", "2050"):
         entry = committed["probe_bundle"][y]
         for k in (*PINNED_SERIES, "b"):

@@ -41,8 +41,11 @@ REFI = 0.14      # share of sovereign debt refinanced each year
 TERM = 0.17      # 10y term premium over Euribor (3.42 − 2.80 − 0.45)
 DIFF = 1.4757    # implicit mortgage spread pp — build_v16.py bisection to the
                  # €744.89 median of gold_cuota_teorica.csv at Euribor 2.80
-IPV_LR = 3.0     # house-price long-run growth (% a/a)
-IPV_REV = 0.60   # yearly reversion of IPV toward IPV_LR
+# The v16 calibration for the two housing parameters the panel can identify.
+# Both sit outside the 90 % band of their own estimate, so they are no longer
+# the default — see ESTIMATED below and docs Evidencia.
+IPV_LR_V16 = 3.0
+IPV_REV_V16 = 0.60
 E_IPV_R = 2.6    # IPV response to the rate lever
 E_IPV_G = 1.1    # IPV response to the growth deviation
 RJUV = 2.317     # youth/total unemployment ratio (stable in the 5y series)
@@ -80,6 +83,27 @@ MC_EXT_SLOPE_PB = -0.136     # pb slope after 2050: (−7.47 − (−6.79)) / 5
 MC_EXT_SLOPE_DEMOG = 0.136   # presion_demog slope after 2050: (6.57 − 5.89) / 5
 
 # ---- gold-slice loaders ----
+@lru_cache(maxsize=1)
+def load_estimated() -> dict[str, dict]:
+    """Panel estimates frozen by tools/gen_estimated_params.py."""
+    path = GOLD_DIR / "estimated_params.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))["params"]
+
+
+def _est(name: str, fallback: float) -> float:
+    row = load_estimated().get(name)
+    return float(row["value"]) if row else fallback
+
+
+# Estimated from the frozen panels rather than inherited from v16. The engine
+# shipped calibrated values its own evidence layer rejects; these are what the
+# data supports. run_scenario(ipv_lr=..., ipv_rev=...) reproduces the v16 path.
+IPV_LR = _est("IPV_LR", IPV_LR_V16)    # 1.23 % a/a  [0.93, 1.53], 20 CCAA × 2007-2026
+IPV_REV = _est("IPV_REV", IPV_REV_V16)  # 0.20 /yr    [0.18, 0.22]
+
+
 @lru_cache(maxsize=1)
 def load_kpis() -> dict:
     return json.loads((GOLD_DIR / "kpis_perfiles.json").read_text(encoding="utf-8"))
@@ -168,6 +192,8 @@ BASE_LEVERS: dict[str, float] = {
 
 _V16 = "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6)"
 _MC = "MC calibration fitted to gold_escenarios_deuda_mc.csv central envelopes (this repo, phase 1)"
+_EST = ("estimado del panel congelado por tools/gen_estimated_params.py — "
+        "sustituye a la calibración v16, que cae fuera de su propia banda del 90 %")
 
 CONSTANTS_TABLE: list[dict] = [
     {"name": "MULT", "value": MULT, "unit": "x", "provenance": _V16 + " · fiscal multiplier, CORE Macro U3"},
@@ -186,8 +212,8 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "REFI", "value": REFI, "unit": "share/yr", "provenance": _V16 + " · debt refinancing share 14 %/yr"},
     {"name": "TERM", "value": TERM, "unit": "pp", "provenance": _V16 + " · 10y term premium (3.42 − 2.80 − 0.45)"},
     {"name": "DIFF", "value": DIFF, "unit": "pp", "provenance": "build_v16.py bisection vs gold_cuota_teorica.csv €744.89 median at Euribor 2.80"},
-    {"name": "IPV_LR", "value": IPV_LR, "unit": "% a/a", "provenance": _V16 + " · house-price long run"},
-    {"name": "IPV_REV", "value": IPV_REV, "unit": "x", "provenance": _V16 + " · IPV reversion"},
+    {"name": "IPV_LR", "value": IPV_LR, "unit": "% a/a", "provenance": _EST + " · crecimiento medio del IPV, 20 CCAA × 2007-2026 (v16 calibraba 3.0, fuera de la banda)"},
+    {"name": "IPV_REV", "value": IPV_REV, "unit": "x", "provenance": _EST + " · AR(1) sobre la desviación del IPV (v16 calibraba 0.60, fuera de la banda)"},
     {"name": "E_IPV_R", "value": E_IPV_R, "unit": "pp IPV / pp rate", "provenance": _V16},
     {"name": "E_IPV_G", "value": E_IPV_G, "unit": "pp IPV / pp growth", "provenance": _V16},
     {"name": "RJUV", "value": RJUV, "unit": "x", "provenance": _V16 + " · youth/total unemployment ratio, 5y series"},

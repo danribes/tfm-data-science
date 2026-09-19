@@ -40,6 +40,8 @@ def run_scenario(
     omega: float | None = None,
     alpha_spread: float | None = None,
     b_crit: float | None = None,
+    ipv_lr: float | None = None,
+    ipv_rev: float | None = None,
 ) -> dict[str, list[float]]:
     """Run the Spain semi-structural engine.
 
@@ -69,6 +71,9 @@ def run_scenario(
     _omega        = c.OMEGA        if omega        is None else omega
     _alpha_spread = c.ALPHA_SPREAD if alpha_spread is None else alpha_spread
     _b_crit       = c.B_CRIT      if b_crit       is None else b_crit
+    # Default to the panel estimates; pass the *_V16 values to reproduce v16.
+    _ipv_lr       = c.IPV_LR       if ipv_lr       is None else ipv_lr
+    _ipv_rev      = c.IPV_REV      if ipv_rev      is None else ipv_rev
 
     # Effective Phillips inertia: omega=1 → THETA (pure adaptive, unchanged)
     _theta_eff = _omega * c.THETA
@@ -119,7 +124,7 @@ def run_scenario(
             wr_idx *= 1 + wreal / 100
 
         # housing
-        ipv = (c.IPV_LR + (V0["ipv"] - c.IPV_LR) * c.IPV_REV ** k
+        ipv = (_ipv_lr + (V0["ipv"] - _ipv_lr) * _ipv_rev ** k
                - c.E_IPV_R * (L.r - B["r"]) + c.E_IPV_G * (g - V0["g"]))
         if k > 0:
             precio *= 1 + ipv / 100

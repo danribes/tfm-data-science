@@ -20,7 +20,10 @@ def test_spain_constants_verbatim_v16():
     assert (c.A_Z, c.A_TAU, c.A_LAM) == (1.10, 0.30, 0.45)
     assert (c.REFI, c.TERM) == (0.14, 0.17)
     assert c.DIFF == 1.4757            # build_v16.py bisection (extract L1055-1073)
-    assert (c.IPV_LR, c.IPV_REV, c.E_IPV_R, c.E_IPV_G) == (3.0, 0.60, 2.6, 1.1)
+    # IPV_LR/IPV_REV no longer default to v16: both calibrated values fall
+    # outside the 90 % band of their own panel estimate, so the engine runs on
+    # the estimates and keeps the v16 pair named for reproducing the old path.
+    assert (c.IPV_LR_V16, c.IPV_REV_V16, c.E_IPV_R, c.E_IPV_G) == (3.0, 0.60, 2.6, 1.1)
     assert c.RJUV == 2.317
     assert c.PM_DECAY == 0.45
 
@@ -116,6 +119,9 @@ def test_preset_levers_raises_on_unknown_id():
 
 # ---- Task 6: chain + debt identity + deviation semantics ----
 from engine.spain import N_YEARS, SERIES_KEYS, Y0, baseline, french, run_scenario
+
+#: Reproduce the v16 housing path, which every pinned expectation encodes.
+_V16_HOUSING = {"ipv_lr": c.IPV_LR_V16, "ipv_rev": c.IPV_REV_V16}
 
 
 def test_series_shape():
@@ -240,13 +246,15 @@ MOVED_PINS = [
 
 @pytest.mark.parametrize("pid,key,k,expected", BASE_PINS)
 def test_persona_base_pins(pid, key, k, expected):
-    deps = persona_dependents(run_scenario(Levers()))
+    # The pins encode the v16 JavaScript, so they ask for the v16 housing pair
+    # explicitly; the engine's own default is now the panel estimate.
+    deps = persona_dependents(run_scenario(Levers(), **_V16_HOUSING))
     assert deps[pid]["series"][key][k] == pytest.approx(expected, abs=1e-3)
 
 
 @pytest.mark.parametrize("pid,moved,key,k,expected", MOVED_PINS)
 def test_persona_moved_lever_pins(pid, moved, key, k, expected):
-    deps = persona_dependents(run_scenario(Levers(**moved)))
+    deps = persona_dependents(run_scenario(Levers(**moved), **_V16_HOUSING))
     assert deps[pid]["series"][key][k] == pytest.approx(expected, abs=1e-3)
 
 
@@ -265,3 +273,25 @@ def test_sensitivity_matrix_structure_and_signs():
     db_dr_2050 = res["matrix"]["r"]["sensitivities"]["2050"]["b"]
     assert db_dr_2050 > 0.0
 
+
+
+def test_housing_default_is_the_panel_estimate():
+    """The engine must not ship a calibration its own evidence layer rejects.
+
+    Both v16 housing constants fall outside the 90 % band of their estimate, so
+    the default is the estimate and the v16 pair is reachable by argument.
+    """
+    est = c.load_estimated()
+    assert c.IPV_LR == pytest.approx(est["IPV_LR"]["value"])
+    assert c.IPV_REV == pytest.approx(est["IPV_REV"]["value"])
+    # Each v16 value sits outside its own estimated band — the reason for this.
+    for name, v16 in (("IPV_LR", c.IPV_LR_V16), ("IPV_REV", c.IPV_REV_V16)):
+        row = est[name]
+        assert not (row["ci_low"] <= v16 <= row["ci_high"]), name
+
+    # Slower trend growth and weaker reversion must give a cheaper 2050 house.
+    default = run_scenario(Levers())
+    v16run = run_scenario(Levers(), ipv_lr=c.IPV_LR_V16, ipv_rev=c.IPV_REV_V16)
+    assert default["precio"][24] < v16run["precio"][24]
+    # …and the v16 keyword path must still reproduce v16 exactly.
+    assert v16run["precio"][24] == pytest.approx(400982, abs=1.0)

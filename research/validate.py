@@ -98,7 +98,7 @@ def compare_ipv_growth() -> Comparison | None:
 
     return Comparison(
         constant="IPV_LR", label="Crecimiento a largo plazo del precio de la vivienda",
-        calibrated=c.IPV_LR, estimate=est,
+        calibrated=c.IPV_LR_V16, estimate=est,
         source="gold_ccaa_trimestral.csv · 20 CCAA × 2007-2026",
         subperiods=tuple(subs),
     )
@@ -133,7 +133,7 @@ def compare_ipv_reversion() -> Comparison | None:
     )
     return Comparison(
         constant="IPV_REV", label="Reversión anual del IPV hacia su tendencia",
-        calibrated=c.IPV_REV, estimate=rev,
+        calibrated=c.IPV_REV_V16, estimate=rev,
         source="gold_ccaa_trimestral.csv · AR(1) sobre el crecimiento interanual",
     )
 

@@ -1,0 +1,38 @@
+{
+  "vintage": "2026-07-31",
+  "params": {
+    "IPV_LR": {
+      "value": 1.2262,
+      "se": 0.1817,
+      "ci_low": 0.9274,
+      "ci_high": 1.525,
+      "n": 1460,
+      "n_units": 20,
+      "calibrated_v16": 3.0,
+      "verdict": "fuera de la banda (por encima)",
+      "source": "gold_ccaa_trimestral.csv · 20 CCAA × 2007-2026"
+    },
+    "IPV_REV": {
+      "value": 0.2031,
+      "se": 0.0132,
+      "ci_low": 0.1814,
+      "ci_high": 0.2248,
+      "n": 1380,
+      "n_units": 20,
+      "calibrated_v16": 0.6,
+      "verdict": "fuera de la banda (por encima)",
+      "source": "gold_ccaa_trimestral.csv · AR(1) sobre el crecimiento interanual"
+    },
+    "PB_PERSIST": {
+      "value": 0.872,
+      "se": 0.0386,
+      "ci_low": 0.8085,
+      "ci_high": 0.9354,
+      "n": 931,
+      "n_units": 18,
+      "calibrated_v16": null,
+      "verdict": "sin equivalente en la calibración v16",
+      "source": "panel fiscal 18 países · 1960+"
+    }
+  }
+}

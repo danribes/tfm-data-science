@@ -134,7 +134,7 @@ def test_ipv_growth_is_estimated_from_the_regional_panel():
     cmp_ = validate.compare_ipv_growth()
     assert cmp_ is not None
     assert cmp_.constant == "IPV_LR"
-    assert cmp_.calibrated == c.IPV_LR
+    assert cmp_.calibrated == c.IPV_LR_V16   # the comparison contests v16, not the default
     assert cmp_.estimate.n_units == 20
     assert math.isfinite(cmp_.estimate.coef)
 
