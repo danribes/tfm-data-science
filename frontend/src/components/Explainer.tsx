@@ -15,8 +15,14 @@ import { ContributionChart } from "./ContributionChart";
 export function Explainer() {
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
+  const chartsHidden = useScenarioStore((s) => s.chartsHidden);
   const [openMech, setOpenMech] = useState(false);
   const q = useExplain(levers, horizon);
+
+  // This block narrates the charts: which red lines are crossed, what the
+  // baseline shows. With no charts on screen it is a caption without a figure,
+  // and it talks about thresholds the reader has been given no way to see.
+  if (chartsHidden) return null;
 
   if (q.isError) {
     return (

@@ -18,10 +18,16 @@ interface ScenarioState {
   levers: Levers;
   horizon: number;
   hotIds: string[];
+  /** The visible route has nothing on screen for the shell explainer to
+   *  explain. It narrates charts and crossed red lines, so on a page that
+   *  shows neither it is orientation text about something the reader cannot
+   *  see. Owned by the route, like hotIds. */
+  chartsHidden: boolean;
   setLever: (id: LeverId, value: number) => void;
   applyPreset: (presetId: string) => void;
   setHorizon: (year: number) => void;
   setHotIds: (ids: string[]) => void;
+  setChartsHidden: (hidden: boolean) => void;
   resetAll: () => void;
 }
 
@@ -31,10 +37,12 @@ export const useScenarioStore = create<ScenarioState>()((set) => ({
   levers: { ...BASE_LEVERS },
   horizon: Y0,
   hotIds: [],
+  chartsHidden: false,
   setLever: (id, value) => set((s) => ({ levers: { ...s.levers, [id]: value } })),
   applyPreset: (presetId) => set({ levers: presetLevers(presetId) }),
   setHorizon: (year) => set({ horizon: clampHorizon(year) }),
   setHotIds: (ids) => set({ hotIds: ids }),
+  setChartsHidden: (hidden) => set({ chartsHidden: hidden }),
   // hotIds belongs to the visible route, not the scenario — resetAll (levers/horizon
   // reset by the Laboratorio "reset" button) must not clobber which levers Persona lit up.
   resetAll: () => set({ levers: { ...BASE_LEVERS }, horizon: Y0 }),

@@ -25,6 +25,7 @@ export default function Persona() {
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
   const setHotIds = useScenarioStore((s) => s.setHotIds);
+  const setChartsHidden = useScenarioStore((s) => s.setChartsHidden);
   const card = personas.data?.personas.find((c) => c.id === id);
   const mod = id ? getPersonaModule(id) : undefined;
 
@@ -44,6 +45,14 @@ export default function Persona() {
     setHotIds(asked ? asked.levers : (card?.hot ?? []));
     return () => setHotIds([]);
   }, [card, asked, setHotIds]);
+
+  // Nothing is plotted until a question is asked, so the shell explainer has
+  // no figure to caption and stays out of the way.
+  const bareLanding = questions.length > 0 && !asked && !showAll;
+  useEffect(() => {
+    setChartsHidden(bareLanding);
+    return () => setChartsHidden(false);
+  }, [bareLanding, setChartsHidden]);
 
   if (personas.isPending) return <p>Cargando perfil…</p>;
   if (personas.isError) return <div className="banner err">Personas no disponibles — el resto de la app sigue funcionando.</div>;
@@ -145,9 +154,11 @@ export default function Persona() {
 
       {conversational && !asked && (
         <p className="ask-hint">
-          Elige una pregunta y respondo con el número que calcula el motor, cómo
-          lo calcula y qué no sabe. Nada más — el resto del panel está ahí abajo
-          si lo quieres.
+          Todavía no hay nada proyectado: las palancas de la izquierda están en
+          su valor observado del vintage {personas.data.vintage}. Elige una
+          pregunta y verás el número que sale del motor, la gráfica de la que
+          viene, cómo se calcula y qué no sabe. Sólo eso — el panel completo del
+          perfil, con todos los indicadores a la vez, sigue disponible debajo.
         </p>
       )}
 
