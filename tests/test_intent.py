@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 from api.main import app
 from engine.levers import LEVER_SPECS
-from engine.spain import SERIES_KEYS, Y0, Y1
+from engine.spain import SERIES_KEYS
 from explain import intent as it
 
 client = TestClient(app)
@@ -38,9 +38,29 @@ def test_no_schema_field_uses_a_nullable_union():
         assert isinstance(spec.get("type"), str), name
 
 
-def test_schema_year_is_bounded_to_the_projection():
-    year = it.SCHEMA["properties"]["year"]
-    assert year["minimum"] == Y0 and year["maximum"] == Y1
+def test_year_is_bounded_by_clamping_not_by_the_schema():
+    """The validator rejects minimum/maximum on an integer, so the window is
+    enforced in code. That is where it has to hold anyway: the model's answer
+    is checked, never trusted."""
+    assert "minimum" not in it.SCHEMA["properties"]["year"]
+    assert "maximum" not in it.SCHEMA["properties"]["year"]
+
+
+def test_schema_uses_no_constraint_the_validator_rejects():
+    """Two 400s already came from constraints this validator does not take.
+    Pin the subset rather than rediscover it one deploy at a time."""
+    banned = {"minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum",
+              "minLength", "maxLength", "pattern", "format"}
+    def walk(node, path="root"):
+        if isinstance(node, dict):
+            for k in node:
+                assert k not in banned, f"{path}.{k}"
+            for k, v in node.items():
+                walk(v, f"{path}.{k}")
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                walk(v, f"{path}[{i}]")
+    walk(it.SCHEMA)
 
 
 def test_schema_offers_only_real_levers():

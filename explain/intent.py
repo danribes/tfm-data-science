@@ -74,7 +74,11 @@ SCHEMA = {
     "type": "object",
     "properties": {
         "series": {"type": "string", "enum": [*ANSWERABLE, NONE_SERIES]},
-        "year": {"type": "integer", "minimum": Y0, "maximum": Y1},
+        # No minimum/maximum: the schema validator rejects them on an integer
+        # ("For 'integer' type, properties maximum, minimum are not supported").
+        # The window is stated in the prompt and enforced by clamping below,
+        # which is where it has to hold anyway — the model is not trusted.
+        "year": {"type": "integer"},
         "levers": {
             "type": "object",
             "properties": {k: {"type": "number"} for k in _RANGES},
@@ -108,7 +112,8 @@ esta serie saldría Y».
 ## Reglas
 - `series`: la que responde a la pregunta. Sólo de la lista. Si ninguna encaja, \
 pon `"{NONE_SERIES}"` y explica por qué en `refusal`.
-- `year`: si la pregunta menciona un año, úsalo. Si no, omite el campo.
+- `year`: si la pregunta menciona un año, úsalo, entre {Y0} y {Y1}. Si no, \
+omite el campo.
 - `levers`: sólo si la pregunta plantea un supuesto explícito («si el Euríbor \
 sube al 5 %», «con una consolidación de 2 puntos»). Usa el valor absoluto que \
 tendría la palanca, no el incremento. Si no hay supuesto, `{{}}`.
