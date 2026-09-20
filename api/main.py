@@ -569,10 +569,17 @@ def rag_collections(
         if not rag_config.readable(cid, _rag_token(x_rag_token, authorization)):
             continue
         counts = st["by_collection"].get(cid, {})
+        docs, chunks = counts.get("documents", 0), counts.get("chunks", 0)
+        if cid == rag_config.MIXED_ID:
+            # The mix owns no rows of its own. Reporting zero would make the
+            # interface grey it out as an empty collection, which is how a
+            # working default would look broken.
+            members = [st["by_collection"].get(m, {}) for m in rag_config.MIXED_MEMBERS]
+            docs = sum(m.get("documents", 0) for m in members)
+            chunks = sum(m.get("chunks", 0) for m in members)
         out.append(RagCollectionOut(
             id=cid, label=meta["label"], authority=meta["authority"],
-            note=meta["note"], documents=counts.get("documents", 0),
-            chunks=counts.get("chunks", 0),
+            note=meta["note"], documents=docs, chunks=chunks,
         ))
     has_third_party = any(cid in st["by_collection"]
                           for cid in rag_config.THIRD_PARTY_COLLECTIONS)

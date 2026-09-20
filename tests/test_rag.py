@@ -183,7 +183,7 @@ def test_search_all_keeps_sources_separated(db, monkeypatch):
 def test_collections_endpoint_lists_everything_when_nothing_is_restricted():
     """Con el corpus abierto, el listado anuncia las cuatro colecciones."""
     ids = {c["id"] for c in client.get("/rag/collections").json()["collections"]}
-    assert ids == {"libros", "metodo", "defensa_tfm", "crack23"}
+    assert ids == {"mixto", "libros", "metodo", "defensa_tfm", "crack23"}
 
 
 def test_collections_endpoint_hides_the_restricted_ones_when_gated(monkeypatch):
@@ -205,7 +205,7 @@ def test_collections_endpoint_lists_everything_for_a_reviewer(gated, monkeypatch
     monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
     body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()
     ids = {c["id"]: c for c in body["collections"]}
-    assert set(ids) == {"libros", "metodo", "defensa_tfm", "crack23"}
+    assert set(ids) == {"mixto", "libros", "metodo", "defensa_tfm", "crack23"}
     assert ids["libros"]["authority"] == "academico"
     assert ids["defensa_tfm"]["authority"] == "defensa"
     assert ids["crack23"]["authority"] == "opinion"
@@ -376,3 +376,57 @@ def test_the_listing_reports_the_plain_scope_without_the_books(monkeypatch):
         "by_collection": {"metodo": {"documents": 14, "chunks": 286}}})
     body = client.get("/rag/collections").json()
     assert body["corpus_scope"] == config.CORPUS_SCOPE
+
+
+# ---- la colección mixta ------------------------------------------------------
+
+def test_the_mix_is_the_default_and_excludes_opinion():
+    """Manuales y método juntos; la divulgación de opinión, aparte.
+
+    La regla del módulo no es «una colección cada vez», es «no enfrentar
+    autoridades distintas». `crack23` está fuera por eso, no por descuido.
+    """
+    assert config.DEFAULT_COLLECTION == config.MIXED_ID
+    assert set(config.MIXED_MEMBERS) == {"libros", "metodo", "defensa_tfm"}
+    assert "crack23" not in config.MIXED_MEMBERS
+
+
+def test_the_mix_returns_passages_from_more_than_one_collection(db, monkeypatch):
+    """Si sólo devolviera una fuente, sería un alias, no una mezcla."""
+    from rag import retrieve
+
+    monkeypatch.setattr(config, "MIXED_MEMBERS", ("libros", "crack23"))
+    hits = retrieve.search("deuda publica", config.MIXED_ID, top_k=6, con=db)
+    assert hits, "la mezcla no devolvió nada"
+    assert len({h.collection for h in hits}) > 1, [h.collection for h in hits]
+
+
+def test_every_passage_from_the_mix_keeps_its_own_authority(db, monkeypatch):
+    """La cita tiene que seguir diciendo de dónde sale cada pasaje."""
+    from rag import retrieve
+
+    monkeypatch.setattr(config, "MIXED_MEMBERS", ("libros", "crack23"))
+    for h in retrieve.search("deuda publica", config.MIXED_ID, top_k=6, con=db):
+        assert h.collection in {"libros", "crack23"}
+        assert h.authority == config.COLLECTIONS[h.collection]["authority"]
+        assert h.authority != "mixto"
+
+
+def test_the_mix_cannot_be_a_side_door_into_a_gated_collection(monkeypatch):
+    """Si un miembro está cerrado, la mezcla se cierra con él."""
+    monkeypatch.setattr(config, "RESTRICTED_COLLECTIONS", frozenset({"libros"}))
+    monkeypatch.setattr(config, "REVIEWER_TOKEN", "t0ken")
+    assert config.readable(config.MIXED_ID, None) is False
+    assert config.readable(config.MIXED_ID, "t0ken") is True
+
+
+def test_the_listing_reports_the_mix_with_the_sum_of_its_members(monkeypatch):
+    """Cero fragmentos haría que la interfaz apagase el destino por defecto."""
+    monkeypatch.setattr("rag.store.stats", lambda con: {
+        "documents": 73, "chunks": 17691,
+        "by_collection": {"libros": {"documents": 58, "chunks": 17402},
+                          "metodo": {"documents": 14, "chunks": 286},
+                          "defensa_tfm": {"documents": 1, "chunks": 3}}})
+    body = client.get("/rag/collections").json()
+    mix = next(c for c in body["collections"] if c["id"] == config.MIXED_ID)
+    assert (mix["documents"], mix["chunks"]) == (73, 17691)

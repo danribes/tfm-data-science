@@ -27,7 +27,7 @@ REMOTE_EMBED = MODE == "remote_hybrid"
 PUBLIC_MODE = MODE == "public_lexical"
 RETRIEVAL_MODE = "lexical" if PUBLIC_MODE else "hybrid"
 CORPUS_SCOPE = "public_project_docs" if PUBLIC_MODE else "private_local"
-DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "libros"
+DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "mixto"
 
 #: Where a query is encoded when the model cannot be loaded locally. The model
 #: must be the one that produced the stored vectors: a query embedded by any
@@ -51,7 +51,24 @@ CRACK_DIR = DATA_ROOT / "crack23"
 #: Collections are kept strictly apart at retrieval time. A textbook passage and
 #: a YouTube transcript must never compete in the same ranked list — citing a
 #: channel with the same authority as Mankiw would discredit the whole answer.
+#: Colecciones que pueden fundirse en una misma respuesta.
+#:
+#: La regla del módulo de recuperación es que un manual y una transcripción de
+#: YouTube no se ordenen nunca en la misma lista. Eso no prohíbe mezclar: lo
+#: que prohíbe es mezclar autoridades distintas. `libros` (académico), `metodo`
+#: y `defensa_tfm` (propios) se citan con peso comparable; `crack23` (opinión)
+#: se queda fuera por ese mismo motivo, y sigue consultable por separado.
+MIXED_ID = "mixto"
+MIXED_MEMBERS: tuple[str, ...] = ("libros", "metodo", "defensa_tfm")
+
 COLLECTIONS = {
+    MIXED_ID: {
+        "label": "Manuales y método, juntos",
+        "authority": "mixto",
+        "note": "Funde los manuales de economía con la documentación propia del "
+                "proyecto. Cada pasaje conserva su colección y su autoridad, de "
+                "modo que la cita sigue diciendo de dónde sale.",
+    },
     "libros": {
         "label": "Economía y métodos",
         "authority": "academico",
@@ -255,5 +272,11 @@ def effective_scope(has_third_party: bool) -> str:
 
 
 def readable(collection: str, token: str | None) -> bool:
-    """A collection is readable when it is not restricted, or the token matches."""
+    """A collection is readable when it is not restricted, or the token matches.
+
+    The mix is readable only when every member is: otherwise it would be a
+    side door into a gated collection.
+    """
+    if collection == MIXED_ID:
+        return all(readable(m, token) for m in MIXED_MEMBERS)
     return not is_restricted(collection) or token_ok(token)

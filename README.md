@@ -128,8 +128,17 @@ entero sin credencial. Las cuatro colecciones responden a cualquier consulta:
 | `metodo` | 14 | 286 | propia |
 | `defensa_tfm` | 1 | 3 | propia |
 
-`corpus_scope` vale `full_open`, y `default_collection` es `libros`: la consulta
-por defecto de la aplicación va contra los manuales.
+`corpus_scope` vale `full_open`. La colección por defecto es `mixto`, que no es
+una fuente sino una vista: funde `libros`, `metodo` y `defensa_tfm` en una sola
+respuesta, de modo que una pregunta se contesta a la vez con los manuales y con
+la documentación del propio proyecto.
+
+La mezcla se hace con RRF sobre los rangos de cada colección —nunca sobre sus
+puntuaciones, que no son comparables— y cada pasaje conserva su colección y su
+autoridad, así que la cita sigue diciendo de dónde sale. `crack23` queda fuera
+de la mezcla: la regla del recuperador no es «una colección cada vez» sino «no
+enfrentar autoridades distintas», y la divulgación de opinión no se ordena
+contra un manual. Sigue consultable por separado.
 
 **Qué significa.** `libros` son manuales de terceros con derechos de autor.
 Servirlos abiertos convierte `/rag/search` en un recuperador público de texto
