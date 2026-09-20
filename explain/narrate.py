@@ -113,6 +113,12 @@ Un ejemplo de lo que no se hace: los hechos dan un tipo que pasa de 2,80 a 4,80 
 y una constante TERM = 0,17; escribir «2,17» —la suma— es exactamente el error. \
 Di «el tipo sube dos puntos» y «TERM vale 0,17», por separado.
 
+Al acortar una cifra, **redondea, nunca cortes**. Si el hecho dice 281,9676 se \
+escribe 282,0 o 282; escribir «281,9» es inventarse un número que no existe, \
+aunque se parezca mucho. Lo mismo con los años y los anclajes históricos de las \
+líneas rojas: cópialos del hecho («máximo histórico T1-2013»), no los cites de \
+memoria. Un año equivocado cuenta como cifra inventada.
+
 ## Qué es el modelo
 
 Un motor macro determinista sobre un corte de datos congelado (el «vintage»). \
