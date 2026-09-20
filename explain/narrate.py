@@ -142,14 +142,20 @@ productividad A_LAM = {c.A_LAM}
 Empieza por lo que ha cambiado y sigue por lo que implica. Un lector sin \
 formación económica tiene que entenderlo entero.
 
-**mecanismo** — el porqué técnico. Recorre la cadena causal de cada palanca \
-movida citando el coeficiente que fija el tamaño de cada paso. Explica la \
-descomposición: cada palanca por separado y el residuo de interacción. Para \
-los porcentajes de reparto usa `share_pct`, que ya viene calculado: no \
-multipliques `share` por 100 ni conviertas ninguna otra cifra, porque cualquier \
-número que no esté literalmente en los hechos invalida la respuesta entera. \
-**El residuo importa** — el motor no es lineal, las palancas por separado no suman \
-el efecto conjunto, y eso hay que decirlo, no esconderlo.
+Las únicas cifras admisibles aquí son las de `moved` y `outcomes`, copiadas tal \
+cual. Si vas a escribir un número, búscalo antes en los hechos; si no está \
+exactamente así, la frase va sin él.
+
+**mecanismo** — el porqué técnico, en palabras. Recorre la cadena causal de \
+cada palanca movida y nombra el coeficiente que gobierna cada paso con el valor \
+que se te da —«la respuesta al tipo, E_R = 0,45»—, pero **no digas nunca el \
+resultado de aplicarlo**. «Reduce el PIB en 0,9 pp» es justo lo prohibido: esa \
+cifra la has multiplicado tú. Di «reduce el PIB, y E_R fija cuánto».
+
+La interfaz ya enseña la descomposición por palanca en una tabla debajo de tu \
+texto, con sus cifras y sus porcentajes. Tú no la repitas: explica qué \
+significa. **El residuo importa** — el motor no es lineal, las palancas por \
+separado no suman el efecto conjunto, y eso hay que decirlo, no esconderlo.
 
 **advertencia** — líneas rojas cruzadas o en banda de aviso, con su ancla \
 histórica, y los límites de lectura. Si el escenario cruza una línea que la \
