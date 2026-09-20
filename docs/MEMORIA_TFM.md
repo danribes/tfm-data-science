@@ -56,7 +56,75 @@ La sección 2 sitúa el trabajo en la literatura de sostenibilidad de la deuda, 
 
 ## 2. Estado del arte
 
-<!-- PENDIENTE: sección de estado del arte con literatura verificada. -->
+Este trabajo toca cuatro literaturas que rara vez se citan juntas: análisis de sostenibilidad de la deuda, dinámica regional de precios de vivienda, predicción con modelos globales y evaluación de sistemas de recuperación aumentada. La sección las recorre en ese orden y termina situando la contribución propia. El criterio de selección ha sido la pertinencia para una decisión concreta del diseño, no la exhaustividad.
+
+### 2.1 Sostenibilidad de la deuda y proyecciones estocásticas
+
+El análisis de sostenibilidad de la deuda (DSA) combina una identidad contable con supuestos sobre tipos, crecimiento y política fiscal. Escolano (2010) ofrece el tratamiento operativo de esa aritmética. La forma estocástica moderna se consolida con Celasun, Ostry y Debrun (2006), que estiman una función de reacción fiscal, simulan choques correlacionados y presentan el resultado como *fan chart*: el antecedente metodológico directo de las bandas Monte Carlo de esta memoria. Berti (2013) desarrolla la variante basada en la matriz histórica de varianzas y covarianzas para países de la UE.
+
+Los marcos institucionales vigentes son el SRDSF del FMI (2022), que sustituye a la guía de 2013 y articula módulos de riesgo a corto y medio plazo junto al análisis estocástico, y el marco del BCE para soberanos del área euro de Bouabdallah et al. (2017), que hace explícita la sensibilidad al diferencial $r-g$. Zenios et al. (2021) formulan el problema como gestión de riesgo de la cartera de deuda.
+
+Conviene fijar la distinción que gobierna toda la interpretación de la sección 6: estos marcos producen bandas cuyo propósito es asignar verosimilitud a trayectorias. El motor de esta memoria produce bandas condicionales a supuestos elegidos. La técnica se parece; el estatus inferencial no.
+
+### 2.2 El diferencial $r-g$ y la función de reacción fiscal
+
+Blanchard (2019) reabrió el debate al argumentar que con $r<g$ los costes fiscales y de bienestar de la deuda pública son menores de lo que supone la ortodoxia, tesis que desarrolla en Blanchard (2023). Jordà et al. (2019) aportan la base empírica de largo plazo sobre rendimientos y crecimiento en dieciséis economías avanzadas, útil para acotar qué valores de $r-g$ son históricamente plausibles.
+
+La objeción relevante para un horizonte de veinticinco años la formulan Mauro y Zhou (2021): un diferencial negativo no garantiza sostenibilidad, porque los diferenciales se revierten de forma abrupta precisamente cuando el soberano es vulnerable. Es la razón por la que este trabajo trata $r-g$ como palanca explorable y no como tendencia extrapolable, y por la que el motor incorpora un diferencial soberano endógeno al nivel de deuda.
+
+Sobre la respuesta fiscal, Bohn (1998) establece el contraste de sostenibilidad basado en la reacción positiva del superávit primario a la deuda rezagada; Mendoza y Ostry (2008) lo extienden a un panel internacional y documentan su debilitamiento con deuda alta; y Ghosh et al. (2013) formalizan la «fatiga fiscal» y derivan de ella el límite de deuda y el espacio fiscal. Esta literatura es el contexto del único parámetro fiscal que esta memoria consigue estimar, `PB_PERSIST` (sección 5.2); los demás quedan calibrados.
+
+### 2.3 Expectativas de inflación en la curva de Phillips
+
+El motor emplea una curva de Phillips neokeynesiana híbrida con un peso adaptativo. La forma procede de Galí y Gertler (1999), que introducen una fracción de fijadores de precios retrospectivos, y de Galí, Gertler y López-Salido (2005), que defienden la robustez de la estimación frente a las críticas econométricas —entre ellas Rudd y Whelan (2007)—.
+
+El dato decisivo para este trabajo es negativo. Mavroeidis, Plagborg-Møller y Stock (2014) muestran en un survey extenso que la curva está débilmente identificada y que los datos disponibles no discriminan bien entre pesos retrospectivos y prospectivos. Coibion, Gorodnichenko y Kamdar (2018) llegan a una conclusión compatible desde la evidencia sobre formación de expectativas. Esto justifica que el peso adaptativo se exponga aquí como **supuesto de escenario ajustable por quien consulta**, y no como parámetro estimado: la literatura no respalda fijarlo con precisión, y presentarlo como estimación sería una falsa precisión.
+
+### 2.4 Precios de vivienda, heterogeneidad regional y dependencia transversal
+
+Para España, Martínez Pagés y Maza (2003) fijan el marco del banco central sobre determinantes del precio antes del ciclo; Ayuso y Restoy (2006) examinan la relación precio-alquiler; y Álvarez Román y García-Posada Gómez (2019) estiman la relación de largo plazo en un panel provincial 1985–2018 y concluyen que los agregados nacionales **ocultan heterogeneidad regional sustancial**, que es el argumento para trabajar con el panel regional.
+
+En dinámica general, Case y Shiller (1989, 1990) documentan momentum y predictibilidad de rendimientos en exceso, y Capozza, Hendershott y Mack (2004) descomponen la dinámica local en un componente de momentum de corto plazo y otro de reversión hacia el equilibrio, estimando ambas velocidades: es el antecedente directo del parámetro $r=1-\phi$ de la sección 5.2. Glaeser y Nathanson (2017) muestran cómo un modelo extrapolativo genera ambos fenómenos a la vez.
+
+La literatura de inferencia en panel es la que sostiene el hallazgo central de esta memoria. Agrupar errores por unidad admite dependencia dentro de cada región, pero no la dependencia *entre* regiones inducida por un factor temporal común. Driscoll y Kraay (1998) proponen el estimador robusto a ese caso; Pesaran (2021) aporta el contraste CD para diagnosticarlo; y Pesaran (2006) formaliza los efectos correlacionados comunes, mostrando que la inferencia que ignora un factor común es inválida. Abadie, Athey, Imbens y Wooldridge (2023) reformulan el problema: agrupar es una decisión sobre el diseño muestral, no un reflejo automático, y agrupar por la dimensión equivocada produce intervalos demasiado estrechos.
+
+Que en España opere un factor común fuerte no es una conjetura de este trabajo. Ghirelli, Leiva-León y Urtasun (2023) miden la sincronización de los ciclos de precios entre ciudades españolas y encuentran convergencia con máximo en 2009; y Galesi et al. (2020) documentan que **un único factor común explica en torno al 60 % de la variación entre las 52 provincias**, incluidas Ceuta y Melilla. El remuestreo sincronizado de la sección 5.3 es, por tanto, un contraste motivado por evidencia publicada sobre el mismo mercado, no una elección conservadora arbitraria.
+
+El instrumental de remuestreo procede de Künsch (1989), que introduce el bootstrap por bloques móviles, y de Politis y Romano (1994) para la variante estacionaria; Lahiri (1999) compara formalmente las variantes y es la fuente citable para justificar el esquema circular. Politis y Romano propusieron el procedimiento circular en 1992, en un capítulo cuya referencia bibliográfica completa no ha podido verificarse y que por ello se menciona como origen histórico sin paginación.
+
+### 2.5 Modelos globales y la dificultad de batir referencias simples
+
+La evidencia de las competiciones de predicción es directamente relevante para el resultado negativo de la sección 6.2. Makridakis, Spiliotis y Assimakopoulos (2018) documentan que los métodos de aprendizaje automático no superaron a los estadísticos simples en un conjunto amplio de series. En la M4 (Makridakis et al., 2020) sólo ganaron los enfoques híbridos y de combinación: el método vencedor fue el ES-RNN de Smyl (2020), que combina suavizado exponencial local con una red recurrente global, y FFORMA (Montero-Manso et al., 2020) quedó segundo mediante combinación ponderada.
+
+La M5 (Makridakis et al., 2022) invirtió el resultado y los métodos de aprendizaje automático entrenados globalmente dominaron. La reconciliación teórica la ofrecen Montero-Manso e Hyndman (2021): un modelo global puede igualar a cualquier conjunto de modelos locales sin suponer que las series se parezcan, pero su ventaja depende de la complejidad del modelo en relación con el tamaño del conjunto. Semenoglou et al. (2021) cuantifican cuántas series hacen falta para que el aprendizaje cruzado rinda.
+
+Leída con esta literatura, la configuración de la sección 5.4 —entrenamiento sobre 1.760 series extranjeras, evaluación sobre 17 series españolas, con transferencia de dominio y una referencia de tendencia fuerte en series persistentes— es precisamente aquella en la que no cabe esperar que un modelo global gane. El resultado negativo es el caso base previsto por la literatura, y su interés no está en la sorpresa sino en que la regla de decisión se fijó antes. MASE se emplea siguiendo a Hyndman y Koehler (2006).
+
+### 2.6 Predicción de impago soberano y evaluación con clases desbalanceadas
+
+Manasse y Roubini (2009) establecen el enfoque de árboles de clasificación para crisis de deuda soberana; Fioramanti (2008), Dawood, Horsewood y Strobel (2017) y Beutel, List y von Schweinitz (2019) recorren variantes de aprendizaje automático y sistemas de alerta temprana. Moreno Badia et al. (2022) aportan las cifras de referencia del campo: AUC de 0,81 en economías avanzadas y emergentes y 0,71 en países de renta baja, frente a un máximo de 0,69 y 0,68 en Cerovic et al. (2018).
+
+Dos resultados metodológicos condicionan cómo debe leerse el AUC de 0,6736 de la sección 6.3. El primero: Bluwstein et al. (2023) muestran que, sobre los mismos datos y el mismo modelo, el esquema de validación cruzada mueve el AUC entre 0,91 sin restricciones y 0,77 con bloqueo estricto por año y episodio. Un AUC obtenido con particiones agrupadas por país no es comparable con cifras publicadas sin bloqueo. El segundo: Roberts et al. (2017) establecen que ignorar la estructura de dependencia al construir las particiones subestima gravemente el error de predicción, lo que convierte el agrupamiento por país en un requisito y no en una precaución opcional.
+
+Sobre la métrica, Saito y Rehmsmeier (2015) y Davis y Goadrich (2006) establecen que con clases desbalanceadas la curva precisión-exhaustividad es más informativa que la ROC, porque su línea base es la prevalencia. King y Zeng (2001) tratan el sesgo de los modelos binarios con eventos raros. El propio Moreno Badia et al. (2022) reconoce las limitaciones del AUC bajo desbalanceo. De ahí que la sección 6.3 informe la precisión media junto a la frecuencia base, y que la magnitud interpretable sea su cociente.
+
+### 2.7 Evaluación de recuperación aumentada y anclaje de modelos de lenguaje
+
+Lewis et al. (2020) introducen la generación aumentada por recuperación. El componente denso sigue el paradigma bi-codificador de Karpukhin et al. (2020); el modelo concreto empleado se documenta en Wang, Yang et al. (2024) y se sitúa públicamente en MTEB (Muennighoff et al., 2023). La mitad léxica sigue el marco probabilístico de Robertson y Zaragoza (2009), y la combinación emplea la fusión recíproca de rangos de Cormack, Clarke y Buettcher (2009). Thakur et al. (2021) documentan con BEIR que un recuperador denso ajustado en un dominio se degrada fuera de él, que es el argumento para no prescindir de la mitad léxica.
+
+Para la calidad de la respuesta, Es et al. (2024) proponen con RAGAs las métricas sin referencia hoy canónicas —fidelidad, relevancia de la respuesta y relevancia del contexto—, y Saad-Falcon et al. (2024) muestran con ARES cómo calibrar jueces automáticos contra una muestra pequeña de anotación humana. El marco formal de la atribución es el AIS de Rashkin et al. (2023), que es exactamente la pregunta planteada al juez automático en la sección 6.6. Liu, Zhang y Liang (2023) auditaron buscadores generativos y encontraron que sólo una fracción minoritaria de frases está plenamente respaldada por su cita: **la presencia de una cita no equivale a una afirmación verificada**. Ji et al. (2023) proporcionan la taxonomía que separa alucinación intrínseca de extrínseca.
+
+El uso de un segundo modelo como juez está avalado y acotado a la vez. Zheng et al. (2023) cuantifican un acuerdo en torno al 80 % con anotadores humanos y enumeran sus sesgos; Wang, Li et al. (2024) demuestran que el veredicto puede invertirse permutando el orden de los candidatos; y Panickssery, Bowman y Feng (2024) muestran que un modelo reconoce y favorece su propio texto. La consecuencia para esta memoria es que el «10 de 12» de la sección 6.6 se presenta como indicio y no como medida.
+
+Por último, la autocrítica central sobre el hit@8 tiene respaldo formal. Fuhr (2018) enumera los errores habituales en evaluación de recuperación —entre ellos reutilizar el mismo conjunto para ajustar y para informar—; Gorman y Bedrick (2019) demuestran que los rankings obtenidos sobre una partición fija y reutilizada no se reproducen bajo remuestreo; y Dwork et al. (2015) dan la base teórica del sobreajuste por reutilización adaptativa de un conjunto de validación. Por eso el 34/35 se presenta aquí como **cota superior y no como estimación**.
+
+### 2.8 Posición de este trabajo
+
+De lo anterior se desprende dónde encaja esta memoria y dónde no. No propone un algoritmo nuevo ni un marco DSA alternativo. Tres elecciones lo distinguen de la práctica habitual:
+
+1. **Integra las cuatro literaturas en un mismo artefacto ejecutable**, de modo que la trazabilidad entre un número de la interfaz y el artefacto que lo respalda es comprobable, no declarativa.
+2. **Trata la elección del esquema de inferencia como resultado y no como detalle técnico.** La literatura de dependencia transversal es conocida; lo que aquí se hace es medir cuánto cambia una conclusión sustantiva sobre España al aplicarla, y publicar ambas bandas.
+3. **Somete la capa de lenguaje a una comprobación numérica automática**, en lugar de evaluarla sólo con métricas de fidelidad. La literatura de atribución mide si una afirmación está respaldada; aquí se impide además que el modelo introduzca aritmética propia, y se informa de con qué frecuencia lo intenta.
 
 ## 3. Datos y trazabilidad
 
@@ -182,7 +250,7 @@ Tres componentes describen la historia sin pretender predecirla, y se agrupan aq
 
 ### 5.6 Recuperación documental y capa de lenguaje
 
-**Recuperación.** La consulta combina embeddings multilingües E5, búsqueda léxica BM25 y fusión de rangos, con separación entre colecciones académicas, metodología propia y opinión, y con etiquetado de autoridad para que un manual y un canal divulgativo no se citen con el mismo peso. Se comprueban identificadores, citas y pertenencia de pasajes a la colección solicitada. La evaluación distingue tres cosas: encontrar un documento, recuperar un pasaje pertinente y producir una respuesta respaldada. [Lewis et al., 2020](https://proceedings.nips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html), [Wang et al., 2024](https://arxiv.org/abs/2402.05672), [protocolo](eval/README_RAG.md).
+**Recuperación.** La consulta combina embeddings multilingües E5, búsqueda léxica BM25 y fusión de rangos, con separación entre colecciones académicas, metodología propia y opinión, y con etiquetado de autoridad para que un manual y un canal divulgativo no se citen con el mismo peso. Se comprueban identificadores, citas y pertenencia de pasajes a la colección solicitada. La evaluación distingue tres cosas: encontrar un documento, recuperar un pasaje pertinente y producir una respuesta respaldada. [Lewis et al., 2020](https://proceedings.nips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html), [Wang, Yang et al., 2024](https://arxiv.org/abs/2402.05672), [protocolo](eval/README_RAG.md).
 
 **Capa de lenguaje.** El modelo de lenguaje tiene dos usos y en ambos rige la misma restricción: *escribe, nunca calcula*.
 
@@ -303,14 +371,108 @@ La [matriz de evidencia](RESULTS.md) resume cada experimento, su alcance y sus p
 
 ## Referencias
 
-- Beers, D., Ndukwe, O. y Berry, J. (2025). [BoC–BoE Sovereign Default Database: What's new in 2025?](https://www.bankofcanada.ca/2025/10/staff-analytical-note-2025-24/). Bank of Canada, Staff Analytical Note 2025-24.
-- Cameron, A. C. y Miller, D. L. (2015). [A Practitioner's Guide to Cluster-Robust Inference](https://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015.pdf). *Journal of Human Resources*, 50(2), 317–372.
-- FMI (2022). [Staff Guidance Note on the Sovereign Risk and Debt Sustainability Framework for Market Access Countries](https://www.imf.org/-/media/files/publications/pp/2022/english/ppea2022039.pdf). Policy Paper 2022/039.
-- Hyndman, R. J. y Koehler, A. B. (2006). [Another look at measures of forecast accuracy](https://robjhyndman.com/papers/mase.pdf). *International Journal of Forecasting*, 22(4), 679–688. DOI: 10.1016/j.ijforecast.2006.03.001.
-- Jordà, Ò. (2005). [Estimation and Inference of Impulse Responses by Local Projections](https://www.aeaweb.org/articles?id=10.1257/0002828053828518). *American Economic Review*, 95(1), 161–182. DOI: 10.1257/0002828053828518.
-- Lewis, P. et al. (2020). [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://proceedings.nips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html). *Advances in Neural Information Processing Systems*, 33.
-- Lundberg, S. M. y Lee, S.-I. (2017). [A Unified Approach to Interpreting Model Predictions](https://proceedings.neurips.cc/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html). *Advances in Neural Information Processing Systems*, 30.
-- Wang, L. et al. (2024). [Multilingual E5 Text Embeddings: A Technical Report](https://arxiv.org/abs/2402.05672). arXiv:2402.05672.
+Cada entrada se ha comprobado contra un registro autorizado —Crossref por DOI, la API de arXiv por identificador, o el servidor de la institución emisora cuando la serie no está indexada en Crossref—. Tres precisiones, por si el lector repite la comprobación:
+
+- Se omite deliberadamente la paginación de tres registros que las fuentes consultadas no devuelven (Künsch, 1989; Lahiri, 1999; Friedman, 2001), en lugar de tomarla de fuentes secundarias.
+- Case y Shiller (1989) carece de DOI: la revista no está indexada en Crossref con anterioridad a 1999. Se cita sin identificador persistente y se indica la versión de trabajo equivalente.
+- El DOI de Berti (2013) está registrado por la Oficina de Publicaciones de la UE y no por Crossref, de modo que resuelve en `doi.org` pero devuelve 404 en la API de Crossref. Las series de documentos de trabajo del Banco de España tampoco están en Crossref y se han verificado contra el servidor de la institución.
+
+### Sostenibilidad de la deuda y política fiscal
+
+- Berti, K. (2013). *Stochastic public debt projections using the historical variance-covariance matrix approach for EU countries*. European Economy Economic Papers 480, Comisión Europea, DG ECFIN. DOI: 10.2765/4211.
+- Blanchard, O. (2019). Public Debt and Low Interest Rates. *American Economic Review*, 109(4), 1197–1229. DOI: 10.1257/aer.109.4.1197.
+- Blanchard, O. (2023). *Fiscal Policy under Low Interest Rates*. The MIT Press. DOI: 10.7551/mitpress/14858.001.0001.
+- Bohn, H. (1998). The Behavior of U.S. Public Debt and Deficits. *The Quarterly Journal of Economics*, 113(3), 949–963. DOI: 10.1162/003355398555793.
+- Bouabdallah, O., Checherita-Westphal, C., Warmedinger, T., de Stefani, R., Drudi, F., Setzer, R. y Westphal, A. (2017). *Debt sustainability analysis for euro area sovereigns: a methodological framework*. ECB Occasional Paper Series 185, Banco Central Europeo.
+- Celasun, O., Ostry, J. D. y Debrun, X. (2006). Primary Surplus Behavior and Risks to Fiscal Sustainability in Emerging Market Countries: A «Fan-Chart» Approach. *IMF Staff Papers*, 53(3), 401–425. DOI: 10.2307/30035919.
+- Escolano, J. (2010). *A Practical Guide to Public Debt Dynamics, Fiscal Sustainability, and Cyclical Adjustment of Budgetary Aggregates*. IMF Technical Notes and Manuals 2010/002. DOI: 10.5089/9781462396955.005.
+- FMI (2022). *Staff Guidance Note on the Sovereign Risk and Debt Sustainability Framework for Market Access Countries*. IMF Policy Papers, 2022(039). DOI: 10.5089/9798400216862.007.
+- Ghosh, A. R., Kim, J. I., Mendoza, E. G., Ostry, J. D. y Qureshi, M. S. (2013). Fiscal Fatigue, Fiscal Space and Debt Sustainability in Advanced Economies. *The Economic Journal*, 123(566), F4–F30. DOI: 10.1111/ecoj.12010.
+- Jordà, Ò., Knoll, K., Kuvshinov, D., Schularick, M. y Taylor, A. M. (2019). The Rate of Return on Everything, 1870–2015. *The Quarterly Journal of Economics*, 134(3), 1225–1298. DOI: 10.1093/qje/qjz012.
+- Mauro, P. y Zhou, J. (2021). r − g < 0: Can We Sleep More Soundly? *IMF Economic Review*, 69(1), 197–229. DOI: 10.1057/s41308-020-00128-y.
+- Mendoza, E. G. y Ostry, J. D. (2008). International evidence on fiscal solvency: Is fiscal policy «responsible»? *Journal of Monetary Economics*, 55(6), 1081–1093. DOI: 10.1016/j.jmoneco.2008.06.003.
+- Zenios, S. A., Consiglio, A., Athanasopoulou, M., Moshammer, E., Gavilan, A. y Erce, A. (2021). Risk Management for Sustainable Sovereign Debt Financing. *Operations Research*, 69(3), 755–773. DOI: 10.1287/opre.2020.2055.
+
+### Inflación y expectativas
+
+- Coibion, O., Gorodnichenko, Y. y Kamdar, R. (2018). The Formation of Expectations, Inflation, and the Phillips Curve. *Journal of Economic Literature*, 56(4), 1447–1491. DOI: 10.1257/jel.20171300.
+- Galí, J. y Gertler, M. (1999). Inflation dynamics: A structural econometric analysis. *Journal of Monetary Economics*, 44(2), 195–222. DOI: 10.1016/S0304-3932(99)00023-9.
+- Galí, J., Gertler, M. y López-Salido, J. D. (2005). Robustness of the estimates of the hybrid New Keynesian Phillips curve. *Journal of Monetary Economics*, 52(6), 1107–1118. DOI: 10.1016/j.jmoneco.2005.08.005.
+- Mavroeidis, S., Plagborg-Møller, M. y Stock, J. H. (2014). Empirical Evidence on Inflation Expectations in the New Keynesian Phillips Curve. *Journal of Economic Literature*, 52(1), 124–188. DOI: 10.1257/jel.52.1.124.
+- Rudd, J. y Whelan, K. (2007). Modeling Inflation Dynamics: A Critical Review of Recent Research. *Journal of Money, Credit and Banking*, 39(s1), 155–170. DOI: 10.1111/j.1538-4616.2007.00019.x.
+
+### Mercado de la vivienda
+
+- Álvarez Román, L. y García-Posada Gómez, M. (2019). *Modelling Regional Housing Prices in Spain*. Documentos de Trabajo 1941, Banco de España.
+- Ayuso, J. y Restoy, F. (2006). House prices and rents: An equilibrium asset pricing approach. *Journal of Empirical Finance*, 13(3), 371–388. DOI: 10.1016/j.jempfin.2005.10.004.
+- Capozza, D. R., Hendershott, P. H. y Mack, C. (2004). An Anatomy of Price Dynamics in Illiquid Markets: Analysis and Evidence from Local Housing Markets. *Real Estate Economics*, 32(1), 1–32. DOI: 10.1111/j.1080-8620.2004.00082.x.
+- Case, K. E. y Shiller, R. J. (1989). The Efficiency of the Market for Single-Family Homes. *American Economic Review*, 79(1), 125–137. (Sin DOI: la revista no está indexada en Crossref con anterioridad a 1999. Versión de trabajo: NBER w2506, DOI 10.3386/w2506.)
+- Case, K. E. y Shiller, R. J. (1990). Forecasting Prices and Excess Returns in the Housing Market. *Real Estate Economics*, 18(3), 253–273. DOI: 10.1111/1540-6229.00521.
+- Galesi, A., Mata, N., Rey, D., Schmitz, S. y Schuffels, J. (2020). *Regional Housing Market Conditions in Spain*. GSBE Research Memorandum 2020/029, Universidad de Maastricht. DOI: 10.26481/umagsb.2020029.
+- Ghirelli, C., Leiva-León, D. y Urtasun, A. (2023). Housing prices in Spain: convergence or decoupling? *SERIEs*, 14(2), 165–187. DOI: 10.1007/s13209-023-00275-1.
+- Glaeser, E. L. y Nathanson, C. G. (2017). An extrapolative model of house price dynamics. *Journal of Financial Economics*, 126(1), 147–170. DOI: 10.1016/j.jfineco.2017.06.012.
+- Martínez Pagés, J. y Maza, L. Á. (2003). *Analysis of House Prices in Spain*. Documento de Trabajo 0307, Banco de España.
+
+### Inferencia en panel y remuestreo
+
+- Abadie, A., Athey, S., Imbens, G. W. y Wooldridge, J. M. (2023). When Should You Adjust Standard Errors for Clustering? *The Quarterly Journal of Economics*, 138(1), 1–35. DOI: 10.1093/qje/qjac038.
+- Cameron, A. C. y Miller, D. L. (2015). A Practitioner's Guide to Cluster-Robust Inference. *Journal of Human Resources*, 50(2), 317–372. DOI: 10.3368/jhr.50.2.317.
+- Driscoll, J. C. y Kraay, A. C. (1998). Consistent Covariance Matrix Estimation with Spatially Dependent Panel Data. *Review of Economics and Statistics*, 80(4), 549–560. DOI: 10.1162/003465398557825.
+- Jordà, Ò. (2005). Estimation and Inference of Impulse Responses by Local Projections. *American Economic Review*, 95(1), 161–182. DOI: 10.1257/0002828053828518.
+- Künsch, H. R. (1989). The Jackknife and the Bootstrap for General Stationary Observations. *The Annals of Statistics*, 17(3). DOI: 10.1214/aos/1176347265.
+- Lahiri, S. N. (1999). Theoretical comparisons of block bootstrap methods. *The Annals of Statistics*, 27(1). DOI: 10.1214/aos/1018031117.
+- Pesaran, M. H. (2006). Estimation and Inference in Large Heterogeneous Panels with a Multifactor Error Structure. *Econometrica*, 74(4), 967–1012. DOI: 10.1111/j.1468-0262.2006.00692.x.
+- Pesaran, M. H. (2021). General diagnostic tests for cross-sectional dependence in panels. *Empirical Economics*, 60(1), 13–50. DOI: 10.1007/s00181-020-01875-7.
+- Politis, D. N. y Romano, J. P. (1994). The Stationary Bootstrap. *Journal of the American Statistical Association*, 89(428), 1303–1313. DOI: 10.1080/01621459.1994.10476870.
+
+### Predicción, competiciones y modelos globales
+
+- Friedman, J. H. (2001). Greedy function approximation: A gradient boosting machine. *The Annals of Statistics*, 29(5). DOI: 10.1214/aos/1013203451.
+- Hyndman, R. J. y Koehler, A. B. (2006). Another look at measures of forecast accuracy. *International Journal of Forecasting*, 22(4), 679–688. DOI: 10.1016/j.ijforecast.2006.03.001.
+- Makridakis, S., Spiliotis, E. y Assimakopoulos, V. (2018). Statistical and Machine Learning forecasting methods: Concerns and ways forward. *PLOS ONE*, 13(3), e0194889. DOI: 10.1371/journal.pone.0194889.
+- Makridakis, S., Spiliotis, E. y Assimakopoulos, V. (2020). The M4 Competition: 100,000 time series and 61 forecasting methods. *International Journal of Forecasting*, 36(1), 54–74. DOI: 10.1016/j.ijforecast.2019.04.014.
+- Makridakis, S., Spiliotis, E. y Assimakopoulos, V. (2022). M5 accuracy competition: Results, findings, and conclusions. *International Journal of Forecasting*, 38(4), 1346–1364. DOI: 10.1016/j.ijforecast.2021.11.013.
+- Montero-Manso, P., Athanasopoulos, G., Hyndman, R. J. y Talagala, T. S. (2020). FFORMA: Feature-based forecast model averaging. *International Journal of Forecasting*, 36(1), 86–92. DOI: 10.1016/j.ijforecast.2019.02.011.
+- Montero-Manso, P. y Hyndman, R. J. (2021). Principles and algorithms for forecasting groups of time series: Locality and globality. *International Journal of Forecasting*, 37(4), 1632–1653. DOI: 10.1016/j.ijforecast.2021.03.004.
+- Semenoglou, A.-A., Spiliotis, E., Makridakis, S. y Assimakopoulos, V. (2021). Investigating the accuracy of cross-learning time series forecasting methods. *International Journal of Forecasting*, 37(3), 1072–1084. DOI: 10.1016/j.ijforecast.2020.11.009.
+- Smyl, S. (2020). A hybrid method of exponential smoothing and recurrent neural networks for time series forecasting. *International Journal of Forecasting*, 36(1), 75–85. DOI: 10.1016/j.ijforecast.2019.03.017.
+
+### Impago soberano y evaluación con clases desbalanceadas
+
+- Beers, D., Ndukwe, O. y Berry, J. (2025). [BoC–BoE Sovereign Default Database: What's new in 2025?](https://www.bankofcanada.ca/2025/10/staff-analytical-note-2025-24/) Staff Analytical Note 2025-24, Bank of Canada.
+- Beutel, J., List, S. y von Schweinitz, G. (2019). Does machine learning help us predict banking crises? *Journal of Financial Stability*, 45, 100693. DOI: 10.1016/j.jfs.2019.100693.
+- Bluwstein, K., Buckmann, M., Joseph, A., Kapadia, S. y Şimşek, Ö. (2023). Credit growth, the yield curve and financial crisis prediction: Evidence from a machine learning approach. *Journal of International Economics*, 145, 103773. DOI: 10.1016/j.jinteco.2023.103773.
+- Cerovic, S., Gerling, K., Hodge, A. y Medas, P. (2018). *Predicting Fiscal Crises*. IMF Working Papers 2018/181. DOI: 10.5089/9781484372555.001.
+- Davis, J. y Goadrich, M. (2006). The relationship between Precision-Recall and ROC curves. *Proceedings of the 23rd International Conference on Machine Learning (ICML '06)*, 233–240. DOI: 10.1145/1143844.1143874.
+- Dawood, M., Horsewood, N. y Strobel, F. (2017). Predicting sovereign debt crises: An Early Warning System approach. *Journal of Financial Stability*, 28, 16–28. DOI: 10.1016/j.jfs.2016.11.008.
+- Fioramanti, M. (2008). Predicting sovereign debt crises using artificial neural networks: A comparative approach. *Journal of Financial Stability*, 4(2), 149–164. DOI: 10.1016/j.jfs.2008.01.001.
+- King, G. y Zeng, L. (2001). Logistic Regression in Rare Events Data. *Political Analysis*, 9(2), 137–163. DOI: 10.1093/oxfordjournals.pan.a004868.
+- Manasse, P. y Roubini, N. (2009). «Rules of thumb» for sovereign debt crises. *Journal of International Economics*, 78(2), 192–205. DOI: 10.1016/j.jinteco.2008.12.002.
+- Moreno Badia, M., Medas, P., Gupta, P. y Xiang, Y. (2022). Debt is not free. *Journal of International Money and Finance*, 127, 102654. DOI: 10.1016/j.jimonfin.2022.102654.
+- Roberts, D. R., Bahn, V., Ciuti, S. et al. (2017). Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure. *Ecography*, 40(8), 913–929. DOI: 10.1111/ecog.02881.
+- Saito, T. y Rehmsmeier, M. (2015). The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets. *PLOS ONE*, 10(3), e0118432. DOI: 10.1371/journal.pone.0118432.
+
+### Recuperación aumentada, atribución y evaluación de modelos de lenguaje
+
+- Cormack, G. V., Clarke, C. L. A. y Buettcher, S. (2009). Reciprocal rank fusion outperforms condorcet and individual rank learning methods. *Proceedings of the 32nd International ACM SIGIR Conference*, 758–759. DOI: 10.1145/1571941.1572114.
+- Dwork, C., Feldman, V., Hardt, M., Pitassi, T., Reingold, O. y Roth, A. (2015). The reusable holdout: Preserving validity in adaptive data analysis. *Science*, 349(6248), 636–638. DOI: 10.1126/science.aaa9375.
+- Es, S., James, J., Espinosa-Anke, L. y Schockaert, S. (2024). RAGAs: Automated Evaluation of Retrieval Augmented Generation. *Proceedings of the 18th Conference of the EACL: System Demonstrations*, 150–158. DOI: 10.18653/v1/2024.eacl-demo.16.
+- Fuhr, N. (2018). Some Common Mistakes In IR Evaluation, And How They Can Be Avoided. *ACM SIGIR Forum*, 51(3), 32–41. DOI: 10.1145/3190580.3190586.
+- Gorman, K. y Bedrick, S. (2019). We Need to Talk about Standard Splits. *Proceedings of the 57th Annual Meeting of the ACL*, 2786–2791. DOI: 10.18653/v1/P19-1267.
+- Ji, Z., Lee, N., Frieske, R. et al. (2023). Survey of Hallucination in Natural Language Generation. *ACM Computing Surveys*, 55(12), 1–38. DOI: 10.1145/3571730.
+- Karpukhin, V., Oğuz, B., Min, S., Lewis, P., Wu, L., Edunov, S., Chen, D. y Yih, W. (2020). Dense Passage Retrieval for Open-Domain Question Answering. *Proceedings of EMNLP 2020*, 6769–6781. DOI: 10.18653/v1/2020.emnlp-main.550.
+- Lewis, P. et al. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. *Advances in Neural Information Processing Systems*, 33. arXiv:2005.11401.
+- Liu, N. F., Zhang, T. y Liang, P. (2023). Evaluating Verifiability in Generative Search Engines. *Findings of the ACL: EMNLP 2023*, 7001–7025. DOI: 10.18653/v1/2023.findings-emnlp.467.
+- Lundberg, S. M. y Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. *Advances in Neural Information Processing Systems*, 30.
+- Muennighoff, N., Tazi, N., Magne, L. y Reimers, N. (2023). MTEB: Massive Text Embedding Benchmark. *Proceedings of the 17th Conference of the EACL*, 2014–2037. DOI: 10.18653/v1/2023.eacl-main.148.
+- Panickssery, A., Bowman, S. R. y Feng, S. (2024). *LLM Evaluators Recognize and Favor Their Own Generations*. arXiv:2404.13076.
+- Rashkin, H., Nikolaev, V., Lamm, M. et al. (2023). Measuring Attribution in Natural Language Generation Models. *Computational Linguistics*, 49(4), 777–840. DOI: 10.1162/coli_a_00486.
+- Robertson, S. y Zaragoza, H. (2009). The Probabilistic Relevance Framework: BM25 and Beyond. *Foundations and Trends in Information Retrieval*, 4(1–2), 1–174. DOI: 10.1561/1500000019.
+- Saad-Falcon, J., Khattab, O., Potts, C. y Zaharia, M. (2024). ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems. *Proceedings of NAACL-HLT 2024*, 338–354. DOI: 10.18653/v1/2024.naacl-long.20.
+- Thakur, N., Reimers, N., Rücklé, A., Srivastava, A. y Gurevych, I. (2021). *BEIR: A Heterogenous Benchmark for Zero-shot Evaluation of Information Retrieval Models*. NeurIPS 2021 Datasets and Benchmarks Track. arXiv:2104.08663.
+- Wang, L., Yang, N., Huang, X., Yang, L., Majumder, R. y Wei, F. [Wang, Yang et al.] (2024). *Multilingual E5 Text Embeddings: A Technical Report*. arXiv:2402.05672.
+- Wang, P., Li, L., Chen, L. et al. [Wang, Li et al.] (2024). Large Language Models are not Fair Evaluators. *Proceedings of ACL 2024*, 9440–9450. DOI: 10.18653/v1/2024.acl-long.511.
+- Zheng, L., Chiang, W.-L., Sheng, Y. et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. NeurIPS 2023 Datasets and Benchmarks Track. arXiv:2306.05685.
 
 ## Anexos
 
