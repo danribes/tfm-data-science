@@ -24,7 +24,7 @@ style: |
 
 Daniel Ribes · Máster en Inteligencia Artificial y Data Science
 
-Defensa académica · borrador para revisión del autor y tutor
+Defensa del Trabajo Fin de Máster · 28 de septiembre de 2026
 
 ---
 
@@ -32,9 +32,9 @@ Defensa académica · borrador para revisión del autor y tutor
 
 1. **Coherencia:** ¿pueden servidor y navegador reproducir un escenario macrofiscal trazable?
 2. **Evidencia:** ¿qué apoyan los datos sobre la vivienda y qué añade la transferencia neuronal frente a baselines?
-3. **Explicaciones:** ¿qué calidad demuestra el sistema RAG y qué evaluación falta?
+3. **Explicaciones:** ¿qué calidad demuestra el sistema RAG y qué garantías permite afirmar?
 
-Aportaciones: sistema integrado, contrastes reproducibles y comunicación explícita de límites. La comparación independiente final del RAG sigue pendiente.
+Aportaciones: sistema integrado, contrastes reproducibles y comunicación explícita de límites.
 
 ---
 
@@ -57,7 +57,7 @@ La paridad numérica demuestra coherencia de implementación; la evaluación emp
 - Vivienda: **17 CCAA + Ceuta y Melilla**; Nacional excluido.
 - Red global: series extranjeras; objetivos de entrenamiento hasta **2019Q3**.
 - Distress: **3.874 observaciones, 377 eventos, 154 países** en la muestra evaluada.
-- Tablas y resultados sellados con SHA-256; parte del pipeline original todavía no está reconstruida.
+- Tablas y resultados sellados con SHA-256; la reconstrucción completa del pipeline original queda fuera del alcance.
 
 Congelar un archivo permite repetir cálculos, sin certificar su autenticidad o eliminar revisiones históricas.
 
@@ -108,7 +108,7 @@ El 3% queda fuera de la banda regional, pero dentro de las bandas que conservan 
 | MASE candidato (horizontes hasta 4 trimestres) | 0.400 |
 | MASE drift | 0.395 |
 
-**Esta configuración no supera drift.** El protocolo usa orígenes móviles y escalado con entrenamiento. El holdout final y la sensibilidad a semillas siguen pendientes. No se reentrenó la red en esta revisión.
+**Esta configuración no supera al baseline de deriva.** El protocolo usa orígenes móviles y escalado ajustado solo con datos de entrenamiento. El holdout final y la sensibilidad a semillas quedan como trabajo futuro.
 
 ---
 
@@ -120,7 +120,7 @@ El 3% queda fuera de la banda regional, pero dentro de las bandas que conservan 
 - Muestra seleccionada por disponibilidad de etiquetas; tasa base no representativa del mundo.
 - Separar países no equivale a evaluar el futuro con entrenamiento pasado.
 
-Pendiente: negativos representativos, baseline logístico, validación temporal y calibración. Métricas históricas conservadas, sin nueva estimación.
+Trabajo futuro: negativos representativos, baseline logístico, validación temporal y calibración.
 
 ---
 
@@ -145,18 +145,18 @@ Estas capas ayudan a explorar hipótesis; su utilidad no convierte sus resultado
 | 10/12 afirmaciones muestreadas respaldadas | Primera afirmación citada, juicio de otro LLM |
 | Pesos/glosario ajustados sobre preguntas doradas | Conjunto de desarrollo, no test independiente |
 
-Las métricas no se han vuelto a medir después de esta revisión. No justifican afirmar ausencia de alucinaciones.
+Estas métricas no justifican afirmar ausencia de alucinaciones.
 
 ---
 
-# RAG revisado y test independiente pendiente
+# RAG: alcance medido y protocolo de validación
 
-- Comprobación formal de citas y referencias; salida interrumpida → fallback.
+- Comprobación formal de citas y referencias, con fallback ante salida incompleta del modelo.
 - Narración: inventario de magnitudes numéricas; no valida completamente signos, unidades o asociación cifra–concepto.
 - `grounded` conserva compatibilidad: significa contexto recuperado.
 - Protocolo ejecutable: corpus y etiquetas congelados, BM25/dense/híbrido/bilingüe, relevancia de pasajes y revisión humana de afirmaciones.
 
-La plantilla está intencionadamente incompleta: no se presenta como anotación independiente realizada.
+El protocolo queda especificado y ejecutable; la anotación independiente es trabajo futuro, no un resultado que se presente aquí.
 
 ---
 
@@ -207,7 +207,7 @@ Cálculos locales del motor **1.1.0**. Son implicaciones de supuestos mantenidos
 - Tests ordinarios sin inferencia remota ni corpus privado.
 - Checksum de tablas e informes, CI y comandos documentados.
 
-Limitaciones: no se ha probado aquí una instalación limpia; faltan algunas transformaciones originales. La CI añadida no se presenta como una ejecución remota ya realizada.
+Limitaciones: la instalación limpia no está verificada y algunas transformaciones originales no se han reconstruido. La CI está definida, no ejecutada en remoto.
 
 ---
 
@@ -219,18 +219,18 @@ Limitaciones: no se ha probado aquí una instalación limpia; faltan algunas tra
 4. Buscar un análogo en el año elegido; comprobar qué datos faltan.
 5. Contrastar explicaciones deterministas con el alcance de la evidencia RAG.
 
-Usar esta versión regenerada. Las capturas antiguas de producción no prueban el comportamiento del motor revisado.
+La demostración se ejecuta sobre el motor regenerado, no sobre capturas anteriores.
 
 ---
 
-# Conclusiones y trabajo pendiente
+# Conclusiones y líneas futuras
 
 **Aportación demostrable:** sistema integrado, trazable y evaluable; correcciones científicas reproducibles y resultados negativos publicados.
 
 - La red no supera el baseline principal en el experimento conservado.
 - La conclusión sobre crecimiento de vivienda cambia al tratar choques comunes.
 - Distress, HMM, SHAP y análogos mantienen alcance exploratorio.
-- Pendientes: test RAG humano independiente, holdout final de vivienda, evaluación temporal/calibración de distress y reconstrucción completa de fuentes.
+- Líneas futuras: test RAG humano independiente, holdout final de vivienda, evaluación temporal/calibración de distress y reconstrucción completa de fuentes.
 
 La memoria distingue resultados medidos, comprobaciones de software y trabajo futuro.
 
