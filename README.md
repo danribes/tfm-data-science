@@ -119,15 +119,29 @@ o Consulta; un servicio RAG caído no impide utilizar los escenarios.
 ### Corpus completo, servido abierto
 
 Por decisión explícita del autor (20-09-2026) el despliegue sirve el corpus
-entero sin credencial: `libros` (58 documentos, 17.402 fragmentos) y `crack23`
-(421 documentos, 3.684 fragmentos) responden como `metodo` y `defensa_tfm`, y
-`corpus_scope` vale `full_open`.
+entero sin credencial. Las cuatro colecciones responden a cualquier consulta:
+
+| Colección | Documentos | Fragmentos | Autoría |
+|---|---:|---:|---|
+| `libros` | 58 | 17.402 | terceros, con derechos de autor |
+| `crack23` | 421 | 3.684 | terceros, divulgación |
+| `metodo` | 14 | 286 | propia |
+| `defensa_tfm` | 1 | 3 | propia |
+
+`corpus_scope` vale `full_open`, y `default_collection` es `libros`: la consulta
+por defecto de la aplicación va contra los manuales.
 
 **Qué significa.** `libros` son manuales de terceros con derechos de autor.
 Servirlos abiertos convierte `/rag/search` en un recuperador público de texto
 literal de esas obras. No es una consecuencia lateral de facilitar el acceso a
 quien evalúa: es una decisión tomada a sabiendas, y se deja escrita aquí para
 que se lea como tal.
+
+**Riesgo asumido.** La política de contenidos de Hugging Face prohíbe alojar
+material infractor. Una denuncia puede retirar el Space, y con él el acceso a
+todo — también a las colecciones propias y a la API del motor. El procedimiento
+de retirada de abajo es, por tanto, además de una cortesía con los titulares de
+derechos, el plan de contingencia del propio trabajo.
 
 **Cómo se cierra otra vez.** La maquinaria de la verja sigue completa en
 `rag/config.py` y bajo prueba. Reponer los nombres en `RESTRICTED_COLLECTIONS`
@@ -136,6 +150,13 @@ y fijar `EVO_RAG_TOKEN` en el Space devuelve el 401 sin tocar la API:
 ```python
 RESTRICTED_COLLECTIONS = frozenset({"libros", "crack23"})
 ```
+
+`THIRD_PARTY_COLLECTIONS`, en cambio, no se toca: describe qué material hay,
+no quién puede leerlo. La distinción no es cosmética. Al abrir el corpus se
+vació `RESTRICTED_COLLECTIONS`, y como `corpus_scope` se calculaba sobre ese
+mismo conjunto, el despliegue pasó a anunciarse como `private_local` mientras
+servía los manuales al mundo. Ahora el ámbito se decide por el material
+presente, y hay pruebas que fallan si vuelve a mentir.
 
 **Cómo se construye y se retira el índice.** Se sube desde una máquina con el
 corpus privado, porque CI no lo tiene ni lo tendrá:

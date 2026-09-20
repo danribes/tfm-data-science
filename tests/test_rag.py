@@ -328,3 +328,51 @@ def test_bearer_header_also_carries_the_token(gated, monkeypatch):
     bad = client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
                       headers={"Authorization": "Bearer otro"})
     assert bad.status_code == 401
+
+
+def test_the_scope_says_the_books_are_there_even_when_ungated():
+    """El despliegue no puede describirse como si no sirviera los manuales.
+
+    `effective_scope` se calculaba sobre RESTRICTED_COLLECTIONS, así que vaciar
+    ese conjunto para abrir el corpus dejó la rama `full_open` inalcanzable: el
+    Space anunciaba `private_local` mientras servía obras con derechos de autor
+    a cualquiera. La pregunta correcta es qué material hay, no quién puede
+    leerlo.
+    """
+    assert config.RESTRICTED_COLLECTIONS == frozenset(), "el corpus se sirve abierto"
+    assert config.effective_scope(True) == "full_open"
+    assert config.effective_scope(False) == config.CORPUS_SCOPE
+
+
+def test_the_scope_still_reports_a_gated_corpus_correctly(monkeypatch):
+    """Y al volver a cerrarlo, vuelve a decirlo."""
+    monkeypatch.setattr(config, "RESTRICTED_COLLECTIONS",
+                        frozenset({"libros", "crack23"}))
+    monkeypatch.setattr(config, "REVIEWER_TOKEN", "t0ken")
+    assert config.effective_scope(True) == "reviewer_restricted"
+    monkeypatch.setattr(config, "REVIEWER_TOKEN", "")
+    assert config.effective_scope(True) == "restricted_locked"
+
+
+def test_the_listing_reports_full_open_when_the_index_holds_the_books(monkeypatch):
+    """El cableado de punta a punta: stats → has_third_party → corpus_scope.
+
+    Se simula el inventario del índice en lugar de construir un corpus real,
+    porque lo que se comprueba es la decisión sobre qué material hay, no la
+    recuperación.
+    """
+    monkeypatch.setattr("rag.store.stats", lambda con: {
+        "documents": 60, "chunks": 21000,
+        "by_collection": {"libros": {"documents": 58, "chunks": 17402},
+                          "metodo": {"documents": 14, "chunks": 286}}})
+    body = client.get("/rag/collections").json()
+    assert body["corpus_scope"] == "full_open", body["corpus_scope"]
+
+
+def test_the_listing_reports_the_plain_scope_without_the_books(monkeypatch):
+    """Sin manuales en el índice, el despliegue es lo que CORPUS_SCOPE dice."""
+    monkeypatch.setattr("rag.store.stats", lambda con: {
+        "documents": 14, "chunks": 286,
+        "by_collection": {"metodo": {"documents": 14, "chunks": 286}}})
+    body = client.get("/rag/collections").json()
+    assert body["corpus_scope"] == config.CORPUS_SCOPE

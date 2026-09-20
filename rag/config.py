@@ -195,6 +195,11 @@ def resolve_device() -> str:
 
 # ---- who may read which collection -------------------------------------------
 
+#: Collections holding third-party copyrighted text. This is a fact about the
+#: material, not a policy: it stays true whether or not the collections are
+#: gated, and it is what lets the deployment describe itself honestly.
+THIRD_PARTY_COLLECTIONS = frozenset({"libros", "crack23"})
+
 #: Collections reachable only with the reviewer token.
 #:
 #: Vacío por decisión explícita del autor (2026-09-20): el corpus completo,
@@ -229,14 +234,20 @@ def token_ok(supplied: str | None) -> bool:
     return diff == 0
 
 
-def effective_scope(has_restricted: bool) -> str:
+def effective_scope(has_third_party: bool) -> str:
     """What the deployment actually holds, not what it was configured for.
 
     A public build serving a reviewer index still answers project questions
     openly, but it is no longer only project documents, and saying otherwise in
     the listing would be the app misdescribing itself.
+
+    The argument is about the *material* present, not about who may read it.
+    An earlier version keyed it on RESTRICTED_COLLECTIONS, so emptying that set
+    to open the corpus made the branch unreachable and the deployment reported
+    itself as `private_local` while serving copyrighted books to anyone — the
+    precise failure this function exists to prevent.
     """
-    if not has_restricted:
+    if not has_third_party:
         return CORPUS_SCOPE
     if not RESTRICTED_COLLECTIONS:
         return "full_open"

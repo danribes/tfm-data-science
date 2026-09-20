@@ -574,8 +574,8 @@ def rag_collections(
             note=meta["note"], documents=counts.get("documents", 0),
             chunks=counts.get("chunks", 0),
         ))
-    has_restricted = any(cid in st["by_collection"]
-                         for cid in rag_config.RESTRICTED_COLLECTIONS)
+    has_third_party = any(cid in st["by_collection"]
+                          for cid in rag_config.THIRD_PARTY_COLLECTIONS)
     # The default has to be one the caller may actually use. Deploying the
     # reviewer index made DEFAULT_COLLECTION «libros», so an anonymous caller
     # was handed a default that this very response declines to list and that
@@ -588,7 +588,7 @@ def rag_collections(
                                   total_documents=st["documents"],
                                   total_chunks=st["chunks"],
                                   retrieval_mode=rag_config.RETRIEVAL_MODE,
-                                  corpus_scope=rag_config.effective_scope(has_restricted),
+                                  corpus_scope=rag_config.effective_scope(has_third_party),
                                   default_collection=default)
 
 
