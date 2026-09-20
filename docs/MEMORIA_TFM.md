@@ -1,10 +1,142 @@
 # España en escenarios: simulación económica transparente y evaluación crítica de modelos de IA
 
+![Portada](figures/portada.svg)
+
 **Estado documental:** 20 de septiembre de 2026, motor 1.1.0, corte de datos `2026-07-31`.
-Pendiente de la portada y del formato exigidos por la normativa de la universidad,
-y de la declaración de contribuciones y de uso de herramientas de IA. Los
-resultados citados proceden de los artefactos indicados; las evaluaciones
-pendientes se distinguen explícitamente de las realizadas.
+Los resultados citados proceden de los artefactos indicados; las evaluaciones
+pendientes se distinguen explícitamente de las realizadas. La portada, el índice
+y esta sección preliminar se generan con `tools/build_frontmatter.py`; los
+campos de universidad y tutor/a están deliberadamente vacíos y debe
+cumplimentarlos el autor conforme a la normativa de su titulación.
+
+## Índice
+
+<!-- INDICE:INICIO -->
+
+- [Normas de presentación aplicadas](#normas-de-presentación-aplicadas)
+- [Declaración de uso de herramientas de inteligencia artificial](#declaración-de-uso-de-herramientas-de-inteligencia-artificial)
+- [Resumen](#resumen)
+- [Abstract](#abstract)
+- [1. Introducción](#1-introducción)
+  - [1.1 Problema](#11-problema)
+  - [1.2 Preguntas y objetivos](#12-preguntas-y-objetivos)
+  - [1.3 Estructura de la memoria](#13-estructura-de-la-memoria)
+- [2. Estado del arte](#2-estado-del-arte)
+  - [2.1 Sostenibilidad de la deuda y proyecciones estocásticas](#21-sostenibilidad-de-la-deuda-y-proyecciones-estocásticas)
+  - [2.2 El diferencial r-g y la función de reacción fiscal](#22-el-diferencial-r-g-y-la-función-de-reacción-fiscal)
+  - [2.3 Expectativas de inflación en la curva de Phillips](#23-expectativas-de-inflación-en-la-curva-de-phillips)
+  - [2.4 Precios de vivienda, heterogeneidad regional y dependencia transversal](#24-precios-de-vivienda-heterogeneidad-regional-y-dependencia-transversal)
+  - [2.5 Modelos globales y la dificultad de batir referencias simples](#25-modelos-globales-y-la-dificultad-de-batir-referencias-simples)
+  - [2.6 Predicción de impago soberano y evaluación con clases desbalanceadas](#26-predicción-de-impago-soberano-y-evaluación-con-clases-desbalanceadas)
+  - [2.7 Evaluación de recuperación aumentada y anclaje de modelos de lenguaje](#27-evaluación-de-recuperación-aumentada-y-anclaje-de-modelos-de-lenguaje)
+  - [2.8 Posición de este trabajo](#28-posición-de-este-trabajo)
+- [3. Datos y trazabilidad](#3-datos-y-trazabilidad)
+  - [3.1 Régimen de corte y procedencia](#31-régimen-de-corte-y-procedencia)
+  - [3.2 Inventario de fuentes](#32-inventario-de-fuentes)
+  - [3.3 Correcciones de procedencia detectadas](#33-correcciones-de-procedencia-detectadas)
+- [4. Arquitectura del sistema](#4-arquitectura-del-sistema)
+  - [4.1 Cuatro capas con una regla](#41-cuatro-capas-con-una-regla)
+  - [4.2 Entorno, despliegue y reproducción](#42-entorno-despliegue-y-reproducción)
+- [5. Diseño metodológico](#5-diseño-metodológico)
+  - [5.1 Simulación y coherencia computacional](#51-simulación-y-coherencia-computacional)
+  - [5.2 Identificación de parámetros](#52-identificación-de-parámetros)
+  - [5.3 Estimación regional e incertidumbre](#53-estimación-regional-e-incertidumbre)
+  - [5.4 Modelos predictivos](#54-modelos-predictivos)
+  - [5.5 Modelos descriptivos](#55-modelos-descriptivos)
+  - [5.6 Recuperación documental y capa de lenguaje](#56-recuperación-documental-y-capa-de-lenguaje)
+- [6. Resultados](#6-resultados)
+  - [6.1 Vivienda regional: la precisión depende del esquema de inferencia](#61-vivienda-regional-la-precisión-depende-del-esquema-de-inferencia)
+  - [6.2 Transferencia neuronal: resultado negativo conservado](#62-transferencia-neuronal-resultado-negativo-conservado)
+  - [6.3 Impago soberano: discriminación moderada, sin calibración](#63-impago-soberano-discriminación-moderada-sin-calibración)
+  - [6.4 Dependencia del estado: sin capacidad predictiva demostrada](#64-dependencia-del-estado-sin-capacidad-predictiva-demostrada)
+  - [6.5 Incertidumbre Monte Carlo: los supuestos dominan](#65-incertidumbre-monte-carlo-los-supuestos-dominan)
+  - [6.6 Recuperación y generación](#66-recuperación-y-generación)
+  - [6.7 Coherencia de implementación](#67-coherencia-de-implementación)
+- [7. Discusión](#7-discusión)
+- [8. Limitaciones](#8-limitaciones)
+- [9. Conclusiones y líneas futuras](#9-conclusiones-y-líneas-futuras)
+- [Referencias](#referencias)
+  - [Sostenibilidad de la deuda y política fiscal](#sostenibilidad-de-la-deuda-y-política-fiscal)
+  - [Inflación y expectativas](#inflación-y-expectativas)
+  - [Mercado de la vivienda](#mercado-de-la-vivienda)
+  - [Inferencia en panel y remuestreo](#inferencia-en-panel-y-remuestreo)
+  - [Predicción, competiciones y modelos globales](#predicción-competiciones-y-modelos-globales)
+  - [Impago soberano y evaluación con clases desbalanceadas](#impago-soberano-y-evaluación-con-clases-desbalanceadas)
+  - [Recuperación aumentada, atribución y evaluación de modelos de lenguaje](#recuperación-aumentada-atribución-y-evaluación-de-modelos-de-lenguaje)
+- [Anexos](#anexos)
+  - [Anexo A. Matriz de evidencia](#anexo-a-matriz-de-evidencia)
+  - [Anexo B. Parámetros y cambios metodológicos](#anexo-b-parámetros-y-cambios-metodológicos)
+  - [Anexo C. Reproducción](#anexo-c-reproducción)
+  - [Anexo D. Corpus documental](#anexo-d-corpus-documental)
+
+<!-- INDICE:FIN -->
+
+## Normas de presentación aplicadas
+
+Esta sección declara las convenciones que **este documento** sigue, para que sean
+comprobables y uniformes. No sustituye a la normativa de presentación de la
+titulación: donde ambas discrepen, prevalece la de la universidad, y los
+elementos que dependen de ella —portada oficial, tipografía, márgenes,
+interlineado, numeración de páginas y depósito— quedan pendientes de aplicar
+sobre la plantilla institucional.
+
+| Elemento | Convención aplicada |
+|---|---|
+| Idioma | Castellano, con resumen y palabras clave también en inglés |
+| Cifras | Separador decimal coma y de millares punto (1.387 observaciones; 0,2039) |
+| Precisión | La del artefacto que respalda cada cifra, sin redondeos intermedios |
+| Fechas | ISO para cortes de datos (`2026-07-31`); trimestres como 2019T3 |
+| Ecuaciones | LaTeX en línea `$…$` y en bloque `$$…$$` |
+| Tablas | Encabezado obligatorio; unidades y tamaño muestral en la propia tabla |
+| Figuras | SVG vectorial, generadas por código y regenerables |
+| Citas | Autor-año en el texto; bibliografía por temas con DOI cuando existe |
+| Verificación de citas | Crossref por DOI, API de arXiv por identificador, o servidor de la institución emisora |
+| Enlaces internos | Rutas relativas al repositorio, comprobadas automáticamente |
+| Numeración | Secciones 1–9; anexos A–D; resumen, índice y bibliografía sin numerar |
+
+Los tres artefactos de portada, índice y diagrama se regeneran con:
+
+```bash
+PYTHONPATH=. python tools/build_frontmatter.py
+```
+
+## Declaración de uso de herramientas de inteligencia artificial
+
+Se declara el uso de asistentes de IA generativa en la realización de este
+trabajo. La declaración es detallada porque el trabajo trata precisamente sobre
+los límites de estos sistemas, y una declaración vaga sería incoherente con su
+tesis.
+
+**Herramientas empleadas.** Asistentes de programación y redacción basados en
+modelos de lenguaje de gran tamaño, empleados de forma conversacional sobre el
+repositorio.
+
+**En qué se han usado.**
+
+| Ámbito | Uso | Verificación aplicada |
+|---|---|---|
+| Implementación | Escritura y refactorización de código del motor, la API, el frontend y los scripts de investigación | Suite de pruebas (523 en Python, 328 en TypeScript), anclas numéricas entre implementaciones e integración continua |
+| Depuración | Diagnóstico de errores de contabilidad de intereses, unidades, etiquetado de series y despliegue | Cada corrección se acompaña de una prueba de regresión que falla sin ella |
+| Análisis | Propuesta de contrastes de robustez y de esquemas de validación | Los resultados proceden de la ejecución del código, no del modelo |
+| Redacción | Borrador y reescritura de esta memoria, del README y de la presentación | Toda cifra se ha comprobado contra el artefacto que la respalda |
+| Bibliografía | Búsqueda de literatura pertinente y elaboración de las fichas | Los 65 DOI se han resuelto contra Crossref, arXiv o la institución emisora |
+| Capa del producto | El sistema entregado incorpora un modelo de lenguaje como componente (secciones 5.6 y 6.6) | Comprobación numérica automática sobre la redacción generada |
+
+**Qué no ha hecho la IA.** No ha generado datos ni resultados: todas las cifras
+de la sección 6 proceden de ejecutar el código sobre los artefactos congelados.
+No ha seleccionado los resultados que se publican —los negativos se conservan—
+ni ha decidido las reglas de éxito, que se fijaron antes de conocer el
+resultado. Ninguna referencia bibliográfica se ha aceptado sin resolverla contra
+un registro autorizado, y las que no pudieron verificarse se descartaron o se
+citan declarando la ausencia de identificador persistente.
+
+**Responsabilidad.** El autor asume la autoría y la responsabilidad plena del
+contenido, de las decisiones metodológicas y de los errores que puedan
+subsistir. El uso de estas herramientas no delega ninguna de las dos.
+
+> **Pendiente de firma del autor.** Esta declaración debe revisarse, ajustarse a
+> la fórmula que exija la titulación y firmarse. Su contenido refleja el uso
+> real observado en el historial del repositorio y no debe suavizarse.
 
 ## Resumen
 
@@ -159,6 +291,8 @@ Dos errores de etiquetado se detectaron y corrigieron durante el trabajo, y se d
 ### 4.1 Cuatro capas con una regla
 
 El sistema se organiza en cuatro capas gobernadas por una regla: *cada capa sólo puede hacer aquello que la siguiente puede comprobar*.
+
+![Las cuatro capas del sistema y la comprobación que cada una deja para la anterior](figures/arquitectura.svg)
 
 1. **Motor determinista.** Identidad de deuda y reglas calibradas, implementado en Python (servidor) y TypeScript (navegador). Su salida es reproducible byte a byte desde artefactos congelados.
 2. **Capa empírica.** Estimadores de panel, modelos predictivos y descriptivos. Publica parámetros, métricas y resultados negativos como artefactos JSON versionados.
