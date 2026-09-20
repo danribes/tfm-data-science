@@ -6,6 +6,7 @@ que está generado: si alguien añade una sección y no regenera, esto falla.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 
@@ -81,3 +82,76 @@ def test_the_declaration_names_what_the_tools_were_used_for():
         assert topic in section, topic
     assert "no ha generado datos ni resultados" in section.lower()
     assert "responsabilidad" in section.lower()
+
+
+def test_no_credential_reaches_the_tracked_tree():
+    """El repositorio es público: un token en su historial queda quemado.
+
+    La hoja de acceso del tribunal lleva EVO_RAG_TOKEN y vive fuera del
+    control de versiones. Esta prueba existe porque `git add -A` es cómodo y
+    no pregunta, y porque un `.gitignore` sólo protege mientras nadie fuerce
+    la ruta.
+    """
+    import subprocess
+
+    root = Path(__file__).resolve().parents[1]
+    tracked = subprocess.run(["git", "ls-files", "-z"], cwd=root,
+                             capture_output=True, text=True, check=True)
+    patterns = (
+        re.compile(r"hf_[A-Za-z0-9]{30,}"),              # token de Hugging Face
+        re.compile(r"sk-ant-[A-Za-z0-9\-_]{20,}"),       # clave de proveedor
+        re.compile(r"EVO_RAG_TOKEN\s*[=:]\s*['\"]?[A-Za-z0-9_\-]{16,}"),
+    )
+    #: El token de revisión, pegado tal cual, no encaja en ningún patrón de
+    #: arriba: es una cadena alfanumérica sin prefijo. Se busca por huella, de
+    #: modo que la prueba reconoce el secreto sin contenerlo.
+    known_secret = "c6040958408df2241c3fdb20ae64959d09e171bca03ac2660da4a2f90134e416"
+    candidate = re.compile(r"[A-Za-z0-9_\-]{24,64}")
+
+    offenders = []
+    for rel in filter(None, tracked.stdout.split("\0")):
+        path = root / rel
+        if not path.is_file() or path.suffix in {".png", ".pdf", ".pptx", ".db", ".svg"}:
+            continue
+        try:
+            body = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        for pat in patterns:
+            if pat.search(body):
+                offenders.append(f"{rel}: {pat.pattern}")
+        for tok in candidate.findall(body):
+            if hashlib.sha256(tok.encode()).hexdigest() == known_secret:
+                offenders.append(f"{rel}: el token de revisión, literal")
+    assert not offenders, offenders
+
+
+def test_the_leak_guard_would_actually_catch_a_leak(tmp_path):
+    """Una prueba de fugas que no puede fallar no protege de nada.
+
+    Se ejercita con un secreto sintético. El de verdad no aparece aquí: partir
+    la cadena en dos trozos concatenados no la oculta de quien lee el fichero
+    ni de quien lo rastrea, y este fichero sí está en el repositorio público.
+    """
+    fake = "ZzQ7wKpLmN4rT8vB2xY6hJ3sD5fG9aCe"
+    fake_digest = hashlib.sha256(fake.encode()).hexdigest()
+
+    candidate = re.compile(r"[A-Za-z0-9_\-]{24,64}")
+    doc = tmp_path / "filtrado.md"
+    doc.write_text(f"token de acceso: {fake}\n", encoding="utf-8")
+    found = [t for t in candidate.findall(doc.read_text(encoding="utf-8"))
+             if hashlib.sha256(t.encode()).hexdigest() == fake_digest]
+    assert found, "el detector por huella no encontró un secreto plantado"
+
+    assert re.compile(r"hf_[A-Za-z0-9]{30,}").search("hf_" + "A" * 34)
+    assert not candidate.findall("una línea corriente, sin credenciales")
+
+
+def test_the_evaluator_sheet_is_ignored_if_it_exists():
+    """Si alguien la crea, git no debe poder verla."""
+    import subprocess
+
+    root = Path(__file__).resolve().parents[1]
+    r = subprocess.run(["git", "check-ignore", "docs/ACCESO_EVALUADORES.md"],
+                       cwd=root, capture_output=True, text=True)
+    assert r.returncode == 0, "docs/ACCESO_EVALUADORES.md debe estar en .gitignore"

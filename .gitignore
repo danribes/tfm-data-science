@@ -28,3 +28,9 @@ docs/deck/media/_archive/
 .env
 .env.*
 !.env.example
+
+# La hoja de acceso para el tribunal lleva el token del índice de revisión.
+# Se entrega con la memoria, no se publica: este repositorio es público y un
+# token en su historial es un token quemado, aunque se borre después.
+docs/ACCESO_EVALUADORES.md
+*.secreto.md

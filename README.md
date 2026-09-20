@@ -166,6 +166,17 @@ con `corpus_scope: reviewer_restricted`: con token, `libros` (58 documentos,
 17.402 fragmentos) y `crack23` (421 documentos, 3.684 fragmentos); sin token,
 401 y un listado que sólo muestra `metodo` y `defensa_tfm`.
 
+**Cómo se obtiene la credencial.** El token viaja con la entrega del trabajo,
+en una hoja de acceso dirigida al tribunal, y no se publica aquí. No es una
+formalidad: este repositorio es público, y un token en su historial queda
+quemado aunque se borre después — `git` conserva lo que se le confía. Quien
+evalúe el trabajo y no la haya recibido puede pedírsela al autor.
+
+Las colecciones `metodo` y `defensa_tfm` son de autoría propia, están abiertas
+y no necesitan credencial, de modo que la aplicación se puede recorrer entera
+sin pedir nada. Lo que queda tras el token son los manuales de terceros, y es
+sólo por sus derechos de autor.
+
 Falta `HF_TOKEN`, deliberadamente: el único token disponible tiene permiso de
 escritura sobre la cuenta entera y el Space sólo necesita inferencia. Hasta que
 se configure uno de sólo lectura, la mitad densa no puede codificar la pregunta

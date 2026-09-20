@@ -625,3 +625,7 @@ El entorno, los comandos y el mapa de qué regenera cada análisis, con sus lím
 ### Anexo D. Corpus documental
 
 El manifiesto del corpus —81 entradas con fichero, tamaño, suma de comprobación, tema, decisión de inclusión y motivo— está en [`docs/CORPUS_MANIFEST.csv`](CORPUS_MANIFEST.csv). Las colecciones con derechos de autor no se publican; el índice desplegado por defecto se construye desde una lista explícita de documentos propios del proyecto.
+
+Durante la evaluación existe una excepción acotada: un índice de revisión que sí incluye los manuales, accesible mediante una credencial y alojado temporalmente en un servidor de terceros. **La credencial se entrega al tribunal en una hoja de acceso que acompaña a este documento y no se publica en el repositorio**, que es público. Esa hoja indica también cómo consultar el corpus desde el navegador y desde la línea de comandos, y advierte de que el despliegue actual resuelve por BM25 y no por la fusión híbrida con la que se midió el `hit@8` de la sección 6.6. Concluida la evaluación, el índice se retira y el material con derechos de autor deja de residir en el servidor.
+
+Las colecciones `metodo` y `defensa_tfm`, de autoría propia, permanecen abiertas sin credencial.
