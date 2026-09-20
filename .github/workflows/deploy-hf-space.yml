@@ -77,7 +77,10 @@ jobs:
           # dir must also leave the Space, or stale code serves forever.
           api.upload_folder(repo_id=repo_id, repo_type="space",
                             folder_path="/tmp/hf-stage",
-                            delete_patterns=["**"],
+                            # The reviewer index is uploaded separately from a
+                            # machine that holds the private corpus; CI cannot
+                            # rebuild it, so CI must not delete it.
+                            delete_patterns=["**", "!data/rag/reviewer.db"],
                             commit_message=f"sync {os.environ['GITHUB_SHA'][:9]}")
 
           url = f"https://{owner}-evo-espana-api.hf.space"

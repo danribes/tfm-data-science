@@ -1,7 +1,7 @@
 # Slim requirements for the public API on Hugging Face Spaces.
 #
 # Engine, research reports, and the public project-documentation RAG.
-# Public retrieval uses standard-library SQLite FTS5; torch, sqlite-vec,
+# Public retrieval uses standard-library SQLite FTS5; torch,
 # sentence-transformers and the private textbook corpus stay out of the image.
 #
 # pandas is here for one reason: /prediction reads the pre-registered origins
@@ -13,6 +13,11 @@ requests>=2.34,<3
 numpy>=2.4,<2.5
 pandas>=3.0,<3.1
 pyyaml>=6.0,<7
+# Reading the dense index, 0,2 MB of C extension. Creating embeddings needs
+# torch; querying them does not. That asymmetry is what lets a deployment
+# without torch answer by dense retrieval under EVO_RAG_MODE=remote_hybrid,
+# instead of falling back to BM25 and quietly becoming a different system.
+sqlite-vec>=0.1.6
 # /explain narration. Small (httpx + pydantic, both already pulled in by
 # FastAPI). Without it the endpoint still answers from the deterministic
 # templates, so this only decides whether the LLM path can run at all.

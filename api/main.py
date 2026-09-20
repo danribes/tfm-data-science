@@ -574,11 +574,13 @@ def rag_collections(
             note=meta["note"], documents=counts.get("documents", 0),
             chunks=counts.get("chunks", 0),
         ))
+    has_restricted = any(cid in st["by_collection"]
+                         for cid in rag_config.RESTRICTED_COLLECTIONS)
     return RagCollectionsResponse(collections=out,
                                   total_documents=st["documents"],
                                   total_chunks=st["chunks"],
                                   retrieval_mode=rag_config.RETRIEVAL_MODE,
-                                  corpus_scope=rag_config.CORPUS_SCOPE,
+                                  corpus_scope=rag_config.effective_scope(has_restricted),
                                   default_collection=rag_config.DEFAULT_COLLECTION)
 
 

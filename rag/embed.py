@@ -100,5 +100,46 @@ def embed_passages(texts: Sequence[str],
         unload()
 
 
+class RemoteEmbedUnavailable(RuntimeError):
+    """The hosted encoder could not answer. Callers degrade to lexical."""
+
+
+def embed_query_remote(text: str) -> list[float]:
+    """Encode one query through the hosted copy of the same model.
+
+    Standard library only: the point of this path is to work where torch is
+    not installed, so it must not drag in a client to get there.
+
+    The prefix matters. e5 is asymmetric — passages were stored with
+    "passage: " and queries must carry "query: " — and dropping it degrades
+    retrieval quietly rather than failing.
+    """
+    import json
+    import urllib.error
+    import urllib.request
+
+    if not config.REMOTE_EMBED_TOKEN:
+        raise RemoteEmbedUnavailable("HF_TOKEN no configurado")
+    body = json.dumps({"inputs": config.QUERY_PREFIX + text,
+                       "options": {"wait_for_model": True}}).encode()
+    req = urllib.request.Request(
+        config.REMOTE_EMBED_URL, data=body,
+        headers={"Authorization": f"Bearer {config.REMOTE_EMBED_TOKEN}",
+                 "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=config.REMOTE_EMBED_TIMEOUT) as res:
+            payload = json.load(res)
+    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+        raise RemoteEmbedUnavailable(f"{type(exc).__name__}: {exc}") from exc
+
+    vec = payload[0] if payload and isinstance(payload[0], list) else payload
+    if not isinstance(vec, list) or len(vec) != config.EMBED_DIM:
+        raise RemoteEmbedUnavailable(
+            f"dimensión inesperada: {len(vec) if isinstance(vec, list) else type(vec)}")
+    return [float(x) for x in vec]
+
+
 def embed_query(text: str) -> list[float]:
+    if config.REMOTE_EMBED:
+        return embed_query_remote(text)
     return _encode([config.QUERY_PREFIX + text], 1)[0]

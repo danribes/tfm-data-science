@@ -12,12 +12,32 @@ from pathlib import Path
 # The public deployment is a deliberately smaller corpus and uses lexical
 # retrieval. Never infer this mode from missing dependencies or model errors.
 MODE = os.environ.get("EVO_RAG_MODE", "hybrid")
-if MODE not in {"hybrid", "public_lexical"}:
+if MODE not in {"hybrid", "public_lexical", "remote_hybrid"}:
     raise ValueError(f"EVO_RAG_MODE desconocido: {MODE!r}")
+
+#: remote_hybrid: the full index with dense retrieval, on a host without torch.
+#:
+#: Creating the vectors needs the model; querying them needs only a vector and
+#: sqlite-vec, which is 0,2 MB. So the deployment carries the index and asks a
+#: hosted copy of the same model to encode the question. Without this the
+#: deployed corpus answers by BM25 alone, which is a different retrieval system
+#: from the one the evaluation measured — the distinction matters more than the
+#: megabytes it saves.
+REMOTE_EMBED = MODE == "remote_hybrid"
 PUBLIC_MODE = MODE == "public_lexical"
 RETRIEVAL_MODE = "lexical" if PUBLIC_MODE else "hybrid"
 CORPUS_SCOPE = "public_project_docs" if PUBLIC_MODE else "private_local"
 DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "libros"
+
+#: Where a query is encoded when the model cannot be loaded locally. The model
+#: must be the one that produced the stored vectors: a query embedded by any
+#: other is scored against an incompatible space and returns plausible noise.
+REMOTE_EMBED_URL = os.environ.get(
+    "EVO_RAG_EMBED_URL",
+    "https://api-inference.huggingface.co/pipeline/feature-extraction/"
+    + os.environ.get("EVO_RAG_MODEL", "intfloat/multilingual-e5-large"))
+REMOTE_EMBED_TOKEN = os.environ.get("HF_TOKEN", "").strip()
+REMOTE_EMBED_TIMEOUT = float(os.environ.get("EVO_RAG_EMBED_TIMEOUT", "20"))
 
 # ---- corpora ----------------------------------------------------------------
 
@@ -200,6 +220,18 @@ def token_ok(supplied: str | None) -> bool:
     for a, b in zip(supplied, REVIEWER_TOKEN):
         diff |= ord(a) ^ ord(b)
     return diff == 0
+
+
+def effective_scope(has_restricted: bool) -> str:
+    """What the deployment actually holds, not what it was configured for.
+
+    A public build serving a reviewer index still answers project questions
+    openly, but it is no longer only project documents, and saying otherwise in
+    the listing would be the app misdescribing itself.
+    """
+    if not has_restricted:
+        return CORPUS_SCOPE
+    return "reviewer_restricted" if REVIEWER_TOKEN else "restricted_locked"
 
 
 def readable(collection: str, token: str | None) -> bool:

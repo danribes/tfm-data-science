@@ -106,9 +106,38 @@ Los resultados históricos del RAG híbrido no evalúan este corpus público.
 La búsqueda y consulta de fragmentos públicos funcionan sin claves de IA.
 La redacción de respuestas requiere una clave de proveedor en los secretos
 del Space; si no está disponible, se muestran los pasajes y el motivo.
-Los libros privados siguen requiriendo su servicio local. La conexión RAG se
-configura por separado de la API del motor, desde Biblioteca o Consulta; un
-servicio RAG caído no impide utilizar los escenarios.
+La conexión RAG se configura por separado de la API del motor, desde Biblioteca
+o Consulta; un servicio RAG caído no impide utilizar los escenarios.
+
+### Índice de revisión
+
+Quien evalúa este trabajo necesita consultar el corpus completo desde su propia
+máquina y en su propio horario. Para eso existe un índice de revisión temporal,
+con tres propiedades deliberadas.
+
+**Cerrado por defecto.** `libros` y `crack23` responden 401 sin el token, y un
+`EVO_RAG_TOKEN` sin configurar deniega en lugar de permitir: olvidar el secreto
+no puede publicar los manuales. El listado tampoco los anuncia a quien no puede
+leerlos.
+
+**Sólo léxico.** El Space no lleva torch ni sentence-transformers, así que este
+índice contiene texto y FTS5, sin la mitad densa: 113 MB frente a los 208 MB del
+corpus local. Es **un sistema de recuperación distinto** — BM25 solo, mientras
+que el hit@8 documentado se midió con fusión híbrida — y los resultados que se
+obtengan ahí no son comparables con los publicados.
+
+**Temporal.** Se sube desde una máquina con el corpus privado, porque CI no lo
+tiene ni lo tendrá, y se retira al terminar la evaluación:
+
+```bash
+PYTHONPATH=. python tools/build_reviewer_index.py --out /tmp/reviewer.db
+PYTHONPATH=. python tools/upload_reviewer_index.py --file /tmp/reviewer.db
+# al terminar la evaluación
+PYTHONPATH=. python tools/upload_reviewer_index.py --remove
+```
+
+Es una excepción acotada por una necesidad concreta, no la política del
+proyecto.
 
 Preparar estos cambios no actualiza el sitio publicado. El procedimiento y
 las comprobaciones previas a publicar están en
@@ -220,11 +249,14 @@ deterministas y el modelo es opcional (`EVO_EXPLAIN_NARRATE=1`): una caída al
 texto de plantilla no se distingue desde fuera, y se prefiere la vía que
 siempre funciona. Cada respuesta declara cuál la ha escrito.
 
-**Recuperación con citas** (RAG). El corpus privado de manuales no sale de la
-máquina local; el despliegue público sirve un índice distinto, construido desde
-una lista explícita de documentos propios del proyecto. Las colecciones con
-derechos de autor no son alcanzables en público, y no por configuración: no
-están en el servidor.
+**Recuperación con citas** (RAG). El despliegue sirve por defecto un índice
+construido desde una lista explícita de documentos propios del proyecto, y las
+colecciones con derechos de autor no forman parte de él.
+
+Durante la evaluación del trabajo existe una excepción acotada, descrita en
+«Índice de revisión» más abajo: un índice que sí incluye los manuales, accesible
+sólo con un token. Mientras esté desplegado, ese material reside en un servidor
+de terceros, y se retira cuando la evaluación termina.
 
 ## Cómo se construyó
 

@@ -123,7 +123,25 @@ def search(query: str, collection: str | None = None, top_k: int | None = None,
         k = top_k or config.TOP_K
         lex = (_lexical(con, query, collection, config.CANDIDATES)
                if config.PUBLIC_MODE or config.W_LEXICAL > 0 else [])
-        den = (_dense(con, query, collection, config.CANDIDATES)
+
+        def dense_or_lexical(text: str | None = None) -> list[int]:
+            """A dense probe that cannot take the whole query down with it.
+
+            When the encoder is hosted, retrieval gains a network dependency,
+            and a timeout there must not turn a working corpus into an error
+            page. The lexical half still answers. It answers worse, and
+            `degraded` on the response says so rather than letting a quietly
+            halved system look healthy.
+            """
+            nonlocal degraded
+            try:
+                return _dense(con, query, collection, config.CANDIDATES, text=text)
+            except Exception:
+                degraded = True
+                return []
+
+        degraded = False
+        den = (dense_or_lexical()
                if not config.PUBLIC_MODE and config.W_DENSE > 0 else [])
 
         # A second dense probe, in English only.
@@ -135,9 +153,14 @@ def search(query: str, collection: str | None = None, top_k: int | None = None,
         # the Spanish one instead of averaging the two into neither.
         terms = (glossary.english_terms(query)
                  if not config.PUBLIC_MODE and config.USE_GLOSSARY else [])
-        den_en = (_dense(con, query, collection, config.CANDIDATES,
-                         text=", ".join(terms)) if not config.PUBLIC_MODE
-                  and terms and config.W_DENSE_EN > 0 else [])
+        den_en = (dense_or_lexical(text=", ".join(terms))
+                  if not config.PUBLIC_MODE and terms and config.W_DENSE_EN > 0
+                  else [])
+        if degraded:
+            # Visible in the logs of whoever runs the service; the API layer
+            # surfaces it to the reader through retrieval_mode.
+            print("rag: dense probe unavailable, answering lexically",
+                  file=__import__("sys").stderr)
 
         if not lex and not den and not den_en:
             return []
