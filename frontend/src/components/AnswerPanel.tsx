@@ -129,7 +129,7 @@ export function AnswerPanel({
 
       <div className={q.companion ? "answer-charts two" : "answer-charts"}>
         <div className="card">
-          <h4>{q.text} <small>base punteada vs escenario</small></h4>
+          <h4>{q.text} <small>línea de partida punteada · escenario en continuo</small></h4>
           <ProjectionChart
             years={YEARS}
             baseline={seriesOf(base, q.series)}
@@ -219,9 +219,18 @@ export function AnswerPanel({
                 de EE. UU. y Reino Unido, sin ver ningún dato español, y evaluado
                 sobre las {prediction.data.protocol.n_ccaa} CCAA desde {prediction.data.protocol.test_start}.
               </p>
+              <p className="layer-note">
+                Se compara con la regla más tonta posible: prolongar la línea
+                recta de los últimos años, lo que en la jerga se llama deriva
+                («drift»). La medida es el error escalado medio (MASE); cuanto
+                más bajo, mejor.
+              </p>
               <table className="layer-table">
                 <thead>
-                  <tr><th>horizonte</th><th>MASE modelo</th><th>MASE deriva</th><th /></tr>
+                  <tr>
+                    <th>horizonte</th><th>error del modelo</th>
+                    <th>error de la deriva</th><th />
+                  </tr>
                 </thead>
                 <tbody>
                   {prediction.data.rows.slice(0, 4).map((r) => {
@@ -278,6 +287,13 @@ export function AnswerPanel({
           </ul>
         </Layer>
       </div>
+
+      {explain.isSuccess && explain.data.coloquial && (
+        <div className="coloquial">
+          <span className="coloquial-lab">Y en corto</span>
+          <p>{explain.data.coloquial}</p>
+        </div>
+      )}
 
       <div className="followups">
         <span className="followups-lab">Seguir preguntando</span>

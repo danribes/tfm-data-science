@@ -407,3 +407,8 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .followups { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .followups-lab { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .ask-nomatch { font-size: 13.5px; color: var(--div-neg); line-height: 1.6; margin: 0; }
+
+/* --- the same answer without a tie on --- */
+.coloquial { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: flex; flex-direction: column; gap: 4px; }
+.coloquial-lab { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+.coloquial p { margin: 0; font-size: 15.5px; line-height: 1.65; color: var(--ink-2); }

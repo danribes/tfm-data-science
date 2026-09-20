@@ -144,10 +144,48 @@ def _advertencia(f: ExplanationFacts) -> str:
     return " ".join(parts)
 
 
+def _coloquial(f: ExplanationFacts) -> str:
+    """The same thing without a tie on, from templates.
+
+    Deliberately flatter than what the model writes: a template cannot be funny
+    on purpose and a template trying to be funny is worse than one that is not.
+    What it can do is drop the register and name the one number that matters.
+    """
+    if f.fresh:
+        return ("Ahora mismo no estás viendo ninguna previsión: son los datos tal "
+                "como estaban. Mueve una palanca y empieza lo interesante.")
+
+    head = next((o for o in f.outcomes if o.key == f.headline_key), None)
+    if head is None:
+        return ("Has tocado algo, pero no lo suficiente como para que se note en "
+                "esta pantalla.")
+
+    if not f.moved:
+        return (f"Sin tocar nada, en {head.year} esto se queda en "
+                f"{nf(head.value, head.dec)} {head.unit}. Ese es el punto de partida.")
+
+    direction = ("sube" if head.delta > 0 else "baja" if head.delta < 0
+                 else "no se mueve")
+    worse = head.up_is_bad if head.delta > 0 else (not head.up_is_bad)
+    verdict = ("y eso, para quien lo vive, es peor" if head.delta and worse
+               else "y eso, para quien lo vive, es mejor")
+    lever = (f"«{f.moved[0].name}»" if len(f.moved) == 1
+             else f"{len(f.moved)} palancas a la vez")
+    # The label is quoted rather than lower-cased into the sentence: its gender
+    # varies by series ("el esfuerzo", "la deuda") and a template cannot know
+    # which article to put in front of it.
+    return (f"Resumiendo: mueves {lever} y «{head.label}» {direction} hasta "
+            f"{nf(head.value, head.dec)} {head.unit} en {head.year} — "
+            f"{_signed(head.delta, head.dec)} frente a no tocar nada, {verdict}. "
+            "Con la letra pequeña de siempre: esto es lo que saldría si esos "
+            "valores se mantuvieran, no una bola de cristal.")
+
+
 def fallback_narration(facts: ExplanationFacts) -> dict[str, str]:
     """Deterministic narration. Same keys as the LLM path."""
     return {
         "resumen": _resumen(facts),
         "mecanismo": _mecanismo(facts),
         "advertencia": _advertencia(facts),
+        "coloquial": _coloquial(facts),
     }

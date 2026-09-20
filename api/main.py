@@ -704,7 +704,8 @@ def explain(req: ExplainRequest) -> ExplainResponse:
         try:
             result = narrate(facts)
             blocks = {"resumen": result.resumen, "mecanismo": result.mecanismo,
-                      "advertencia": result.advertencia}
+                      "advertencia": result.advertencia,
+                      "coloquial": result.coloquial}
             source, model = "llm", result.model
         except NarrationUnavailable as exc:
             reason = str(exc)

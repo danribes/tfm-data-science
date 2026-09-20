@@ -74,8 +74,15 @@ OUTPUT_SCHEMA = {
             "description": "Líneas rojas cruzadas o próximas, y los límites de "
                            "lectura del resultado.",
         },
+        "coloquial": {
+            "type": "string",
+            "description": "2-4 frases. Lo mismo, contado como se lo contarías "
+                           "a un amigo en un bar: llano, relajado, con ironía si "
+                           "viene a cuento. Sin cifras nuevas, sin tecnicismos y "
+                           "sin dejar de ser cierto.",
+        },
     },
-    "required": ["resumen", "mecanismo", "advertencia"],
+    "required": ["resumen", "mecanismo", "advertencia", "coloquial"],
     "additionalProperties": False,
 }
 
@@ -142,6 +149,28 @@ mecanismo, donde una lista corta se lee mejor. Nada de «es importante señalar�
 palancas se mantuvieran.
 
 Nunca des consejo de inversión, de compra de vivienda ni de voto.
+
+## Lenguaje llano
+
+El lector puede no haber estudiado economía. Todo lo serio —tablas, cifras, \
+fórmulas, la cadena causal— se mantiene, pero explicado con palabras corrientes. \
+Si usas un término técnico, dilo y explícalo en la misma frase: «el saldo \
+primario, es decir, lo que ingresa el Estado menos lo que gasta sin contar los \
+intereses».
+
+Nada en inglés sin traducir. Si un término no tiene equivalente asentado, pon \
+el español primero y el inglés entre paréntesis una sola vez: «la deriva \
+(drift)», «el error escalado medio (MASE)». Nunca al revés, y nunca sueltes \
+«drift», «gap», «baseline», «forecast» o «spread» como si fueran españolas: \
+deriva, brecha, referencia de partida, previsión, prima de riesgo.
+
+## El cierre coloquial
+
+`coloquial` es lo mismo dicho de otra manera, no un resumen más corto ni un \
+adorno. Tono de sobremesa: llano, tranquilo, irónico cuando el dato lo merece. \
+Puedes usar la segunda persona. No introduzcas ni una cifra que no esté ya \
+arriba, no contradigas nada, y no conviertas la ironía en consejo ni en \
+militancia: sigue siendo lo que el modelo implica, contado sin corbata.
 """
 
 
@@ -150,6 +179,7 @@ class NarrationResult:
     resumen: str
     mecanismo: str
     advertencia: str
+    coloquial: str
     model: str
     cached_input_tokens: int
     input_tokens: int
@@ -288,6 +318,7 @@ def narrate(facts: ExplanationFacts, *, timeout: float = 30.0) -> NarrationResul
             resumen=data["resumen"],
             mecanismo=data["mecanismo"],
             advertencia=data["advertencia"],
+            coloquial=data.get("coloquial", ""),
             model=response.model,
             cached_input_tokens=getattr(response.usage, "cache_read_input_tokens", 0) or 0,
             input_tokens=response.usage.input_tokens,

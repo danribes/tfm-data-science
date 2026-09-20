@@ -90,6 +90,9 @@ export interface ExplainResponse extends ApiMeta {
   resumen: string;
   mecanismo: string;
   advertencia: string;
+  /** The same answer in plain, unbuttoned Spanish. The deterministic path
+   *  writes one too, so this is present whichever path answered. */
+  coloquial: string;
   /** "llm" or "deterministic" — shown to the reader, never hidden. */
   source: string;
   model: string | null;

@@ -124,11 +124,28 @@ def test_spanish_number_formatting():
     assert nf(3.42, 2) == "3,42"
 
 
-def test_fallback_always_returns_all_three_blocks():
+def test_fallback_always_returns_every_block():
+    """Four now, since the answer carries a plain-language closing.
+
+    The deterministic path writes one too, so the UI never has to branch on
+    which path produced the text — a colloquial block that only appears when
+    the model is reachable would read as a feature that keeps breaking.
+    """
     for levers, horizon in [(Levers(), Y0), (RATE_UP, 2030), (ADVERSE, 2050)]:
         blocks = fallback_narration(build_facts(levers, horizon))
-        assert set(blocks) == {"resumen", "mecanismo", "advertencia"}
+        assert set(blocks) == {"resumen", "mecanismo", "advertencia", "coloquial"}
         assert all(v.strip() for v in blocks.values())
+
+
+def test_fallback_coloquial_says_something_of_its_own():
+    """Not a copy of the summary, and it carries the headline number."""
+    facts = build_facts(RATE_UP, 2040)
+    blocks = fallback_narration(facts)
+    head = next(o for o in facts.outcomes if o.key == facts.headline_key)
+    assert blocks["coloquial"] != blocks["resumen"]
+    assert nf(head.value, head.dec) in blocks["coloquial"]
+    # The disclaimer travels with the relaxed register, not only the formal one.
+    assert "bola de cristal" in blocks["coloquial"]
 
 
 def test_fallback_names_the_lever_and_its_numbers():

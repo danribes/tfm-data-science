@@ -400,6 +400,9 @@ class ExplainResponse(ApiMeta):
     resumen: str
     mecanismo: str
     advertencia: str
+    #: The same answer in plain, unbuttoned Spanish. Always present: the
+    #: deterministic path writes one too, so the UI never has to branch.
+    coloquial: str = ""
     #: "llm" when Claude wrote it, "deterministic" when the templates did. The
     #: UI shows this: a reader is entitled to know which produced the text.
     source: str
