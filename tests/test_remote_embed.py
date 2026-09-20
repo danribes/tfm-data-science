@@ -12,6 +12,7 @@ dimension check, and above all that a failure degrades instead of raising.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import io
 import urllib.error
@@ -38,6 +39,48 @@ def _ok(vector):
 def remote(monkeypatch):
     monkeypatch.setattr(config, "REMOTE_EMBED", True)
     monkeypatch.setattr(config, "REMOTE_EMBED_TOKEN", "hf_test")
+
+
+def _fake_vector(text: str, dim: int = config.EMBED_DIM) -> list[float]:
+    """Deterministic unit-norm pseudo-embedding, as in test_rag."""
+    h = hashlib.sha256(text.encode()).digest()
+    raw = [(h[i % len(h)] - 128) / 128.0 for i in range(dim)]
+    norm = sum(v * v for v in raw) ** 0.5 or 1.0
+    return [v / norm for v in raw]
+
+
+@pytest.fixture
+def corpus(tmp_path, monkeypatch):
+    """A small real index — an FTS5 table and a vec0 table — built here.
+
+    The first version of the two tests below read the corpus at config.DB_PATH.
+    That passed on the machine that has the books and failed in CI, which is
+    exactly backwards: the private corpus is data that exists in one place, not
+    a fixture. What these tests are actually about is the plumbing — that a
+    dead encoder still returns BM25 hits, and that a supplied vector reaches
+    vec0 — and three sentences exercise that as well as twenty-one thousand.
+    """
+    from rag import store
+
+    path = tmp_path / "corpus.db"
+    monkeypatch.setattr(config, "DB_PATH", path)
+    con = store.connect(path)
+    store.init_schema(con)
+    texts = [
+        "La curva de Phillips relaciona la inflación con la brecha de desempleo.",
+        "Las expectativas adaptativas forman la previsión a partir del error pasado.",
+        "La deuda pública crece cuando el tipo de interés supera al crecimiento.",
+    ]
+    doc = store.add_document(con, collection="libros", title="Manual de prueba",
+                             source_path="/x/sha-remote", sha256="sha-remote", pages=1)
+    store.add_chunks(
+        con, doc,
+        [{"ordinal": i, "page": 1, "section": "Cap. 1", "text": t}
+         for i, t in enumerate(texts)],
+        [_fake_vector(t) for t in texts])
+    con.commit()
+    con.close()
+    return path
 
 
 def test_query_carries_the_asymmetric_prefix(remote, monkeypatch):
@@ -86,7 +129,7 @@ def test_network_failure_raises_the_typed_error(remote, monkeypatch):
         embed.embed_query("hola")
 
 
-def test_search_degrades_to_lexical_when_the_encoder_is_down(monkeypatch):
+def test_search_degrades_to_lexical_when_the_encoder_is_down(corpus, monkeypatch):
     """The whole point of the fallback: a timeout at the encoder must cost
     quality, not availability. A corpus that errors is worse than one that
     answers by BM25 and says so."""
@@ -100,8 +143,8 @@ def test_search_degrades_to_lexical_when_the_encoder_is_down(monkeypatch):
     assert hits, "lexical retrieval must still answer"
 
 
-def test_dense_runs_against_the_real_index_with_a_supplied_vector(monkeypatch):
-    """Everything but the HTTP call, against the actual corpus.
+def test_dense_runs_against_a_real_index_with_a_supplied_vector(corpus, monkeypatch):
+    """Everything but the HTTP call, against a real index.
 
     A stub vector cannot retrieve meaningfully, so this asserts the plumbing —
     packing, the vec0 match and the collection filter — not the ranking.

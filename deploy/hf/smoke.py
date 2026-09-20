@@ -20,7 +20,11 @@ def main() -> None:
     stage = parser.parse_args().stage.resolve(strict=True)
     assert (stage / "data/rag/public.db").is_file(), "Missing assembled public index"
     assert not (stage / ".env").exists(), "A deployment must not include local secrets"
-    for package in ("torch", "sentence_transformers", "sqlite_vec", "pymupdf"):
+    # sqlite_vec is deliberately absent from this list: 0,2 MB of C extension
+    # that reads vectors is what lets the deployment answer by dense retrieval
+    # under remote_hybrid. What must stay out is everything that *creates*
+    # them — that is the weight, and the private corpus with it.
+    for package in ("torch", "sentence_transformers", "pymupdf"):
         assert importlib.util.find_spec(package) is None, f"Use a slim environment: {package} is installed"
 
     os.environ.update({
