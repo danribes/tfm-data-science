@@ -1,25 +1,35 @@
 # Comprobación funcional del modelo
 
-Revisión local del 20 de septiembre de 2026. Las comprobaciones acreditan el
+Revisión y publicación del 20 de septiembre de 2026. Las comprobaciones acreditan el
 comportamiento observado del software y sus identidades contables. No miden
 capacidad de predicción económica ni fidelidad semántica de respuestas nuevas.
 
 ## Estado del despliegue
 
-La rama remota `main` y el HEAD local apuntaban a
-`dde09c6e6e3fd4842535994e12884c8fdcdc139c`. Los cambios revisados seguían
-sin commit ni push. Las últimas ejecuciones publicadas de GitHub Actions
-correspondían a ese commit anterior.
+La publicación conjunta del motor **1.1.0** y la biblioteca pública se realizó
+desde el commit [`557e940`](https://github.com/danribes/tfm-data-science/commit/557e940d21dfb9f0d3291eeb30ada0e1380023d5).
+Finalizaron correctamente los workflows de
+[Hugging Face](https://github.com/danribes/tfm-data-science/actions/runs/35499568244),
+[GitHub Pages](https://github.com/danribes/tfm-data-science/actions/runs/35499568231)
+y [verificación](https://github.com/danribes/tfm-data-science/actions/runs/35499568186).
 
-El sitio público y `/health` respondieron HTTP 200. La
-[API pública](https://danribes-evo-espana-api.hf.space/health) declaraba motor
-**1.0.0**; el servidor local declaraba **1.1.0**. Por tanto, esta revisión no
-acredita un despliegue público de las correcciones.
+La [API pública](https://danribes-evo-espana-api.hf.space/health) anuncia **1.1.0**.
+Pasaron 22 peticiones públicas HTTP 200, incluidas búsquedas en `metodo` y
+`defensa_tfm`. Las 40 series del escenario base remoto coinciden exactamente
+con el motor local. `/vintage` conserva 141 registros y `/personas` publica
+12 perfiles y 42 KPI. `/rag/collections` anuncia **6 documentos propios y
+27 fragmentos**, con recuperación léxica.
 
-La comprobación posterior del mismo día confirmó HTTP 200 en Pages y en
-`/health`, todavía con motor **1.0.0**, y HTTP 503 en `/rag/collections`.
-La continuación descrita al final de este documento está preparada y probada
-localmente; no se ha publicado ni subido el corpus privado.
+El navegador verificó el [panel publicado](https://danribes.github.io/tfm-data-science/),
+Biblioteca, las fuentes del perfil comprador y Consulta a 390 px: sin errores
+de JavaScript ni peticiones API fallidas, y sin desbordamiento horizontal.
+La consulta SSE devolvió los pasajes con HTTP 200 y la explicación de que no
+se había obtenido una respuesta redactada completa. No se acredita generación
+remota de respuestas en esa comprobación.
+
+Antes de esta publicación, la API servía 1.0.0 desde `dde09c6` y la biblioteca
+devolvía 503. El corpus académico privado, sus transcripciones e informes
+detallados de libros siguen excluidos de GitHub y del Space.
 
 ## Auditoría matemática
 
@@ -111,7 +121,7 @@ desarrollo se mantiene en 37/39, aunque las sondas nuevas detectan limitaciones
 al localizar evidencia concreta. Los detalles y resultados están en
 [RAG_STAGED_BOOKS.md](RAG_STAGED_BOOKS.md).
 
-## Biblioteca pública preparada para Hugging Face
+## Biblioteca pública en Hugging Face
 
 Se completó un modo público independiente del índice académico: SQLite FTS5
 sobre **6 documentos propios y 27 fragmentos**, con colecciones `metodo` y
@@ -141,8 +151,7 @@ informes públicos de investigación. Las pruebas comprueban que un informe
 privado antiguo no se incorpora por reutilizar el directorio. El workflow del
 Space ejecuta la comprobación del paquete reducido antes de subirlo.
 
-Esto prepara el funcionamiento público sin portátil de la documentación propia.
-Los libros y el recuperador híbrido permanecen locales. La publicación conjunta
-incluye también las correcciones previas del motor **1.1.0**, todavía sin commit;
-el sitio existente sigue sirviendo la versión anterior hasta publicar esa
-revisión. Procedimiento: [deploy/hf/README.md](../deploy/hf/README.md).
+La documentación propia funciona públicamente sin portátil. Los libros y el
+recuperador híbrido permanecen locales. La publicación conjunta incluye también
+las correcciones del motor **1.1.0**; el estado observado se registra arriba.
+Procedimiento: [deploy/hf/README.md](../deploy/hf/README.md).

@@ -35,7 +35,7 @@ de analogías. Los informes históricos de distress, transferencia neuronal y
 RAG **no se volvieron a estimar**. Actualizar sus advertencias no cambia sus
 métricas ni demuestra una mejora de sus modelos.
 
-No se realizó una instalación limpia, ejecución remota de CI, despliegue,
+En esa primera comprobación no se realizó una instalación limpia, ejecución remota de CI, despliegue,
 evaluación humana del RAG ni validación temporal calibrada de impago.
 Estas comprobaciones verifican software y artefactos; los límites científicos
 y los experimentos pendientes figuran en [RESULTS.md](RESULTS.md).
@@ -54,7 +54,7 @@ Comprobaciones posteriores del 20 de septiembre de 2026:
 | Biblioteca pública | 6 documentos propios, 27 fragmentos; búsqueda léxica sin modelo ni índice privado |
 | Navegador con API pública ensamblada | Biblioteca, Consulta y fuentes de perfil; Consulta a 390 px sin desbordamiento; sin fallos HTTP en los recorridos comprobados |
 | Integridad de artefactos | **43 artefactos verificados** |
-| Publicación remota | No realizada; `/health` público sigue anunciando 1.0.0 y `/rag/collections` devuelve 503 |
+| Publicación remota en ese momento | Todavía pendiente; `/health` anunciaba 1.0.0 y `/rag/collections` devolvía 503. Véase la publicación posterior al final. |
 
 La comprobación reducida se reproduce con `deploy/hf/smoke.py` siguiendo
 [estas instrucciones](../deploy/hf/README.md). A diferencia del entorno completo
@@ -78,3 +78,22 @@ Los tres registros detallados de libros, las transcripciones locales y las
 capturas archivadas se excluyen de Git. El manifiesto público verifica
 **40 artefactos**; la comprobación anterior de 43 incluía los tres registros
 locales. Los resultados científicos no se modifican por esta separación.
+
+## Publicación verificada
+
+El 20 de septiembre se publicó la revisión `557e940` en `main`.
+[deploy-hf-space](https://github.com/danribes/tfm-data-science/actions/runs/35499568244),
+[deploy-pages](https://github.com/danribes/tfm-data-science/actions/runs/35499568231)
+y [verify](https://github.com/danribes/tfm-data-science/actions/runs/35499568186)
+terminaron correctamente. El Space arrancó el contenedor actualizado.
+
+Las 22 peticiones API comprobadas en producción respondieron HTTP 200.
+El motor anuncia 1.1.0 y las 40 series del escenario base son idénticas a las
+locales. La biblioteca pública ofrece seis documentos y 27 fragmentos;
+las citas Markdown conservan sección y no inventan páginas.
+
+Chromium verificó el sitio publicado, Biblioteca, el cajón de fuentes del
+perfil comprador y Consulta móvil, sin errores de JavaScript o HTTP API.
+Consulta recuperó pasajes por SSE, pero no produjo una respuesta redactada;
+se mostró su alternativa explicativa. Esta prueba no acredita que un proveedor
+de generación esté operativo. Los materiales privados permanecen locales.

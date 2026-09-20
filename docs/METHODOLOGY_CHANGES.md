@@ -2,7 +2,9 @@
 
 Esta revisión corrige implementación e interpretación. No convierte las
 simulaciones en previsiones ni atribuye independencia retrospectiva a los
-experimentos existentes. Los cambios permanecen locales hasta su revisión.
+experimentos existentes. El motor 1.1.0 y la biblioteca pública de documentación
+propia se publicaron el 20 de septiembre de 2026 en Hugging Face y GitHub Pages.
+Las comprobaciones del despliegue se registran en [MODEL_CHECK.md](MODEL_CHECK.md).
 
 ## Vivienda y coherencia de los motores
 
