@@ -344,3 +344,37 @@ def test_narration_is_opt_in_not_the_default():
     assert body["source"] == "deterministic"
     assert body["fallback_reason"] is None, "not asking is not a failure"
     assert body["coloquial"].strip(), "the two-part answer survives without the model"
+
+
+def test_every_answerable_series_narrates_about_itself():
+    """The answer panel asks about whichever series its question resolved to.
+
+    Only five series were ever built into outcomes, so a question about
+    pensions was answered about the deficit and the colloquial line claimed
+    nothing had moved — for twenty-two of the twenty-seven series the profiles
+    ask about. Each must now name itself in both registers.
+    """
+    from explain.facts import SERIES_META, HEADLINES
+
+    known = {h["key"] for h in HEADLINES} | set(SERIES_META)
+    levers = Levers(r=4.8, idx=-0.5)
+    for key in sorted(known):
+        facts = build_facts(levers, 2040, headline=key)
+        head = next((o for o in facts.outcomes if o.key == key), None)
+        assert head is not None, f"{key}: no outcome for the requested series"
+        blocks = fallback_narration(facts)
+        assert head.label in blocks["resumen"], f"{key}: formal block omits it"
+        assert head.label in blocks["coloquial"], f"{key}: colloquial block omits it"
+        assert "no lo suficiente" not in blocks["coloquial"], f"{key}: generic filler"
+
+
+def test_series_metadata_matches_the_engine():
+    """A label here is user-facing prose; a key that is not a series is a
+    silent KeyError the moment someone asks about it."""
+    from engine.spain import SERIES_KEYS
+    from explain.facts import SERIES_META
+
+    for key, meta in SERIES_META.items():
+        assert key in SERIES_KEYS, key
+        assert meta["label"].strip() and meta["label"][0].isupper(), key
+        assert isinstance(meta["dec"], int) and isinstance(meta["up_is_bad"], bool), key

@@ -100,6 +100,44 @@ MECHANISM: dict[str, list[dict]] = {
 }
 
 
+#: Label, unit and polarity for every series a persona question can ask about.
+#:
+#: HEADLINES is the fixed set of five outcomes each narration reports. This is
+#: the wider vocabulary: the answer panel asks /explain about whichever series
+#: its question resolves to, and twenty-two of those are not among the five.
+#: Without an entry here the narration described debt, deficit, unemployment,
+#: inflation and housing effort whatever had been asked — a pensions question
+#: answered about the deficit, and the colloquial line claimed nothing had
+#: moved. Units and decimals mirror the frontend's SERIES_FORMAT so prose and
+#: tiles cannot disagree.
+SERIES_META: dict[str, dict] = {
+    "arop": {"label": "Pobreza o exclusión infantil", "unit": "%", "dec": 1, "up_is_bad": True},
+    "auton": {"label": "Peso del autoempleo", "unit": "%", "dec": 1, "up_is_bad": False},
+    "bono": {"label": "Rendimiento del bono a 10 años", "unit": "%", "dec": 2, "up_is_bad": True},
+    "cuota": {"label": "Cuota hipotecaria mensual", "unit": "€/mes", "dec": 0, "up_is_bad": True},
+    "d1": {"label": "Salarios públicos", "unit": "%PIB", "dec": 2, "up_is_bad": False},
+    "d3": {"label": "Subvenciones", "unit": "%PIB", "dec": 2, "up_is_bad": False},
+    "dep": {"label": "Tasa de dependencia", "unit": "/100", "dec": 1, "up_is_bad": True},
+    "edu": {"label": "Gasto público en educación", "unit": "%PIB", "dec": 2, "up_is_bad": False},
+    "g": {"label": "Crecimiento del PIB real", "unit": "%", "dec": 1, "up_is_bad": False},
+    "int": {"label": "Intereses de la deuda", "unit": "%PIB", "dec": 1, "up_is_bad": True},
+    "ipv": {"label": "Crecimiento del precio de la vivienda", "unit": "% a/a", "dec": 1, "up_is_bad": False},
+    "nomreal": {"label": "Poder de compra de la nómina", "unit": "", "dec": 1, "up_is_bad": False},
+    "p2": {"label": "Consumo intermedio", "unit": "%PIB", "dec": 2, "up_is_bad": False},
+    "p51": {"label": "Inversión pública", "unit": "%PIB", "dec": 2, "up_is_bad": False},
+    "pens": {"label": "Gasto en pensiones", "unit": "%PIB", "dec": 2, "up_is_bad": True},
+    "precio": {"label": "Precio de la vivienda", "unit": "€", "dec": 0, "up_is_bad": False},
+    "r": {"label": "Tipo de interés de referencia", "unit": "%", "dec": 2, "up_is_bad": True},
+    "salario": {"label": "Salario medio anual", "unit": "€/año", "dec": 0, "up_is_bad": False},
+    "salmes": {"label": "Salario medio mensual", "unit": "€/mes", "dec": 0, "up_is_bad": False},
+    "sobre": {"label": "Sobrecarga por coste de vivienda", "unit": "%", "dec": 1, "up_is_bad": True},
+    "spread": {"label": "Prima de riesgo", "unit": "pb", "dec": 0, "up_is_bad": True},
+    "temp": {"label": "Temporalidad", "unit": "%", "dec": 1, "up_is_bad": True},
+    "ujuv": {"label": "Paro juvenil", "unit": "%", "dec": 1, "up_is_bad": True},
+    "wrealIdx": {"label": "Salario real acumulado", "unit": "", "dec": 1, "up_is_bad": False},
+}
+
+
 @dataclass(frozen=True)
 class MovedLever:
     id: str
@@ -267,6 +305,22 @@ def build_facts(levers: Levers, horizon: int, headline: str = "b") -> Explanatio
             key=h["key"], label=h["label"], unit=h["unit"], year=year,
             base=b_val, value=s_val, delta=delta, dec=h["dec"],
             up_is_bad=h["up_is_bad"], direction=direction,
+        ))
+
+    # The caller may ask about a series outside the five. Add it, first, so the
+    # narration is about what was asked: without this the headline had no
+    # matching outcome and every block described the standing five instead.
+    if headline not in {o.key for o in outcomes} and headline in SERIES_META:
+        m = SERIES_META[headline]
+        b_val, s_val = base[headline][k], run[headline][k]
+        delta = s_val - b_val
+        outcomes.insert(0, Outcome(
+            key=headline, label=m["label"], unit=m["unit"], year=Y0 + k,
+            base=b_val, value=s_val, delta=delta, dec=m["dec"],
+            up_is_bad=m["up_is_bad"],
+            direction=("sin cambio" if abs(delta) < 1e-9
+                       else "empeora" if (delta > 0) == m["up_is_bad"]
+                       else "mejora"),
         ))
 
     contributions, interaction, joint_delta = (

@@ -164,8 +164,7 @@ def _coloquial(f: ExplanationFacts) -> str:
         return (f"Sin tocar nada, en {head.year} esto se queda en "
                 f"{nf(head.value, head.dec)} {head.unit}. Ese es el punto de partida.")
 
-    direction = ("sube" if head.delta > 0 else "baja" if head.delta < 0
-                 else "no se mueve")
+    moved_at_all = abs(head.delta) > 1e-9
     worse = head.up_is_bad if head.delta > 0 else (not head.up_is_bad)
     verdict = ("y eso, para quien lo vive, es peor" if head.delta and worse
                else "y eso, para quien lo vive, es mejor")
@@ -174,9 +173,18 @@ def _coloquial(f: ExplanationFacts) -> str:
     # The label is quoted rather than lower-cased into the sentence: its gender
     # varies by series ("el esfuerzo", "la deuda") and a template cannot know
     # which article to put in front of it.
+    # An empty unit (an index) must not leave a double space, and a series that
+    # did not move needs "se queda en", not "no se mueve hasta".
+    amount = f"{nf(head.value, head.dec)} {head.unit}".strip()
+    if not moved_at_all:
+        return (f"Resumiendo: mueves {lever} y «{head.label}» se queda en "
+                f"{amount} en {head.year}: esa palanca no le llega. "
+                "Y con la letra pequeña de siempre: esto es lo que saldría si "
+                "esos valores se mantuvieran, no una bola de cristal.")
+    direction = "sube" if head.delta > 0 else "baja"
     return (f"Resumiendo: mueves {lever} y «{head.label}» {direction} hasta "
-            f"{nf(head.value, head.dec)} {head.unit} en {head.year} — "
-            f"{_signed(head.delta, head.dec)} frente a no tocar nada, {verdict}. "
+            f"{amount} en {head.year} — {_signed(head.delta, head.dec)} frente "
+            f"a no tocar nada, {verdict}. "
             "Con la letra pequeña de siempre: esto es lo que saldría si esos "
             "valores se mantuvieran, no una bola de cristal.")
 
