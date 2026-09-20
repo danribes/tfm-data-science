@@ -19,6 +19,9 @@ publican también resultados negativos y límites de identificación.
 - [Matriz de evidencia](docs/RESULTS.md): modelos, baselines, particiones,
   métricas y conclusiones permitidas.
 - [Guía de defensa](docs/DEFENSA_TFM.md) y [presentación](docs/deck/deck.marp.md).
+- [Guion de demostración](docs/DEMO_DEFENSA.md): recorrido de seis minutos por
+  la aplicación en directo, con los valores que debe mostrar cada paso y qué
+  hacer cuando no los muestre.
 - [Reproducción](docs/REPRODUCIBILITY.md): entorno, datos, comandos y pasos
   todavía ausentes para reconstruir el pipeline legado completo.
 - [Cambios metodológicos](docs/METHODOLOGY_CHANGES.md): correcciones del motor,
@@ -157,6 +160,22 @@ cualquier resultado que salga de ahí.
 
 Es una excepción acotada por una necesidad concreta, no la política del
 proyecto.
+
+**Estado desplegado (20-09-2026).** El índice está subido y el Space responde
+con `corpus_scope: reviewer_restricted`: con token, `libros` (58 documentos,
+17.402 fragmentos) y `crack23` (421 documentos, 3.684 fragmentos); sin token,
+401 y un listado que sólo muestra `metodo` y `defensa_tfm`.
+
+Falta `HF_TOKEN`, deliberadamente: el único token disponible tiene permiso de
+escritura sobre la cuenta entera y el Space sólo necesita inferencia. Hasta que
+se configure uno de sólo lectura, la mitad densa no puede codificar la pregunta
+y la recuperación degrada a BM25 — el índice lleva los vectores, pero no se
+están usando. **Cualquier resultado leído hoy del índice de revisión es BM25, no
+la fusión híbrida con la que se midió el hit@8.** Es exactamente la degradación
+que `dense_or_lexical` existe para hacer visible en lugar de silenciosa.
+
+Para retirar el corpus cuando termine la evaluación basta `--remove`, y además
+borrar `EVO_RAG_DB`, `EVO_RAG_MODE` y `EVO_RAG_TOKEN` de los ajustes del Space.
 
 Preparar estos cambios no actualiza el sitio publicado. El procedimiento y
 las comprobaciones previas a publicar están en
