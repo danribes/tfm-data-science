@@ -1,5 +1,12 @@
 # España en escenarios
 
+<p align="center">
+  <a href="docs/MEMORIA_TFM.md">
+    <img src="docs/figures/portada.svg" width="430"
+         alt="Portada de la memoria: las cuatro capas del sistema y qué se acredita de cada una" />
+  </a>
+</p>
+
 **Análisis macrofiscal condicional para España, con evaluación empírica y explicaciones trazables.**
 
 TFM de Inteligencia Artificial y Data Science · motor **1.1.0** · referencia del escenario **2026-07-31**.
