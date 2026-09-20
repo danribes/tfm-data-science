@@ -20,14 +20,50 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import NamedTuple
 
 ROOT = Path(__file__).resolve().parents[1]
 ICONS = ROOT / "docs/deck/icons"
 FIGURES = ROOT / "docs/figures"
 MEMORIA = ROOT / "docs/MEMORIA_TFM.md"
 
-NAVY, TEAL, CLAY, SLATE = "#0b2545", "#087f8c", "#b85622", "#476a9f"
-PAPER, INK, GREY = "#f4f7fa", "#1b2430", "#536475"
+class Palette(NamedTuple):
+    """Los colores de una figura, para poder dibujarla dos veces.
+
+    El README se lee en claro y en oscuro. Una portada con el papel fijado a
+    blanco es una plancha luminosa en mitad de una página oscura, así que el
+    color no puede vivir en constantes sueltas: se pasa, y se dibuja cada
+    figura una vez por tema.
+    """
+    navy: str      # títulos y trazo principal
+    teal: str      # acento y comprobaciones
+    clay: str      # avisos
+    slate: str     # tercer acento
+    paper: str     # fondo de la figura
+    card: str      # fondo de las cajas
+    ink: str       # texto corriente
+    grey: str      # texto secundario
+    rule: str      # separadores
+    band: str      # fondo de la banda de cabecera
+    onnavy: str    # texto sobre la banda de cabecera
+    blank: str     # los huecos a rellenar de la portada
+
+
+LIGHT = Palette(navy="#0b2545", teal="#087f8c", clay="#b04f1e", slate="#476a9f",
+                paper="#f4f7fa", card="#ffffff", ink="#1b2430", grey="#536475",
+                rule="#d5dee6", band="#0b2545", onnavy="#9fd9d3", blank="#b0bcc7")
+
+#: No es la clara invertida. Sobre fondo oscuro el navy desaparece y el teal
+#: original no llega al contraste mínimo, así que ambos suben de luminosidad y
+#: el papel se queda en un gris azulado antes que en negro puro, que vibra
+#: contra el texto claro.
+DARK = Palette(navy="#9fc6e8", teal="#4fc3bd", clay="#e0875a", slate="#8fb0d8",
+               paper="#0f141b", card="#19212c", ink="#e8eef4", grey="#9fb0c0",
+               rule="#2b3746", band="#16202e", onnavy="#bfe4e0", blank="#55677a")
+
+# Nombres antiguos, conservados para no romper importaciones externas.
+NAVY, TEAL, CLAY, SLATE = LIGHT.navy, LIGHT.teal, LIGHT.clay, LIGHT.slate
+PAPER, INK, GREY = LIGHT.paper, LIGHT.ink, LIGHT.grey
 
 #: Las cuatro capas, en el orden en que se ejecutan. `check` es lo que la capa
 #: siguiente puede comprobar de esta — la regla que da sentido al diagrama.
@@ -77,7 +113,7 @@ def chevron(cx: float, y: float, colour: str, w: float = 9, h: float = 6,
             f'stroke-linecap="round" stroke-linejoin="round"/>')
 
 
-def architecture_svg() -> str:
+def architecture_svg(p: Palette) -> str:
     """Las cuatro capas, el flujo que baja y la comprobación que sube."""
     W, H = 920, 694
     top, band_h, gap = 104, 100, 26
@@ -86,61 +122,61 @@ def architecture_svg() -> str:
 
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
            f'width="{W}" height="{H}" font-family="Arial, Helvetica, sans-serif">',
-           f'<rect width="{W}" height="{H}" fill="{PAPER}"/>',
-           f'<text x="{left}" y="40" font-size="23" font-weight="bold" fill="{NAVY}">'
+           f'<rect width="{W}" height="{H}" fill="{p.paper}"/>',
+           f'<text x="{left}" y="40" font-size="23" font-weight="bold" fill="{p.navy}">'
            'Cada capa sólo puede hacer aquello que la siguiente puede comprobar</text>',
-           f'<text x="{left}" y="64" font-size="14" fill="{GREY}">'
+           f'<text x="{left}" y="64" font-size="14" fill="{p.grey}">'
            'La regla que ordena el sistema: separar cálculo, evidencia y redacción, '
            'y dejar una comprobación entre cada par.</text>']
 
     for i, layer in enumerate(LAYERS):
         y = top + i * (band_h + gap)
         out.append(f'<rect x="{left}" y="{y}" width="{box_w}" height="{band_h}" rx="8" '
-                   f'fill="white" stroke="{NAVY}" stroke-width="1.5"/>')
-        out.append(f'<rect x="{left}" y="{y}" width="6" height="{band_h}" rx="3" fill="{TEAL}"/>')
-        out.append(icon(layer["icon"], left + 26, y + 26, 44, NAVY))
+                   f'fill="{p.card}" stroke="{p.navy}" stroke-width="1.5"/>')
+        out.append(f'<rect x="{left}" y="{y}" width="6" height="{band_h}" rx="3" fill="{p.teal}"/>')
+        out.append(icon(layer["icon"], left + 26, y + 26, 44, p.navy))
         out.append(f'<text x="{left + 90}" y="{y + 34}" font-size="18" font-weight="bold" '
-                   f'fill="{NAVY}">{esc(layer["name"])}</text>')
+                   f'fill="{p.navy}">{esc(layer["name"])}</text>')
         for k, line in enumerate(layer["what"].split("\n")):
             out.append(f'<text x="{left + 90}" y="{y + 56 + k * 17}" font-size="13.5" '
-                       f'fill="{INK}">{esc(line)}</text>')
+                       f'fill="{p.ink}">{esc(line)}</text>')
 
         # La comprobación, a la derecha, con la flecha que sube hacia la capa previa.
         cx = left + box_w + 30
-        out.append(icon("check", cx, y + 20, 20, TEAL))
+        out.append(icon("check", cx, y + 20, 20, p.teal))
         out.append(f'<text x="{cx + 27}" y="{y + 28}" font-size="12" font-weight="bold" '
-                   f'fill="{TEAL}">COMPROBABLE</text>')
+                   f'fill="{p.teal}">COMPROBABLE</text>')
         for k, line in enumerate(_wrap(layer["check"], 34)):
             out.append(f'<text x="{cx}" y="{y + 52 + k * 15}" font-size="12" '
-                       f'fill="{GREY}">{esc(line)}</text>')
+                       f'fill="{p.grey}">{esc(line)}</text>')
 
     # La espina de ejecución, a la izquierda: baja atravesando las cuatro capas.
     spine_x = left - 18
     spine_top, spine_bot = top + 18, top + 3 * (band_h + gap) + band_h - 18
     out.insert(4, f'<path d="M {spine_x} {spine_top} L {spine_x} {spine_bot}" '
-                  f'stroke="{NAVY}" stroke-width="2"/>')
+                  f'stroke="{p.navy}" stroke-width="2"/>')
     for i in range(len(LAYERS) - 1):
         ay = top + i * (band_h + gap) + band_h + gap / 2 - 3
-        out.append(chevron(spine_x, ay, NAVY))
+        out.append(chevron(spine_x, ay, p.navy))
 
     # La comprobación, a la derecha: sube desde cada capa hacia la anterior.
     ver_x = W - 42
     out.append(f'<path d="M {ver_x} {spine_top} L {ver_x} {spine_bot}" '
-               f'stroke="{TEAL}" stroke-width="2" stroke-dasharray="5 4"/>')
+               f'stroke="{p.teal}" stroke-width="2" stroke-dasharray="5 4"/>')
     for i in range(len(LAYERS) - 1):
         ay = top + i * (band_h + gap) + band_h + gap / 2 + 3
-        out.append(chevron(ver_x, ay, TEAL, up=True))
+        out.append(chevron(ver_x, ay, p.teal, up=True))
 
     foot = H - 40
     out.append(f'<line x1="{left - 30}" y1="{foot - 30}" x2="{W - 30}" y2="{foot - 30}" '
-               f'stroke="#d5dee6" stroke-width="1"/>')
-    out.append(chevron(left - 18, foot - 12, NAVY))
-    out.append(f'<text x="{left - 2}" y="{foot - 3}" font-size="13" fill="{INK}">'
-               f'<tspan font-weight="bold" fill="{NAVY}">Ejecución</tspan>'
+               f'stroke="{p.rule}" stroke-width="1"/>')
+    out.append(chevron(left - 18, foot - 12, p.navy))
+    out.append(f'<text x="{left - 2}" y="{foot - 3}" font-size="13" fill="{p.ink}">'
+               f'<tspan font-weight="bold" fill="{p.navy}">Ejecución</tspan>'
                '  los hechos se calculan antes de narrarse</text>')
-    out.append(chevron(W - 330, foot - 6, TEAL, up=True))
-    out.append(f'<text x="{W - 314}" y="{foot - 3}" font-size="13" fill="{GREY}">'
-               f'<tspan font-weight="bold" fill="{TEAL}">Comprobación</tspan>'
+    out.append(chevron(W - 330, foot - 6, p.teal, up=True))
+    out.append(f'<text x="{W - 314}" y="{foot - 3}" font-size="13" fill="{p.grey}">'
+               f'<tspan font-weight="bold" fill="{p.teal}">Comprobación</tspan>'
                '  cada capa deja una traza verificable</text>')
     out.append("</svg>")
     return "\n".join(out)
@@ -159,102 +195,104 @@ def _wrap(text: str, width: int) -> list[str]:
     return lines
 
 
-#: Lo que el motor separa y que la portada resume en cuatro sellos.
+#: Lo que el motor separa y que la portada resume en cuatro sellos. El cuarto
+#: campo nombra el color, no lo fija: cada tema lo resuelve sobre su paleta.
 CLAIMS = [
-    ("check", "Coherencia computacional", "verificada", TEAL),
-    ("history", "Descripción histórica", "publicada con su muestra", SLATE),
-    ("target", "Capacidad predictiva", "medida y no alcanzada", CLAY),
-    ("dismiss", "Identificación causal", "no reclamada", GREY),
+    ("check", "Coherencia computacional", "verificada", "teal"),
+    ("history", "Descripción histórica", "publicada con su muestra", "slate"),
+    ("target", "Capacidad predictiva", "medida y no alcanzada", "clay"),
+    ("dismiss", "Identificación causal", "no reclamada", "grey"),
 ]
 
 
-def portada_svg(title: str, subtitle: str, author: str, programme: str,
-                defence: str, vintage: str, engine: str) -> str:
+def portada_svg(p: Palette, title: str, subtitle: str, author: str,
+                programme: str, defence: str, vintage: str, engine: str) -> str:
     """Cubierta A4. El campo de la universidad queda a completar a propósito."""
     W, H = 595, 842
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
            f'width="{W}" height="{H}" font-family="Arial, Helvetica, sans-serif">',
-           f'<rect width="{W}" height="{H}" fill="white"/>',
-           f'<rect x="0" y="0" width="{W}" height="196" fill="{NAVY}"/>',
-           f'<rect x="0" y="196" width="{W}" height="5" fill="{TEAL}"/>']
+           f'<rect width="{W}" height="{H}" fill="{p.paper}"/>',
+           f'<rect x="0" y="0" width="{W}" height="196" fill="{p.band}"/>',
+           f'<rect x="0" y="196" width="{W}" height="5" fill="{p.teal}"/>']
 
     # Marca de agua: la identidad de deuda, que es el núcleo del motor.
-    out.append(f'<text x="44" y="52" font-size="12.5" fill="#9fd9d3" '
+    out.append(f'<text x="44" y="52" font-size="12.5" fill="{p.onnavy}" '
                f'font-family="Georgia, serif" font-style="italic">'
                'b(t) = b(t−1)·(1+i)/(1+g) − sp</text>')
 
     for k, line in enumerate(_wrap(title, 26)):
         out.append(f'<text x="44" y="{104 + k * 38}" font-size="33" font-weight="bold" '
-                   f'fill="white">{esc(line)}</text>')
+                   f'fill="#ffffff">{esc(line)}</text>')
     for k, line in enumerate(_wrap(subtitle, 58)):
         out.append(f'<text x="44" y="{166 + k * 19}" font-size="14.5" '
-                   f'fill="#9fd9d3">{esc(line)}</text>')
+                   f'fill="{p.onnavy}">{esc(line)}</text>')
 
     # El diagrama de la idea central, reducido a cuatro bandas.
     y0 = 240
     out.append(f'<text x="44" y="{y0 - 14}" font-size="12" font-weight="bold" '
-               f'letter-spacing="1.2" fill="{GREY}">LA IDEA CENTRAL</text>')
+               f'letter-spacing="1.2" fill="{p.grey}">LA IDEA CENTRAL</text>')
     for i, layer in enumerate(LAYERS):
         y = y0 + i * 52
         out.append(f'<rect x="44" y="{y}" width="{W - 88}" height="42" rx="6" '
-                   f'fill="{PAPER}" stroke="{NAVY}" stroke-width="1"/>')
-        out.append(f'<rect x="44" y="{y}" width="5" height="42" rx="2.5" fill="{TEAL}"/>')
-        out.append(icon(layer["icon"], 64, y + 11, 21, NAVY))
+                   f'fill="{p.paper}" stroke="{p.navy}" stroke-width="1"/>')
+        out.append(f'<rect x="44" y="{y}" width="5" height="42" rx="2.5" fill="{p.teal}"/>')
+        out.append(icon(layer["icon"], 64, y + 11, 21, p.navy))
         out.append(f'<text x="97" y="{y + 20}" font-size="13.5" font-weight="bold" '
-                   f'fill="{NAVY}">{esc(layer["name"])}</text>')
-        out.append(f'<text x="97" y="{y + 34}" font-size="10.5" fill="{GREY}">'
+                   f'fill="{p.navy}">{esc(layer["name"])}</text>')
+        out.append(f'<text x="97" y="{y + 34}" font-size="10.5" fill="{p.grey}">'
                    f'{esc(layer["check"])}</text>')
         if i < len(LAYERS) - 1:
-            out.append(chevron(68, y + 44, NAVY, w=8, h=5))
-        out.append(icon("check", W - 74, y + 12, 18, TEAL))
+            out.append(chevron(68, y + 44, p.navy, w=8, h=5))
+        out.append(icon("check", W - 74, y + 12, 18, p.teal))
 
     # Los cuatro sellos: qué se acredita y qué no.
     ys = y0 + 4 * 52 + 22
     out.append(f'<text x="44" y="{ys}" font-size="12" font-weight="bold" '
-               f'letter-spacing="1.2" fill="{GREY}">QUÉ SE ACREDITA Y QUÉ NO</text>')
-    for i, (ic, label, verdict, colour) in enumerate(CLAIMS):
+               f'letter-spacing="1.2" fill="{p.grey}">QUÉ SE ACREDITA Y QUÉ NO</text>')
+    for i, (ic, label, verdict, tone) in enumerate(CLAIMS):
+        colour = getattr(p, tone)
         cx, cy = 44 + (i % 2) * 254, ys + 16 + (i // 2) * 46
         out.append(f'<rect x="{cx}" y="{cy}" width="240" height="38" rx="5" '
-                   f'fill="white" stroke="{colour}" stroke-width="1.2"/>')
+                   f'fill="{p.card}" stroke="{colour}" stroke-width="1.2"/>')
         out.append(icon(ic, cx + 12, cy + 11, 17, colour))
         out.append(f'<text x="{cx + 38}" y="{cy + 17}" font-size="11.5" '
-                   f'font-weight="bold" fill="{NAVY}">{esc(label)}</text>')
+                   f'font-weight="bold" fill="{p.navy}">{esc(label)}</text>')
         out.append(f'<text x="{cx + 38}" y="{cy + 30}" font-size="10.5" '
                    f'fill="{colour}">{esc(verdict)}</text>')
 
     # El hallazgo que sostiene la memoria, en el hueco entre los sellos y el pie.
     hy = ys + 16 + 2 * 46 + 12
     out.append(f'<rect x="44" y="{hy}" width="{W - 88}" height="58" rx="6" '
-               f'fill="{PAPER}" stroke="{TEAL}" stroke-width="1.2"/>')
-    out.append(f'<rect x="44" y="{hy}" width="5" height="58" rx="2.5" fill="{CLAY}"/>')
+               f'fill="{p.paper}" stroke="{p.teal}" stroke-width="1.2"/>')
+    out.append(f'<rect x="44" y="{hy}" width="5" height="58" rx="2.5" fill="{p.clay}"/>')
     out.append(icon("bulb", 62, hy + 13, 19, CLAY))
     out.append(f'<text x="90" y="{hy + 21}" font-size="11.5" font-weight="bold" '
-               f'letter-spacing="0.8" fill="{CLAY}">HALLAZGO METODOLÓGICO PRINCIPAL</text>')
+               f'letter-spacing="0.8" fill="{p.clay}">HALLAZGO METODOLÓGICO PRINCIPAL</text>')
     finding = ("Preservar los movimientos nacionales comunes al remuestrear ensancha la banda "
                "regional hasta que el 3 % heredado deja de rechazarse.")
     for k, line in enumerate(_wrap(finding, 82)):
         out.append(f'<text x="90" y="{hy + 38 + k * 14}" font-size="11" '
-                   f'fill="{INK}">{esc(line)}</text>')
+                   f'fill="{p.ink}">{esc(line)}</text>')
 
     # Pie: autoría y sello del corte. La universidad y el tutor van vacíos.
     fy = H - 176
-    out.append(f'<line x1="44" y1="{fy}" x2="{W - 44}" y2="{fy}" stroke="#d5dee6" stroke-width="1"/>')
+    out.append(f'<line x1="44" y1="{fy}" x2="{W - 44}" y2="{fy}" stroke="{p.rule}" stroke-width="1"/>')
     out.append(f'<text x="44" y="{fy + 26}" font-size="16" font-weight="bold" '
-               f'fill="{NAVY}">{esc(author)}</text>')
-    out.append(f'<text x="44" y="{fy + 46}" font-size="12.5" fill="{INK}">{esc(programme)}</text>')
-    out.append(f'<text x="44" y="{fy + 70}" font-size="12.5" fill="{GREY}">'
+               f'fill="{p.navy}">{esc(author)}</text>')
+    out.append(f'<text x="44" y="{fy + 46}" font-size="12.5" fill="{p.ink}">{esc(programme)}</text>')
+    out.append(f'<text x="44" y="{fy + 70}" font-size="12.5" fill="{p.grey}">'
                '<tspan font-weight="bold">Universidad:</tspan> '
-               '<tspan fill="#b0bcc7">_______________________________________</tspan></text>')
-    out.append(f'<text x="44" y="{fy + 90}" font-size="12.5" fill="{GREY}">'
+               '<tspan fill="{p.blank}">_______________________________________</tspan></text>')
+    out.append(f'<text x="44" y="{fy + 90}" font-size="12.5" fill="{p.grey}">'
                '<tspan font-weight="bold">Tutor/a:</tspan> '
-               '<tspan fill="#b0bcc7">___________________________________________</tspan></text>')
-    out.append(f'<text x="44" y="{fy + 116}" font-size="12.5" fill="{INK}">'
+               '<tspan fill="{p.blank}">___________________________________________</tspan></text>')
+    out.append(f'<text x="44" y="{fy + 116}" font-size="12.5" fill="{p.ink}">'
                f'<tspan font-weight="bold">Defensa:</tspan> {esc(defence)}</text>')
 
-    out.append(f'<rect x="0" y="{H - 52}" width="{W}" height="52" fill="{PAPER}"/>')
-    out.append(f'<rect x="0" y="{H - 52}" width="{W}" height="3" fill="{TEAL}"/>')
+    out.append(f'<rect x="0" y="{H - 52}" width="{W}" height="52" fill="{p.paper}"/>')
+    out.append(f'<rect x="0" y="{H - 52}" width="{W}" height="3" fill="{p.teal}"/>')
     out.append(icon("calendar", 44, H - 38, 17, GREY))
-    out.append(f'<text x="70" y="{H - 25}" font-size="11" fill="{GREY}">'
+    out.append(f'<text x="70" y="{H - 25}" font-size="11" fill="{p.grey}">'
                f'Corte de datos {esc(vintage)} · motor {esc(engine)} · '
                'proyección condicional, no previsión</text>')
 
@@ -284,16 +322,20 @@ def build_index(text: str) -> str:
 
 def main() -> int:
     FIGURES.mkdir(parents=True, exist_ok=True)
-    (FIGURES / "arquitectura.svg").write_text(architecture_svg(), encoding="utf-8")
+    themes = (("", LIGHT), ("-dark", DARK))
+    for suffix, pal in themes:
+        (FIGURES / f"arquitectura{suffix}.svg").write_text(
+            architecture_svg(pal), encoding="utf-8")
 
     text = MEMORIA.read_text(encoding="utf-8")
     title = re.search(r"^# (.+)$", text, re.M).group(1)
     main_title, _, subtitle = title.partition(":")
-    (FIGURES / "portada.svg").write_text(
-        portada_svg(main_title.strip(), subtitle.strip(),
-                    "Daniel Ribes", "Máster en Inteligencia Artificial y Data Science",
-                    "28 de septiembre de 2026", "2026-07-31", "1.1.0"),
-        encoding="utf-8")
+    for suffix, pal in themes:
+        (FIGURES / f"portada{suffix}.svg").write_text(
+            portada_svg(pal, main_title.strip(), subtitle.strip(),
+                        "Daniel Ribes", "Máster en Inteligencia Artificial y Data Science",
+                        "28 de septiembre de 2026", "2026-07-31", "1.1.0"),
+            encoding="utf-8")
 
     if BEGIN in text and END in text:
         idx = build_index(text)
@@ -304,7 +346,8 @@ def main() -> int:
     else:
         print("índice: marcadores ausentes en la memoria, no se ha tocado")
 
-    for f in ("arquitectura.svg", "portada.svg"):
+    for f in ("arquitectura.svg", "arquitectura-dark.svg",
+              "portada.svg", "portada-dark.svg"):
         print(f"{FIGURES / f}  {(FIGURES / f).stat().st_size / 1000:.1f} kB")
     return 0
 

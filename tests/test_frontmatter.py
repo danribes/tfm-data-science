@@ -145,3 +145,71 @@ def test_the_leak_guard_would_actually_catch_a_leak(tmp_path):
 
     assert re.compile(r"hf_[A-Za-z0-9]{30,}").search("hf_" + "A" * 34)
     assert not candidate.findall("una línea corriente, sin credenciales")
+
+
+# ---- los dos temas -----------------------------------------------------------
+
+def _relative_luminance(hexcolor: str) -> float:
+    h = hexcolor.lstrip("#")
+    chan = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    chan = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in chan]
+    return 0.2126 * chan[0] + 0.7152 * chan[1] + 0.0722 * chan[2]
+
+
+def contrast(a: str, b: str) -> float:
+    hi, lo = sorted((_relative_luminance(a), _relative_luminance(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def test_both_themes_are_generated_and_differ():
+    """Un tema oscuro idéntico al claro es un fichero, no un tema."""
+    figs = MEMORIA.parent / "figures"
+    for name in ("portada", "arquitectura"):
+        light = (figs / f"{name}.svg").read_text(encoding="utf-8")
+        dark = (figs / f"{name}-dark.svg").read_text(encoding="utf-8")
+        assert light and dark
+        assert light != dark, name
+
+
+def test_the_dark_theme_is_actually_dark():
+    """Y el claro, claro: la comprobación que un intercambio de ficheros falla."""
+    assert _relative_luminance(fm.DARK.paper) < 0.05
+    assert _relative_luminance(fm.LIGHT.paper) > 0.85
+    assert _relative_luminance(fm.DARK.ink) > 0.7
+    assert _relative_luminance(fm.LIGHT.ink) < 0.1
+
+
+def test_every_palette_field_is_set_in_both_themes():
+    """Un campo olvidado en una paleta es un color del otro tema colándose."""
+    assert set(fm.LIGHT._fields) == set(fm.DARK._fields)
+    for field in fm.LIGHT._fields:
+        for pal in (fm.LIGHT, fm.DARK):
+            value = getattr(pal, field)
+            assert re.fullmatch(r"#[0-9a-fA-F]{6}", value), (pal, field, value)
+
+
+@pytest.mark.parametrize("theme", ["LIGHT", "DARK"])
+def test_text_clears_the_contrast_floor_in_both_themes(theme):
+    """4,5:1 para texto corriente. El barro claro se quedaba en 4,45 y hubo
+    que oscurecerlo: sin esta prueba, nadie lo habría vuelto a mirar."""
+    pal = getattr(fm, theme)
+    pairs = [("ink", "paper"), ("ink", "card"), ("grey", "paper"), ("grey", "card"),
+             ("navy", "card"), ("teal", "card"), ("clay", "paper"), ("onnavy", "band")]
+    for fg, bg in pairs:
+        ratio = contrast(getattr(pal, fg), getattr(pal, bg))
+        assert ratio >= 4.5, f"{theme}: {fg} sobre {bg} = {ratio:.2f}"
+    assert contrast("#ffffff", pal.band) >= 4.5, f"{theme}: título sobre la banda"
+
+
+def test_the_header_band_is_a_surface_not_an_ink():
+    """En oscuro, `navy` es una tinta clara. Rellenar la banda con ella dejó una
+    plancha azul pálido con texto blanco encima."""
+    assert _relative_luminance(fm.DARK.band) < 0.1
+    assert _relative_luminance(fm.LIGHT.band) < 0.1
+
+
+def test_the_readme_serves_the_dark_cover_to_dark_readers():
+    readme = (MEMORIA.parent.parent / "README.md").read_text(encoding="utf-8")
+    assert "prefers-color-scheme: dark" in readme
+    assert "docs/figures/portada-dark.svg" in readme
+    assert "docs/figures/portada.svg" in readme

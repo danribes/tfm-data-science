@@ -2,8 +2,11 @@
 
 <p align="center">
   <a href="docs/MEMORIA_TFM.md">
-    <img src="docs/figures/portada.svg" width="430"
-         alt="Portada de la memoria: las cuatro capas del sistema y qué se acredita de cada una" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/figures/portada-dark.svg" />
+      <img src="docs/figures/portada.svg" width="430"
+           alt="Portada de la memoria: las cuatro capas del sistema y qué se acredita de cada una" />
+    </picture>
   </a>
 </p>
 
