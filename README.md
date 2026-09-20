@@ -145,6 +145,161 @@ El generador TypeScript importa el motor Python local: no necesita levantar la
 API. `EVO_PYTHON` permite seleccionar otro intérprete. La actualización de
 checksums debe acompañarse de la revisión del diff de resultados.
 
+## Cómo está construido el modelo
+
+El sistema tiene cuatro capas y una regla que las separa: **cada capa sólo
+puede hacer aquello que la siguiente puede comprobar**.
+
+### 1. Motor semiestructural — la única fuente de cifras
+
+Un motor determinista sobre un corte de datos congelado. Diez palancas
+independientes mueven una economía calibrada y producen cuarenta series
+anuales de 2026 a 2050. No aprende de los datos: impone relaciones
+—Okun, Phillips, la curva de salarios, la identidad de la deuda— y calcula
+qué implicarían unos supuestos.
+
+La identidad que gobierna el resultado principal es `b(t+1) = b(t)·(1+r−g) − sp`:
+la deuda crece con el tipo efectivo, baja con el crecimiento nominal y baja con
+el superávit primario. Todo lo demás del sistema consume esta salida; nada la
+reescribe.
+
+El mismo cálculo existe en Python y en TypeScript, fijado a anclas numéricas
+compartidas, para que el navegador y el servidor no puedan divergir en silencio.
+
+### 2. Estimación en panel — qué dicen los datos sobre los parámetros
+
+De los ocho parámetros que el corte congelado podría informar, **dos se
+estiman y seis no se identifican**, y cada caso está declarado con su motivo
+econométrico en `research/panel.py`:
+
+| Parámetro | Estado | Motivo |
+|---|---|---|
+| `IPV_LR` | estimado: 1,2151 % [0,9008; 1,5295] | media regional, 1.387 observaciones, 19 unidades |
+| `IPV_REV` | estimado: 0,2039 [0,1811; 0,2268] | AR(1) sobre la desviación, 1.311 pares |
+| `PB_PERSIST` | estimado: 0,8720 [0,8085; 0,9354] | panel de 18 países desde 1960 |
+| `E_IPV_R` | no identificado | el Euríbor es nacional y el panel regional: sin variación transversal en el tipo |
+| `OKUN` | no identificado | el corte no trae paro regional ni brecha del producto |
+| `KAPPA` | no identificado | no hay serie de expectativas de inflación |
+| `MULT` | no identificado | exigiría un shock fiscal identificado; gasto e ingreso son endógenos al ciclo |
+| `E_R` | no identificado | sin serie de PIB por país, sólo gasto e ingreso |
+
+El núcleo fiscal, por tanto, sigue calibrado. Es una limitación declarada, no
+una omisión: «los datos no identifican esto» es una afirmación más fuerte que
+un coeficiente obtenido de una regresión que no lo sostiene.
+
+### 3. Aprendizaje profundo — un resultado negativo conservado
+
+Una red pequeña entrenada con 1.760 series extranjeras y 113.649 ventanas, sin
+ver ningún dato español, evaluada sobre las CCAA con orígenes móviles.
+
+**Pierde contra la deriva** —prolongar la recta de los últimos años—: MASE 0,400
+frente a 0,3953, y gana en 5 de 17 comunidades cuando la regla de desarrollo
+exigía 12. Está en la aplicación por eso, no a pesar de eso: es el único lugar
+donde el lector ve contra qué se mide una previsión, y por qué este sistema no
+ofrece una.
+
+### 4. LLM — escribe, nunca calcula
+
+Dos usos, ambos con la misma restricción.
+
+**Resolución de preguntas** (`/ask`). Traduce texto libre a una consulta
+ejecutable: serie, año y valores de palanca. El modelo elige de un vocabulario
+cerrado de 25 series; una serie desconocida se convierte en rechazo, una
+palanca desconocida se descarta y un valor fuera del rango publicado se recorta
+a él. El modelo elige; los límites del motor deciden qué es admisible.
+
+**Redacción** (`/explain`). Los hechos llegan calculados y el modelo sólo pone
+palabras. Una comprobación posterior rechaza cualquier cifra que no esté
+literalmente en los hechos, admitiendo redondeos pero no truncamientos.
+
+Esa comprobación **descarta en torno a una de cada cinco redacciones**:
+conversiones a puntos básicos, restas, un porcentaje derivado de una
+proporción, un año histórico citado de memoria. Todas eran violaciones reales
+de «escribe, no calcules». Por eso la redacción por defecto la hacen plantillas
+deterministas y el modelo es opcional (`EVO_EXPLAIN_NARRATE=1`): una caída al
+texto de plantilla no se distingue desde fuera, y se prefiere la vía que
+siempre funciona. Cada respuesta declara cuál la ha escrito.
+
+**Recuperación con citas** (RAG). El corpus privado de manuales no sale de la
+máquina local; el despliegue público sirve un índice distinto, construido desde
+una lista explícita de documentos propios del proyecto. Las colecciones con
+derechos de autor no son alcanzables en público, y no por configuración: no
+están en el servidor.
+
+## Cómo se construyó
+
+1. **Portar antes que inventar.** El motor v16 existía como prototipo en
+   JavaScript. Se extrajo a una referencia de 1.720 líneas y se portó con anclas
+   numéricas que fijan el resultado; cualquier mejora posterior tuvo que
+   demostrar que era una mejora, no una deriva.
+2. **Congelar el corte de datos.** Una fecha de referencia única hace que un
+   cálculo se pueda repetir. El coste es que faltan datos que existen; se acepta
+   a cambio de reproducibilidad.
+3. **Estimar sólo lo identificable.** Antes de estimar se escribió qué podía
+   estimarse y qué no. La lista de imposibles es parte del resultado.
+4. **Publicar los experimentos que fallan.** El modelo neuronal no supera su
+   baseline y se conserva con su protocolo.
+5. **Medir la incertidumbre de las propias estimaciones.** El bootstrap por
+   bloques mostró que la banda regional primaria subestima la incertidumbre
+   cuando las regiones comparten ciclo; ambas bandas se publican.
+6. **Separar hechos de prosa.** La capa de explicación calcula primero y
+   redacta después, con una comprobación entre las dos.
+
+## Preguntas de defensa previstas
+
+Las dos preguntas más difíciles que el propio material invita, con la respuesta
+que se sostiene.
+
+### ¿Por qué cambiar el valor por defecto si el rechazo del 3 % no es robusto?
+
+El 3 % nunca fue una estimación: era una calibración heredada, documentada como
+valor por defecto sin derivación. La sustitución no rechaza una estimación
+previa, sino que reemplaza un supuesto sin origen por un estimador con muestra,
+banda y protocolo declarados.
+
+Sobre la robustez, la matriz de evidencia dice dos cosas y se mantienen las dos.
+La banda primaria, agrupada por región, excluye el 3 %. Las tres bandas de
+bootstrap por bloques, que permiten dependencia temporal común entre regiones,
+lo incluyen. No es una contradicción: al remuestrear todas las regiones a la vez
+la muestra efectiva deja de ser diecinueve series y pasa a ser esencialmente un
+ciclo inmobiliario nacional de dieciocho años, así que la banda se ensancha
+porque la información real es menor.
+
+La conclusión defendible es la estrecha: 1,2151 % es el mejor estimador puntual
+con estos datos y la diferencia frente al 3 % no está resuelta. El motor usa el
+estimador y conserva la senda anterior accesible por argumento:
+`run_scenario(ipv_lr=3.0, ipv_rev=0.4)` la reproduce: precio mediano de
+400.982 € en 2050, frente a 353.640 € con los valores por defecto actuales.
+
+Cuidado con ese `0,4`. La constante se llama `IPV_REV_V16` y vale 0,60, pero
+guarda una **persistencia**, mientras que el parámetro actual es una **tasa de
+reversión**: reversión = 1 − persistencia = 0,40. Decir «0,60» en voz alta
+invita a una línea de preguntas sobre si se entiende la propia
+reparametrización. Las anclas numéricas, por su parte, ya no fijan la senda
+v16: se regeneraron con los valores por defecto actuales.
+
+Conviene añadir lo que la propia ficha de `IPV_LR` declara: la estimación es una
+media muestral regional, no una tendencia estructural identificada. Se sustituye
+un número no documentado por otro mejor documentado, no una conjetura por una
+certeza.
+
+### ¿No es cosmético llamar «estimado» a un motor cuyo núcleo fiscal no lo está?
+
+Sí, el núcleo fiscal sigue calibrado, y es una limitación real. Los seis
+parámetros no identificados están declarados uno a uno con su motivo, resumidos
+en la tabla de la sección 2.
+
+Los dos que sí se estiman son los del bloque de vivienda, que es donde la
+aplicación hace sus afirmaciones más directas al lector: el esfuerzo hipotecario
+de los perfiles ciudadanos. El resultado de deuda descansa sobre parámetros
+calibrados, y así consta en la matriz de evidencia.
+
+La pregunta de seguimiento previsible es por qué no incorporar paro regional, que
+el INE publica. La respuesta es el compromiso del corte congelado: añadir una
+serie fuera de la referencia rompería la propiedad que hace repetible cualquier
+cálculo del sistema. Es una elección de reproducibilidad sobre completitud, y se
+puede discutir; no es un descuido.
+
 ## Datos y limitaciones
 
 La fecha de referencia del escenario no equivale a la fecha de adquisición de
