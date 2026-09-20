@@ -378,12 +378,18 @@ panel no afirma que la red prediga: muestra su error, el de la deriva
 en tres de cada cuatro, y esa tabla es la que justifica que el resto de la
 aplicación ofrezca escenarios condicionales y no pronósticos.
 
-El experimento estaba preinscrito. La regla de éxito —ganar en 12 de 17
-comunidades— se fijó antes de conocer el resultado, el corpus de entrenamiento
-excluye España por construcción y excluye cualquier objetivo posterior a
-2019T3. Se cumplió el protocolo y el resultado fue negativo: MASE 0,4000 frente
-a 0,3953 de la deriva, 5 victorias de 17. Que la regla se escribiera antes es lo
-que convierte un experimento fallido en un resultado.
+La regla de éxito —ganar en 12 de 17 comunidades— se fijó en el repositorio
+antes de conocer el resultado, el corpus de entrenamiento excluye España por
+construcción y excluye cualquier objetivo posterior a 2019T3. Se cumplió el
+protocolo y el resultado fue negativo: MASE 0,4000 frente a 0,3953 de la
+deriva, 5 victorias de 17.
+
+Conviene decir exactamente qué respalda eso y qué no. La regla es anterior al
+resultado y su historia es comprobable en el control de versiones, de modo que
+no es un umbral elegido después de ver los datos. Pero no se depositó en un
+registro externo independiente, así que es más débil que una preinscripción
+formal y más fuerte que un criterio *post hoc*. Esa es la afirmación que
+sostiene el resultado negativo, ni más ni menos.
 
 ### ¿Para qué mostrar la puntuación de España si advierten de que no se interprete?
 
