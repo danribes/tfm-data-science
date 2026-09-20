@@ -11,6 +11,34 @@ contrastes empíricos, modelos de aprendizaje automático y recuperación de
 información económica. Las proyecciones son condicionales; los experimentos
 publican también resultados negativos y límites de identificación.
 
+## Probar la aplicación
+
+**→ <https://danribes.github.io/tfm-data-science/>**
+
+No hace falta instalar nada ni ninguna credencial. La API responde en
+<https://danribes-evo-espana-api.hf.space> (contrato en
+[`/docs`](https://danribes-evo-espana-api.hf.space/docs)) y el Space está en
+[huggingface.co/spaces/danribes/evo-espana-api](https://huggingface.co/spaces/danribes/evo-espana-api).
+
+Por dónde entrar:
+
+| | |
+|---|---|
+| [Perfiles](https://danribes.github.io/tfm-data-science/persona/03) | Doce perfiles ciudadanos; se pregunta en lenguaje corriente y responde el motor |
+| [Laboratorio](https://danribes.github.io/tfm-data-science/laboratorio) | Las diez palancas y los ocho escenarios ilustrativos |
+| [Consulta](https://danribes.github.io/tfm-data-science/consulta) | Pregunta libre sobre el corpus, con citas |
+| [Biblioteca](https://danribes.github.io/tfm-data-science/biblioteca) | El corpus documental, por colecciones |
+| [Evidencia](https://danribes.github.io/tfm-data-science/evidencia) | Parámetros estimados, bandas y resultados negativos |
+
+El Space es gratuito y se duerme: la primera petición tras un rato de
+inactividad tarda entre 30 y 90 segundos en despertarlo. El motor corre además
+en el navegador, así que los escenarios funcionan aunque la API esté fría.
+
+Las rutas profundas devuelven HTTP 404 de GitHub Pages y **aun así cargan la
+aplicación**: el despliegue copia `index.html` en `404.html` y el enrutado es
+de cliente. Es el comportamiento normal de una SPA ahí alojada, no un enlace
+roto.
+
 ## Material académico
 
 - [Borrador de memoria](docs/MEMORIA_TFM.md): preguntas, métodos, resultados,

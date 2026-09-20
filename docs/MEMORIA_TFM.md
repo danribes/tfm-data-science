@@ -303,6 +303,13 @@ La paridad numérica entre el motor de servidor y el de navegador se verifica co
 
 ### 4.2 Entorno, despliegue y reproducción
 
+La aplicación está publicada y puede recorrerse sin instalar nada ni presentar credencial alguna:
+
+- Panel: <https://danribes.github.io/tfm-data-science/>
+- API y contrato: <https://danribes-evo-espana-api.hf.space/docs>
+
+El Space es gratuito y se suspende por inactividad, de modo que la primera petición tras un intervalo largo tarda entre treinta y noventa segundos en despertarlo; el motor corre también en el navegador, así que los escenarios responden aunque la API esté fría.
+
 El entorno de referencia es Linux x86_64 con Python 3.12 y Node 22, con cierre de dependencias fijado en `requirements-lock.txt` y registrado en [`docs/environment.json`](environment.json). La aplicación se publica como sitio estático (GitHub Pages) y API contenedorizada (Hugging Face Spaces). El índice documental público se construye desde una lista explícita de documentos propios del proyecto; las colecciones con derechos de autor no forman parte de él.
 
 El despliegue actual va más allá y sirve también los manuales, sin credencial, por decisión explícita del autor. Se documenta aquí porque es una decisión sobre licencias de datos, no un detalle de despliegue, y porque su reversión está a una línea de distancia. [Procedimiento](../README.md).
