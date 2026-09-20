@@ -327,3 +327,20 @@ def test_contribution_share_is_supplied_as_a_percentage_too():
         assert ct.share_pct == pytest.approx(round(ct.share * 100, 1))
     payload = facts.to_dict()
     assert all("share_pct" in c for c in payload["contributions"])
+
+
+def test_narration_is_opt_in_not_the_default():
+    """Templates are the reliable path, so they are what an unasked request gets.
+
+    The model honours "write, never compute" about four times in five; the rest
+    trip the numeric check and fall back. Falling back is invisible from
+    outside, so the default is the path that always works and the nicer prose
+    is switched on deliberately.
+    """
+    from explain.narrate import NARRATE_BY_DEFAULT
+
+    assert NARRATE_BY_DEFAULT is False, "narration must not default on"
+    body = client.post("/explain", json={"levers": {"r": 4.8}, "horizon": 2040}).json()
+    assert body["source"] == "deterministic"
+    assert body["fallback_reason"] is None, "not asking is not a failure"
+    assert body["coloquial"].strip(), "the two-part answer survives without the model"

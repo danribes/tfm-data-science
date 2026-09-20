@@ -38,7 +38,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
 from explain.facts import build_facts
 from explain.fallback import fallback_narration
 from explain.intent import IntentUnavailable, resolve_intent
-from explain.narrate import NarrationUnavailable, narrate
+from explain.narrate import NARRATE_BY_DEFAULT, NarrationUnavailable, narrate
 from explain.report import generate_policy_brief_html
 from data.live import country_list, panel_builder
 from engine import generic
@@ -700,7 +700,8 @@ def explain(req: ExplainRequest) -> ExplainResponse:
 
     source, model, reason = "deterministic", None, None
     blocks = fallback_narration(facts)
-    if req.narrate:
+    want_narration = NARRATE_BY_DEFAULT if req.narrate is None else req.narrate
+    if want_narration:
         try:
             result = narrate(facts)
             blocks = {"resumen": result.resumen, "mecanismo": result.mecanismo,

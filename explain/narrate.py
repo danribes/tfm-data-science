@@ -55,6 +55,16 @@ MODEL = os.environ.get("EVO_EXPLAIN_MODEL", "claude-haiku-4-5-20251001")
 EFFORT = os.environ.get("EVO_EXPLAIN_EFFORT", "")
 MAX_TOKENS = 4000  # headroom: on Opus 5 thinking counts against this too
 
+#: Whether /explain narrates unless a request says otherwise. Off by default.
+#:
+#: Measured across scenarios the model honours "write, never compute" about
+#: four times in five; the rest trip the numeric check and fall back. The
+#: templates are not a degraded mode — they carry the same four blocks, round
+#: correctly and never misquote an anchor — so the reliable path is the default
+#: and the nicer prose is opt-in. EVO_EXPLAIN_NARRATE=1 turns it on.
+NARRATE_BY_DEFAULT = os.environ.get("EVO_EXPLAIN_NARRATE", "0").strip().lower() in {
+    "1", "true", "yes", "on"}
+
 OUTPUT_SCHEMA = {
     "type": "object",
     "properties": {

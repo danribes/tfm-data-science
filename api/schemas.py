@@ -386,7 +386,10 @@ class ExplainRequest(BaseModel):
     headline: str = Field("b", description="Serie que encabeza la explicación")
     #: False forces the deterministic path — used by the offline mock build and
     #: the smoke test, which must never depend on a network call.
-    narrate: bool = True
+    #: None follows the server default (off); an explicit value overrides it,
+    #: which is how the smoke test and the mock build pin the deterministic path
+    #: and how a demo turns the model on for one call.
+    narrate: bool | None = None
 
 
 class ContributionOut(BaseModel):

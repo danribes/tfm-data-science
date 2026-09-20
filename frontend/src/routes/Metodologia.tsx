@@ -131,10 +131,15 @@ export default function Metodologia() {
           </li>
         </ul>
         <p style={{ fontSize: 14.5 }}>
-          Los hechos numéricos del escenario son trazables al motor y reproducibles
-          desactivando la narración (<code>narrate: false</code>). La redacción
-          generada requiere evaluación de fidelidad; las instrucciones al modelo
-          no garantizan que cada afirmación sea correcta.
+          Por defecto la explicación la escriben las plantillas, no el modelo. La
+          comprobación que rechaza cualquier cifra ausente de los hechos descarta
+          en torno a una de cada cinco redacciones del modelo —conversiones de
+          unidades, restas, un año histórico citado de memoria— y esa caída al
+          texto determinista no se distingue desde fuera. Se prefiere la vía que
+          siempre funciona: se activa el modelo con <code>EVO_EXPLAIN_NARRATE=1</code>
+          y cada respuesta dice cuál la ha escrito. La redacción generada sigue
+          requiriendo evaluación de fidelidad: las instrucciones al modelo no
+          garantizan que cada afirmación sea correcta.
         </p>
       </div>
 
