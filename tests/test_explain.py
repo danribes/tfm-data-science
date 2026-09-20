@@ -312,3 +312,18 @@ def test_validate_accepts_the_blocks_the_schema_asks_for():
         validate_narration({k: v for k, v in good.items() if k != "coloquial"}, facts)
     with pytest.raises(NarrationUnavailable):
         validate_narration({**good, "resumen": "  "}, facts)
+
+
+def test_contribution_share_is_supplied_as_a_percentage_too():
+    """The model may not compute, so anything prose needs must be handed over.
+
+    It wrote "99,6 %" from a share of 0,9963 — correct, and rejected by the
+    numeric-inventory check, which dropped the whole narration to templates.
+    The percentage is now a fact, so no multiplication is required.
+    """
+    facts = build_facts(ADVERSE, 2040)
+    assert facts.contributions
+    for ct in facts.contributions:
+        assert ct.share_pct == pytest.approx(round(ct.share * 100, 1))
+    payload = facts.to_dict()
+    assert all("share_pct" in c for c in payload["contributions"])

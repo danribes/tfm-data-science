@@ -134,6 +134,14 @@ class Contribution:
     lever_name: str
     delta: float
     share: float  # of the sum of |single-lever deltas|, not of the joint delta
+    #: The same share as a percentage, already rounded.
+    #:
+    #: Prose wants "99,6 %", the model is forbidden to compute, and the
+    #: numeric-inventory check rejects any figure not in these facts — so a
+    #: model multiplying 0,9963 by 100 was correct, obedient to the prompt and
+    #: rejected anyway, dropping the whole narration to templates. Handing it
+    #: the percentage removes the arithmetic instead of widening the check.
+    share_pct: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -211,9 +219,13 @@ def decompose(levers: Levers, key: str, k: int) -> tuple[list[Contribution], flo
         singles.append((m.id, m.name, solo[key][k] - base[key][k]))
 
     total_abs = sum(abs(d) for _, _, d in singles)
+
+    def _share(d: float) -> float:
+        return (abs(d) / total_abs) if total_abs > 1e-12 else 0.0
+
     contributions = [
         Contribution(lever_id=lid, lever_name=name, delta=d,
-                     share=(abs(d) / total_abs) if total_abs > 1e-12 else 0.0)
+                     share=_share(d), share_pct=round(_share(d) * 100, 1))
         for lid, name, d in singles
     ]
     contributions.sort(key=lambda x: abs(x.delta), reverse=True)

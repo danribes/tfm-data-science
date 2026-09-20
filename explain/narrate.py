@@ -132,8 +132,11 @@ formación económica tiene que entenderlo entero.
 
 **mecanismo** — el porqué técnico. Recorre la cadena causal de cada palanca \
 movida citando el coeficiente que fija el tamaño de cada paso. Explica la \
-descomposición: cada palanca por separado y el residuo de interacción. **El \
-residuo importa** — el motor no es lineal, las palancas por separado no suman \
+descomposición: cada palanca por separado y el residuo de interacción. Para \
+los porcentajes de reparto usa `share_pct`, que ya viene calculado: no \
+multipliques `share` por 100 ni conviertas ninguna otra cifra, porque cualquier \
+número que no esté literalmente en los hechos invalida la respuesta entera. \
+**El residuo importa** — el motor no es lineal, las palancas por separado no suman \
 el efecto conjunto, y eso hay que decirlo, no esconderlo.
 
 **advertencia** — líneas rojas cruzadas o en banda de aviso, con su ancla \
