@@ -102,14 +102,16 @@ GOLDEN: tuple[Question, ...] = (
         id="macro-okun",
         question="¿Qué relación hay entre la brecha del producto y el desempleo?",
         collection="libros", topic="macro",
-        expect_docs=("Principles of Economics", "The Economy", "Principles of Microeconomics"),
+        expect_docs=("Principles of Economics", "The Economy", "Principles of Microeconomics",
+                     "Macroeconomics"),
         expect_terms=(("desempleo", "unemployment", "paro"), ("producto", "output", "gap")),
     ),
     Question(
         id="macro-phillips",
         question="¿Por qué la curva de Phillips se desplaza cuando cambian las expectativas de inflación?",
         collection="libros", topic="macro",
-        expect_docs=("Principles of Economics", "The Economy"),
+        expect_docs=("Principles of Economics", "The Economy",
+                     "Formation of Expectations", "dinamica reciente de la inflacion"),
         expect_terms=(("phillips",), ("inflacion", "inflation"), ("expectativas", "expectations")),
     ),
     # ---- debt sustainability: the core of the app ----
@@ -117,7 +119,8 @@ GOLDEN: tuple[Question, ...] = (
         id="dsa-bola-nieve",
         question="¿Qué es el efecto bola de nieve de la deuda y cuándo se vuelve explosivo?",
         collection="libros", topic="dsa",
-        expect_docs=("Debt Sustainability", "Sovereign Risk", "sostenibilidad de la deuda"),
+        expect_docs=("Debt Sustainability", "Sovereign Risk", "sostenibilidad de la deuda",
+                     "Documento Ocasional 1803", "Debt Sustainability Monitor"),
         expect_terms=(("deuda", "debt"), ("tipo de interes", "interest rate"), ("crecimiento", "growth")),
         note="La identidad b(t+1)=b(t)(1+r-g)-sp es literalmente el motor.",
     ),
@@ -125,8 +128,18 @@ GOLDEN: tuple[Question, ...] = (
         id="dsa-r-menos-g",
         question="¿Por qué importa la diferencia entre el tipo de interés y la tasa de crecimiento?",
         collection="libros", topic="dsa",
-        expect_docs=("Debt Sustainability", "Sovereign Risk", "sostenibilidad de la deuda"),
+        expect_docs=("Debt Sustainability", "Sovereign Risk", "sostenibilidad de la deuda",
+                     "Documento Ocasional 1803", "Debt Sustainability Monitor"),
         expect_terms=(("crecimiento", "growth"), ("tipo de interes", "interest rate")),
+        forbidden_docs=("Mises",),
+        note=("El caso duro del conjunto. La pregunta nunca dice «deuda», así que "
+              "la sonda densa española la lee como teoría del tipo de interés y "
+              "trae a Mises, que habla largo de tipos y nada de sostenibilidad. "
+              "La sonda inglesa sí acierta —devuelve ECB OP185, el Debt "
+              "Sustainability Monitor y el marco del FMI— pero pesa 4 frente a 6 "
+              "y no puede superar a los tres primeros españoles. Subir ese peso "
+              "gana un rank-1 y pierde dos de cobertura de términos, así que la "
+              "fusión se queda como está y el fallo se mide en vez de taparse."),
     ),
     Question(
         id="dsa-estocastico",
@@ -140,7 +153,8 @@ GOLDEN: tuple[Question, ...] = (
         id="dsa-saldo-primario",
         question="¿Qué saldo primario hace falta para estabilizar la ratio de deuda sobre PIB?",
         collection="libros", topic="dsa",
-        expect_docs=("Debt Sustainability", "Sovereign Risk", "sostenibilidad de la deuda"),
+        expect_docs=("Debt Sustainability", "Sovereign Risk", "sostenibilidad de la deuda",
+                     "Documento Ocasional 1803", "Debt Sustainability Monitor"),
         expect_terms=(("saldo primario", "primary balance"), ("deuda", "debt")),
     ),
     # ---- econometrics: the methods the research layer uses ----

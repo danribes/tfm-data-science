@@ -48,6 +48,21 @@ TERMS: dict[str, str] = {
     "superavit primario": "primary surplus",
     "bola de nieve": "snowball effect debt dynamics",
     "efecto bola de nieve": "snowball effect",
+    # The r−g differential, spelled out the way a reader asks it. Without
+    # these the query expands to a bare "interest rate" plus "growth rate" and
+    # lands in Austrian monetary theory, which discusses both at length and
+    # says nothing about debt: measured as Mises taking four of the top eight.
+    # It is terminology the DSA literature indexes under, so it earns its place
+    # by the same rule as the rest.
+    "diferencia entre el tipo de interes y la tasa de crecimiento":
+        "interest-growth differential r minus g debt dynamics debt sustainability",
+    "diferencia entre tipo de interes y crecimiento":
+        "interest-growth differential r minus g debt sustainability",
+    "diferencial entre el tipo de interes y el crecimiento":
+        "interest-growth differential r minus g debt sustainability",
+    "tipo de interes y la tasa de crecimiento":
+        "interest-growth differential debt dynamics",
+    "r menos g": "interest-growth differential debt sustainability snowball effect",
     "riesgo soberano": "sovereign risk",
     "prima de riesgo": "risk premium sovereign spread",
     "consolidacion fiscal": "fiscal consolidation austerity",

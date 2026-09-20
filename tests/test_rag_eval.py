@@ -244,13 +244,36 @@ def test_a_document_with_text_is_recorded(tmp_path, monkeypatch):
 def test_glossary_keeps_phrases_whole():
     """Deduplicating word by word turned "growth rate" + "interest rate" into
     "growth rate interest", destroying the second term of art — the one the
-    question was about. Phrases are the unit."""
+    question was about. Phrases are the unit.
+
+    The vehicle changed: the r−g question this used to ask now matches a single
+    longer entry, by the longest-first rule tested below. Two disjoint phrases
+    still exercise the original bug, which was about deduplication and not
+    about which query triggered it.
+    """
+    from rag import glossary
+
+    terms = glossary.english_terms(
+        "¿cómo afecta la brecha del producto a la tasa de crecimiento?")
+    assert "output gap" in terms
+    assert "growth rate" in terms
+
+
+def test_glossary_reads_r_minus_g_as_debt_dynamics():
+    """The whole phrase beats its parts, and that is the point.
+
+    Expanded as "interest rate" plus "growth rate", this question retrieved
+    Austrian monetary theory: Mises discusses both at length and debt
+    sustainability not at all. As one term of art it sends the English probe to
+    ECB OP185, the Debt Sustainability Monitor and the IMF framework.
+    """
     from rag import glossary
 
     terms = glossary.english_terms(
         "¿Por qué importa la diferencia entre el tipo de interés y la tasa de crecimiento?")
-    assert "growth rate" in terms
-    assert "interest rate" in terms
+    assert len(terms) == 1
+    assert "debt" in terms[0]
+    assert "growth rate" not in terms
 
 
 def test_glossary_matches_the_longest_term_first():
