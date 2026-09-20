@@ -180,13 +180,28 @@ def test_search_all_keeps_sources_separated(db, monkeypatch):
 
 # ---- endpoints --------------------------------------------------------------
 
-def test_collections_endpoint_hides_the_restricted_ones_by_default():
+def test_collections_endpoint_lists_everything_when_nothing_is_restricted():
+    """Con el corpus abierto, el listado anuncia las cuatro colecciones."""
+    ids = {c["id"] for c in client.get("/rag/collections").json()["collections"]}
+    assert ids == {"libros", "metodo", "defensa_tfm", "crack23"}
+
+
+def test_collections_endpoint_hides_the_restricted_ones_when_gated(monkeypatch):
     """Advertising a collection nobody can read is an invitation to try."""
+    monkeypatch.setattr("rag.config.RESTRICTED_COLLECTIONS",
+                        frozenset({"libros", "crack23"}))
     ids = {c["id"] for c in client.get("/rag/collections").json()["collections"]}
     assert ids == {"metodo", "defensa_tfm"}
 
 
-def test_collections_endpoint_lists_everything_for_a_reviewer(monkeypatch):
+def test_the_open_corpus_needs_no_credential():
+    """Lo que la decisión de abrir el corpus significa, dicho como prueba."""
+    for coll in ("libros", "crack23", "metodo", "defensa_tfm"):
+        r = client.post("/rag/search", json={"query": "phillips", "collection": coll})
+        assert r.status_code != 401, coll
+
+
+def test_collections_endpoint_lists_everything_for_a_reviewer(gated, monkeypatch):
     monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
     body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()
     ids = {c["id"]: c for c in body["collections"]}
@@ -233,8 +248,21 @@ def test_chat_refuses_to_answer_without_passages(monkeypatch):
 
 
 # ---- the reviewer token ------------------------------------------------------
+#
+# El despliegue sirve hoy el corpus abierto: RESTRICTED_COLLECTIONS está vacío
+# por decisión del autor. La maquinaria de la verja sigue en el código y estas
+# pruebas la siguen ejerciendo, rearmándola en la propia prueba. Borrarlas
+# porque la política actual no las usa dejaría sin red el día que se vuelva a
+# cerrar, que es justo cuando importa que funcione.
 
-def test_restricted_collections_need_the_token(monkeypatch):
+
+@pytest.fixture
+def gated(monkeypatch):
+    """Vuelve a cerrar libros y crack23 durante la prueba."""
+    monkeypatch.setattr("rag.config.RESTRICTED_COLLECTIONS",
+                        frozenset({"libros", "crack23"}))
+
+def test_restricted_collections_need_the_token(gated, monkeypatch):
     """The books are third-party copyright; only an evaluator should reach them."""
     monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
     for path, payload in (
@@ -246,7 +274,7 @@ def test_restricted_collections_need_the_token(monkeypatch):
         assert ok.status_code != 401, path
 
 
-def test_an_unset_token_locks_rather_than_opens(monkeypatch):
+def test_an_unset_token_locks_rather_than_opens(gated, monkeypatch):
     """Forgetting to configure it must not publish the corpus.
 
     The dangerous default is the one where a missing secret means "no check".
@@ -258,7 +286,7 @@ def test_an_unset_token_locks_rather_than_opens(monkeypatch):
                        headers={"X-Rag-Token": ""}).status_code == 401
 
 
-def test_a_wrong_token_is_refused(monkeypatch):
+def test_a_wrong_token_is_refused(gated, monkeypatch):
     monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
     for bad in ("t0keN", "t0ke", "t0kenn", "", "otro"):
         r = client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
@@ -266,7 +294,7 @@ def test_a_wrong_token_is_refused(monkeypatch):
         assert r.status_code == 401, bad
 
 
-def test_surrounding_whitespace_is_tolerated(monkeypatch):
+def test_surrounding_whitespace_is_tolerated(gated, monkeypatch):
     """A token arrives pasted from an email, and often with a space attached.
 
     Trimming costs nothing — no one guesses a secret by adding whitespace — and
@@ -278,7 +306,7 @@ def test_surrounding_whitespace_is_tolerated(monkeypatch):
     assert r.status_code != 401
 
 
-def test_the_project_documents_stay_open(monkeypatch):
+def test_the_project_documents_stay_open(gated, monkeypatch):
     """Gating the books must not gate the app's own documentation."""
     monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
     for coll in ("metodo", "defensa_tfm"):
@@ -286,7 +314,7 @@ def test_the_project_documents_stay_open(monkeypatch):
         assert r.status_code != 401, coll
 
 
-def test_bearer_header_also_carries_the_token(monkeypatch):
+def test_bearer_header_also_carries_the_token(gated, monkeypatch):
     """One credential, whichever endpoint serves the corpus.
 
     The interface already sends Authorization: Bearer to a tunnelled corpus;

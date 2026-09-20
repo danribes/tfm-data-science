@@ -195,9 +195,16 @@ def resolve_device() -> str:
 
 # ---- who may read which collection -------------------------------------------
 
-#: Collections holding third-party copyrighted text. Reachable only with the
-#: reviewer token, never by default.
-RESTRICTED_COLLECTIONS = frozenset({"libros", "crack23"})
+#: Collections reachable only with the reviewer token.
+#:
+#: Vacío por decisión explícita del autor (2026-09-20): el corpus completo,
+#: manuales de terceros incluidos, se sirve abierto. La maquinaria de abajo se
+#: conserva intacta y volver a cerrarlo es reponer los nombres aquí y fijar
+#: EVO_RAG_TOKEN en el despliegue — una línea, sin cambios en la API.
+#:
+#: Mientras esté vacío, `/rag/search` devuelve texto literal de obras con
+#: derechos de autor a cualquiera que lo pida, sin credencial.
+RESTRICTED_COLLECTIONS: frozenset[str] = frozenset()
 
 #: Shared secret that unlocks them, from EVO_RAG_TOKEN. Empty means locked:
 #: an unset token can never accidentally publish the books, which is the
@@ -231,6 +238,8 @@ def effective_scope(has_restricted: bool) -> str:
     """
     if not has_restricted:
         return CORPUS_SCOPE
+    if not RESTRICTED_COLLECTIONS:
+        return "full_open"
     return "reviewer_restricted" if REVIEWER_TOKEN else "restricted_locked"
 
 

@@ -29,8 +29,8 @@ docs/deck/media/_archive/
 .env.*
 !.env.example
 
-# La hoja de acceso para el tribunal lleva el token del índice de revisión.
-# Se entrega con la memoria, no se publica: este repositorio es público y un
-# token en su historial es un token quemado, aunque se borre después.
-docs/ACCESO_EVALUADORES.md
+# Cualquier hoja con credenciales queda fuera del control de versiones. El
+# corpus se sirve hoy abierto y no hay token que repartir, pero el patrón se
+# conserva: este repositorio es público y un secreto en su historial queda
+# quemado aunque un commit posterior lo borre.
 *.secreto.md

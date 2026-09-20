@@ -102,21 +102,17 @@ def main() -> int:
           "no se ha obtenido una respuesta" not in str(chat.get("answer", "")).lower(),
           str(chat.get("answer", ""))[:110])
 
-    # Containment: the copyrighted collections must not be reachable without a
-    # token. Which refusal arrives depends on what is deployed — 422 when the
-    # index does not hold them at all, 401 when it does and they are gated —
-    # and this check ran with only 422/503 allowed, so the deploy that put the
-    # reviewer index up failed on the collection being *correctly* protected.
-    #
-    # The status is the weaker half of the assertion anyway. What actually
-    # matters is that no book text comes back, so that is asserted directly:
-    # a future 200 with passages fails here whatever the status line says.
-    for private in ("libros", "crack23"):
+    # El corpus se sirve abierto por decisión explícita del autor: las cuatro
+    # colecciones responden sin credencial. Lo que se comprueba ya no es que
+    # los manuales estén cerrados, sino que están efectivamente servidos — un
+    # 401 aquí significaría que la verja se ha rearmado sin querer, y un 0
+    # pasajes, que el índice no está donde el despliegue cree.
+    for public in ("libros", "crack23"):
         status, body = call(base, "/rag/search",
-                            {"query": "curva de Phillips", "collection": private, "top_k": 2})
+                            {"query": "curva de Phillips", "collection": public, "top_k": 2})
         passages = body.get("passages") or body.get("hits") or []
-        check(f"/rag/search refuses «{private}»",
-              status in (401, 403, 422, 503) and not passages,
+        check(f"/rag/search sirve «{public}» sin credencial",
+              status == 200 and bool(passages),
               f"status {status}, {len(passages)} pasajes")
 
     print()

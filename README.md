@@ -106,9 +106,9 @@ seis documentos propios del proyecto, enumerados en
 desde esos archivos, sin acceder al corpus privado ni cargar embeddings.
 Los resultados históricos del RAG híbrido no evalúan este corpus público.
 
-Durante la evaluación del trabajo ese modo se sustituye por `remote_hybrid`, que
-sirve el corpus completo tras un token; se describe en «Índice de revisión» más
-abajo y se retira al terminar.
+El despliegue actual sustituye ese modo por `remote_hybrid` y sirve el corpus
+completo —manuales incluidos— sin credencial; se describe en «Corpus completo,
+servido abierto» más abajo.
 
 La búsqueda y consulta de fragmentos públicos funcionan sin claves de IA.
 La redacción de respuestas requiere una clave de proveedor en los secretos
@@ -116,77 +116,60 @@ del Space; si no está disponible, se muestran los pasajes y el motivo.
 La conexión RAG se configura por separado de la API del motor, desde Biblioteca
 o Consulta; un servicio RAG caído no impide utilizar los escenarios.
 
-### Índice de revisión
+### Corpus completo, servido abierto
 
-Quien evalúa este trabajo necesita consultar el corpus completo desde su propia
-máquina y en su propio horario. Para eso existe un índice de revisión temporal,
-con tres propiedades deliberadas.
+Por decisión explícita del autor (20-09-2026) el despliegue sirve el corpus
+entero sin credencial: `libros` (58 documentos, 17.402 fragmentos) y `crack23`
+(421 documentos, 3.684 fragmentos) responden como `metodo` y `defensa_tfm`, y
+`corpus_scope` vale `full_open`.
 
-**Cerrado por defecto.** `libros` y `crack23` responden 401 sin el token, y un
-`EVO_RAG_TOKEN` sin configurar deniega en lugar de permitir: olvidar el secreto
-no puede publicar los manuales. El listado tampoco los anuncia a quien no puede
-leerlos.
+**Qué significa.** `libros` son manuales de terceros con derechos de autor.
+Servirlos abiertos convierte `/rag/search` en un recuperador público de texto
+literal de esas obras. No es una consecuencia lateral de facilitar el acceso a
+quien evalúa: es una decisión tomada a sabiendas, y se deja escrita aquí para
+que se lea como tal.
 
-**El mismo recuperador que se evaluó.** Crear los vectores necesita el modelo;
-consultarlos necesita un vector y `sqlite-vec`, que ocupa 0,2 MB. Así que el
-despliegue lleva el índice completo (201 MB) y pide a una copia alojada del
-mismo modelo —`intfloat/multilingual-e5-large`, el que produjo esos vectores—
-que codifique cada pregunta.
+**Cómo se cierra otra vez.** La maquinaria de la verja sigue completa en
+`rag/config.py` y bajo prueba. Reponer los nombres en `RESTRICTED_COLLECTIONS`
+y fijar `EVO_RAG_TOKEN` en el Space devuelve el 401 sin tocar la API:
 
-Importa porque la alternativa era servir BM25 solo, y el hit@8 publicado se
-midió con fusión híbrida: quien evaluara la recuperación estaría juzgando un
-sistema distinto del que se describe. Con `EVO_RAG_MODE=remote_hybrid` es el
-mismo. Si el codificador remoto falla, la mitad léxica sigue respondiendo y la
-degradación se registra: un fallo de red cuesta calidad, no disponibilidad.
+```python
+RESTRICTED_COLLECTIONS = frozenset({"libros", "crack23"})
+```
 
-**Temporal.** Se sube desde una máquina con el corpus privado, porque CI no lo
-tiene ni lo tendrá, y se retira al terminar la evaluación:
+**Cómo se construye y se retira el índice.** Se sube desde una máquina con el
+corpus privado, porque CI no lo tiene ni lo tendrá:
 
 ```bash
 PYTHONPATH=. python tools/build_reviewer_index.py --out /tmp/reviewer.db
 PYTHONPATH=. python tools/upload_reviewer_index.py --file /tmp/reviewer.db
-# al terminar la evaluación
+# para dejar de servirlo
 PYTHONPATH=. python tools/upload_reviewer_index.py --remove
 ```
 
 En los ajustes del Space: `EVO_RAG_MODE=remote_hybrid`,
-`EVO_RAG_DB=/app/data/rag/reviewer.db`, `HF_TOKEN` para el codificador y
-`EVO_RAG_TOKEN` para quien evalúa. Falta cualquiera de los dos últimos y el
-corpus restringido responde 401, que es el fallo correcto.
+`EVO_RAG_DB=/app/data/rag/reviewer.db` y `HF_TOKEN` para el codificador.
 
 `--lexical-only` construye la variante sin vectores: 113 MB y BM25 solo. Es más
 pequeña y es otro recuperador; si se usa, hay que decirlo al interpretar
 cualquier resultado que salga de ahí.
 
-Es una excepción acotada por una necesidad concreta, no la política del
-proyecto.
+**El mismo recuperador que se evaluó.** Crear los vectores necesita el modelo;
+consultarlos necesita un vector y `sqlite-vec`, que ocupa 0,2 MB. Por eso el
+despliegue lleva el índice completo (201 MB) y pide a una copia alojada del
+mismo modelo —`intfloat/multilingual-e5-large`— que codifique cada pregunta.
+Importa porque la alternativa era servir BM25 solo, y el hit@8 publicado se
+midió con fusión híbrida: quien evaluara la recuperación estaría juzgando un
+sistema distinto del que se describe.
 
-**Estado desplegado (20-09-2026).** El índice está subido y el Space responde
-con `corpus_scope: reviewer_restricted`: con token, `libros` (58 documentos,
-17.402 fragmentos) y `crack23` (421 documentos, 3.684 fragmentos); sin token,
-401 y un listado que sólo muestra `metodo` y `defensa_tfm`.
-
-**Cómo se obtiene la credencial.** El token viaja con la entrega del trabajo,
-en una hoja de acceso dirigida al tribunal, y no se publica aquí. No es una
-formalidad: este repositorio es público, y un token en su historial queda
-quemado aunque se borre después — `git` conserva lo que se le confía. Quien
-evalúe el trabajo y no la haya recibido puede pedírsela al autor.
-
-Las colecciones `metodo` y `defensa_tfm` son de autoría propia, están abiertas
-y no necesitan credencial, de modo que la aplicación se puede recorrer entera
-sin pedir nada. Lo que queda tras el token son los manuales de terceros, y es
-sólo por sus derechos de autor.
-
-Falta `HF_TOKEN`, deliberadamente: el único token disponible tiene permiso de
-escritura sobre la cuenta entera y el Space sólo necesita inferencia. Hasta que
-se configure uno de sólo lectura, la mitad densa no puede codificar la pregunta
-y la recuperación degrada a BM25 — el índice lleva los vectores, pero no se
-están usando. **Cualquier resultado leído hoy del índice de revisión es BM25, no
-la fusión híbrida con la que se midió el hit@8.** Es exactamente la degradación
-que `dense_or_lexical` existe para hacer visible en lugar de silenciosa.
-
-Para retirar el corpus cuando termine la evaluación basta `--remove`, y además
-borrar `EVO_RAG_DB`, `EVO_RAG_MODE` y `EVO_RAG_TOKEN` de los ajustes del Space.
+**Estado desplegado.** Falta `HF_TOKEN`, deliberadamente: el único token
+disponible tiene permiso de escritura sobre la cuenta entera y el Space sólo
+necesita inferencia. Hasta que se configure uno de sólo lectura, la mitad densa
+no puede codificar la pregunta y la recuperación degrada a BM25 — el índice
+lleva los vectores, pero no se están usando. **Cualquier resultado leído hoy
+del corpus es BM25, no la fusión híbrida con la que se midió el hit@8.** Es
+exactamente la degradación que `dense_or_lexical` existe para hacer visible en
+lugar de silenciosa.
 
 Preparar estos cambios no actualiza el sitio publicado. El procedimiento y
 las comprobaciones previas a publicar están en
@@ -302,10 +285,9 @@ siempre funciona. Cada respuesta declara cuál la ha escrito.
 construido desde una lista explícita de documentos propios del proyecto, y las
 colecciones con derechos de autor no forman parte de él.
 
-Durante la evaluación del trabajo existe una excepción acotada, descrita en
-«Índice de revisión» más abajo: un índice que sí incluye los manuales, accesible
-sólo con un token. Mientras esté desplegado, ese material reside en un servidor
-de terceros, y se retira cuando la evaluación termina.
+El despliegue actual va más allá, por decisión explícita del autor: sirve
+también los manuales, y sin credencial. Se describe en «Corpus completo,
+servido abierto», junto con la línea que lo cierra otra vez.
 
 ## Cómo se construyó
 

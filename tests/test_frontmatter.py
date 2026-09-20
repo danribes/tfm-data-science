@@ -85,12 +85,12 @@ def test_the_declaration_names_what_the_tools_were_used_for():
 
 
 def test_no_credential_reaches_the_tracked_tree():
-    """El repositorio es público: un token en su historial queda quemado.
+    """El repositorio es público: un secreto en su historial queda quemado.
 
-    La hoja de acceso del tribunal lleva EVO_RAG_TOKEN y vive fuera del
-    control de versiones. Esta prueba existe porque `git add -A` es cómodo y
-    no pregunta, y porque un `.gitignore` sólo protege mientras nadie fuerce
-    la ruta.
+    Ya no hay token de corpus que repartir —se sirve abierto—, pero siguen
+    pasando por aquí claves de proveedor y de Hugging Face. La prueba existe
+    porque `git add -A` es cómodo y no pregunta, y porque un `.gitignore`
+    sólo protege mientras nadie fuerce la ruta.
     """
     import subprocess
 
@@ -102,10 +102,10 @@ def test_no_credential_reaches_the_tracked_tree():
         re.compile(r"sk-ant-[A-Za-z0-9\-_]{20,}"),       # clave de proveedor
         re.compile(r"EVO_RAG_TOKEN\s*[=:]\s*['\"]?[A-Za-z0-9_\-]{16,}"),
     )
-    #: El token de revisión, pegado tal cual, no encaja en ningún patrón de
-    #: arriba: es una cadena alfanumérica sin prefijo. Se busca por huella, de
-    #: modo que la prueba reconoce el secreto sin contenerlo.
-    known_secret = "c6040958408df2241c3fdb20ae64959d09e171bca03ac2660da4a2f90134e416"
+    #: Huellas SHA-256 de secretos concretos que no deben aparecer nunca. La
+    #: del token de revisión sigue aquí aunque el token esté retirado: si
+    #: reaparece en un fichero versionado, es que alguien lo ha reintroducido.
+    known_secrets = {"c6040958408df2241c3fdb20ae64959d09e171bca03ac2660da4a2f90134e416"}
     candidate = re.compile(r"[A-Za-z0-9_\-]{24,64}")
 
     offenders = []
@@ -121,8 +121,8 @@ def test_no_credential_reaches_the_tracked_tree():
             if pat.search(body):
                 offenders.append(f"{rel}: {pat.pattern}")
         for tok in candidate.findall(body):
-            if hashlib.sha256(tok.encode()).hexdigest() == known_secret:
-                offenders.append(f"{rel}: el token de revisión, literal")
+            if hashlib.sha256(tok.encode()).hexdigest() in known_secrets:
+                offenders.append(f"{rel}: un secreto conocido, literal")
     assert not offenders, offenders
 
 
@@ -145,13 +145,3 @@ def test_the_leak_guard_would_actually_catch_a_leak(tmp_path):
 
     assert re.compile(r"hf_[A-Za-z0-9]{30,}").search("hf_" + "A" * 34)
     assert not candidate.findall("una línea corriente, sin credenciales")
-
-
-def test_the_evaluator_sheet_is_ignored_if_it_exists():
-    """Si alguien la crea, git no debe poder verla."""
-    import subprocess
-
-    root = Path(__file__).resolve().parents[1]
-    r = subprocess.run(["git", "check-ignore", "docs/ACCESO_EVALUADORES.md"],
-                       cwd=root, capture_output=True, text=True)
-    assert r.returncode == 0, "docs/ACCESO_EVALUADORES.md debe estar en .gitignore"

@@ -305,7 +305,7 @@ La paridad numérica entre el motor de servidor y el de navegador se verifica co
 
 El entorno de referencia es Linux x86_64 con Python 3.12 y Node 22, con cierre de dependencias fijado en `requirements-lock.txt` y registrado en [`docs/environment.json`](environment.json). La aplicación se publica como sitio estático (GitHub Pages) y API contenedorizada (Hugging Face Spaces). El índice documental público se construye desde una lista explícita de documentos propios del proyecto; las colecciones con derechos de autor no forman parte de él.
 
-Durante la evaluación del trabajo existe una excepción acotada: un índice de revisión que sí incluye los manuales, accesible sólo mediante un token, alojado temporalmente en un servidor de terceros y retirado al concluir la evaluación. Se documenta aquí porque es una decisión sobre licencias de datos, no un detalle de despliegue. [Procedimiento](../README.md).
+El despliegue actual va más allá y sirve también los manuales, sin credencial, por decisión explícita del autor. Se documenta aquí porque es una decisión sobre licencias de datos, no un detalle de despliegue, y porque su reversión está a una línea de distancia. [Procedimiento](../README.md).
 
 Las limitaciones de reproducción conocidas se declaran: la instalación limpia no está verificada en un entorno nuevo, la integración continua está definida pero no ejecutada en remoto, y algunas transformaciones del pipeline original no se han reconstruido. El anexo C recoge el mapa de comandos.
 
@@ -626,6 +626,8 @@ El entorno, los comandos y el mapa de qué regenera cada análisis, con sus lím
 
 El manifiesto del corpus —81 entradas con fichero, tamaño, suma de comprobación, tema, decisión de inclusión y motivo— está en [`docs/CORPUS_MANIFEST.csv`](CORPUS_MANIFEST.csv). Las colecciones con derechos de autor no se publican; el índice desplegado por defecto se construye desde una lista explícita de documentos propios del proyecto.
 
-Durante la evaluación existe una excepción acotada: un índice de revisión que sí incluye los manuales, accesible mediante una credencial y alojado temporalmente en un servidor de terceros. **La credencial se entrega al tribunal en una hoja de acceso que acompaña a este documento y no se publica en el repositorio**, que es público. Esa hoja indica también cómo consultar el corpus desde el navegador y desde la línea de comandos, y advierte de que el despliegue actual resuelve por BM25 y no por la fusión híbrida con la que se midió el `hit@8` de la sección 6.6. Concluida la evaluación, el índice se retira y el material con derechos de autor deja de residir en el servidor.
+El despliegue sirve el corpus completo **sin credencial**, por decisión explícita del autor: las cuatro colecciones, manuales de terceros incluidos, responden a cualquier consulta. No hace falta token ni hoja de acceso para reproducir cualquier resultado de la sección 6.6.
 
-Las colecciones `metodo` y `defensa_tfm`, de autoría propia, permanecen abiertas sin credencial.
+Conviene que la memoria lo diga con sus consecuencias y no sólo como una comodidad. `libros` reúne obras con derechos de autor, y servirlas abiertas convierte el extremo `/rag/search` en un recuperador público de su texto literal. La verja que lo impedía sigue implementada y bajo prueba —reponer dos nombres en `RESTRICTED_COLLECTIONS` la rearma—, de modo que la apertura es una decisión reversible y deliberada, no un descuido de configuración.
+
+Dos advertencias sobre lo que se consulte ahí. La primera: el despliegue resuelve hoy por BM25, no por la fusión híbrida con la que se midió el `hit@8`, porque falta el token de inferencia del codificador denso. La segunda, ya señalada en la sección 6.6: las 35 preguntas participaron en el ajuste, así que esa cifra es una cota superior de desarrollo.

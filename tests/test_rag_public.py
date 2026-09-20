@@ -247,6 +247,8 @@ def test_default_collection_is_one_the_caller_may_actually_use(public_runtime, m
     that found it.
     """
     monkeypatch.setattr(config, "DEFAULT_COLLECTION", "libros")
+    monkeypatch.setattr(config, "RESTRICTED_COLLECTIONS",
+                        frozenset({"libros", "crack23"}))
     client = TestClient(api_main.app)
 
     body = client.get("/rag/collections").json()
@@ -264,6 +266,8 @@ def test_default_collection_is_one_the_caller_may_actually_use(public_runtime, m
 def test_the_token_holder_still_gets_the_configured_default(public_runtime, monkeypatch):
     """Filtering the default must not downgrade a reader who may read it."""
     monkeypatch.setattr(config, "DEFAULT_COLLECTION", "libros")
+    monkeypatch.setattr(config, "RESTRICTED_COLLECTIONS",
+                        frozenset({"libros", "crack23"}))
     monkeypatch.setattr(config, "REVIEWER_TOKEN", "t0ken")
     client = TestClient(api_main.app)
     body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()

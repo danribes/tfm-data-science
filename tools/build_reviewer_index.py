@@ -11,8 +11,9 @@ That makes the reviewer index a *different retrieval system* from the local
 one: BM25 alone, where the documented hit@8 was measured with hybrid fusion.
 Anyone reading results from it should know that, and the README says so.
 
-The output holds third-party copyrighted text. It is never committed, and it
-belongs on a deployment only behind EVO_RAG_TOKEN.
+The output holds third-party copyrighted text. It is never committed. It is
+served openly on the current deployment by explicit decision of the author;
+RESTRICTED_COLLECTIONS in rag/config.py is what puts it back behind a token.
 """
 from __future__ import annotations
 
