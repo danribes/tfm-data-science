@@ -55,7 +55,7 @@ La paridad numérica demuestra coherencia de implementación; la evaluación emp
 
 - Referencia del escenario: **2026-07-31**; adquisición y construcción se documentan por separado.
 - Vivienda: **17 CCAA + Ceuta y Melilla**; Nacional excluido.
-- Red global: series extranjeras; objetivos de entrenamiento hasta **2019Q3**.
+- Red global: 1.760 series extranjeras; objetivos de entrenamiento hasta **2019Q3**.
 - Distress: **3.874 observaciones, 377 eventos, 154 países** en la muestra evaluada.
 - Tablas y resultados sellados con SHA-256; la reconstrucción completa del pipeline original queda fuera del alcance.
 
@@ -142,7 +142,7 @@ Estas capas ayudan a explorar hipótesis; su utilidad no convierte sus resultado
 | Evidencia histórica de desarrollo | Lectura correcta |
 |---|---|
 | 34/35 documentos esperados en top-8 | Recuperación de libro, no corrección de respuesta |
-| 10/12 afirmaciones muestreadas respaldadas | Primera afirmación citada, juicio de otro LLM |
+| 10/12 primeras frases citadas con respaldo | Una frase por respuesta, juicio de otro LLM |
 | Pesos/glosario ajustados sobre preguntas doradas | Conjunto de desarrollo, no test independiente |
 
 Estas métricas no justifican afirmar ausencia de alucinaciones.
@@ -162,7 +162,7 @@ El protocolo queda especificado y ejecutable; la anotación independiente es tra
 
 # Análogos: comparación descriptiva corregida
 
-**4,091 observaciones completas · 173 países · 1991–2020**
+**4.091 observaciones completas · 173 países · 1991–2020**
 
 - Consulta en el año seleccionado: deuda, saldo total, crecimiento real, paro e inflación.
 - Mahalanobis: covarianza y diferencias en las mismas coordenadas.

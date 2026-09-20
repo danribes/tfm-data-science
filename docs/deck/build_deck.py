@@ -22,7 +22,7 @@ os.environ.setdefault('MPLCONFIGDIR', '/tmp/evo-matplotlib')
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from engine.constants import ENGINE_VERSION, VINTAGE, IPV_LR, IPV_REV
+from engine.constants import ENGINE_VERSION, VINTAGE, IPV_LR, IPV_REV, IPV_REV_V16
 from engine.levers import Levers, PRESETS, preset_levers
 from engine.spain import run_scenario
 
@@ -60,8 +60,25 @@ def main():
     dl, distress = read('t1-dl-global.json'), read('distress.json')
     state, rag = read('state_dependence.json'), read('rag-eval-2026-08-09.json')
     analog = read('analog-metric.json')
+    chat = read('rag-chat-eval.json')
     figures(housing, mc)
     verdict = dl['verdict']
+
+    # Figures that used to be typed into the slide text. Every one of them was
+    # correct when checked against docs/RESULTS.md, which is exactly the
+    # problem: nothing made them stay correct. They are read from the same
+    # artefacts RESULTS.md cites, so a re-run moves the deck with the evidence
+    # instead of leaving the two to drift apart silently.
+    # Python's ',' grouping is anglo: 3,874 where a Spanish deck needs 3.874.
+    def es(n):
+        return f"{n:,}".replace(",", ".")
+
+    regions_head, _, regions_tail = housing['regions'].partition(';')
+    boot = housing['windows'][0]['synchronized_time_blocks'][0]
+    mc_central = max(mc['assumption_sensitivity'], key=lambda r: r['n_paths'])
+    rag_hit = sum(1 for q in rag['questions'] if q['hit'])
+    rag_n = len(rag['questions'])
+    fidelity = chat['summary']
     slides = [
 '''<!-- _class: cover -->
 # España en escenarios
@@ -87,12 +104,12 @@ Aportaciones: sistema integrado, contrastes reproducibles y comunicación explí
 - Los documentos y el índice RAG son locales; la generación remota envía pasajes seleccionados al proveedor.
 
 La paridad numérica demuestra coherencia de implementación; la evaluación empírica responde otras preguntas.''',
-'''# Datos: referencia, muestra y fechas
+f'''# Datos: referencia, muestra y fechas
 
-- Referencia del escenario: **2026-07-31**; adquisición y construcción se documentan por separado.
-- Vivienda: **17 CCAA + Ceuta y Melilla**; Nacional excluido.
-- Red global: series extranjeras; objetivos de entrenamiento hasta **2019Q3**.
-- Distress: **3.874 observaciones, 377 eventos, 154 países** en la muestra evaluada.
+- Referencia del escenario: **{VINTAGE}**; adquisición y construcción se documentan por separado.
+- Vivienda: **{regions_head}**;{regions_tail}.
+- Red global: {es(dl['n_series'])} series extranjeras; objetivos de entrenamiento hasta **{dl['cutoff']}**.
+- Distress: **{es(distress['n'])} observaciones, {distress['n_positive']} eventos, {distress['n_countries']} países** en la muestra evaluada.
 - Tablas y resultados sellados con SHA-256; la reconstrucción completa del pipeline original queda fuera del alcance.
 
 Congelar un archivo permite repetir cálculos, sin certificar su autenticidad o eliminar revisiones históricas.''',
@@ -114,15 +131,15 @@ $$h_k=\mu+(h_0-\mu)(1-\kappa)^k+\text{{canales de tipos y crecimiento}}$$
 
 - Antes se utilizaba la tasa de reversión como factor de persistencia.
 - Python y TypeScript ahora aplican la misma definición.
-- El .60 de v16 era persistencia, equivalente a reversión .40.
+- El .{int(IPV_REV_V16*100)} de v16 era persistencia, equivalente a reversión .{int((1-IPV_REV_V16)*100)}.
 - La comparación LP acumula log-precios, excluye crecimiento realizado y muestra puntos anuales; su amplitud se normaliza en el primer año.
 
 Media histórica estimada: **{IPV_LR:.4f}%**. No identifica por sí sola una tendencia estructural.''',
-'''# La incertidumbre depende de la inferencia
+f'''# La incertidumbre depende de la inferencia
 
 ![w:990](figures/housing-uncertainty.svg)
 
-El 3% queda fuera de la banda regional, pero dentro de las bandas que conservan choques nacionales comunes. **Su rechazo no es robusto.** 500 réplicas, semilla 42; sensibilidad condicional a ventana y bloques.''',
+El 3% queda fuera de la banda regional, pero dentro de las bandas que conservan choques nacionales comunes. **Su rechazo no es robusto.** {boot['n_boot']} réplicas, semilla {boot['seed']}; sensibilidad condicional a ventana y bloques.''',
 f'''# Transferencia neuronal: resultado negativo
 
 | Contraste principal conservado | Resultado |
@@ -152,12 +169,12 @@ f'''# SHAP y regímenes: lectura descriptiva
 - Los regímenes HMM describen retrospectivamente la serie y dependen de la especificación.
 
 Estas capas ayudan a explorar hipótesis; su utilidad no convierte sus resultados en pronósticos validados.''',
-'''# RAG: qué se midió realmente
+f'''# RAG: qué se midió realmente
 
 | Evidencia histórica de desarrollo | Lectura correcta |
 |---|---|
-| 34/35 documentos esperados en top-8 | Recuperación de libro, no corrección de respuesta |
-| 10/12 afirmaciones muestreadas respaldadas | Primera afirmación citada, juicio de otro LLM |
+| {rag_hit}/{rag_n} documentos esperados en top-8 | Recuperación de libro, no corrección de respuesta |
+| {fidelity['fidelity_supported']}/{fidelity['fidelity_checked']} primeras frases citadas con respaldo | Una frase por respuesta, juicio de otro LLM |
 | Pesos/glosario ajustados sobre preguntas doradas | Conjunto de desarrollo, no test independiente |
 
 Estas métricas no justifican afirmar ausencia de alucinaciones.''',
@@ -171,7 +188,7 @@ Estas métricas no justifican afirmar ausencia de alucinaciones.''',
 El protocolo queda especificado y ejecutable; la anotación independiente es trabajo futuro, no un resultado que se presente aquí.''',
 f'''# Análogos: comparación descriptiva corregida
 
-**{analog['n_complete']:,} observaciones completas · {analog['n_countries']} países · {analog['years'][0]}–{analog['years'][1]}**
+**{es(analog['n_complete'])} observaciones completas · {analog['n_countries']} países · {analog['years'][0]}–{analog['years'][1]}**
 
 - Consulta en el año seleccionado: deuda, saldo total, crecimiento real, paro e inflación.
 - Mahalanobis: covarianza y diferencias en las mismas coordenadas.
@@ -180,11 +197,11 @@ f'''# Análogos: comparación descriptiva corregida
 - Sin veredicto de sostenibilidad; información estructural no medida se declara ausente.
 
 La semejanza histórica no predice la trayectoria española.''',
-'''# Monte Carlo: sensibilidad, no cobertura predictiva
+f'''# Monte Carlo: sensibilidad, no cobertura predictiva
 
 ![w:940](figures/montecarlo-sensitivity.svg)
 
-4.000 trayectorias, semilla común 42. La amplitud cambia con los supuestos. La banda contiene el 90% central de simulaciones; su cobertura en datos reales no está validada.''',
+{es(mc_central['n_paths'])} trayectorias, semilla común {mc_central['seed']}. La amplitud cambia con los supuestos. La banda contiene el 90% central de simulaciones; su cobertura en datos reales no está validada.''',
 ]
     rows=[]
     for preset in PRESETS:
