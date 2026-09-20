@@ -96,12 +96,16 @@ para la API y la biblioteca pública. Los workflows `deploy-pages` y
 `deploy-hf-space` publican ambos servicios desde este repositorio; el paquete
 de la API se prepara con las herramientas de `deploy/hf/`.
 
-La configuración del Space incorpora un modo `public_lexical`: busca con
-SQLite FTS5 en seis documentos propios del proyecto, enumerados en
+El Space arranca por defecto en modo `public_lexical`: busca con SQLite FTS5 en
+seis documentos propios del proyecto, enumerados en
 [`rag/public_sources.json`](rag/public_sources.json). Expone las colecciones
 `metodo` y `defensa_tfm`, con atribución `propio`. El ensamblado genera su índice
 desde esos archivos, sin acceder al corpus privado ni cargar embeddings.
 Los resultados históricos del RAG híbrido no evalúan este corpus público.
+
+Durante la evaluación del trabajo ese modo se sustituye por `remote_hybrid`, que
+sirve el corpus completo tras un token; se describe en «Índice de revisión» más
+abajo y se retira al terminar.
 
 La búsqueda y consulta de fragmentos públicos funcionan sin claves de IA.
 La redacción de respuestas requiere una clave de proveedor en los secretos
@@ -120,11 +124,17 @@ con tres propiedades deliberadas.
 no puede publicar los manuales. El listado tampoco los anuncia a quien no puede
 leerlos.
 
-**Sólo léxico.** El Space no lleva torch ni sentence-transformers, así que este
-índice contiene texto y FTS5, sin la mitad densa: 113 MB frente a los 208 MB del
-corpus local. Es **un sistema de recuperación distinto** — BM25 solo, mientras
-que el hit@8 documentado se midió con fusión híbrida — y los resultados que se
-obtengan ahí no son comparables con los publicados.
+**El mismo recuperador que se evaluó.** Crear los vectores necesita el modelo;
+consultarlos necesita un vector y `sqlite-vec`, que ocupa 0,2 MB. Así que el
+despliegue lleva el índice completo (201 MB) y pide a una copia alojada del
+mismo modelo —`intfloat/multilingual-e5-large`, el que produjo esos vectores—
+que codifique cada pregunta.
+
+Importa porque la alternativa era servir BM25 solo, y el hit@8 publicado se
+midió con fusión híbrida: quien evaluara la recuperación estaría juzgando un
+sistema distinto del que se describe. Con `EVO_RAG_MODE=remote_hybrid` es el
+mismo. Si el codificador remoto falla, la mitad léxica sigue respondiendo y la
+degradación se registra: un fallo de red cuesta calidad, no disponibilidad.
 
 **Temporal.** Se sube desde una máquina con el corpus privado, porque CI no lo
 tiene ni lo tendrá, y se retira al terminar la evaluación:
@@ -135,6 +145,15 @@ PYTHONPATH=. python tools/upload_reviewer_index.py --file /tmp/reviewer.db
 # al terminar la evaluación
 PYTHONPATH=. python tools/upload_reviewer_index.py --remove
 ```
+
+En los ajustes del Space: `EVO_RAG_MODE=remote_hybrid`,
+`EVO_RAG_DB=/app/data/rag/reviewer.db`, `HF_TOKEN` para el codificador y
+`EVO_RAG_TOKEN` para quien evalúa. Falta cualquiera de los dos últimos y el
+corpus restringido responde 401, que es el fallo correcto.
+
+`--lexical-only` construye la variante sin vectores: 113 MB y BM25 solo. Es más
+pequeña y es otro recuperador; si se usa, hay que decirlo al interpretar
+cualquier resultado que salga de ahí.
 
 Es una excepción acotada por una necesidad concreta, no la política del
 proyecto.
