@@ -76,10 +76,9 @@ OUTPUT_SCHEMA = {
         },
         "coloquial": {
             "type": "string",
-            "description": "2-4 frases. Lo mismo, contado como se lo contarías "
-                           "a un amigo en un bar: llano, relajado, con ironía si "
-                           "viene a cuento. Sin cifras nuevas, sin tecnicismos y "
-                           "sin dejar de ser cierto.",
+            "description": "2-4 frases, SIN NINGUNA CIFRA. Lo mismo contado "
+                           "como a un amigo en un bar: llano, relajado, con "
+                           "ironía si viene a cuento. La magnitud, con palabras.",
         },
     },
     "required": ["resumen", "mecanismo", "advertencia", "coloquial"],
@@ -182,8 +181,13 @@ deriva, brecha, referencia de partida, previsión, prima de riesgo.
 
 ## El cierre coloquial
 
-`coloquial` es lo mismo dicho de otra manera, no un resumen más corto ni un \
-adorno. Tono de sobremesa: llano, tranquilo, irónico cuando el dato lo merece. \
+`coloquial` no lleva ni una cifra. Ni una. Describe la magnitud con palabras \
+—«sube bastante», «se queda casi igual», «se va de las manos»— y deja los \
+números arriba, que para eso están. Es la regla más fácil de cumplir y la que \
+evita que una coma de más tire abajo toda la respuesta.
+
+Por lo demás, `coloquial` es lo mismo dicho de otra manera, no un resumen más \
+corto ni un adorno. Tono de sobremesa: llano, tranquilo, irónico cuando el dato lo merece. \
 Puedes usar la segunda persona. No introduzcas ni una cifra que no esté ya \
 arriba, no contradigas nada, y no conviertas la ironía en consejo ni en \
 militancia: sigue siendo lo que el modelo implica, contado sin corbata.
@@ -269,12 +273,19 @@ def validate_narration(data: dict, facts: ExplanationFacts) -> None:
 
     collect(facts.to_dict())
     collect(SYSTEM)
-    for block in data.values():
+    for name, block in data.items():
         # Remove ordinal list labels, which are formatting rather than facts.
         block = re.sub(r"(?m)^\s*\d+[.)]\s+", "", block)
         for token in _NUMBER.findall(block):
             if not (_number_values(token) & allowed):
-                raise NarrationUnavailable(f"number absent from supplied facts: {token}")
+                # Name the block and quote its neighbourhood. Without this the
+                # reason is a bare number, and finding which of four blocks
+                # invented it means guessing — four deploys were spent that way.
+                where = block.find(token)
+                around = " ".join(block[max(0, where - 60):where + 60].split())
+                raise NarrationUnavailable(
+                    f"number absent from supplied facts: {token} "
+                    f"(en «{name}»: …{around}…)")
 
 
 def _facts_block(facts: ExplanationFacts) -> str:
