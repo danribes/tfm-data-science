@@ -35,6 +35,24 @@ HEADLINES: list[dict] = [
      "up_is_bad": True, "at_end": False},
 ]
 
+#: Series whose welfare sign is not a property of the series but of who is
+#: reading it, as (who gains when it rises, who loses when it rises).
+#:
+#: `up_is_bad` is one global bit, and for these it was answering a question it
+#: cannot answer. Persona 03 is «quien quiere comprar vivienda», and it was
+#: shown that a falling house price «es peor» while a falling mortgage payment
+#: «es mejor» — the owner's view and the buyer's view, one sentence apart, to
+#: the same reader. Naming both sides is the honest form: the engine computes
+#: the number, and it is not the engine's business whose side the reader is on.
+SIDES: dict[str, tuple[str, str]] = {
+    "precio": ("quien ya tiene piso", "quien quiere comprar"),
+    "ipv": ("quien ya tiene piso", "quien quiere comprar"),
+    "salario": ("quien cobra un sueldo", "quien paga nóminas"),
+    "salmes": ("quien cobra un sueldo", "quien paga nóminas"),
+    "wrealIdx": ("quien cobra un sueldo", "quien paga nóminas"),
+    "pens": ("quien cobra una pensión", "quien la paga con sus impuestos"),
+}
+
 #: The transmission chain each lever travels, with the engine constant that
 #: sets the size of each step. Sourced from engine/constants.py at import time
 #: so a recalibration can never leave the prose describing the old coefficients.
@@ -163,6 +181,9 @@ class Outcome:
     dec: int
     up_is_bad: bool
     direction: str  # "mejora" | "empeora" | "sin cambio"
+    #: Who gains and who loses when this series rises, for the series where
+    #: that depends on the reader. See SIDES.
+    sides: tuple[str, str] | None = None
 
 
 @dataclass(frozen=True)
@@ -305,6 +326,7 @@ def build_facts(levers: Levers, horizon: int, headline: str = "b") -> Explanatio
             key=h["key"], label=h["label"], unit=h["unit"], year=year,
             base=b_val, value=s_val, delta=delta, dec=h["dec"],
             up_is_bad=h["up_is_bad"], direction=direction,
+            sides=SIDES.get(h["key"]),
         ))
 
     # The caller may ask about a series outside the five. Add it, first, so the
@@ -321,10 +343,19 @@ def build_facts(levers: Levers, horizon: int, headline: str = "b") -> Explanatio
             direction=("sin cambio" if abs(delta) < 1e-9
                        else "empeora" if (delta > 0) == m["up_is_bad"]
                        else "mejora"),
+            sides=SIDES.get(headline),
         ))
 
+    # The year the headline outcome actually reports, which is the end of the
+    # projection only for the series flagged `at_end`. Pinning both of these to
+    # Y1 made the summary say «en 2030» and the decomposition under it say «en
+    # 2050», splitting one answer across two horizons — and the shares were the
+    # 2050 shares, so they did not describe the number above them either.
+    head_out = next((o for o in outcomes if o.key == headline), None)
+    head_k = (head_out.year - Y0) if head_out is not None else (Y1 - Y0)
+
     contributions, interaction, joint_delta = (
-        decompose(levers, headline, Y1 - Y0) if moved else ([], 0.0, 0.0)
+        decompose(levers, headline, head_k) if moved else ([], 0.0, 0.0)
     )
 
     base_status = {r["id"]: r["status"] for r in evaluate_redlines(base, k)}
@@ -341,7 +372,7 @@ def build_facts(levers: Levers, horizon: int, headline: str = "b") -> Explanatio
     return ExplanationFacts(
         vintage=c.VINTAGE, engine_version=c.ENGINE_VERSION, horizon=horizon,
         fresh=fresh, moved=moved, outcomes=outcomes,
-        headline_key=headline, headline_year=Y1,
+        headline_key=headline, headline_year=Y0 + head_k,
         contributions=contributions, interaction=interaction,
         joint_delta=joint_delta, redlines=redlines,
         mechanism={m.id: MECHANISM.get(m.id, []) for m in moved},

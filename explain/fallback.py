@@ -176,9 +176,18 @@ def _coloquial(f: ExplanationFacts) -> str:
                 f"{nf(head.value, head.dec)} {head.unit}. Ese es el punto de partida.")
 
     moved_at_all = abs(head.delta) > 1e-9
-    worse = head.up_is_bad if head.delta > 0 else (not head.up_is_bad)
-    verdict = ("y eso, para quien lo vive, es peor" if head.delta and worse
-               else "y eso, para quien lo vive, es mejor")
+    if head.sides:
+        # For these the sign of the welfare change is a property of the reader,
+        # not of the series, so the sentence names both sides instead of
+        # picking one. Cheaper than asking who is reading, and more honest than
+        # guessing: a cheaper house is good news to a buyer and bad news to an
+        # owner, and the engine has no opinion on which of them asked.
+        gains, loses = head.sides if head.delta > 0 else head.sides[::-1]
+        verdict = f"lo cual es buena noticia para {gains} y mala para {loses}"
+    else:
+        worse = head.up_is_bad if head.delta > 0 else (not head.up_is_bad)
+        verdict = ("y eso, para quien lo vive, es peor" if head.delta and worse
+                   else "y eso, para quien lo vive, es mejor")
     lever = (f"«{f.moved[0].name}»" if len(f.moved) == 1
              else f"{len(f.moved)} palancas a la vez")
     # The label is quoted rather than lower-cased into the sentence: its gender

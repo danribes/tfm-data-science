@@ -14,7 +14,8 @@ from api.main import app
 from engine.constants import BASE_LEVERS
 from engine.levers import Levers
 from engine.spain import Y0, Y1, baseline, run_scenario
-from explain.facts import SERIES_META, build_facts, decompose, moved_levers
+from explain.facts import (HEADLINES, SERIES_META, SIDES, build_facts, decompose,
+                           moved_levers)
 from explain.fallback import _signed, fallback_narration, nf
 
 client = TestClient(app)
@@ -324,6 +325,61 @@ def test_fallback_leaves_no_double_space_for_a_unitless_series():
                 # lstrip, because the decomposition bullets are indented on
                 # purpose; what must not appear is a gap left by an absent unit.
                 assert "  " not in line.lstrip(), f"double space for {key}: {line!r}"
+
+
+def test_headline_year_is_the_year_the_headline_reports():
+    """The summary said «en 2030» and the decomposition under it said «2050».
+
+    headline_year was pinned to Y1 while the outcome followed the horizon, so
+    one answer spanned two horizons and the shares described a movement other
+    than the number printed above them.
+    """
+    facts = build_facts(RATE_UP, 2030, headline="u")
+    head = next(o for o in facts.outcomes if o.key == "u")
+    assert facts.headline_year == head.year == 2030
+    assert "en 2030" in fallback_narration(facts)["mecanismo"]
+
+    # The series flagged at_end still report the end of the projection.
+    debt = build_facts(RATE_UP, 2030, headline="b")
+    assert debt.headline_year == Y1
+
+
+def test_decomposition_is_computed_at_the_headline_year():
+    """Shares must describe the movement the summary just stated."""
+    facts = build_facts(ADVERSE, 2030, headline="u")
+    if facts.contributions:
+        head = next(o for o in facts.outcomes if o.key == "u")
+        assert facts.joint_delta == pytest.approx(head.delta, abs=1e-9)
+
+
+def test_reader_relative_series_name_both_sides_instead_of_judging():
+    """Persona 03 was told a cheaper house «es peor».
+
+    up_is_bad is one global bit, and for a house price it encodes the owner's
+    interest; the buyer reading the same screen was shown the opposite of the
+    truth, one sentence away from a mortgage payment judged from their side.
+    """
+    facts = build_facts(RATE_UP, 2035, headline="precio")
+    head = next(o for o in facts.outcomes if o.key == "precio")
+    coloquial = fallback_narration(facts)["coloquial"]
+
+    assert head.delta < 0, "the fixture is pointless if the price does not fall"
+    assert "quien quiere comprar" in coloquial
+    assert "es peor" not in coloquial
+    # Falling: the buyer gains and the owner loses, not the other way round.
+    assert coloquial.index("quien quiere comprar") < coloquial.index("quien ya tiene piso")
+
+
+def test_unambiguous_series_keep_their_verdict():
+    """Not every series is contested: a rising debt is nobody's good news."""
+    coloquial = fallback_narration(build_facts(RATE_UP, 2035, headline="b"))["coloquial"]
+    assert "para quien lo vive" in coloquial
+
+
+def test_every_reader_relative_series_is_a_real_series():
+    """A typo here would silently restore the verdict it was meant to replace."""
+    known = {h["key"] for h in HEADLINES} | set(SERIES_META)
+    assert set(SIDES) <= known, set(SIDES) - known
 
 
 def test_validate_accepts_the_blocks_the_schema_asks_for():
