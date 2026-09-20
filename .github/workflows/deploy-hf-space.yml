@@ -85,3 +85,13 @@ jobs:
           print(f"::notice::API en {url} — si difiere de la variable API_BASE, "
                 f"actualízala y relanza deploy-pages.")
           PY
+
+      # The Space rebuilds its Docker image after the upload, so give it time
+      # before asking whether it answers. A deploy that ships and then serves
+      # nothing is the failure this step exists to make loud: every check here
+      # is about content, because the app returns 200 either way.
+      - name: Wait for the Space to rebuild
+        run: sleep 150
+
+      - name: Check the live Space answers
+        run: python deploy/hf/live_check.py
