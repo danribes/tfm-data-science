@@ -235,3 +235,36 @@ def test_public_startup_does_not_warm_model(public_runtime, monkeypatch):
     import threading
     monkeypatch.setattr(threading, "Thread", lambda *a, **k: pytest.fail("No public model warmup"))
     api_main._warm_embedder()
+
+
+def test_default_collection_is_one_the_caller_may_actually_use(public_runtime, monkeypatch):
+    """The listing advertised a default it refused to serve.
+
+    Deploying the reviewer index set DEFAULT_COLLECTION to «libros». An
+    anonymous caller then got a response that did not list «libros», declared
+    it the default, and answered 401 when asked for it — the first request any
+    client makes on trust, refused. The deploy's own live check was the client
+    that found it.
+    """
+    monkeypatch.setattr(config, "DEFAULT_COLLECTION", "libros")
+    client = TestClient(api_main.app)
+
+    body = client.get("/rag/collections").json()
+    listed = {c["id"] for c in body["collections"]}
+    assert "libros" not in listed
+    assert body["default_collection"] in listed, body["default_collection"]
+
+    # And the advertised default must actually answer for that caller.
+    r = client.post("/rag/search",
+                    json={"query": "deuda nominal",
+                          "collection": body["default_collection"]})
+    assert r.status_code == 200
+
+
+def test_the_token_holder_still_gets_the_configured_default(public_runtime, monkeypatch):
+    """Filtering the default must not downgrade a reader who may read it."""
+    monkeypatch.setattr(config, "DEFAULT_COLLECTION", "libros")
+    monkeypatch.setattr(config, "REVIEWER_TOKEN", "t0ken")
+    client = TestClient(api_main.app)
+    body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()
+    assert body["default_collection"] == "libros"

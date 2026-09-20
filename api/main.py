@@ -576,12 +576,20 @@ def rag_collections(
         ))
     has_restricted = any(cid in st["by_collection"]
                          for cid in rag_config.RESTRICTED_COLLECTIONS)
+    # The default has to be one the caller may actually use. Deploying the
+    # reviewer index made DEFAULT_COLLECTION «libros», so an anonymous caller
+    # was handed a default that this very response declines to list and that
+    # answers 401 — the first request any client makes on trust, refused. The
+    # listing is filtered by token, and so is this.
+    default = rag_config.DEFAULT_COLLECTION
+    if not rag_config.readable(default, _rag_token(x_rag_token, authorization)):
+        default = out[0].id if out else default
     return RagCollectionsResponse(collections=out,
                                   total_documents=st["documents"],
                                   total_chunks=st["chunks"],
                                   retrieval_mode=rag_config.RETRIEVAL_MODE,
                                   corpus_scope=rag_config.effective_scope(has_restricted),
-                                  default_collection=rag_config.DEFAULT_COLLECTION)
+                                  default_collection=default)
 
 
 @app.post("/rag/search", response_model=RagSearchResponse)
