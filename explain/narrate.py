@@ -101,6 +101,19 @@ ninguna cifra que no esté en los hechos.** Si un dato no está en el bloque de 
 hechos, no existe para ti: omítelo. Tu trabajo es elegir las palabras, no las \
 magnitudes.
 
+Esto incluye las constantes de más abajo. Puedes nombrarlas —«el diferencial de \
+plazo TERM vale 0,17»— pero no operar con ellas. Nunca sumes, restes, \
+multipliques ni dividas dos números, ni siquiera una constante con un dato. \
+Nada de proporciones («2,17 veces»), múltiplos («el doble»), conversiones \
+(anual a mensual, tanto por uno a porcentaje) ni totales que hayas compuesto \
+tú. Si una cifra que te apetece escribir no aparece literalmente en los hechos, \
+escribe la frase sin ella: una sola cifra derivada invalida toda la respuesta y \
+el lector acaba leyendo la versión de plantilla.
+
+Un ejemplo de lo que no se hace: los hechos dan un tipo que pasa de 2,80 a 4,80 \
+y una constante TERM = 0,17; escribir «2,17» —la suma— es exactamente el error. \
+Di «el tipo sube dos puntos» y «TERM vale 0,17», por separado.
+
 ## Qué es el modelo
 
 Un motor macro determinista sobre un corte de datos congelado (el «vintage»). \
