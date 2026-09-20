@@ -64,6 +64,8 @@ jobs:
           from huggingface_hub import HfApi
           from huggingface_hub.errors import RepositoryNotFoundError
 
+          from pathlib import Path
+
           api = HfApi(token=os.environ["HF_TOKEN"])
           owner = api.whoami()["name"]
           repo_id = f"{owner}/evo-espana-api"
@@ -75,13 +77,35 @@ jobs:
               api.create_repo(repo_id, repo_type="space", space_sdk="docker")
           # delete_patterns mirrors removals: a file dropped from the staging
           # dir must also leave the Space, or stale code serves forever.
+          #
+          # It used to read ["**", "!data/rag/reviewer.db"], which looks like an
+          # exclusion and is not one: huggingface_hub matches these patterns
+          # with fnmatch and has no negation, so "!data/..." was simply a
+          # pattern matching nothing while "**" matched everything. Every push
+          # deleted the reviewer index, and the deploy then failed on the live
+          # check with "no such table: chunks_fts" — the corpus gone, and the
+          # comment above it still claiming it was protected.
+          #
+          # So the patterns are built rather than asserted. Everything outside
+          # data/ is mirrored; data/ is left alone, because the only two things
+          # in it are public.db, which this upload replaces anyway, and the
+          # reviewer index, which CI has no way to rebuild.
+          stage = Path("/tmp/hf-stage")
+          delete_patterns = sorted(
+              f"{p.name}/**" if p.is_dir() else p.name
+              for p in stage.iterdir() if p.name != "data"
+          )
+          print(f"delete_patterns: {delete_patterns}")
           api.upload_folder(repo_id=repo_id, repo_type="space",
                             folder_path="/tmp/hf-stage",
-                            # The reviewer index is uploaded separately from a
-                            # machine that holds the private corpus; CI cannot
-                            # rebuild it, so CI must not delete it.
-                            delete_patterns=["**", "!data/rag/reviewer.db"],
+                            delete_patterns=delete_patterns,
                             commit_message=f"sync {os.environ['GITHUB_SHA'][:9]}")
+
+          # The index is 201 MB that CI cannot reproduce, so losing it silently
+          # is not acceptable: say so in the log either way.
+          kept = [f.path for f in api.list_repo_tree(
+              repo_id, repo_type="space", path_in_repo="data/rag", recursive=True)]
+          print(f"::notice::data/rag after sync: {kept}")
 
           url = f"https://{owner}-evo-espana-api.hf.space"
           print(f"::notice::Space actualizado: https://huggingface.co/spaces/{repo_id}")
