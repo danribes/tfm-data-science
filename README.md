@@ -90,9 +90,11 @@ seleccionados al proveedor configurado.
 
 ## Aplicación pública y biblioteca
 
-El despliegue utiliza GitHub Pages para el panel y Hugging Face Spaces para
-la API. `deploy/cf/` contiene herramientas de un despliegue alternativo que
-no está configurado; no es un servicio del que dependa la aplicación.
+El despliegue utiliza [GitHub Pages](https://danribes.github.io/tfm-data-science/)
+para el panel y [Hugging Face Spaces](https://huggingface.co/spaces/danribes/evo-espana-api)
+para la API y la biblioteca pública. Los workflows `deploy-pages` y
+`deploy-hf-space` publican ambos servicios desde este repositorio; el paquete
+de la API se prepara con las herramientas de `deploy/hf/`.
 
 La configuración del Space incorpora un modo `public_lexical`: busca con
 SQLite FTS5 en seis documentos propios del proyecto, enumerados en

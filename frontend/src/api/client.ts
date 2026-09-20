@@ -43,8 +43,8 @@ function initialCustomBase(): string | null {
       history.replaceState(null, "", location.pathname + (qs ? `?${qs}` : "") + location.hash);
       return null;
     }
-    // Earlier versions used this setting for a corpus tunnel but accidentally
-    // redirected health/scenario too. Preserve that URL for the library only.
+    // Earlier versions used this library URL override for all API requests.
+    // Preserve that URL for the library only.
     const stored = localStorage.getItem(RAG_KEY) || localStorage.getItem(LEGACY_KEY);
     localStorage.removeItem(LEGACY_KEY);
     const base = stored?.trim() ? cleanBase(stored) : null;

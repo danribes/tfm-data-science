@@ -1,8 +1,9 @@
 # API pública y documentación del proyecto en Hugging Face
 
 El Space sirve el motor, datos congelados e informes de investigación junto
-con una biblioteca de seis documentos propios. Usa SQLite FTS5, sin E5,
-PyTorch, libros privados, túnel ni recursos de Cloudflare.
+con una biblioteca de seis documentos propios. La biblioteca usa SQLite FTS5
+y se construye desde la documentación del repositorio. GitHub Pages publica
+el panel, que conecta con esta API.
 
 ## Preparación y comprobación local
 
@@ -61,6 +62,6 @@ La búsqueda no requiere ninguna. Sin proveedor disponible, Consulta conserva
 los fragmentos recuperados y explica que no ha podido redactar una respuesta.
 
 Después de publicar, comprobar `/health`, `/rag/collections`, una búsqueda
-en `/rag/search` y Consulta en el panel. Si el navegador conserva un túnel
-antiguo, restablecer la conexión RAG desde sus ajustes o abrir el panel con
-`?rag=reset`. Este ajuste no cambia la conexión del motor.
+en `/rag/search` y Consulta en el panel. Si el navegador conserva una dirección
+de biblioteca antigua, restablecer la conexión RAG desde sus ajustes o abrir
+el panel con `?rag=reset`. Este ajuste no cambia la conexión del motor.
