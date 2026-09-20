@@ -172,3 +172,36 @@ def resolve_device() -> str:
         return "cuda" if torch.cuda.is_available() else "cpu"
     except ImportError:
         return "cpu"
+
+# ---- who may read which collection -------------------------------------------
+
+#: Collections holding third-party copyrighted text. Reachable only with the
+#: reviewer token, never by default.
+RESTRICTED_COLLECTIONS = frozenset({"libros", "crack23"})
+
+#: Shared secret that unlocks them, from EVO_RAG_TOKEN. Empty means locked:
+#: an unset token can never accidentally publish the books, which is the
+#: failure mode worth designing against.
+REVIEWER_TOKEN = os.environ.get("EVO_RAG_TOKEN", "").strip()
+
+
+def is_restricted(collection: str) -> bool:
+    return collection in RESTRICTED_COLLECTIONS
+
+
+def token_ok(supplied: str | None) -> bool:
+    """Constant-time-ish comparison; a wrong length is already a mismatch."""
+    if not REVIEWER_TOKEN or not supplied:
+        return False
+    supplied = supplied.strip()
+    if len(supplied) != len(REVIEWER_TOKEN):
+        return False
+    diff = 0
+    for a, b in zip(supplied, REVIEWER_TOKEN):
+        diff |= ord(a) ^ ord(b)
+    return diff == 0
+
+
+def readable(collection: str, token: str | None) -> bool:
+    """A collection is readable when it is not restricted, or the token matches."""
+    return not is_restricted(collection) or token_ok(token)

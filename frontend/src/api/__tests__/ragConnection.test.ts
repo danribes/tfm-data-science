@@ -207,7 +207,12 @@ describe("independent RAG connection", () => {
     });
   });
 
-  it("never attaches a corpus token when the custom RAG target is the main API", async () => {
+  it("sends the corpus token on corpus routes only, whatever host serves them", async () => {
+    // The rule used to be "never to the main API", which kept the credential
+    // away from the scenario endpoints and, as a side effect, made a reviewer
+    // token useless against the deployed corpus — where an evaluator looks.
+    // What has to hold is narrower and still holds: engine routes never carry
+    // it. Which host serves the corpus is a deployment detail.
     const fetchMock = mockFetch();
     const client = await import("../client");
     client.setRagConnection(`${MAIN}/`, TOKEN);
@@ -217,7 +222,9 @@ describe("independent RAG connection", () => {
     await client.ragChatStream({ question: "inflación" }, {});
     for (const [url, init] of fetchMock.mock.calls) {
       expect(String(url).startsWith(MAIN)).toBe(true);
-      expect(auth(init)).toBeNull();
+      const isCorpusRoute = String(url).includes("/rag/");
+      if (isCorpusRoute) expect(auth(init)).toBe(`Bearer ${TOKEN}`);
+      else expect(auth(init)).toBeNull();
     }
   });
 

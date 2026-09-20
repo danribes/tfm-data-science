@@ -5,7 +5,7 @@ import csv
 import json
 from dataclasses import asdict
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 
@@ -60,6 +60,34 @@ def _rag_unavailable(exc: Exception) -> HTTPException:
         status_code=503,
         detail=("La biblioteca no está disponible en este despliegue: faltan "
                 f"dependencias o el índice configurado. ({type(exc).__name__})"))
+
+
+def _rag_token(x_rag_token: str | None, authorization: str | None) -> str | None:
+    """The reviewer token from either header.
+
+    X-Rag-Token is explicit; Authorization: Bearer is what the frontend already
+    sends to a tunnelled corpus. Accepting both means one credential works
+    wherever the corpus happens to be served from.
+    """
+    if x_rag_token:
+        return x_rag_token
+    if authorization and authorization.lower().startswith("bearer "):
+        return authorization[7:]
+    return None
+
+
+def _rag_forbidden(collection: str) -> HTTPException:
+    """A restricted collection without the token.
+
+    401 and not 404: pretending the collection does not exist would make the
+    app lie about its own contents, which it documents openly. What is withheld
+    is the text, not its existence.
+    """
+    return HTTPException(
+        status_code=401,
+        detail=(f"«{collection}» requiere el token de revisión. Es un corpus de "
+                "manuales con derechos de autor, accesible sólo a quien evalúa "
+                "este trabajo. Envíalo en la cabecera X-Rag-Token."))
 
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
@@ -515,7 +543,9 @@ def evidence() -> EvidenceResponse:
 
 
 @app.get("/rag/collections", response_model=RagCollectionsResponse)
-def rag_collections() -> RagCollectionsResponse:
+def rag_collections(
+        x_rag_token: str | None = Header(default=None),
+        authorization: str | None = Header(default=None)) -> RagCollectionsResponse:
     """What the library holds. Empty counts mean the corpus is not ingested yet."""
     try:
         from rag import config as rag_config, store as rag_store
@@ -533,6 +563,11 @@ def rag_collections() -> RagCollectionsResponse:
 
     out = []
     for cid, meta in rag_config.COLLECTIONS.items():
+        # A listing that advertises a collection the caller cannot read is an
+        # invitation to try. Restricted ones appear only with the token, which
+        # also lets the interface decide what to offer without a second call.
+        if not rag_config.readable(cid, _rag_token(x_rag_token, authorization)):
+            continue
         counts = st["by_collection"].get(cid, {})
         out.append(RagCollectionOut(
             id=cid, label=meta["label"], authority=meta["authority"],
@@ -548,7 +583,9 @@ def rag_collections() -> RagCollectionsResponse:
 
 
 @app.post("/rag/search", response_model=RagSearchResponse)
-def rag_search(req: RagSearchRequest) -> RagSearchResponse:
+def rag_search(req: RagSearchRequest,
+               x_rag_token: str | None = Header(default=None),
+               authorization: str | None = Header(default=None)) -> RagSearchResponse:
     """Configured retrieval, no generation — the passages on their own."""
     try:
         from rag import config as rag_config, retrieve as rag_retrieve
@@ -560,6 +597,8 @@ def rag_search(req: RagSearchRequest) -> RagSearchResponse:
     if collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
                             detail=f"colección no disponible: {collection}")
+    if not rag_config.readable(collection, _rag_token(x_rag_token, authorization)):
+        raise _rag_forbidden(collection)
     try:
         hits = rag_retrieve.search(req.query, collection, req.top_k)
     except Exception as exc:
@@ -594,7 +633,9 @@ def _scenario_facts(req: RagChatRequest) -> dict:
 
 
 @app.post("/rag/chat", response_model=RagChatResponse)
-def rag_chat(req: RagChatRequest) -> RagChatResponse:
+def rag_chat(req: RagChatRequest,
+             x_rag_token: str | None = Header(default=None),
+             authorization: str | None = Header(default=None)) -> RagChatResponse:
     """Answer from retrieved context; citation checks do not prove entailment."""
     try:
         from rag import chat as rag_chat_mod, config as rag_config
@@ -606,6 +647,8 @@ def rag_chat(req: RagChatRequest) -> RagChatResponse:
     if collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
                             detail=f"colección no disponible: {collection}")
+    if not rag_config.readable(collection, _rag_token(x_rag_token, authorization)):
+        raise _rag_forbidden(collection)
 
     facts = _scenario_facts(req) if req.include_scenario else None
 
@@ -625,7 +668,9 @@ def rag_chat(req: RagChatRequest) -> RagChatResponse:
 
 
 @app.post("/rag/chat/stream")
-def rag_chat_stream(req: RagChatRequest) -> StreamingResponse:
+def rag_chat_stream(req: RagChatRequest,
+                    x_rag_token: str | None = Header(default=None),
+                    authorization: str | None = Header(default=None)) -> StreamingResponse:
     """Same as /rag/chat but streamed: passages first, then the answer word by word.
 
     Time-to-first-content drops from ~5 s to under a second, because the reader
@@ -641,6 +686,8 @@ def rag_chat_stream(req: RagChatRequest) -> StreamingResponse:
     if collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
                             detail=f"colección no disponible: {collection}")
+    if not rag_config.readable(collection, _rag_token(x_rag_token, authorization)):
+        raise _rag_forbidden(collection)
 
     facts = _scenario_facts(req) if req.include_scenario else None
 

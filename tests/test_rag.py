@@ -180,8 +180,15 @@ def test_search_all_keeps_sources_separated(db, monkeypatch):
 
 # ---- endpoints --------------------------------------------------------------
 
-def test_collections_endpoint_lists_all_three_with_authority():
-    body = client.get("/rag/collections").json()
+def test_collections_endpoint_hides_the_restricted_ones_by_default():
+    """Advertising a collection nobody can read is an invitation to try."""
+    ids = {c["id"] for c in client.get("/rag/collections").json()["collections"]}
+    assert ids == {"metodo", "defensa_tfm"}
+
+
+def test_collections_endpoint_lists_everything_for_a_reviewer(monkeypatch):
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()
     ids = {c["id"]: c for c in body["collections"]}
     assert set(ids) == {"libros", "metodo", "defensa_tfm", "crack23"}
     assert ids["libros"]["authority"] == "academico"
@@ -215,9 +222,81 @@ def test_chat_endpoint_rejects_unknown_collection():
 def test_chat_refuses_to_answer_without_passages(monkeypatch):
     """An uncited answer is worse than none — it looks sourced and is not."""
     monkeypatch.setattr("rag.retrieve.search", lambda *a, **k: [])
-    r = client.post("/rag/chat", json={"question": "¿que dice sobre la fusion fria?"})
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    r = client.post("/rag/chat", json={"question": "¿que dice sobre la fusion fria?"},
+                    headers={"X-Rag-Token": "t0ken"})
     body = r.json()
     assert r.status_code == 200
     assert body["grounded"] is False
     assert body["passages"] == []
     assert "no cubre" in body["answer"].lower()
+
+
+# ---- the reviewer token ------------------------------------------------------
+
+def test_restricted_collections_need_the_token(monkeypatch):
+    """The books are third-party copyright; only an evaluator should reach them."""
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    for path, payload in (
+        ("/rag/search", {"query": "curva de Phillips", "collection": "libros"}),
+        ("/rag/chat", {"question": "¿qué es la curva de Phillips?", "collection": "libros"}),
+    ):
+        assert client.post(path, json=payload).status_code == 401, path
+        ok = client.post(path, json=payload, headers={"X-Rag-Token": "t0ken"})
+        assert ok.status_code != 401, path
+
+
+def test_an_unset_token_locks_rather_than_opens(monkeypatch):
+    """Forgetting to configure it must not publish the corpus.
+
+    The dangerous default is the one where a missing secret means "no check".
+    """
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "")
+    r = client.post("/rag/search", json={"query": "phillips", "collection": "libros"})
+    assert r.status_code == 401
+    assert client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
+                       headers={"X-Rag-Token": ""}).status_code == 401
+
+
+def test_a_wrong_token_is_refused(monkeypatch):
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    for bad in ("t0keN", "t0ke", "t0kenn", "", "otro"):
+        r = client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
+                        headers={"X-Rag-Token": bad})
+        assert r.status_code == 401, bad
+
+
+def test_surrounding_whitespace_is_tolerated(monkeypatch):
+    """A token arrives pasted from an email, and often with a space attached.
+
+    Trimming costs nothing — no one guesses a secret by adding whitespace — and
+    the alternative is an evaluator locked out by an invisible character.
+    """
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    r = client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
+                    headers={"X-Rag-Token": "  t0ken \n"})
+    assert r.status_code != 401
+
+
+def test_the_project_documents_stay_open(monkeypatch):
+    """Gating the books must not gate the app's own documentation."""
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    for coll in ("metodo", "defensa_tfm"):
+        r = client.post("/rag/search", json={"query": "motor", "collection": coll})
+        assert r.status_code != 401, coll
+
+
+def test_bearer_header_also_carries_the_token(monkeypatch):
+    """One credential, whichever endpoint serves the corpus.
+
+    The interface already sends Authorization: Bearer to a tunnelled corpus;
+    accepting it here means an evaluator is not handed two different
+    instructions depending on where the books happen to live that week.
+    """
+    monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
+    r = client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
+                    headers={"Authorization": "Bearer t0ken"})
+    assert r.status_code != 401
+    bad = client.post("/rag/search", json={"query": "phillips", "collection": "libros"},
+                      headers={"Authorization": "Bearer otro"})
+    assert bad.status_code == 401

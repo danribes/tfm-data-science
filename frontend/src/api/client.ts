@@ -66,7 +66,8 @@ const initialBase = initialCustomBase();
 let ragToken = "";
 try {
   const stored = JSON.parse(sessionStorage.getItem(AUTH_KEY) || "null");
-  if (initialBase && initialBase !== API_BASE && stored?.baseUrl === initialBase && typeof stored.token === "string") {
+  const boundTo = initialBase ?? DEFAULT_RAG_API_BASE;
+  if (stored?.baseUrl === boundTo && typeof stored.token === "string") {
     ragToken = stored.token;
   } else sessionStorage.removeItem(AUTH_KEY);
 } catch { /* unavailable session storage */ }
@@ -87,14 +88,17 @@ export function subscribeRagConnection(listener: () => void): () => void {
  *  They are never baked into a public build or sent to the scenario API. */
 export function setRagConnection(url: string | null, token = ""): void {
   const base = url?.trim() ? cleanBase(url) : null;
-  const secret = base && base !== API_BASE ? token.trim() : "";
+  // Bound to the endpoint it was entered for, so it cannot follow the reader
+  // to a different host; kept in sessionStorage, so it dies with the tab.
+  const secret = token.trim();
   try {
     localStorage.removeItem(LEGACY_KEY);
     if (base) localStorage.setItem(RAG_KEY, base);
     else localStorage.removeItem(RAG_KEY);
   } catch { /* settings still apply to this page view */ }
   try {
-    if (secret) sessionStorage.setItem(AUTH_KEY, JSON.stringify({ baseUrl: base, token: secret }));
+    if (secret) sessionStorage.setItem(AUTH_KEY, JSON.stringify(
+      { baseUrl: base ?? DEFAULT_RAG_API_BASE, token: secret }));
     else sessionStorage.removeItem(AUTH_KEY);
   } catch { /* memory only when storage is unavailable */ }
   ragToken = secret;
@@ -142,7 +146,12 @@ async function response(endpoint: string, init?: RequestInit, rag = false): Prom
   const base = rag ? ragConnection.baseUrl : API_BASE;
   const headers = new Headers(init?.headers);
   headers.set("Content-Type", "application/json");
-  const authenticated = rag && ragConnection.customBaseUrl && base !== API_BASE && !!ragToken;
+  // The token goes to whichever endpoint it was entered against, custom or
+  // default. Restricting it to a custom URL kept it away from the scenario API,
+  // which is still true — `rag` is false for those calls — but it also made the
+  // reviewer token useless against the deployed corpus, which is where an
+  // evaluator will look.
+  const authenticated = rag && !!ragToken;
   if (authenticated) headers.set("Authorization", `Bearer ${ragToken}`);
   let res: Response;
   try {
