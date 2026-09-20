@@ -27,6 +27,12 @@ def _signed(value: float, dec: int = 1) -> str:
     return sign + nf(abs(value), dec)
 
 
+def _sp(unit: str) -> str:
+    """A leading space only when there is a unit. Several series are indices
+    and carry none; without this they print a double space before «en»."""
+    return f" {unit}" if unit else ""
+
+
 def _lever_phrase(m) -> str:
     return (f"{m.name} de {nf(m.base, m.dec)} a {nf(m.value, m.dec)} {m.unit} "
             f"({_signed(m.delta, m.dec)})")
@@ -57,15 +63,20 @@ def _resumen(f: ExplanationFacts) -> str:
         # head.label, not a fixed string: the headline is whichever series the
         # caller asked about, and naming it «deuda pública» while printing
         # another series' values is the worst kind of wrong — plausible.
+        # «puntos» was fixed for the same reason it should not have been: it is
+        # the right word for a series measured in percent and nonsense for one
+        # measured in euros — a house price does not fall by 104.420 puntos.
+        delta_unit = "puntos" if head.unit.startswith("%") else head.unit
+        delta = f"{_signed(head.delta, head.dec)} {delta_unit}".strip()
         parts.append(
             f"{head.label} {verb} de {nf(head.base, head.dec)} a "
-            f"{nf(head.value, head.dec)} {head.unit} en {head.year} "
-            f"({_signed(head.delta, head.dec)} puntos).")
+            f"{nf(head.value, head.dec)}{_sp(head.unit)} en {head.year} "
+            f"({delta}).")
 
     others = [o for o in f.outcomes
               if o.key != f.headline_key and abs(o.delta) > 0.05]
     if others:
-        bits = [f"{o.label} {_signed(o.delta, o.dec)} {o.unit} en {o.year}"
+        bits = [f"{o.label} {_signed(o.delta, o.dec)}{_sp(o.unit)} en {o.year}"
                 for o in others[:3]]
         parts.append("En el mismo escenario: " + "; ".join(bits) + ".")
 
@@ -94,15 +105,15 @@ def _mecanismo(f: ExplanationFacts) -> str:
         unit = hd.unit if hd else ""
         lines.append(
             f"Descomposición del movimiento de {what} en {f.headline_year} "
-            f"({_signed(f.joint_delta, 1)} {unit} en total), volviendo a correr el "
+            f"({_signed(f.joint_delta, 1)}{_sp(unit)} en total), volviendo a correr el "
             "motor con una sola palanca cada vez:")
         for ct in f.contributions:
             lines.append(
-                f"  · {ct.lever_name}: {_signed(ct.delta, 1)} {unit} por sí sola "
+                f"  · {ct.lever_name}: {_signed(ct.delta, 1)}{_sp(unit)} por sí sola "
                 f"({nf(ct.share * 100, 0)} % del movimiento bruto).")
         if abs(f.interaction) > 0.05:
             lines.append(
-                f"  · Interacción entre palancas: {_signed(f.interaction, 1)} {unit}. "
+                f"  · Interacción entre palancas: {_signed(f.interaction, 1)}{_sp(unit)}. "
                 "El motor no es lineal, así que las palancas por separado no suman "
                 "el efecto conjunto — esta diferencia es real, no un error de "
                 "redondeo.")

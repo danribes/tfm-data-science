@@ -14,8 +14,8 @@ from api.main import app
 from engine.constants import BASE_LEVERS
 from engine.levers import Levers
 from engine.spain import Y0, Y1, baseline, run_scenario
-from explain.facts import build_facts, decompose, moved_levers
-from explain.fallback import fallback_narration, nf
+from explain.facts import SERIES_META, build_facts, decompose, moved_levers
+from explain.fallback import _signed, fallback_narration, nf
 
 client = TestClient(app)
 
@@ -290,6 +290,40 @@ def test_fallback_decomposition_uses_the_headline_unit():
     if facts.contributions:
         esf = next(o for o in facts.outcomes if o.key == "esf")
         assert f"Descomposición del movimiento de {esf.label.lower()}" in mech
+
+
+def test_fallback_states_the_change_in_the_series_own_unit():
+    """«puntos» is the right word for a percentage and nonsense for a price.
+
+    The summary closed every headline sentence with «(−104.420 puntos)», which
+    for the house price is not a rounding slip but a different quantity: the
+    sentence had already printed euros two clauses earlier. Third time this
+    family of bug appears — a unit or a label fixed in the template while the
+    series behind it varies — hence a test per member of the family.
+    """
+    facts = build_facts(RATE_UP, 2035, headline="precio")
+    resumen = fallback_narration(facts)["resumen"]
+    precio = next(o for o in facts.outcomes if o.key == "precio")
+
+    assert f"({_signed(precio.delta, precio.dec)} €)" in resumen
+    assert "puntos" not in resumen
+
+    # And still «puntos» where that is the correct word.
+    deuda = fallback_narration(build_facts(RATE_UP, 2035, headline="b"))["resumen"]
+    assert "puntos)" in deuda
+
+
+def test_fallback_leaves_no_double_space_for_a_unitless_series():
+    """Several series are indices and carry no unit."""
+    unitless = [k for k, m in SERIES_META.items() if not m["unit"]]
+    assert unitless, "the guard is pointless if every series has a unit"
+    for key in unitless:
+        blocks = fallback_narration(build_facts(RATE_UP, 2035, headline=key))
+        for block in blocks.values():
+            for line in block.splitlines():
+                # lstrip, because the decomposition bullets are indented on
+                # purpose; what must not appear is a gap left by an absent unit.
+                assert "  " not in line.lstrip(), f"double space for {key}: {line!r}"
 
 
 def test_validate_accepts_the_blocks_the_schema_asks_for():
