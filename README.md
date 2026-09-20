@@ -300,6 +300,70 @@ serie fuera de la referencia rompería la propiedad que hace repetible cualquier
 cálculo del sistema. Es una elección de reproducibilidad sobre completitud, y se
 puede discutir; no es un descuido.
 
+### ¿Por qué está la red neuronal en la aplicación si pierde contra una recta?
+
+Porque es el único sitio donde el lector ve contra qué se mide una previsión. El
+panel no afirma que la red prediga: muestra su error, el de la deriva
+—prolongar la recta de los últimos años— y cuál gana en cada horizonte. Pierde
+en tres de cada cuatro, y esa tabla es la que justifica que el resto de la
+aplicación ofrezca escenarios condicionales y no pronósticos.
+
+El experimento estaba preinscrito. La regla de éxito —ganar en 12 de 17
+comunidades— se fijó antes de conocer el resultado, el corpus de entrenamiento
+excluye España por construcción y excluye cualquier objetivo posterior a
+2019T3. Se cumplió el protocolo y el resultado fue negativo: MASE 0,4000 frente
+a 0,3953 de la deriva, 5 victorias de 17. Que la regla se escribiera antes es lo
+que convierte un experimento fallido en un resultado.
+
+### ¿Para qué mostrar la puntuación de España si advierten de que no se interprete?
+
+La puntuación existe porque el clasificador se entrena sobre 154 países y España
+queda fuera del conjunto etiquetado; aplicarlo a España es la única forma de
+enseñar qué hace el modelo ante un caso que no ha visto. La cobertura de esa
+fila es de 8 de 12 características, y también consta.
+
+Lo que no puede hacerse es leerla como probabilidad. No hay validación temporal
+ni calibración, y la población etiquetada es selectiva: los países que aparecen
+con impago no son una muestra aleatoria. Un AUC de 0,6736 ordena razonablemente
+entre países y no dice nada sobre si un 0,017409 equivale a un 1,7 % de riesgo.
+
+Queda abierta una cuestión de diseño que el proyecto no zanja: si el valor
+pedagógico de enseñar la salida de un modelo sobre un caso no etiquetado
+compensa el riesgo de que alguien lea como probabilidad una cifra que no lo es.
+Retirarla de la interfaz y dejarla sólo en la matriz de evidencia sería
+defendible.
+
+### ¿Qué autoriza un horizonte de 44 años sin cobertura empírica de las bandas?
+
+Nada lo autoriza como previsión, y no se presenta como tal: el artefacto de
+Monte Carlo declara `empirical_coverage_validated: false`.
+
+La banda es la distribución condicional que implica la identidad de deuda bajo
+unos choques AR(1) calibrados. No es un intervalo predictivo con cobertura
+demostrada. El propio artefacto enumera por qué: los choques se extraen de forma
+independiente entre tipo, crecimiento y saldo primario, y ni la incertidumbre
+paramétrica, ni los cambios estructurales, ni la adaptación de la política
+entran en el cálculo.
+
+El horizonte largo sirve para una cosa concreta, y es un argumento en contra de
+sí mismo. Con escala de choques 1, la anchura p5–p95 de 2050 pasa de 21,53
+puntos con persistencia 0,50 a 127,40 con 0,96; en 2070, de 41,53 a 347,57. Una
+banda que se sextuplica al mover un solo supuesto demuestra que las cifras
+lejanas no son informativas, y hace falta el horizonte largo para que eso se vea.
+
+### ¿Por qué reportar hit@8 sobre el mismo conjunto con el que se ajustó?
+
+Porque ocultarlo sería peor y sustituirlo, imposible por ahora. La matriz lo
+etiqueta como resultado de desarrollo: 34 de 35 sobre preguntas usadas durante
+el ajuste. Mide que el sistema recupera lo que se le enseñó a recuperar, no que
+responda bien. Es una cota superior, no una estimación.
+
+Lo que falta está especificado, no prometido: preguntas externas, corpus fijado
+por hash, etiquetas de pasaje y de respuesta, revisión humana y comparación
+entre recuperación léxica, densa e híbrida. El protocolo está escrito y es
+ejecutable; una plantilla sin anotaciones no es un conjunto evaluado, y por eso
+no figura como métrica.
+
 ## Datos y limitaciones
 
 La fecha de referencia del escenario no equivale a la fecha de adquisición de
