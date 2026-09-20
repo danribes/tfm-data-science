@@ -3,6 +3,16 @@ import type { Levers } from "../engine/levers";
 
 type LeverKey = keyof Levers;
 
+/** The year a persona question is answered at when the reader has not picked
+ *  one themselves.
+ *
+ *  Y0 is the untouched baseline: every delta is zero there, so a question
+ *  answered at Y0 returns today's value and reads as a feature that does not
+ *  work. 2035 is far enough out that the mechanism has run and near enough
+ *  that the reader can still picture it. Series pinned to the end of the
+ *  projection (the debt) report 2050 regardless. */
+export const ANSWER_YEAR = 2035;
+
 /** A question a reader can actually ask, bound to what answers it.
  *
  *  The binding is the point. A free-text box over a scenario engine invites

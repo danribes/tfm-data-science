@@ -6,6 +6,8 @@ import Persona from "../Persona";
 import { queryClient } from "../../api/hooks";
 import { useScenarioStore } from "../../state/scenarioStore";
 import { SHIPPED_IDS } from "../../personas/registry";
+import { ANSWER_YEAR } from "../../personas/questions";
+import { Y0 } from "../../engine/spain";
 
 const ui = (id: string) =>
   render(
@@ -102,5 +104,33 @@ describe("Persona — the free-text box", () => {
     fireEvent.submit(document.querySelector(".consulta-form")!);
     await waitFor(() => expect(document.querySelector(".ask-nomatch")).not.toBeNull());
     expect(document.querySelector(".answer-value")).toBeNull();
+  });
+});
+
+describe("Persona — a question is answered about a year worth asking about", () => {
+  beforeEach(() => {
+    queryClient.clear();
+    useScenarioStore.getState().resetAll();
+  });
+
+  it("clicking a suggested question moves the horizon off the baseline year", async () => {
+    // At Y0 every delta is zero, so the answer returned today's value and read
+    // as a broken feature: the reader asks about the future and is shown the
+    // present.
+    expect(useScenarioStore.getState().horizon).toBe(Y0);
+    ui("03");
+    const chip = await screen.findByRole("button", { name: /vivienda media/i });
+    fireEvent.click(chip);
+    await waitFor(() =>
+      expect(useScenarioStore.getState().horizon).toBe(ANSWER_YEAR));
+  });
+
+  it("a horizon the reader chose is never overridden", async () => {
+    useScenarioStore.getState().setHorizon(2042);
+    ui("03");
+    const chip = await screen.findByRole("button", { name: /vivienda media/i });
+    fireEvent.click(chip);
+    await waitFor(() => expect(document.querySelector(".answer")).not.toBeNull());
+    expect(useScenarioStore.getState().horizon).toBe(2042);
   });
 });

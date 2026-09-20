@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useEvidence, usePersonas, useRedlines } from "../api/hooks";
-import { baseline, YEARS } from "../engine/spain";
+import { Y0, baseline, YEARS } from "../engine/spain";
 import { evaluatePersonaReds } from "../engine/redlines";
 import { seriesOf, type AnySeriesKey } from "../engine/derived";
 import { nf } from "../lib/fmt";
@@ -13,7 +13,7 @@ import { ProjectionChart } from "../components/ProjectionChart";
 import { Semaphore } from "../components/Semaphore";
 import { Stamp } from "../components/Stamp";
 import { SHIPPED_IDS, getPersonaModule } from "../personas/registry";
-import { matchQuestion, questionsFor, type PersonaQuestion } from "../personas/questions";
+import { ANSWER_YEAR, matchQuestion, questionsFor, type PersonaQuestion } from "../personas/questions";
 import { api } from "../api/client";
 import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenarioStore";
 import type { LeverId } from "../engine/levers";
@@ -92,14 +92,30 @@ export default function Persona() {
     calibrated_v16: cmp.calibrated,
   }));
 
+  /** Select a question and make sure it is answered about a year worth asking
+   *  about.
+   *
+   *  The landing state is deliberately the untouched baseline at Y0, where
+   *  nothing is projected yet — that is what «mueve una palanca para abrir un
+   *  escenario» means. But a reader who has just asked «¿cuánto costará una
+   *  vivienda?» is asking about the future, and answering at 2026 returned the
+   *  starting value with every delta at zero: a correct number that reads as a
+   *  broken feature. The first question moves the horizon off Y0; a horizon the
+   *  reader chose themselves is never overridden. */
+  const ask = (qid: string) => {
+    if (horizon === Y0) setHorizon(ANSWER_YEAR);
+    setAskedId(qid);
+    setAdHoc(null);
+    setNoMatch(false);
+    setRefusal(null);
+  };
+
   /** Keyword matching, which is the floor this never drops below. */
   const submitLocal = (text: string) => {
     const hit = matchQuestion(text, questions);
     if (hit) {
-      setAskedId(hit.id);
-      setAdHoc(null);
+      ask(hit.id);
       setTyped("");
-      setNoMatch(false);
     } else {
       // Saying nothing looks identical to a broken button. The reader has to
       // learn that this box answers a bounded set, and the only honest moment
@@ -128,7 +144,10 @@ export default function Persona() {
         // The question may name a year and a scenario, not just a subject.
         // Applying them is the point: the reader asked about 2040 at a 5 %
         // Euríbor, so that is the scenario the answer should be computed on.
+        // A question that names no year still deserves a year in which
+        // something has happened.
         if (res.year) setHorizon(res.year);
+        else if (horizon === Y0) setHorizon(ANSWER_YEAR);
         for (const [id, value] of Object.entries(res.levers ?? {})) {
           setLever(id as LeverId, value);
         }
@@ -198,7 +217,7 @@ export default function Persona() {
                 <button
                   type="button"
                   className={q.id === askedId ? "example-chip on" : "example-chip"}
-                  onClick={() => { setAskedId(q.id); setAdHoc(null); setNoMatch(false); setRefusal(null); }}
+                  onClick={() => ask(q.id)}
                 >
                   {q.text}
                 </button>
@@ -217,7 +236,7 @@ export default function Persona() {
           k={k}
           year={year}
           estimated={estimated}
-          onAsk={setAskedId}
+          onAsk={ask}
         />
       )}
 
