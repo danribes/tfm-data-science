@@ -223,8 +223,11 @@ def validate_narration(data: dict, facts: ExplanationFacts) -> None:
     decimal separators accept either conventional interpretation. The caller
     falls back to deterministic prose on failure.
     """
-    keys = {"resumen", "mecanismo", "advertencia"}
-    if not isinstance(data, dict) or set(data) != keys or any(
+    # Required, not exact: the schema gained `coloquial` and an equality check
+    # here rejected every well-formed response, silently serving templates.
+    # Extra keys the schema permits are not a reason to discard the answer.
+    keys = {"resumen", "mecanismo", "advertencia", "coloquial"}
+    if not isinstance(data, dict) or not keys <= set(data) or any(
         not isinstance(data[k], str) or not data[k].strip() for k in keys
     ):
         raise NarrationUnavailable("malformed narration fields")

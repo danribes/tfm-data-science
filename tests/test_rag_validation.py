@@ -82,7 +82,8 @@ def test_narration_accepts_known_rounding_and_rejects_new_magnitude():
     debt = next(out.value for out in facts.outcomes if out.key == "b")
     blocks = {"resumen": f"Deuda: {debt:.1f}.".replace(".", ",", 1),
               "mecanismo": "Respuesta condicional al tipo de interés.",
-              "advertencia": "No es una previsión."}
+              "advertencia": "No es una previsión.",
+              "coloquial": "En corto: sube."}
     validate_narration(blocks, facts)
     blocks["resumen"] = "Deuda: 987654321 %."
     with pytest.raises(NarrationUnavailable, match="number absent"):

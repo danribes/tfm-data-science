@@ -290,3 +290,25 @@ def test_fallback_decomposition_uses_the_headline_unit():
     if facts.contributions:
         esf = next(o for o in facts.outcomes if o.key == "esf")
         assert f"Descomposición del movimiento de {esf.label.lower()}" in mech
+
+
+def test_validate_accepts_the_blocks_the_schema_asks_for():
+    """A key the schema requires must not be treated as contamination.
+
+    validate_narration compared the key set for equality, so adding
+    `coloquial` to the output schema made every well-formed response fail and
+    the endpoint served templates while reporting itself healthy. The failure
+    was invisible: `source` said "deterministic", which is also what a missing
+    key looks like.
+    """
+    from explain.narrate import NarrationUnavailable, validate_narration
+
+    facts = build_facts(RATE_UP, 2040)
+    good = {"resumen": "Sube.", "mecanismo": "Por el tipo.",
+            "advertencia": "Es condicional.", "coloquial": "En corto: sube."}
+    validate_narration(good, facts)          # must not raise
+
+    with pytest.raises(NarrationUnavailable):
+        validate_narration({k: v for k, v in good.items() if k != "coloquial"}, facts)
+    with pytest.raises(NarrationUnavailable):
+        validate_narration({**good, "resumen": "  "}, facts)
