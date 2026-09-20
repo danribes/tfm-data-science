@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "corpus_scope": "public_project_docs",
+  "sources": [
+    {"path": "README.md", "title": "España en escenarios — presentación del proyecto", "collection": "metodo"},
+    {"path": "docs/MEMORIA_TFM.md", "title": "Memoria del TFM", "collection": "metodo"},
+    {"path": "docs/RESULTS.md", "title": "Resultados y límites del proyecto", "collection": "metodo"},
+    {"path": "docs/METHODOLOGY_CHANGES.md", "title": "Correcciones metodológicas del proyecto", "collection": "metodo"},
+    {"path": "docs/REPRODUCIBILITY.md", "title": "Reproducibilidad del proyecto", "collection": "metodo"},
+    {"path": "docs/DEFENSA_TFM.md", "title": "Guía de defensa del TFM", "collection": "defensa_tfm"}
+  ]
+}

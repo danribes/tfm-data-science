@@ -23,7 +23,7 @@ export default function Metodologia() {
       </div>
 
       <div className="card">
-        <h4>Vintage <small>congelado — la app nunca mezcla fechas</small></h4>
+        <h4>Vintage <small>referencia del escenario — cada fuente conserva sus fechas</small></h4>
         <p style={{ fontSize: 14.5 }}>
           Datos congelados el <b>{health.data?.vintage ?? "…"}</b>
           {vintage.data ? <> ({nf(vintage.data.n_files, 0)} ficheros fuente)</> : null}.
@@ -45,12 +45,13 @@ export default function Metodologia() {
         <p style={{ fontSize: 14.5 }}>
           Monte Carlo se calcula <b>solo</b> en el servidor: los sorteos NumPy PCG64 no son
           reproducibles en JS, así que los pines de semilla 42 del fixture atan al motor Python y la
-          regla de aceptación del abanico es la envolvente dorada ±2 pp en 2030/2050/2070.
+          comprobación de reproducción del abanico usa la envolvente dorada ±2 pp en
+          2030/2050/2070. No mide cobertura predictiva sobre observaciones reales.
         </p>
       </div>
 
       <div className="card">
-        <h4>Constantes del motor <small>calibración v16 — defaults declarados, no estimaciones</small></h4>
+        <h4>Constantes del motor <small>calibraciones declaradas y parámetros de vivienda estimados</small></h4>
         {constants.isSuccess ? (
           <table style={{ fontSize: 13.5, borderCollapse: "collapse" }}>
             <thead><tr><th style={{ textAlign: "left" }}>nombre</th><th>valor</th><th style={{ textAlign: "left" }}>unidad</th><th style={{ textAlign: "left" }}>procedencia</th></tr></thead>
@@ -130,10 +131,10 @@ export default function Metodologia() {
           </li>
         </ul>
         <p style={{ fontSize: 14.5 }}>
-          Consecuencia para quien revise este trabajo: cualquier cifra que
-          aparezca en un texto explicativo es trazable al motor y reproducible
+          Los hechos numéricos del escenario son trazables al motor y reproducibles
           desactivando la narración (<code>narrate: false</code>). La redacción
-          puede variar entre ejecuciones; los números no.
+          generada requiere evaluación de fidelidad; las instrucciones al modelo
+          no garantizan que cada afirmación sea correcta.
         </p>
       </div>
 

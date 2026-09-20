@@ -1,0 +1,6 @@
+# Optional source acquisition and scientific figures. Downloads are never part of tests.
+-c requirements-lock.txt
+-r requirements.txt
+wbgapi>=1.0.14,<1.1
+openpyxl>=3.1.5,<3.2
+matplotlib>=3.11,<3.12

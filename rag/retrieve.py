@@ -18,7 +18,7 @@ import struct
 from dataclasses import dataclass, asdict
 from typing import Sequence
 
-from rag import config, embed, glossary, store
+from rag import config, glossary, store
 
 
 @dataclass(frozen=True)
@@ -61,7 +61,7 @@ def _lexical(con: sqlite3.Connection, query: str, collection: str,
              limit: int) -> list[int]:
     # BM25 cannot cross a language, so a Spanish question can never reach an
     # English textbook without the English terms being in the query.
-    expr = _fts_query(glossary.expand(query))
+    expr = _fts_query(glossary.expand(query) if config.USE_GLOSSARY else query)
     if not expr:
         return []
     rows = con.execute(
@@ -77,6 +77,8 @@ def _lexical(con: sqlite3.Connection, query: str, collection: str,
 
 def _dense(con: sqlite3.Connection, query: str, collection: str,
            limit: int, text: str | None = None) -> list[int]:
+    from rag import embed
+
     vec = embed.embed_query(text if text is not None else query)
     blob = struct.pack(f"{len(vec)}f", *vec)
     # Over-fetch then filter by collection: vec0 KNN cannot join in its own
@@ -101,14 +103,17 @@ def _rrf(rankings: Sequence[tuple[Sequence[int], float]],
     """
     scores: dict[int, float] = {}
     for ranking, weight in rankings:
+        if weight <= 0:
+            continue
         for pos, cid in enumerate(ranking):
             scores[cid] = scores.get(cid, 0.0) + weight / (k + pos + 1)
     return scores
 
 
-def search(query: str, collection: str = "libros", top_k: int | None = None,
+def search(query: str, collection: str | None = None, top_k: int | None = None,
            con: sqlite3.Connection | None = None) -> list[Passage]:
-    """Hybrid search within one collection, best first."""
+    """Search one collection using the explicitly configured retrieval mode."""
+    collection = config.DEFAULT_COLLECTION if collection is None else collection
     if collection not in config.COLLECTIONS:
         raise ValueError(f"colección desconocida: {collection!r}")
 
@@ -116,8 +121,10 @@ def search(query: str, collection: str = "libros", top_k: int | None = None,
     con = con or store.connect()
     try:
         k = top_k or config.TOP_K
-        lex = _lexical(con, query, collection, config.CANDIDATES)
-        den = _dense(con, query, collection, config.CANDIDATES)
+        lex = (_lexical(con, query, collection, config.CANDIDATES)
+               if config.PUBLIC_MODE or config.W_LEXICAL > 0 else [])
+        den = (_dense(con, query, collection, config.CANDIDATES)
+               if not config.PUBLIC_MODE and config.W_DENSE > 0 else [])
 
         # A second dense probe, in English only.
         #
@@ -126,15 +133,17 @@ def search(query: str, collection: str = "libros", top_k: int | None = None,
         # Embedding the terminology on its own gives the English literature a
         # full-strength ranking of its own, which fusion can then weigh against
         # the Spanish one instead of averaging the two into neither.
-        terms = glossary.english_terms(query)
+        terms = (glossary.english_terms(query)
+                 if not config.PUBLIC_MODE and config.USE_GLOSSARY else [])
         den_en = (_dense(con, query, collection, config.CANDIDATES,
-                         text=", ".join(terms)) if terms else [])
+                         text=", ".join(terms)) if not config.PUBLIC_MODE
+                  and terms and config.W_DENSE_EN > 0 else [])
 
         if not lex and not den and not den_en:
             return []
 
         fused = _rrf([(den, config.W_DENSE), (den_en, config.W_DENSE_EN),
-                      (lex, config.W_LEXICAL)])
+                      (lex, 1.0 if config.PUBLIC_MODE else config.W_LEXICAL)])
         lex_pos = {cid: i for i, cid in enumerate(lex)}
         den_pos = {cid: i for i, cid in enumerate(den)}
         for cid, i in ((c, i) for i, c in enumerate(den_en)):

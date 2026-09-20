@@ -1,9 +1,10 @@
 """Every named engine constant — the single source of truth (spec §4.1).
 
-Spain constants are the v16 calibration, ported verbatim from
+Most Spain constants retain the v16 calibration from
 docs/superpowers/plans/references/v16-engine-extract.md S1 (extract L69-91:
-`const BASE` and `const C`). They are calibrated defaults, NOT estimates —
-phase 3 contests may replace them (AC-V6). Vintage-anchored values (V0,
+`const BASE` and `const C`). Housing growth and reversion use frozen panel
+estimates, with inference limitations in docs/eval/housing-robustness.json.
+Other behavioural coefficients remain calibrated defaults. Vintage-anchored values (V0,
 BASE_LEVERS) load from the committed gold slice, never hardcoded twice.
 
 Generic-engine defaults (OKUN_COEFFICIENT, PHILLIPS_SLOPE) are imported from
@@ -21,7 +22,7 @@ from engine.generic import OKUN_COEFFICIENT, PHILLIPS_SLOPE
 
 GOLD_DIR = Path(__file__).resolve().parents[1] / "data" / "gold"
 VINTAGE = (GOLD_DIR / "VINTAGE").read_text(encoding="utf-8").strip()
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"
 
 # ---- Spain semi-structural constants (v16 `const C`, extract L73-91) ----
 MULT = 1.40      # fiscal multiplier (CORE Macro U3)
@@ -41,11 +42,12 @@ REFI = 0.14      # share of sovereign debt refinanced each year
 TERM = 0.17      # 10y term premium over Euribor (3.42 − 2.80 − 0.45)
 DIFF = 1.4757    # implicit mortgage spread pp — build_v16.py bisection to the
                  # €744.89 median of gold_cuota_teorica.csv at Euribor 2.80
-# The v16 calibration for the two housing parameters the panel can identify.
-# Both sit outside the 90 % band of their own estimate, so they are no longer
-# the default — see ESTIMATED below and docs Evidencia.
+# Historical v16 housing calibrations. Panel estimates now supply the defaults,
+# but the growth calibration is inside the synchronized time-block intervals:
+# its rejection is not robust to common national shocks. These estimates are
+# descriptive, not identification of structural long-run parameters.
 IPV_LR_V16 = 3.0
-IPV_REV_V16 = 0.60
+IPV_REV_V16 = 0.60  # legacy persistence factor; equivalent reversion rate = 0.40
 E_IPV_R = 2.6    # IPV response to the rate lever
 E_IPV_G = 1.1    # IPV response to the growth deviation
 RJUV = 2.317     # youth/total unemployment ratio (stable in the 5y series)
@@ -54,11 +56,12 @@ PM_DECAY = 0.45  # geometric decay of the import-price Phillips term (extract L1
 # ---- Expectations regime (see engine/spain.py run_scenario) ----
 # OMEGA: adaptive-expectations weight in the hybrid Phillips curve.
 #   1.0 = pure adaptive (current v16 calibration, default — no behaviour change)
-#   0.0 = fully anchored (ECB target fully credible; inflation always mean-reverts)
-#   0.5 = Galí-Gertler (1999) split: half backward, half anchored
+#   0.0 = no lagged deviation; contemporaneous shocks still affect inflation
+#         around frozen V0.pi. This does not implement an ECB 2% target.
+#   0.5 = illustrative intermediate lagged-deviation persistence
 # ALPHA_SPREAD: endogenous sovereign-spread sensitivity to debt excess.
 #   0.0 = exogenous spread (current default — no behaviour change)
-#   0.04 = ≈4 bp per pp of debt above B_CRIT (Spain 2010-12 episode calibration)
+#   0.04 = illustrative 4 bp per pp of debt above B_CRIT; not an estimate
 # B_CRIT: debt/GDP threshold (% PIB) above which spread feedback activates.
 OMEGA         = 1.0    # adaptive weight (1.0 = pure adaptive, default unchanged)
 ALPHA_SPREAD  = 0.0    # pp bono per pp debt excess (0.0 = off, default unchanged)
@@ -97,11 +100,11 @@ def _est(name: str, fallback: float) -> float:
     return float(row["value"]) if row else fallback
 
 
-# Estimated from the frozen panels rather than inherited from v16. The engine
-# shipped calibrated values its own evidence layer rejects; these are what the
-# data supports. run_scenario(ipv_lr=..., ipv_rev=...) reproduces the v16 path.
-IPV_LR = _est("IPV_LR", IPV_LR_V16)    # 1.23 % a/a  [0.93, 1.53], 20 CCAA × 2007-2026
-IPV_REV = _est("IPV_REV", IPV_REV_V16)  # 0.20 /yr    [0.18, 0.22]
+# Descriptive estimates from the frozen panels, conditional on sample and model.
+# For legacy housing dynamics use run_scenario(ipv_lr=3.0, ipv_rev=0.40):
+# v16 retained 0.60 of the annual deviation, equivalent to 0.40 reversion.
+IPV_LR = _est("IPV_LR", IPV_LR_V16)    # regional annual growth; 17 CCAA + Ceuta and Melilla (Nacional excluded)
+IPV_REV = _est("IPV_REV", 1.0 - IPV_REV_V16)  # fraction reverting per year; growth persistence is 1 − IPV_REV
 
 
 @lru_cache(maxsize=1)
@@ -192,8 +195,7 @@ BASE_LEVERS: dict[str, float] = {
 
 _V16 = "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6)"
 _MC = "MC calibration fitted to gold_escenarios_deuda_mc.csv central envelopes (this repo, phase 1)"
-_EST = ("estimado del panel congelado por tools/gen_estimated_params.py — "
-        "sustituye a la calibración v16, que cae fuera de su propia banda del 90 %")
+_EST = "panel histórico congelado; incertidumbre dependiente del estimador: docs/eval/housing-robustness.json"
 
 CONSTANTS_TABLE: list[dict] = [
     {"name": "MULT", "value": MULT, "unit": "x", "provenance": _V16 + " · fiscal multiplier, CORE Macro U3"},
@@ -212,14 +214,14 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "REFI", "value": REFI, "unit": "share/yr", "provenance": _V16 + " · debt refinancing share 14 %/yr"},
     {"name": "TERM", "value": TERM, "unit": "pp", "provenance": _V16 + " · 10y term premium (3.42 − 2.80 − 0.45)"},
     {"name": "DIFF", "value": DIFF, "unit": "pp", "provenance": "build_v16.py bisection vs gold_cuota_teorica.csv €744.89 median at Euribor 2.80"},
-    {"name": "IPV_LR", "value": IPV_LR, "unit": "% a/a", "provenance": _EST + " · crecimiento medio del IPV, 20 CCAA × 2007-2026 (v16 calibraba 3.0, fuera de la banda)"},
-    {"name": "IPV_REV", "value": IPV_REV, "unit": "x", "provenance": _EST + " · AR(1) sobre la desviación del IPV (v16 calibraba 0.60, fuera de la banda)"},
+    {"name": "IPV_LR", "value": IPV_LR, "unit": "% a/a", "provenance": _EST + " · crecimiento medio del IPV, 17 CCAA + Ceuta y Melilla; Nacional excluido; banda condicional a la muestra"},
+    {"name": "IPV_REV", "value": IPV_REV, "unit": "x", "provenance": _EST + " · tasa anual de reversión 1−phi; persistencia del motor = phi; v16 usaba persistencia 0.60 (reversión 0.40)"},
     {"name": "E_IPV_R", "value": E_IPV_R, "unit": "pp IPV / pp rate", "provenance": _V16},
     {"name": "E_IPV_G", "value": E_IPV_G, "unit": "pp IPV / pp growth", "provenance": _V16},
     {"name": "RJUV", "value": RJUV, "unit": "x", "provenance": _V16 + " · youth/total unemployment ratio, 5y series"},
     {"name": "PM_DECAY", "value": PM_DECAY, "unit": "x", "provenance": _V16 + " · import-price shock decay"},
-    {"name": "OMEGA", "value": OMEGA, "unit": "x", "provenance": "expectations regime: 1.0=adaptive (default), 0.0=anchored — Galí-Gertler (1999) hybrid NKPC"},
-    {"name": "ALPHA_SPREAD", "value": ALPHA_SPREAD, "unit": "pp bono / pp debt", "provenance": "endogenous spread: 0.0=off (default), 0.04=Spain 2010-12 calibration"},
+    {"name": "OMEGA", "value": OMEGA, "unit": "x", "provenance": "lagged inflation-deviation weight: 1.0=default, 0.0=no lag around frozen inflation reference; not an ECB target model"},
+    {"name": "ALPHA_SPREAD", "value": ALPHA_SPREAD, "unit": "pp bono / pp debt", "provenance": "endogenous spread: 0.0=off (default); 0.04=illustrative 4 bp per pp debt, not an estimate"},
     {"name": "B_CRIT", "value": B_CRIT, "unit": "% PIB", "provenance": "debt/GDP threshold above which spread feedback activates"},
     {"name": "CAL_SALARIO_MES", "value": CAL_SALARIO_MES, "unit": "EUR/mes", "provenance": "kpis_perfiles.json salario_medio 24497 / 14 (build_v16 calib)"},
     {"name": "GENERIC_OKUN", "value": OKUN_COEFFICIENT, "unit": "pp u / pp GDP", "provenance": "engine.generic.OKUN_COEFFICIENT (generic engine calibrated default, literature 0.3-0.5), NOT country-specific — distinct from Spain's 0.48"},

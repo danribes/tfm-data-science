@@ -20,6 +20,7 @@ export type Scenario = Record<SeriesKey, number[]>;
 
 /** French amortization monthly payment (engine/spain.py french()). */
 export function french(principal: number, annualRatePct: number, nMonths: number): number {
+  if (annualRatePct === 0) return principal / nMonths;
   const i = annualRatePct / 1200.0;
   return (principal * i) / (1 - Math.pow(1 + i, -nMonths));
 }
@@ -61,7 +62,8 @@ export function runScenario(L: Levers): Scenario {
     const pb = gc.pb + L.sp - gc.presion_demog * L.dem;
     const bPrev = b;
     b = (bPrev * (1 + ief / 100)) / (1 + gnom / 100) - pb;
-    const intr = (bPrev * ief) / 100;
+    // Current-GDP interest ratio: i_t * D_{t-1} / Y_t (v16 omitted GDP growth).
+    const intr = (bPrev * ief) / 100 / (1 + gnom / 100);
     const saldo = pb - intr;
 
     // wage setting (WS)
@@ -72,9 +74,9 @@ export function runScenario(L: Levers): Scenario {
       wrIdx *= 1 + wreal / 100;
     }
 
-    // housing
+    // IPV_REV removes this fraction of the growth gap each year; 1 - REV persists.
     const ipv =
-      C.IPV_LR + (V0.ipv - C.IPV_LR) * Math.pow(C.IPV_REV, k) -
+      C.IPV_LR + (V0.ipv - C.IPV_LR) * Math.pow(1 - C.IPV_REV, k) -
       C.E_IPV_R * (L.r - B.r) + C.E_IPV_G * (g - V0.g);
     if (k > 0) precio *= 1 + ipv / 100;
     const cuota = french(precio * 0.8, L.r + C.DIFF, 300);

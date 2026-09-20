@@ -150,6 +150,7 @@ class PersonaDependentsOut(BaseModel):
 
 
 class ScenarioResponse(ApiMeta):
+    warnings: list[str] = Field(default_factory=list)
     horizon: int
     years: list[int]
     baseline: dict[str, list[float]]
@@ -169,6 +170,9 @@ class MonteCarloRequest(BaseModel):
 
 
 class MonteCarloResponse(ApiMeta):
+    warnings: list[str] = Field(default_factory=list)
+    uncertainty_kind: str = "conditional_simulation"
+    empirical_coverage_validated: bool = False
     years: list[int]
     percentiles: dict[str, list[float]]
     n_paths: int
@@ -281,8 +285,7 @@ class IrfPointOut(EstimateOut):
 class EnginePathPointOut(BaseModel):
     h: int
     years: float
-    #: None antes del ancla: la regla del motor es anual y extrapolarla a
-    #: horizontes intranuales inventaría una afirmación que la constante no hace.
+    #: None en horizontes no anuales; h=0 es el cambio acumulado nulo.
     coef: float | None = None
 
 
@@ -290,13 +293,15 @@ class IrfOut(BaseModel):
     horizons: list[IrfPointOut]
     engine_path: list[EnginePathPointOut]
     anchor_h: int
+    engine_reversion: float
     unit: str
     note: str
+    comparison_note: str
 
 
 class EvidenceResponse(ApiMeta):
     comparisons: list[ComparisonOut]
-    #: Respuesta dinámica a un choque regional, frente a lo que supone el motor.
+    #: Asociación regional descriptiva y forma acumulada del motor, normalizada.
     irf: IrfOut | None = None
     fiscal_persistence: EstimateOut | None = None
     #: Qué constantes NO puede juzgar el vintage y por qué. Se publica junto a
@@ -309,7 +314,7 @@ class EvidenceResponse(ApiMeta):
 
 class RagSearchRequest(BaseModel):
     query: str = Field(min_length=2, max_length=1000)
-    collection: str = Field("libros")
+    collection: str | None = None
     top_k: int = Field(8, ge=1, le=25)
 
 
@@ -335,7 +340,7 @@ class RagSearchResponse(ApiMeta):
 
 class RagChatRequest(BaseModel):
     question: str = Field(min_length=2, max_length=2000)
-    collection: str = Field("libros")
+    collection: str | None = None
     top_k: int = Field(8, ge=1, le=25)
     #: Cuando es true, el escenario activo viaja con la pregunta y la respuesta
     #: puede enlazar la teoría con los números en pantalla.
@@ -368,6 +373,9 @@ class RagCollectionsResponse(ApiMeta):
     collections: list[RagCollectionOut]
     total_documents: int
     total_chunks: int
+    retrieval_mode: str = "hybrid"
+    corpus_scope: str = "private_local"
+    default_collection: str = "libros"
 
 
 # ---- /explain (spec §10): engine-computed facts, LLM-narrated prose ----
@@ -464,7 +472,7 @@ class PredictionResponse(ApiMeta):
     note: str = ""
 
 
-# ---- Distress: el complemento probabilístico del umbral del 7 % ----
+# ---- Distress: puntuación exploratoria, sin calibración para España ----
 
 class DistressFeatureOut(BaseModel):
     feature: str
@@ -476,7 +484,10 @@ class DistressFeatureOut(BaseModel):
 class DistressCountryOut(BaseModel):
     iso3: str
     year: int
+    #: Nombre conservado por compatibilidad; salida del clasificador, no PD calibrada.
     probability: float
+    score_kind: str = "uncalibrated_classifier_score"
+    calibration_status: str = "not_evaluated"
     base_rate: float
     #: False cuando el país no está en la base de impagos — el caso de España.
     in_label_set: bool
@@ -485,6 +496,10 @@ class DistressCountryOut(BaseModel):
 
 class DistressResponse(ApiMeta):
     available: bool
+    score_kind: str = "uncalibrated_classifier_score"
+    calibration_status: str = "not_evaluated"
+    validation_scheme: str = "country_grouped_cross_validation_not_temporal"
+    importance_scope: str = "training_sample_permutation_importance"
     n: int = 0
     n_positive: int = 0
     base_rate: float = 0.0
@@ -562,7 +577,7 @@ class AnalogMatch(BaseModel):
     match_year: int
     distance: float
     dominant_lever: str | None = None
-    match_snapshot: dict[str, float]
+    match_snapshot: dict[str, float | None]
     outcome: list[AnalogOutcomePoint]
     outcome_truncated: bool
     diffs: list[StructuralDiff]
@@ -571,6 +586,9 @@ class AnalogMatch(BaseModel):
 
 class AnalogResponse(ApiMeta):
     horizon: int
+    query_year: int = 2026
+    features: list[str] = Field(default_factory=list)
+    limitations: str = ""
     query_snapshot: dict[str, float]
     matches: list[AnalogMatch]
     rag_available: bool

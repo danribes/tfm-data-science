@@ -7,6 +7,7 @@ import { YEARS } from "../engine/spain";
 import { nf } from "../lib/fmt";
 import { ProjectionChart } from "./ProjectionChart";
 import { SERIES_FORMAT } from "./KpiRow";
+import { RagCorpusNotice } from "./RagCorpusNotice";
 import type { PersonaQuestion } from "../personas/questions";
 
 function fmt(key: string, v: number): string {
@@ -35,51 +36,40 @@ function Layer({ title, tag, children }: {
   );
 }
 
-/** What the literature says about the concept behind this question.
- *
- *  Its own component because it must not query until opened: the corpus is
- *  copyrighted, lives only on the machine that holds the index, and answers 503
- *  everywhere else. Firing it on every answer would be a failed request per
- *  question for every reader of the public deploy.
- *
- *  An absent corpus is stated, not hidden. A sources drawer that quietly shows
- *  nothing reads as "no sources exist", which is the opposite of true. */
+/** Source passages load only when the reader opens the drawer. */
 function CorpusLayer({ concept }: { concept: string }) {
   const [open, setOpen] = useState(false);
   const corpus = useRagSearch(concept, open);
-  const status = corpus.error as { status?: number } | null;
-  const unavailable = status?.status === 503;
+  const error = corpus.error as { detail?: string; message?: string } | null;
+  const passages = corpus.data?.passages ?? [];
 
   return (
     <div className={open ? "layer open" : "layer"}>
       <button type="button" className="layer-head" onClick={() => setOpen((v) => !v)}>
         <span className="layer-tag">fuentes</span>
-        <span className="layer-title">Qué dice la literatura sobre «{concept}»</span>
+        <span className="layer-title">Fuentes sobre «{concept}»</span>
         <span className="layer-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && (
         <div className="layer-body">
+          <RagCorpusNotice data={corpus.corpus} />
           {corpus.isPending && <p className="muted">Buscando en el corpus…</p>}
-          {unavailable && (
+          {corpus.isError && (
             <p className="layer-note">
-              El corpus son manuales con derechos de autor y vive sólo en la
-              máquina local, así que no se consulta desde este despliegue. El
-              número de arriba no depende de él: lo calcula el motor.
+              No se ha podido consultar el corpus: {error?.detail ?? error?.message ?? "error desconocido"}.
             </p>
           )}
-          {corpus.isError && !unavailable && (
-            <p className="layer-note">No se ha podido consultar el corpus.</p>
-          )}
-          {corpus.isSuccess && corpus.data.passages.length === 0 && (
+          {corpus.emptyCollection && <p className="layer-note">No hay colecciones con pasajes disponibles.</p>}
+          {corpus.isSuccess && passages.length === 0 && (
             <p className="layer-note">
               El corpus no cubre este concepto. Prefiero decirlo a devolver un
               pasaje que no viene a cuento.
             </p>
           )}
-          {corpus.isSuccess && corpus.data.passages.length > 0 && (
+          {corpus.isSuccess && passages.length > 0 && (
             <>
               <ol className="layer-list">
-                {corpus.data.passages.map((p, i) => (
+                {passages.map((p, i) => (
                   <li key={i}>
                     <span className="psg-cite">{p.cita}</span>
                     <span className={`psg-auth ${p.authority}`}>{p.authority}</span>

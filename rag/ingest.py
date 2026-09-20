@@ -3,9 +3,10 @@
 Run:  .venv/bin/python -m rag.ingest --collection libros
       .venv/bin/python -m rag.ingest --all --limit 2      (smoke test first)
 
-Design constraint: this must survive being killed. Each document is committed
-before the next begins and keyed by content hash, so a re-run skips what is
-already in and picks up where it stopped. There is no "start over" cost.
+Each document is committed atomically before the next begins. Unchanged source
+hashes are skipped; changed sources replace the old document and all its indexes
+within the same collection. A failed/interrupted document retains its previous
+complete version and can be retried; earlier documents remain committed.
 """
 from __future__ import annotations
 
@@ -19,20 +20,38 @@ from typing import Iterator
 from rag import config, embed, extract, store
 
 
+_BOOK_METADATA_FIELDS = (
+    "source_url", "download_url", "authors", "year", "edition", "publisher", "language",
+    "license", "availability", "retrieved_at", "downloaded_at", "accessed_at",
+    "sha256", "note", "notes",
+)
+
+
 def _books() -> Iterator[dict]:
-    """Indexable rows of CORPUS_MANIFEST.csv, in manifest order."""
+    """Indexable manifest rows, including optional source/bibliographic metadata.
+
+    Older manifests need only their existing columns. Availability and license
+    remain separate, explicit source statements: a downloadable PDF is not
+    automatically assigned an open license.
+    """
     if not config.BOOKS_MANIFEST.exists():
         print(f"!! sin manifiesto: {config.BOOKS_MANIFEST}", file=sys.stderr)
         return
-    for row in csv.DictReader(open(config.BOOKS_MANIFEST, encoding="utf-8")):
-        if row.get("include", "").strip().lower() not in {"si", "sí", "yes", "true"}:
-            continue
-        path = config.BOOKS_DIR / row["file"]
-        if not path.exists():
-            print(f"!! falta el fichero: {row['file']}", file=sys.stderr)
-            continue
-        yield {"path": path, "title": Path(row["file"]).stem,
-               "collection": "libros", "meta": {"topic": row.get("topic", "")}}
+    with config.BOOKS_MANIFEST.open(encoding="utf-8", newline="") as manifest:
+        for row in csv.DictReader(manifest):
+            if row.get("include", "").strip().lower() not in {"si", "sí", "yes", "true"}:
+                continue
+            path = config.BOOKS_DIR / row["file"]
+            if not path.exists():
+                print(f"!! falta el fichero: {row['file']}", file=sys.stderr)
+                continue
+            meta = {"topic": row.get("topic", "")}
+            for field in _BOOK_METADATA_FIELDS:
+                value = (row.get(field) or "").strip()
+                if value:
+                    meta[field] = value
+            yield {"path": path, "title": Path(row["file"]).stem,
+                   "collection": "libros", "meta": meta}
 
 
 def _crack23() -> Iterator[dict]:
@@ -49,13 +68,17 @@ def _crack23() -> Iterator[dict]:
 def _metodo() -> Iterator[dict]:
     """The project's own method docs — lets the chat cite its own provenance."""
     repo = Path(__file__).resolve().parents[1]
-    for rel in ("README.md", "docs/superpowers/specs", "docs/superpowers/plans"):
+    for rel in ("README.md", "docs/MEMORIA_TFM.md", "docs/RESULTS.md",
+                "docs/METHODOLOGY_CHANGES.md", "docs/REPRODUCIBILITY.md",
+                "docs/superpowers/specs", "docs/superpowers/plans"):
         p = repo / rel
         if p.is_file():
-            yield {"path": p, "title": p.stem, "collection": "metodo", "meta": {}}
+            yield {"path": p, "title": p.stem, "collection": "metodo",
+                   "meta": {"document_status": "current"}}
         elif p.is_dir():
             for f in sorted(p.rglob("*.md")):
-                yield {"path": f, "title": f.stem, "collection": "metodo", "meta": {}}
+                yield {"path": f, "title": f.stem, "collection": "metodo",
+                       "meta": {"document_status": "historical_design"}}
 
 
 def _defensa_tfm() -> Iterator[dict]:
@@ -70,23 +93,29 @@ SOURCES = {"libros": _books, "crack23": _crack23, "metodo": _metodo, "defensa_tf
 
 
 def ingest_document(con, doc: dict, *, force: bool = False) -> tuple[int, str]:
-    """Returns (chunks_written, status)."""
+    """Atomically replace a collection/source path; return (chunks, status).
+
+    The schema still has global content-hash uniqueness. Identical content
+    owned by a different source is reported explicitly and never deleted.
+    Paths use the source manifest's spelling, preserving existing index keys.
+    """
     path: Path = doc["path"]
     sha = extract.sha256_file(path)
+    collection, source_path = doc["collection"], str(path)
+    existing = con.execute(
+        "SELECT id, sha256 FROM documents WHERE collection=? AND source_path=?",
+        (collection, source_path),
+    ).fetchall()
+    if len(existing) == 1 and existing[0][1] == sha and not force:
+        return 0, "ya-indexado"
+    owner = con.execute("SELECT id FROM documents WHERE sha256=?", (sha,)).fetchone()
+    if owner and owner[0] not in {row[0] for row in existing}:
+        raise ValueError("El contenido ya pertenece a otra fuente o colección; no se modifica su índice.")
 
-    if store.document_exists(con, sha):
-        if not force:
-            return 0, "ya-indexado"
-        store.delete_document(con, sha)
-
-    pages = (extract.pdf_pages(path) if path.suffix.lower() == ".pdf"
-             else extract.markdown_pages(path))
-
-    doc_id = store.add_document(
-        con, collection=doc["collection"], title=doc["title"],
-        source_path=str(path), sha256=sha, pages=0, meta=doc.get("meta"),
-    )
-
+    # A savepoint also works when the caller already owns an outer transaction.
+    # Never commit individual batches: that would expose partial replacements
+    # and make a failed embedding erase the last working version.
+    con.execute("SAVEPOINT rag_ingest_document")
     written = 0
     max_page = 0
     batch: list[dict] = []
@@ -96,38 +125,39 @@ def ingest_document(con, doc: dict, *, force: bool = False) -> tuple[int, str]:
         if not batch:
             return
         vectors = embed.embed_passages([c["text"] for c in batch])
+        if len(vectors) != len(batch):
+            raise ValueError("El lote de embeddings está incompleto")
         written += store.add_chunks(con, doc_id, batch, vectors)
-        con.commit()          # commit per batch: a kill loses at most one batch
         batch = []
 
     try:
+        for old_id, _ in existing:
+            store.delete_document_id(con, old_id, commit=False)
+        doc_id = store.add_document(
+            con, collection=collection, title=doc["title"], source_path=source_path,
+            sha256=sha, pages=0, meta=doc.get("meta"), commit=False,
+        )
+        pages = (extract.pdf_pages(path) if path.suffix.lower() == ".pdf"
+                 else extract.markdown_pages(path))
         for ch in extract.chunk_pages(pages):
             max_page = max(max_page, ch.get("page") or 0)
             batch.append(ch)
             if len(batch) >= config.BATCH_SIZE * 4:
                 flush()
         flush()
-    except Exception:
-        # Leave nothing half-written: a partial document would be silently
-        # under-retrieved forever.
-        con.rollback()
-        store.delete_document(con, sha)
+        if not written:
+            # Empty extraction must not erase a previous usable version.
+            con.execute("ROLLBACK TO SAVEPOINT rag_ingest_document")
+            con.execute("RELEASE SAVEPOINT rag_ingest_document")
+            return 0, "sin-texto"
+        con.execute("UPDATE documents SET pages=? WHERE id=?", (max_page, doc_id))
+        con.execute("RELEASE SAVEPOINT rag_ingest_document")
+    except BaseException:
+        # Includes KeyboardInterrupt: the interactive retry has the same
+        # atomic behavior as SQLite recovery after a terminated process.
+        con.execute("ROLLBACK TO SAVEPOINT rag_ingest_document")
+        con.execute("RELEASE SAVEPOINT rag_ingest_document")
         raise
-
-    if not written:
-        # A document that yielded no text is not ingested, it only looks
-        # ingested: the row counts towards "473 documentos" while no search can
-        # ever reach it. Scanned PDFs with no text layer land here — every page
-        # loads and every page is empty. Dropping the row keeps the count
-        # honest and lets a later run retry the file, because the sha is what
-        # `document_exists` checks.
-        con.rollback()
-        store.delete_document(con, sha)
-        con.commit()
-        return 0, "sin-texto"
-
-    con.execute("UPDATE documents SET pages=? WHERE id=?", (max_page, doc_id))
-    con.commit()
     return written, "ok"
 
 

@@ -1,66 +1,82 @@
-file,mb,sha256_16,topic,include,note
-Adler S. - Day Trading with ChatGPT - Test the Power of AI for Stock Market (2023).pdf,0.47,e24bc4c408fd1557,offtopic,no,fuera de tema (trading/DeFi) — no macro
-"Banerjee A., Duflo E. - Good Economics for Hard Times (2019).pdf",4.92,948c4c2f3a3e00d2,core,si,
-"Bashir I. - Mastering Blockchain, 4th ed - DeFi and NFTs Reference Guide (2023).pdf",21.52,eaab5284cca18be1,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Brouwer M. - Governmental Forms and Economic Development (2011).pdf,2.58,7fa670281a1cd7ea,development,si,
-CORE Team - The Economy - Economics for a Changing World (2021).pdf,72.7,0dc933493bf7bc98,core,si,
-Case K. - Principles of Microeconomics (12th ed) (2017).pdf,28.87,2052b9e2d8737eec,core,no,edición redundante — se indexa la 13ª
-"Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019).pdf",162.64,748241c4604e7516,core,si,
-"Chan E. - Hands-On AI Trading with Python, QuantConnect, and AWS (2023).pdf",28.21,bfae9cafd16b879e,offtopic,no,fuera de tema (trading/DeFi) — no macro
-"Damsker A. - Understanding DeFi - Roles, Tools, Risks, and Rewards (2024).pdf",3.4,c7ea0cd6c8e380a1,offtopic,no,fuera de tema (trading/DeFi) — no macro
-"Di Maggio M. - Blockchain, Crypto and DeFi - Bridging Finance and Technology (2025).pdf",88.74,90576920b4d6a026,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Everett H. - Recursive Games (1957).pdf,2.46,bf09912750e252da,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Guevara J. - Algorithmic Trading via AI-Machine Learning with R (2026).pdf,21.12,e2f4458371442342,offtopic,no,fuera de tema (trading/DeFi) — no macro
-"Horne I. - Why DeFi Matters - What Cryptoassets, Web3 Really Mean for Finance (2023).pdf",14.08,58ecb4b471a2bf68,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Jesse H. - Generative AI for Trading and Asset Management (2025).pdf,13.15,31c5744150da77f6,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Kakkar A. - Trading Decoded - AI Applications In Finance (2020).pdf,2.9,d11bc56e48b1b9d2,offtopic,no,fuera de tema (trading/finanzas) — no macro
-Kim S. - DeFi For Dummies (2022).pdf,27.47,7b66324781c1b0f5,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Laudal T. - A New Approach to the Economics of Public Goods.pdf,1.08,b01c5c9711cc9a38,development,si,
-Leahy E. - AI-Powered Bitcoin Trading - Developing an Investment Strategy (2024).pdf,11.28,fc3a195d949be784,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Mankiw G. - Brief Principles of Macroeconomics (9th ed) (2020).pdf,16.21,ff812fa89c02217f,core,no,edición redundante — se indexa solo la 9ª
-Mankiw G. - Essentials of Economics (10th ed) (2023).pdf,43.62,e21a998a505670df,core,no,edición redundante — se indexa solo la 9ª
-Mankiw G. - Principles of Economics (8th ed) (2017).pdf,28.17,539021543c89f65c,core,no,edición redundante — se indexa solo la 9ª
-Mankiw G. - Principles of Economics (9th ed) (2020).pdf,23.56,d250499ce3ee74a7,core,si,
-Mankiw G. - Principles of Macroeconomics (8th ed) (2018).pdf,23.16,e3e6332eab356e93,core,no,edición redundante — se indexa solo la 9ª
-Mankiw G. - Principles of Microeconomics (8th ed) (2018).pdf,19.39,7e60e1c5459447b0,core,no,edición redundante — se indexa solo la 9ª
-Mankiw G. - Principles of Microeconomics (9th ed) (2021).pdf,19.58,642deac26eaf2d16,core,no,edición redundante — se indexa solo la 9ª
-"Mankiw G., Taylor M. - Economics (5th ed) (2020).pdf",20,e38a706d8e8730ff,core,no,edición redundante — se indexa solo la 9ª
-"Mises L. - Economic Policy, Thoughts for Today and Tomorrow (1979).pdf",0.7,054db1f5d1d3d304,austrian,si,
-Mises L. - Fundamentos Economicos de la Libertad (articulo).pdf,0.41,6f5a51489a4ecce9,austrian,si,
-"Mises L. - Human Action, Scholars Edition - A Treatise on Economics (1998).pdf",53.39,457800b1b15d92b1,austrian,si,
-"Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011).pdf",17.95,094d5999c9586c6c,austrian,si,
-Mises L. - La Teoria del Dinero y del Credito.pdf,9.44,93a44609f3e2fd20,austrian,si,
-Mises L. - Planificacion para la Libertad (facsimile).pdf,19.53,4cc03e91b6cf3265,austrian,si,
-"Mises L. - Socialismo (Die Gemeinwirtschaft, 3a ed).pdf",43.38,82396ce5b6c06d0f,austrian,si,
-Mises L. - The Anti-Capitalistic Mentality.pdf,0.63,d3cb030a07388207,austrian,si,
-Mises L. - The Theory of Money and Credit (1912).pdf,24.76,28e659e3e27edd59,austrian,si,
-"Ramamurthy B. - Blockchain, Cryptocurrency And DeFi Systems (2025).pdf",13.38,78c6b89e67c9cf6a,offtopic,no,fuera de tema (trading/DeFi) — no macro
-Rothbard M. - Lo Esencial de Ludwig von Mises.pdf,2.15,2e0a5d43b65d4dae,austrian,si,
-"Samuelson P., Nordhaus W. - Economics (16th ed) (1998).pdf",25.48,cc7f87e0955ead79,core,si,
-"Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015).pdf",13.2,ed404016fea70305,methods,si,
-"Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020).pdf",20.91,7638aeb0418bfcea,methods,si,
-The Pocketbook of Economic Indicators (2002).pdf,0.4,e0b951c2d3e399cb,core,si,
-White C. - Understanding Economic Development - The Global Transition from Poverty to Prosperity (2010).pdf,11.54,3d164746fef323ce,development,si,
-Zanotti G. - La Filosofia Politica de Ludwig von Mises (articulo).pdf,0.15,4bc8f80d08be1690,austrian,si,
-open_access/BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES).pdf,0.4,c22afe3864f638a6,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g
-open_access/Banco de Espana - Documento Ocasional 1803 (ES).pdf,0.83,b347eeb58351a400,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g
-open_access/EC - Debt Sustainability Monitor methodology (ip199).pdf,4.69,556353687736b082,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g
-open_access/ECB OP185 - Debt Sustainability Analysis for Euro Area Sovereigns (2017).pdf,0.4,549271cbf6bf5f25,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g
-open_access/IMF - Staff Guidance Note Sovereign Risk and Debt Sustainability Framework (2022).pdf,1.83,480debb587818093,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g
-open_access/Banco de Espana - Informe Anual 2023 (ES).pdf,12.06,32e9b15c2dea121f,espana,si,acceso abierto (institucion publica / preprint del autor)
-open_access/Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market.pdf,0.8,580d03999112e5aa,vivienda,si,acceso abierto (institucion publica / preprint del autor)
-open_access/Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES).pdf,0.96,9340cb83b0db76a5,vivienda,si,acceso abierto (institucion publica / preprint del autor)
-open_access/ECB WP3105 - Opening the Black Box of Local Projections (2025).pdf,5.05,15c83d3dfa2bb4c8,metodos,si,acceso abierto (institucion publica / preprint del autor)
-"open_access/Jorda O. - Impulse Responses by Local Projections, Practical Issues.pdf",0.32,703abb7cd338d5ce,metodos,si,acceso abierto (institucion publica / preprint del autor)
-open_access/Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16).pdf,0.57,c6fa4f66d7211c01,metodos,si,acceso abierto (institucion publica / preprint del autor)
-open_access/MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES).pdf,2.4,b31a5bc04dd91f9d,pobreza,si,acceso abierto (institucion publica / preprint del autor)
-"open_access/Plagborg-Moller, Wolf - Local Projections and VARs Estimate the Same IRFs.pdf",0.46,41c5744d0f88001e,metodos,si,acceso abierto (institucion publica / preprint del autor)
-open_access/AIReF - Analisis del mercado laboral (ES).pdf,0.42,c4a82bfde856a05d,laboral,si,acceso abierto (institucion publica / NBER working paper)
-"open_access/Blanchard, Leigh - Growth Forecast Errors and Fiscal Multipliers (IMF WP13-01).pdf",1.09,b856675eba06f31a,multiplicador,si,acceso abierto (institucion publica / NBER working paper)
-"open_access/IMF TNM1404 - Fiscal Multipliers, Size, Determinants and Use.pdf",0.54,6a42d4f56420cd8a,multiplicador,si,acceso abierto (institucion publica / NBER working paper)
-open_access/IMF WP11-52 - How Big (Small) are Fiscal Multipliers.pdf,2.49,a50204b14fe6ba5e,multiplicador,si,acceso abierto (institucion publica / NBER working paper)
-open_access/IMF WP12-286 - Fiscal Multipliers and the State of the Economy.pdf,1.37,e90df90dd719573c,multiplicador,si,acceso abierto (institucion publica / NBER working paper)
-"open_access/Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719).pdf",0.26,d66b65ac2f28e96e,multiplicador,si,acceso abierto (institucion publica / NBER working paper)
-open_access/EC - Child poverty and social exclusion EU (Child Guarantee).pdf,0.12,cd0b86e5a1991b4b,pobreza,no,"folleto de 2 paginas, sin contenido util"
-"open_access/UNICEF - Espana pobreza infantil en medio de la abundancia, Report Card 18 (ES).pdf",0.65,85ffca623c77c776,pobreza,si,acceso abierto (UNICEF via servidor de administracion publica)
-open_access/UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES).pdf,6.92,bbbc78fcdb9e732b,pobreza,si,acceso abierto (UNICEF via servidor de administracion publica)
+file,mb,sha256_16,topic,include,note,source_url,download_url,authors,year,edition,availability,accessed_at,sha256,publisher,language
+Adler S. - Day Trading with ChatGPT - Test the Power of AI for Stock Market (2023).pdf,0.47,e24bc4c408fd1557,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+"Banerjee A., Duflo E. - Good Economics for Hard Times (2019).pdf",4.92,948c4c2f3a3e00d2,core,si,,,,,,,,,,,
+"Bashir I. - Mastering Blockchain, 4th ed - DeFi and NFTs Reference Guide (2023).pdf",21.52,eaab5284cca18be1,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Brouwer M. - Governmental Forms and Economic Development (2011).pdf,2.58,7fa670281a1cd7ea,development,si,,,,,,,,,,,
+CORE Team - The Economy - Economics for a Changing World (2021).pdf,72.7,0dc933493bf7bc98,core,si,,,,,,,,,,,
+Case K. - Principles of Microeconomics (12th ed) (2017).pdf,28.87,2052b9e2d8737eec,core,no,edición redundante — se indexa la 13ª,,,,,,,,,,
+"Case K., Fair R., Oster S. - Principles of Microeconomics (13th ed) (2019).pdf",162.64,748241c4604e7516,core,si,,,,,,,,,,,
+"Chan E. - Hands-On AI Trading with Python, QuantConnect, and AWS (2023).pdf",28.21,bfae9cafd16b879e,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+"Damsker A. - Understanding DeFi - Roles, Tools, Risks, and Rewards (2024).pdf",3.4,c7ea0cd6c8e380a1,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+"Di Maggio M. - Blockchain, Crypto and DeFi - Bridging Finance and Technology (2025).pdf",88.74,90576920b4d6a026,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Everett H. - Recursive Games (1957).pdf,2.46,bf09912750e252da,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Guevara J. - Algorithmic Trading via AI-Machine Learning with R (2026).pdf,21.12,e2f4458371442342,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+"Horne I. - Why DeFi Matters - What Cryptoassets, Web3 Really Mean for Finance (2023).pdf",14.08,58ecb4b471a2bf68,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Jesse H. - Generative AI for Trading and Asset Management (2025).pdf,13.15,31c5744150da77f6,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Kakkar A. - Trading Decoded - AI Applications In Finance (2020).pdf,2.9,d11bc56e48b1b9d2,offtopic,no,fuera de tema (trading/finanzas) — no macro,,,,,,,,,,
+Kim S. - DeFi For Dummies (2022).pdf,27.47,7b66324781c1b0f5,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Laudal T. - A New Approach to the Economics of Public Goods.pdf,1.08,b01c5c9711cc9a38,development,si,,,,,,,,,,,
+Leahy E. - AI-Powered Bitcoin Trading - Developing an Investment Strategy (2024).pdf,11.28,fc3a195d949be784,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Mankiw G. - Brief Principles of Macroeconomics (9th ed) (2020).pdf,16.21,ff812fa89c02217f,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+Mankiw G. - Essentials of Economics (10th ed) (2023).pdf,43.62,e21a998a505670df,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+Mankiw G. - Principles of Economics (8th ed) (2017).pdf,28.17,539021543c89f65c,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+Mankiw G. - Principles of Economics (9th ed) (2020).pdf,23.56,d250499ce3ee74a7,core,si,,,,,,,,,,,
+Mankiw G. - Principles of Macroeconomics (8th ed) (2018).pdf,23.16,e3e6332eab356e93,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+Mankiw G. - Principles of Microeconomics (8th ed) (2018).pdf,19.39,7e60e1c5459447b0,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+Mankiw G. - Principles of Microeconomics (9th ed) (2021).pdf,19.58,642deac26eaf2d16,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+"Mankiw G., Taylor M. - Economics (5th ed) (2020).pdf",20,e38a706d8e8730ff,core,no,edición redundante — se indexa solo la 9ª,,,,,,,,,,
+"Mises L. - Economic Policy, Thoughts for Today and Tomorrow (1979).pdf",0.7,054db1f5d1d3d304,austrian,si,,,,,,,,,,,
+Mises L. - Fundamentos Economicos de la Libertad (articulo).pdf,0.41,6f5a51489a4ecce9,austrian,si,,,,,,,,,,,
+"Mises L. - Human Action, Scholars Edition - A Treatise on Economics (1998).pdf",53.39,457800b1b15d92b1,austrian,si,,,,,,,,,,,
+"Mises L. - La Accion Humana - Tratado de Economia (10a ed, 2011).pdf",17.95,094d5999c9586c6c,austrian,si,,,,,,,,,,,
+Mises L. - La Teoria del Dinero y del Credito.pdf,9.44,93a44609f3e2fd20,austrian,si,,,,,,,,,,,
+Mises L. - Planificacion para la Libertad (facsimile).pdf,19.53,4cc03e91b6cf3265,austrian,si,,,,,,,,,,,
+"Mises L. - Socialismo (Die Gemeinwirtschaft, 3a ed).pdf",43.38,82396ce5b6c06d0f,austrian,si,,,,,,,,,,,
+Mises L. - The Anti-Capitalistic Mentality.pdf,0.63,d3cb030a07388207,austrian,si,,,,,,,,,,,
+Mises L. - The Theory of Money and Credit (1912).pdf,24.76,28e659e3e27edd59,austrian,si,,,,,,,,,,,
+"Ramamurthy B. - Blockchain, Cryptocurrency And DeFi Systems (2025).pdf",13.38,78c6b89e67c9cf6a,offtopic,no,fuera de tema (trading/DeFi) — no macro,,,,,,,,,,
+Rothbard M. - Lo Esencial de Ludwig von Mises.pdf,2.15,2e0a5d43b65d4dae,austrian,si,,,,,,,,,,,
+"Samuelson P., Nordhaus W. - Economics (16th ed) (1998).pdf",25.48,cc7f87e0955ead79,core,no,PDF escaneado sin capa de texto: las 805 paginas cargan y ninguna devuelve caracteres. Sustituido por la 19a ed.,,,,,,,,,,
+"Stock J., Watson M. - Introduction to Econometrics (3rd ed) (2015).pdf",13.2,ed404016fea70305,methods,si,,,,,,,,,,,
+"Stock J., Watson M. - Introduction to Econometrics (4th ed) (2020).pdf",20.91,7638aeb0418bfcea,methods,si,,,,,,,,,,,
+The Pocketbook of Economic Indicators (2002).pdf,0.4,e0b951c2d3e399cb,core,si,,,,,,,,,,,
+White C. - Understanding Economic Development - The Global Transition from Poverty to Prosperity (2010).pdf,11.54,3d164746fef323ce,development,si,,,,,,,,,,,
+Zanotti G. - La Filosofia Politica de Ludwig von Mises (articulo).pdf,0.15,4bc8f80d08be1690,austrian,si,,,,,,,,,,,
+open_access/BCE - Analisis de la sostenibilidad de la deuda en la zona del euro (ES).pdf,0.4,c22afe3864f638a6,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g,,,,,,,,,,
+open_access/Banco de Espana - Documento Ocasional 1803 (ES).pdf,0.83,b347eeb58351a400,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g,,,,,,,,,,
+open_access/EC - Debt Sustainability Monitor methodology (ip199).pdf,4.69,556353687736b082,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g,,,,,,,,,,
+open_access/ECB OP185 - Debt Sustainability Analysis for Euro Area Sovereigns (2017).pdf,0.4,549271cbf6bf5f25,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g,,,,,,,,,,
+open_access/IMF - Staff Guidance Note Sovereign Risk and Debt Sustainability Framework (2022).pdf,1.83,480debb587818093,sostenibilidad,si,acceso abierto (institucion publica) — cubre la dinamica r-g,,,,,,,,,,
+open_access/Banco de Espana - Informe Anual 2023 (ES).pdf,12.06,32e9b15c2dea121f,espana,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+open_access/Banco de Espana DO2314 - Risk and Vulnerability Indicators Spanish Housing Market.pdf,0.8,580d03999112e5aa,vivienda,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+open_access/Banco de Espana DO2610 - Encuesta Financiera de las Familias 2024 (ES).pdf,0.96,9340cb83b0db76a5,vivienda,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+open_access/ECB WP3105 - Opening the Black Box of Local Projections (2025).pdf,5.05,15c83d3dfa2bb4c8,metodos,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+"open_access/Jorda O. - Impulse Responses by Local Projections, Practical Issues.pdf",0.32,703abb7cd338d5ce,metodos,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+open_access/Jorda O. - Local Projections for Applied Economics (FRBSF WP 2023-16).pdf,0.57,c6fa4f66d7211c01,metodos,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+open_access/MDSA - Evolucion de pobreza y exclusion social 2019-2024 (ES).pdf,2.4,b31a5bc04dd91f9d,pobreza,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+"open_access/Plagborg-Moller, Wolf - Local Projections and VARs Estimate the Same IRFs.pdf",0.46,41c5744d0f88001e,metodos,si,acceso abierto (institucion publica / preprint del autor),,,,,,,,,,
+open_access/AIReF - Analisis del mercado laboral (ES).pdf,0.42,c4a82bfde856a05d,laboral,si,acceso abierto (institucion publica / NBER working paper),,,,,,,,,,
+"open_access/Blanchard, Leigh - Growth Forecast Errors and Fiscal Multipliers (IMF WP13-01).pdf",1.09,b856675eba06f31a,multiplicador,si,acceso abierto (institucion publica / NBER working paper),,,,,,,,,,
+"open_access/IMF TNM1404 - Fiscal Multipliers, Size, Determinants and Use.pdf",0.54,6a42d4f56420cd8a,multiplicador,si,acceso abierto (institucion publica / NBER working paper),,,,,,,,,,
+open_access/IMF WP11-52 - How Big (Small) are Fiscal Multipliers.pdf,2.49,a50204b14fe6ba5e,multiplicador,si,acceso abierto (institucion publica / NBER working paper),,,,,,,,,,
+open_access/IMF WP12-286 - Fiscal Multipliers and the State of the Economy.pdf,1.37,e90df90dd719573c,multiplicador,si,acceso abierto (institucion publica / NBER working paper),,,,,,,,,,
+"open_access/Ramey, Zubairy - Government Spending Multipliers in Good Times and in Bad (NBER w20719).pdf",0.26,d66b65ac2f28e96e,multiplicador,si,acceso abierto (institucion publica / NBER working paper),,,,,,,,,,
+open_access/EC - Child poverty and social exclusion EU (Child Guarantee).pdf,0.12,cd0b86e5a1991b4b,pobreza,no,"folleto de 2 paginas, sin contenido util",,,,,,,,,,
+"open_access/UNICEF - Espana pobreza infantil en medio de la abundancia, Report Card 18 (ES).pdf",0.65,85ffca623c77c776,pobreza,si,acceso abierto (UNICEF via servidor de administracion publica),,,,,,,,,,
+open_access/UNICEF - Impacto de politicas para revertir la pobreza infantil 2025 (ES).pdf,6.92,bbbc78fcdb9e732b,pobreza,si,acceso abierto (UNICEF via servidor de administracion publica),,,,,,,,,,
+"Samuelson P., Nordhaus W. - Microeconomics (19th ed) (2009).pdf",5.78,f48816da46820129,core,si,"Volumen de microeconomia de la 19a ed. Reemplaza a la 16a, ilegible. archive.org, coleccion opensource.",,,,,,,,,,
+"Gali J., Gertler M. - Inflation Dynamics - A Structural Econometric Analysis (NBER WP 7551, 2000).pdf",0.49,94159189d4ab4e5d,expectativas,si,"expectativas hibridas: origen del parametro OMEGA (Gali-Gertler 1999) — NBER WP, acceso abierto",,,,,,,,,,
+"Gali J., Gertler M., Lopez-Salido D. - Robustness of the Hybrid New Keynesian Phillips Curve (NBER WP 11788, 2005).pdf",0.25,66d0118771aa6a37,expectativas,si,"robustez de la NKPC hibrida — NBER WP, acceso abierto",,,,,,,,,,
+"Coibion O., Gorodnichenko Y., Kamdar R. - The Formation of Expectations, Inflation and the Phillips Curve (NBER WP 23304, 2017).pdf",0.52,44e09592dfce6c99,expectativas,si,"formacion de expectativas: racionales vs adaptativas — NBER WP, acceso abierto",,,,,,,,,,
+Banco de Espana DO2404 - Analisis de la dinamica reciente de la inflacion (ES).pdf,1.26,046c86ec4d16f84d,expectativas,si,"expectativas ancladas vs adaptativas en Espana — BdE, acceso abierto",,,,,,,,,,
+Banco de Espana DO1910 - IPC usos y vias de mejora - curva de Phillips (ES).pdf,0.50,aa990b0b821139dd,expectativas,si,"pesos forward/backward de Ball-Mazumder — BdE, acceso abierto",,,,,,,,,,
+Banco de Espana BE2004 - Expectativas de inflacion y regla de aprendizaje (ES).pdf,0.34,0603f4e060c0a677,expectativas,si,"regla de aprendizaje de expectativas — BdE, acceso abierto",,,,,,,,,,
+"Manning C.D., Raghavan P., Schutze H. - Introduction to Information Retrieval (2008).pdf",6.58,ab67ad67d89309a3,information_retrieval,si,Downloaded from the author-provided link; private local RAG copy. Citations use PDF page numbers.,https://nlp.stanford.edu/IR-book/,https://nlp.stanford.edu/IR-book/pdf/irbookonlinereading.pdf,Christopher D. Manning; Prabhakar Raghavan; Hinrich Schütze,2008,Online edition updated 2009-04-01,Free full PDF linked by the authors; copyright retained,2026-09-20,ab67ad67d89309a3d03de219173cfdea471e856a5083c83e49b11be8c01581ea,Cambridge University Press,en
+"James G., Witten D., Hastie T., Tibshirani R., Taylor J. - An Introduction to Statistical Learning with Applications in Python (2023).pdf",19.12,278d3bdd49a8a480,statistical_learning,si,Downloaded from the author-provided link; private local RAG copy. Citations use PDF page numbers.,https://www.statlearning.com/,https://drive.usercontent.google.com/download?id=1ajFkHO6zjrdGNqhqW1jKBZdiNGh_8YQ1&export=download,Gareth James; Daniela Witten; Trevor Hastie; Robert Tibshirani; Jonathan Taylor,2023,"Python, first edition",Free full PDF linked by the authors; copyright retained,2026-09-20,278d3bdd49a8a480c2ff8e03245822caad8a3a48e81afd6d039c52c8fc13ad60,Springer,en
+"Hyndman R., Athanasopoulos G. - Forecasting Principles and Practice (3rd ed, OTexts, acceso libre).md",0.05,d50b8caa6ac76af6,forecasting,si,"evaluacion de pronosticos, baselines naive/drift, MASE, validacion cruzada temporal e intervalos — OTexts, libre por los autores",,,,,,,,,,
+Huntington-Klein N. - The Effect - Fixed Effects y Diseno de Investigacion (acceso libre del autor).md,0.32,9fcea35e0bf81a19,econometria,si,"efectos fijos, DiD y ajuste estadistico para paneles regionales — version libre del autor en theeffectbook.net",,,,,,,,,,
+Cunningham S. - Causal Inference The Mixtape - Panel Data (acceso libre del autor).md,0.04,cd72b68ad70b8f92,econometria,si,datos de panel y estimador within — version libre del autor en mixtape.scunning.com,,,,,,,,,,
+"Wooldridge J. - Econometric Analysis of Cross Section and Panel Data (1st ed, 2002, MIT Press).pdf",3.93,f283f17af8441c3e,econometria,si,"inferencia agrupada, efectos no observados y heterogeneidad — base metodologica del panel CCAA; Chapters 1–20 and References are present; final Index listed at printed page 737 is absent. Corrected the staged filename that incorrectly called this the second edition. Citations use physical PDF pages.",,,Jeffrey M. Wooldridge,2002,First edition; supplied PDF lacks final index,User-supplied local PDF,2026-09-20,f283f17af8441c3eaddacc644d27f0b6b151424013191de4954cdb513d461844,MIT Press,en
+"Blanchard O. - Macroeconomics (9th ed, 2025).pdf",36.67,713165dd734e7046,macro,si,"transmision monetaria, desempleo, expectativas y politica fiscal — mecanismos del motor; Ninth edition; copyright 2025; ISBN 9780138119010. Citations use physical PDF pages.",,,Olivier Blanchard,2025,Ninth edition,User-supplied local PDF,2026-09-20,713165dd734e7046439d62739726da0cc9f620a0a86000a955c536d73875a78b,Pearson,en
+"Gali J. - Monetary Policy, Inflation and the Business Cycle (1st ed, 2008).pdf",1.01,50e115746cd4de33,expectativas,si,NKPC y expectativas: marco teorico detras de OMEGA; First edition; ISBN 9780691133164; subtitle: An Introduction to the New Keynesian Framework. Citations use physical PDF pages.,,,Jordi Galí,2008,First edition,User-supplied local PDF,2026-09-20,50e115746cd4de334100c1501a11afee129f49926397b4c4e857fa4d78b282fe,Princeton University Press,en
+"Woodford M. - Interest and Prices - Chapter 1 The Return of Monetary Rules (preliminary draft, 2002).pdf",0.33,c12a3d39e8e5c217,expectativas,si,"borrador preliminar de 2002; capitulo suelto, no el libro completo; Only Chapter 1, The Return of Monetary Rules: title, contents and printed pages 1–70; not the complete published book. Citations use physical PDF pages.",,,Michael Woodford,2002,Chapter 1; preliminary draft dated 2002-01-30,User-supplied local PDF,2026-09-20,c12a3d39e8e5c2178f389855932eb66a1b35ff9cd70a3538c60bb79f28370129,Princeton University (author affiliation),en

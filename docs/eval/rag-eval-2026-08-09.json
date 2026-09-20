@@ -1,4 +1,10 @@
 {
+  "evaluation": {
+    "split": "development",
+    "independent_held_out": false,
+    "annotation": "Historical artifact: questions informed retrieval tuning. Metrics have not been rerun; missing original configuration fields are unknown.",
+    "metric_scope": "Document-title hit@8, not passage-level relevance or answer accuracy."
+  },
   "model": "intfloat/multilingual-e5-large",
   "weights": {
     "dense": 6.0,

@@ -1,9 +1,8 @@
-"""Answer generation over retrieved passages, with mandatory citation.
+"""Answer generation over retrieved passages, with reference validation.
 
 The model is given passages and told to answer *only* from them. If retrieval
-comes back empty, it says the corpus does not cover the question rather than
-answering from its own parametric memory — an uncited answer from a RAG is
-worse than no answer, because it looks sourced and is not.
+comes back empty, it abstains. Reference checks reject missing or out-of-range
+citations, but do not prove that a passage supports the generated claim.
 
 Provider handling follows the old `app/rag_assistant.py`: a list of
 OpenAI-compatible endpoints tried in order, so a dead key or an exhausted quota
@@ -19,6 +18,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from rag import config, retrieve
+from rag.validation import checked_answer
 
 #: Tried in order. Each is OpenAI-compatible (`/chat/completions`), which is why
 #: one client shape covers all of them. Anthropic is deliberately last: the
@@ -47,7 +47,9 @@ Reglas duras:
 3. Distingue la autoridad de la fuente. Un manual académico y una transcripción \
    de un canal de YouTube no valen lo mismo: si citas material marcado como \
    «opinion», dilo explícitamente («según el canal…, que es una opinión, no un \
-   manual»).
+   manual»). El material «propio» describe este proyecto: identifícalo como \
+   documentación del proyecto, sin presentarlo como evidencia académica \
+   independiente.
 4. Si los pasajes se contradicen, muéstralo en vez de elegir uno en silencio.
 
 Estilo: español de España, frases con verbo, prosa y no listas de viñetas salvo \
@@ -62,7 +64,9 @@ class Answer:
     passages: list[dict]
     provider: str | None
     model: str | None
-    grounded: bool          # False when nothing was retrieved
+    # Compatibility field: True means retrieved context exists, NOT verified
+    # factual support. It can be True for abstentions or provider failures.
+    grounded: bool
     error: str | None = None
 
 
@@ -101,10 +105,8 @@ def _call(provider: dict, messages: list[dict], max_tokens: int,
     body = r.json()
     choice = body["choices"][0]
     text = (choice["message"].get("content") or "").strip()
-    if choice.get("finish_reason") == "length" and not text:
-        # All budget went to reasoning, none to text. Treated as a provider
-        # failure so the cascade moves on instead of returning emptiness.
-        raise RuntimeError("respuesta agotada en razonamiento (finish=length)")
+    if choice.get("finish_reason") in {"length", "content_filter"}:
+        raise RuntimeError("respuesta incompleta (finish_reason)")
     return text
 
 
@@ -133,6 +135,7 @@ def _call_stream(provider: dict, messages: list[dict], max_tokens: int,
         # accented character in the Spanish answers into mojibake — "pública"
         # arrived as "pÃºblica". The payload is always UTF-8 JSON.
         r.encoding = "utf-8"
+        finished = False
         for raw in r.iter_lines(decode_unicode=True):
             if not raw:
                 continue
@@ -143,23 +146,31 @@ def _call_stream(provider: dict, messages: list[dict], max_tokens: int,
             if payload == "[DONE]":
                 return
             try:
-                delta = _json.loads(payload)["choices"][0].get("delta", {})
+                choice = _json.loads(payload)["choices"][0]
             except (ValueError, KeyError, IndexError):
                 continue
+            reason = choice.get("finish_reason")
+            if reason in {"length", "content_filter"}:
+                raise RuntimeError("respuesta incompleta (finish_reason)")
+            finished = finished or reason == "stop"
+            delta = choice.get("delta", {})
             piece = delta.get("content")
             if piece:
                 yield piece
+        if not finished:
+            raise RuntimeError("stream terminado sin cierre")
 
 
-def stream(question: str, collection: str = "libros", *,
+def stream(question: str, collection: str | None = None, *,
            top_k: int | None = None, scenario_facts: dict | None = None,
            max_tokens: int = 2600, timeout: float = 60.0):
-    """Generator of events for SSE: passages first, then answer deltas.
+    """Generator of events for SSE: passages first, then checked answer text.
 
     Retrieval finishes in well under a second while generation takes several,
     so the passages are emitted immediately — the reader has the evidence in
-    hand before the first word of prose arrives, and the evidence is the part
-    that has to be right.
+    hand while generation runs. Provider deltas are buffered until completion
+    so an invalid reference or interrupted answer is not published first.
+    Validation checks citation structure, not semantic fidelity.
 
     Yields (event_name, payload) tuples; the endpoint serialises them.
     """
@@ -197,26 +208,19 @@ def stream(question: str, collection: str = "libros", *,
         try:
             for piece in _call_stream(prov, messages, max_tokens, timeout):
                 parts.append(piece)
-                yield "delta", {"text": piece}
-        except Exception as exc:
             if parts:
-                # Died mid-stream: the client already rendered these words, so
-                # finish with what arrived rather than silently restarting on
-                # another provider and duplicating text.
-                yield "done", {"answer": "".join(parts), "grounded": True,
-                               "provider": prov["name"], "model": prov["model"],
-                               "error": f"stream interrumpido: {type(exc).__name__}"}
+                answer = checked_answer("".join(parts), len(passages))
+                yield "delta", {"text": answer}
+                yield "done", {"answer": answer, "grounded": True,
+                               "provider": prov["name"], "model": prov["model"]}
                 return
+        except Exception as exc:
             last = f"{prov['name']}: {type(exc).__name__}"
             continue
-        if parts:
-            yield "done", {"answer": "".join(parts), "grounded": True,
-                           "provider": prov["name"], "model": prov["model"]}
-            return
         last = f"{prov['name']}: respuesta vacía"
 
-    yield "done", {"answer": ("No hay proveedor de lenguaje disponible ahora "
-                              "mismo. Arriba están los pasajes relevantes."),
+    yield "done", {"answer": ("No se ha obtenido una respuesta completa con "
+                              "referencias válidas. Puedes consultar los pasajes recuperados."),
                    "grounded": True, "provider": None, "model": None,
                    "error": last}
 
@@ -270,10 +274,10 @@ def refusal_for(question: str) -> str | None:
     return None
 
 
-def ask(question: str, collection: str = "libros", *, top_k: int | None = None,
+def ask(question: str, collection: str | None = None, *, top_k: int | None = None,
         scenario_facts: dict | None = None, max_tokens: int = 2600,
         timeout: float = 60.0) -> Answer:
-    """Retrieve, then answer with citations. Never answers ungrounded."""
+    """Retrieve, then check reference integrity; entailment remains unverified."""
     refusal = refusal_for(question)
     if refusal:
         return Answer(text=refusal, passages=[], provider=None, model=None,
@@ -306,6 +310,7 @@ def ask(question: str, collection: str = "libros", *, top_k: int | None = None,
         try:
             text = _call(prov, messages, max_tokens, timeout)
             if text:
+                text = checked_answer(text, len(passages))
                 return Answer(text=text, passages=dicts, provider=prov["name"],
                               model=prov["model"], grounded=True)
             last = f"{prov['name']}: respuesta vacía"
@@ -316,7 +321,7 @@ def ask(question: str, collection: str = "libros", *, top_k: int | None = None,
     # Every provider failed. Return the passages anyway — they are the valuable
     # part, and the reader can judge them without a generated summary.
     return Answer(
-        text=("No hay proveedor de lenguaje disponible ahora mismo. Estos son "
-              "los pasajes relevantes del corpus, sin redactar:"),
+        text=("No se ha obtenido una respuesta completa con referencias válidas. "
+              "Puedes consultar los pasajes recuperados, sin redactar:"),
         passages=dicts, provider=None, model=None, grounded=True, error=last,
     )

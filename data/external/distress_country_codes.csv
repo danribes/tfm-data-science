@@ -1,0 +1,167 @@
+country,iso3,mapping_basis
+Afghanistan,AFG,exact_normalized_ISO_name
+Albania,ALB,exact_normalized_ISO_name
+Algeria,DZA,exact_normalized_ISO_name
+Angola,AGO,exact_normalized_ISO_name
+Anguilla,AIA,existing_reviewed_alias
+Antigua and Barbuda,ATG,exact_normalized_ISO_name
+Argentina,ARG,exact_normalized_ISO_name
+Armenia,ARM,exact_normalized_ISO_name
+Aruba,ABW,exact_normalized_ISO_name
+Azerbaijan,AZE,exact_normalized_ISO_name
+Bahamas,BHS,exact_normalized_ISO_name
+Bangladesh,BGD,exact_normalized_ISO_name
+Barbados,BRB,exact_normalized_ISO_name
+Belarus,BLR,exact_normalized_ISO_name
+Belize,BLZ,exact_normalized_ISO_name
+Benin,BEN,exact_normalized_ISO_name
+Bhutan,BTN,exact_normalized_ISO_name
+Bolivia,BOL,exact_normalized_ISO_name
+Bosnia & Herzegovina,BIH,exact_normalized_ISO_name
+Botswana,BWA,exact_normalized_ISO_name
+Brazil,BRA,exact_normalized_ISO_name
+Bulgaria,BGR,exact_normalized_ISO_name
+Burkina Faso,BFA,exact_normalized_ISO_name
+Burundi,BDI,exact_normalized_ISO_name
+Cabo Verde,CPV,exact_normalized_ISO_name
+Cambodia,KHM,exact_normalized_ISO_name
+Cameroon,CMR,exact_normalized_ISO_name
+Central African Republic,CAF,exact_normalized_ISO_name
+Chad,TCD,exact_normalized_ISO_name
+Chile,CHL,exact_normalized_ISO_name
+China,CHN,exact_normalized_ISO_name
+Colombia,COL,exact_normalized_ISO_name
+Comoros,COM,exact_normalized_ISO_name
+Cook Islands,COK,existing_reviewed_alias
+Costa Rica,CRI,exact_normalized_ISO_name
+Croatia,HRV,exact_normalized_ISO_name
+Cuba,CUB,exact_normalized_ISO_name
+Curaçao,CUW,exact_normalized_ISO_name
+Cyprus,CYP,exact_normalized_ISO_name
+Czechoslovakia,,excluded_dissolved_state
+Côte d’Ivoire,CIV,exact_normalized_ISO_name
+Dem. Rep. of Congo (Kinshasa),COD,existing_reviewed_alias
+Djibouti,DJI,exact_normalized_ISO_name
+Dominica,DMA,exact_normalized_ISO_name
+Dominican Republic,DOM,exact_normalized_ISO_name
+Ecuador,ECU,exact_normalized_ISO_name
+Egypt,EGY,existing_reviewed_alias
+El Salvador,SLV,exact_normalized_ISO_name
+Equatorial Guinea,GNQ,exact_normalized_ISO_name
+Eritrea,ERI,exact_normalized_ISO_name
+Ethiopia,ETH,exact_normalized_ISO_name
+Fiji,FJI,exact_normalized_ISO_name
+Gabon,GAB,exact_normalized_ISO_name
+Georgia,GEO,exact_normalized_ISO_name
+Ghana,GHA,exact_normalized_ISO_name
+Greece,GRC,exact_normalized_ISO_name
+Grenada,GRD,exact_normalized_ISO_name
+Guatemala,GTM,exact_normalized_ISO_name
+Guinea,GIN,exact_normalized_ISO_name
+Guinea-Bissau,GNB,exact_normalized_ISO_name
+Guyana,GUY,exact_normalized_ISO_name
+Haiti,HTI,exact_normalized_ISO_name
+Honduras,HND,exact_normalized_ISO_name
+Hungary,HUN,exact_normalized_ISO_name
+India,IND,exact_normalized_ISO_name
+Indonesia,IDN,exact_normalized_ISO_name
+Iran,IRN,exact_normalized_ISO_name
+Iraq,IRQ,exact_normalized_ISO_name
+Ireland,IRL,exact_normalized_ISO_name
+Jamaica,JAM,exact_normalized_ISO_name
+Jordan,JOR,exact_normalized_ISO_name
+Kazakhstan,KAZ,exact_normalized_ISO_name
+Kenya,KEN,exact_normalized_ISO_name
+"Korea, Democratic People's Republic of (North)",PRK,existing_reviewed_alias
+Kosovo,XKX,reviewed_WDI_code_alias
+Kyrgyz Republic,KGZ,exact_normalized_ISO_name
+Laos,LAO,existing_reviewed_alias
+Latvia,LVA,exact_normalized_ISO_name
+Lebanon,LBN,exact_normalized_ISO_name
+Lesotho,LSO,exact_normalized_ISO_name
+Liberia,LBR,exact_normalized_ISO_name
+Libya,LBY,exact_normalized_ISO_name
+Lithuania,LTU,exact_normalized_ISO_name
+Madagascar,MDG,exact_normalized_ISO_name
+Malawi,MWI,exact_normalized_ISO_name
+Malaysia,MYS,exact_normalized_ISO_name
+Maldives,MDV,exact_normalized_ISO_name
+Mali,MLI,exact_normalized_ISO_name
+Marshall Islands,MHL,exact_normalized_ISO_name
+Mauritania,MRT,exact_normalized_ISO_name
+Mauritius,MUS,exact_normalized_ISO_name
+Mexico,MEX,exact_normalized_ISO_name
+Micronesia,FSM,existing_reviewed_alias
+Moldova,MDA,exact_normalized_ISO_name
+Mongolia,MNG,exact_normalized_ISO_name
+Montenegro,MNE,exact_normalized_ISO_name
+Morocco,MAR,exact_normalized_ISO_name
+Mozambique,MOZ,exact_normalized_ISO_name
+Myanmar,MMR,exact_normalized_ISO_name
+Namibia,NAM,exact_normalized_ISO_name
+Nauru,NRU,existing_reviewed_alias
+Nepal,NPL,exact_normalized_ISO_name
+Netherlands Antilles,ANT,existing_reviewed_alias
+Nicaragua,NIC,exact_normalized_ISO_name
+Niger,NER,exact_normalized_ISO_name
+Nigeria,NGA,exact_normalized_ISO_name
+North Macedonia,MKD,exact_normalized_ISO_name
+Pakistan,PAK,exact_normalized_ISO_name
+Palau,PLW,exact_normalized_ISO_name
+Panama,PAN,exact_normalized_ISO_name
+Papua New Guinea,PNG,exact_normalized_ISO_name
+Paraguay,PRY,exact_normalized_ISO_name
+Peru,PER,exact_normalized_ISO_name
+Philippines,PHL,exact_normalized_ISO_name
+Poland,POL,exact_normalized_ISO_name
+Portugal,PRT,exact_normalized_ISO_name
+Puerto Rico,PRI,existing_reviewed_alias
+Rep. of Congo (Brazzaville),COG,existing_reviewed_alias
+Romania,ROU,exact_normalized_ISO_name
+Rwanda,RWA,exact_normalized_ISO_name
+Samoa,WSM,exact_normalized_ISO_name
+Senegal,SEN,exact_normalized_ISO_name
+Serbia,SRB,exact_normalized_ISO_name
+Seychelles,SYC,exact_normalized_ISO_name
+Sierra Leone,SLE,exact_normalized_ISO_name
+Sint Maarten,SXM,existing_reviewed_alias
+Slovak Republic,SVK,exact_normalized_ISO_name
+Slovenia,SVN,exact_normalized_ISO_name
+Solomon Islands,SLB,exact_normalized_ISO_name
+Somalia,SOM,existing_reviewed_alias
+South Africa,ZAF,exact_normalized_ISO_name
+South Sudan,SSD,exact_normalized_ISO_name
+Sri Lanka,LKA,exact_normalized_ISO_name
+St. Kitts & Nevis,KNA,reviewed_WDI_code_alias
+St. Lucia,LCA,reviewed_WDI_code_alias
+St. Vincent and the Grenadines,VCT,reviewed_WDI_code_alias
+Sudan,SDN,exact_normalized_ISO_name
+Suriname,SUR,exact_normalized_ISO_name
+Syria,SYR,existing_reviewed_alias
+São Tomé and Príncipe,STP,exact_normalized_ISO_name
+Tajikistan,TJK,exact_normalized_ISO_name
+Tanzania,TZA,exact_normalized_ISO_name
+Thailand,THA,exact_normalized_ISO_name
+The Gambia,GMB,exact_normalized_ISO_name
+Togo,TGO,exact_normalized_ISO_name
+Tonga,TON,exact_normalized_ISO_name
+Trinidad & Tobago,TTO,exact_normalized_ISO_name
+Tunisia,TUN,exact_normalized_ISO_name
+Turkey,TUR,existing_reviewed_alias
+Turkmenistan,TKM,exact_normalized_ISO_name
+Tuvalu,TUV,exact_normalized_ISO_name
+USSR/Russian Federation,RUS,existing_reviewed_alias
+Uganda,UGA,exact_normalized_ISO_name
+Ukraine,UKR,exact_normalized_ISO_name
+United Kingdom,GBR,exact_normalized_ISO_name
+Uruguay,URY,exact_normalized_ISO_name
+Uzbekistan,UZB,exact_normalized_ISO_name
+Vanuatu,VUT,exact_normalized_ISO_name
+Venezuela,VEN,existing_reviewed_alias
+Vietnam,VNM,existing_reviewed_alias
+West Bank & Gaza,PSE,reviewed_WDI_code_alias
+Yemen,YEM,exact_normalized_ISO_name
+Yugoslavia,,excluded_dissolved_state
+Zambia,ZMB,exact_normalized_ISO_name
+Zimbabwe,ZWE,exact_normalized_ISO_name
+eSwatini (Swaziland),SWZ,existing_reviewed_alias

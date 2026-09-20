@@ -1,9 +1,9 @@
-"""Build and freeze the historical analog panel (vintage 2026-07-31).
+"""Rebuild historical analog data (observations through 2023).
 
 Sources:
   - World Bank API (wbgapi) — growth, inflation, unemployment, trade openness,
     external debt share, GDP-per-worker growth
-  - IMF WEO Apr-2024 CSV — gross debt % GDP, primary balance % GDP
+  - IMF DataMapper cached/downloaded release — gross debt and overall balance (% GDP)
   - Penn World Table 10.01 (already in data/gold/pwt1001.xlsx) — TFP growth
   - Static embedded dicts — EMU membership, Polity5 proxy, IRR FX regime
 
@@ -12,6 +12,7 @@ Run once; output is committed to git as a frozen gold file.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import sys
 from datetime import date
@@ -24,8 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GOLD = ROOT / "data" / "gold"
 VINTAGE = "2026-07-31"
 QUERY_FEATURES = [
-    "debt_gdp", "overall_balance_gdp", "interest_rate_10y",
-    "gdp_growth", "unemployment", "inflation", "r_minus_g",
+    "debt_gdp", "overall_balance_gdp", "gdp_growth", "unemployment", "inflation",
 ]
 
 # ── EMU membership start years ─────────────────────────────────────────────
@@ -39,7 +39,8 @@ EMU_START: dict[str, int] = {
 # ── Polity5 democracy proxy (simplified; 1=full democracy ≥8, 0=not) ───────
 # Direction rule: diverge if analog Polity5 < 6 (see spec §4)
 # We store a continuous approximation bucketed by World Bank income + region.
-# Full Polity5 data requires INSCR licence; this proxy covers 80% of episodes.
+# These are hand-assigned, time-invariant legacy proxies, not observed Polity5 scores.
+# They are excluded from current matching and structural conclusions.
 POLITY5_APPROX: dict[str, float] = {
     # High-income OECD: 9–10
     "USA": 10, "DEU": 10, "GBR": 10, "FRA": 9, "ITA": 9, "ESP": 9,
@@ -59,7 +60,7 @@ POLITY5_APPROX: dict[str, float] = {
 }
 
 # ── IRR FX regime simplified (fixed/peg/float) ─────────────────────────────
-# Only the broad post-1980 classification matters for the structural diff.
+# Time-invariant legacy categories: excluded from historical structural conclusions.
 # float = managed or free float; fixed = currency board or hard peg; peg = other
 FX_REGIME: dict[str, str] = {
     # EMU members: fixed (within union)
@@ -90,7 +91,7 @@ def _fetch_wb() -> pd.DataFrame:
         "NE.TRD.GNFS.ZS": "trade_openness",   # (X+M)/GDP
         "DT.DOD.DECT.GD.ZS": "ext_debt_share", # external debt / GNI (proxy)
         "SL.GDP.PCAP.EM.KD.ZG": "labor_prod_growth", # GDP per worker growth
-        "FR.INR.LEND": "interest_rate_10y",  # proxy: lending rate (2-5pp above sovereign 10y yield on average; covers 170+ countries)
+        "FR.INR.LEND": "lending_rate",  # private bank lending rate; context only, not sovereign yield
     }
     frames = []
     for code, name in indicators.items():
@@ -109,7 +110,7 @@ def _fetch_wb() -> pd.DataFrame:
 
 
 def _fetch_weo() -> pd.DataFrame:
-    """Load IMF WEO data for debt and primary balance via datamapper API."""
+    """Use overall balance consistently; never substitute a primary balance."""
     import requests
 
     def _datamapper(indicator: str) -> pd.DataFrame:
@@ -133,20 +134,10 @@ def _fetch_weo() -> pd.DataFrame:
 
     debt_df = _datamapper("GGXWDG_NGDP")
 
-    # Try primary balance (GGXONLB_NGDP) first; fall back to overall balance
-    # (GGXCNL_NGDP) if coverage is thin.  The column is named overall_balance_gdp
-    # in both cases so the engine's _SERIES_TO_PANEL stays consistent.
-    pb_df = _datamapper("GGXONLB_NGDP")
-    pb_indicator = "GGXONLB_NGDP"
-    if pb_df.empty or pb_df[pb_indicator].isna().mean() > 0.80 if pb_indicator in pb_df.columns else True:
-        print(
-            f"  [warn] {pb_indicator} has <20% coverage — falling back to "
-            "GGXCNL_NGDP (overall balance). Column will be named "
-            "overall_balance_gdp.",
-            file=sys.stderr,
-        )
-        pb_df = _datamapper("GGXCNL_NGDP")
-        pb_indicator = "GGXCNL_NGDP"
+    pb_indicator = "GGXCNL_NGDP"
+    pb_df = _datamapper(pb_indicator)
+    if pb_df.empty:
+        raise ValueError("IMF overall balance unavailable; cannot substitute primary balance")
 
     pivot = debt_df.merge(pb_df, on=["iso3", "year"], how="outer")
     pivot.rename(columns={
@@ -191,6 +182,7 @@ def _add_structural(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _compute_stats(df: pd.DataFrame) -> dict:
+    # Descriptive source statistics only. Runtime fits its complete candidate population.
     stats = {}
     for feat in QUERY_FEATURES:
         if feat in df.columns:
@@ -207,18 +199,20 @@ def _append_manifest() -> None:
     if manifest.exists():
         with open(manifest) as f:
             rows = list(csv.DictReader(f))
-    fieldnames = ["source", "url", "fetched", "bytes", "raw_file", "processed_file"]
-    panel_bytes = (GOLD / "gold_analog_panel.csv").stat().st_size
-    stats_bytes = (GOLD / "gold_analog_panel_stats.json").stat().st_size
+    fieldnames = ["source", "url", "acquired_at", "observation_cutoff", "built_at",
+                  "bytes", "raw_file", "processed_file", "kind", "sha256"]
+    derived = {"gold_analog_panel.csv": "analog_panel", "gold_analog_panel_stats.json": "analog_stats"}
+    rows = [r for r in rows if r.get("processed_file") not in derived]
     today = date.today().isoformat()
-    rows.append({"source": "analog_panel", "url": "WB+IMF-WEO+PWT",
-                 "fetched": today, "bytes": panel_bytes,
-                 "raw_file": "", "processed_file": "gold_analog_panel.csv"})
-    rows.append({"source": "analog_stats", "url": "derived",
-                 "fetched": today, "bytes": stats_bytes,
-                 "raw_file": "", "processed_file": "gold_analog_panel_stats.json"})
-    with open(manifest, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fieldnames)
+    for filename, source in derived.items():
+        path = GOLD / filename
+        rows.append({"source": source, "url": "", "acquired_at": "",
+                     "observation_cutoff": "2023", "built_at": today,
+                     "bytes": path.stat().st_size, "raw_file": "",
+                     "processed_file": filename, "kind": "derived",
+                     "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    with manifest.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
 
@@ -252,16 +246,10 @@ def main() -> None:
     # Add structural columns
     df = _add_structural(df)
 
-    # Ensure columns exist that may be absent if a source fetch failed.
-    # interest_rate_10y is populated from FR.INR.LEND (WB lending rate proxy,
-    # ~3,400 rows across 170+ countries); ext_debt_share and labor_prod_growth
-    # may fail due to transient WB API issues.
-    for _col in ("interest_rate_10y", "ext_debt_share"):
-        if _col not in df.columns:
-            df[_col] = np.nan
-
-    # Compute r_minus_g
-    df["r_minus_g"] = df["interest_rate_10y"] - df["gdp_growth"]
+    # Missing auxiliary rates stay missing; they cannot identify sovereign r−g.
+    for col in ("lending_rate", "ext_debt_share"):
+        if col not in df.columns:
+            df[col] = np.nan
 
     # Filter: drop rows with missing debt_gdp; keep 1980-2023
     df = df.dropna(subset=["debt_gdp"])
@@ -270,11 +258,18 @@ def main() -> None:
     # Drop intermediate column
     df = df.drop(columns=["labor_prod_growth"], errors="ignore")
 
+    missing = set(QUERY_FEATURES) - set(df.columns)
+    if missing:
+        raise ValueError(f"Incomplete acquisition; missing required analog columns: {sorted(missing)}")
+    complete = df[(df.iso3 != "ESP") & (df.year <= 2020)].dropna(subset=QUERY_FEATURES)
+    if len(complete) <= len(QUERY_FEATURES):
+        raise ValueError("Insufficient complete historical candidates; existing gold panel retained")
+
     out_cols = [
-        "iso3", "year", "debt_gdp", "overall_balance_gdp", "interest_rate_10y",
+        "iso3", "year", "debt_gdp", "overall_balance_gdp", "lending_rate",
         "gdp_growth", "unemployment", "inflation", "emu_member", "fx_regime",
         "ext_debt_share", "democracy", "trade_openness", "tfp_growth_5y",
-        "labor_prod_growth_5y", "r_minus_g",
+        "labor_prod_growth_5y",
     ]
     df = df[[c for c in out_cols if c in df.columns]]
 

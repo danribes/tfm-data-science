@@ -56,18 +56,24 @@ export default function Evidencia() {
       <section className="card guide-s">
         <h2>Qué hace esta página</h2>
         <p>
-          En <Link to="/metodologia">Datos y método</Link> se declara que las
-          constantes del motor son <strong>calibraciones, no estimaciones</strong>:
-          vienen de la literatura y no se han medido sobre estos datos. Esta
-          página es la respuesta a esa declaración. Para cada constante que el
-          vintage congelado puede juzgar, se estima su valor sobre los paneles
-          históricos, se da una banda al 90 % y se dice si la calibración cae
-          dentro.
+          El motor combina calibraciones de la literatura con dos parámetros
+          de vivienda estimados sobre el vintage congelado. Esta página compara
+          las <strong>calibraciones originales de v16</strong> con las
+          estimaciones del panel y sus bandas al 90 %. El motor actual usa las
+          estimaciones de vivienda; los demás coeficientes siguen calibrados.
+          Su procedencia se detalla en <Link to="/metodologia">Datos y método</Link>.
         </p>
         <p>
           Que una calibración quede fuera de la banda <em>no es un error del
           modelo</em>: es un hallazgo, y aquí se publica como tal. Lo que sí
           sería un error es presentar una calibración como si estuviera medida.
+        </p>
+        <p>
+          Las bandas principales agrupan por región. Un análisis complementario
+          conserva los choques nacionales mediante bloques temporales comunes
+          de 4, 8 y 12 trimestres: sus intervalos para la media histórica se
+          amplían e incluyen el 3 % de v16. El rechazo depende del estimador;
+          esta media no identifica por sí sola una tendencia estructural.
         </p>
       </section>
 
@@ -86,7 +92,7 @@ export default function Evidencia() {
               <table className="guide-t ev-t">
                 <thead>
                   <tr>
-                    <th>Constante</th><th>Calibrado</th><th>Estimado</th>
+                    <th>Constante</th><th>Calibración v16</th><th>Estimado</th>
                     <th>Banda 90 %</th><th>Muestra</th><th></th><th>Veredicto</th>
                   </tr>
                 </thead>
@@ -144,7 +150,8 @@ export default function Evidencia() {
             </div>
             <p className="caption">
               La barra clara es la banda al 90 %, el punto oscuro el valor
-              estimado y el marcador el valor que usa el motor. Está dibujada a
+              estimado y el marcador la calibración original v16. Su factor de
+              persistencia 0,60 equivale a una tasa de reversión 0,40. Está dibujada a
               escala a propósito: en una tabla de cifras, quedarse fuera por poco
               y quedarse fuera por el triple se leen igual.
             </p>
@@ -157,9 +164,11 @@ export default function Evidencia() {
               de tener que preguntarse.
             </p>
             <p className="caption">
-              Errores estándar agrupados por unidad. Sin agrupar, la fuerte
-              autocorrelación dentro de cada región o país haría que casi
-              cualquier estimación pareciera significativa.
+              El panel regional contiene 17 CCAA, Ceuta y Melilla; excluye el
+              agregado Nacional. Los errores estándar se agrupan por unidad
+              para admitir dependencia dentro de cada región o país. No cubren
+              por sí solos la dependencia entre regiones ni la incertidumbre
+              sobre una tendencia futura fuera de esta ventana.
             </p>
           </section>
 
@@ -169,43 +178,36 @@ export default function Evidencia() {
             const anchor = irf.horizons.find((p) => p.h === irf.anchor_h);
             const engineLast = irf.engine_path[irf.engine_path.length - 1]?.coef;
             // Same payload as the curve, so the sentence cannot drift from it.
-            const rev = q.data.comparisons.find((x) => x.constant === "IPV_REV")
-              ?.calibrated ?? 0;
-            // Read off the data, not asserted in prose: if a future vintage
-            // reverses the sign, the sentence reverses with it.
-            const builds = anchor ? last.coef > anchor.coef : false;
+            const rev = irf.engine_reversion;
             return (
               <section className="card guide-s">
-                <h2>Cuánto dura un choque de vivienda</h2>
+                <h2>Crecimiento previo y cambio acumulado de la vivienda</h2>
                 <p>
                   <code>IPV_REV</code> es una afirmación sobre dinámica: el
-                  motor supone que una desviación del precio se deshace un{" "}
-                  {nf(rev * 100, 0)} % cada año. Esta es la versión de los
-                  datos. {irf.note}, estimado horizonte a horizonte.
+                  motor reduce una desviación del crecimiento anual un{" "}
+                  {nf(rev * 100, 0)} % cada año. El efecto sobre el nivel de
+                  precios se acumula. El panel estima una {irf.note},
+                  horizonte a horizonte.
                 </p>
                 <IrfChart irf={irf} />
                 <p>
-                  A los {nf(last.years, 0)} años la desviación estimada es de{" "}
+                  A los {nf(last.years, 0)} años la asociación estimada es de{" "}
                   <strong>{nf(last.coef, 2)}</strong>{" "}
                   <span className="dim">
                     [{nf(last.ci_low, 2)} … {nf(last.ci_high, 2)}]
                   </span>{" "}
                   {irf.unit}
                   {engineLast != null && (
-                    <> frente a {nf(engineLast, 2)} bajo el supuesto del motor</>
+                    <> frente a {nf(engineLast, 2)} en la forma normalizada del motor</>
                   )}
-                  .{" "}
-                  {builds
-                    ? "La respuesta no se deshace: sigue creciendo. En el panel regional, un choque de precios tiene inercia, no reversión."
-                    : "La respuesta decae, en línea con lo que supone el motor."}
+                  . La coincidencia a {nf(anchor?.years ?? irf.anchor_h / 4, 0)} año
+                  se impone para comparar la forma; no valida el motor.
                 </p>
                 <p className="caption">
-                  Es persistencia, no causalidad estructural: identifica la
-                  parte del choque específica de una comunidad, no un
-                  experimento. Y mide desviaciones entre CCAA — un choque que
-                  suba el precio en toda España a la vez desaparece al restar la
-                  media del trimestre, que es precisamente lo que permite
-                  estimar el resto.
+                  {irf.comparison_note} Restar la media regional elimina el
+                  movimiento común, pero no convierte el crecimiento previo en
+                  una innovación exógena. Las bandas agrupan por región y no
+                  incorporan por sí solas toda la dependencia entre regiones.
                 </p>
               </section>
             );
@@ -264,7 +266,7 @@ export default function Evidencia() {
               <li>
                 <strong>La ventana importa, y por eso está partida.</strong> El
                 IPV cae con fuerza hasta 2013 y sube con fuerza después; el 3 %
-                que usa el motor no cae en ninguna de las dos ventanas, pero
+                de la calibración original no cae en ninguna de las dos ventanas, pero
                 queda entre ellas. Una calibración tomada de una historia más
                 larga que la del corte no es por ello errónea: responde a otra
                 pregunta, la de un ciclo completo.
@@ -276,13 +278,11 @@ export default function Evidencia() {
               </li>
               <li>
                 <strong>Los números se mueven con el vintage.</strong> Los tests
-                fijan sobre todo la maquinaria: que los efectos fijos recuperan
-                una pendiente conocida, que agrupar ensancha la banda. Dos
-                fijan además el signo de lo que se ve aquí — que la calibración
-                del IPV queda fuera de su banda, que el choque no se deshace —
-                para que un cambio de corte tenga que revisarse a mano en vez de
-                pasar callando. Los coeficientes en sí son propiedad del corte
-                de datos.
+                comprueban los estimadores, la exclusión del agregado nacional
+                y la diferencia entre reversión del crecimiento y cambio
+                acumulado del precio. La normalización del primer año no es
+                una prueba de capacidad predictiva. Los coeficientes describen
+                este corte de datos y pueden cambiar con otra muestra.
               </li>
             </ul>
           </section>

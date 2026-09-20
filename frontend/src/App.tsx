@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, NavLink, Outlet, Route, Routes } from "react-router-dom";
 import { queryClient, useHealth, usePersonas } from "./api/hooks";
-import { API_BASE, DEFAULT_API_BASE, setApiBase } from "./api/client";
+import { API_BASE } from "./api/client";
 import { crossCheckEngine } from "./state/appHealth";
 import { useScenarioStore } from "./state/scenarioStore";
 import { ApiDownScreen } from "./components/ApiDownScreen";
@@ -31,35 +31,39 @@ function WithExplainer() {
   );
 }
 
-/** Escape hatch out of a local-corpus tunnel that has stopped answering.
- *
- *  The health check gates the whole app, so a stale override in localStorage
- *  would otherwise lock the reader out of the very screen that could clear it. */
-function ResetApiBase() {
-  if (API_BASE === DEFAULT_API_BASE) return null;
-  return (
-    <p style={{ fontSize: 12, marginTop: 10 }}>
-      <button
-        type="button"
-        className="link-btn"
-        onClick={() => {
-          setApiBase(null);
-          location.reload();
-        }}
-      >
-        Volver a la API pública
-      </button>{" "}
-      <span style={{ color: "var(--muted)" }}>
-        (estás apuntando a una máquina local que no responde)
-      </span>
-    </p>
-  );
-}
-
 function Shell() {
   const health = useHealth();
   const personas = usePersonas();
   const hotIds = useScenarioStore((s) => s.hotIds);
+  const [railOpen, setRailOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia?.("(max-width: 1024px)").matches ?? false);
+  const railToggle = useRef<HTMLButtonElement>(null);
+  const closeRail = () => { setRailOpen(false); railToggle.current?.focus(); };
+  useEffect(() => {
+    const media = window.matchMedia?.("(max-width: 1024px)");
+    if (!media) return;
+    const update = () => { setIsMobile(media.matches); setRailOpen(false); };
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    if (!railOpen || !isMobile) return;
+    const rail = document.getElementById("scenario-levers");
+    const focusable = () => Array.from(rail?.querySelectorAll<HTMLElement>("button:not(:disabled), input, select, a[href]") ?? []);
+    focusable()[0]?.focus();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault(); setRailOpen(false); railToggle.current?.focus();
+      } else if (event.key === "Tab") {
+        const items = focusable();
+        const first = items[0], last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    };
+    document.addEventListener("keydown", keydown);
+    return () => document.removeEventListener("keydown", keydown);
+  }, [railOpen, isMobile]);
   useEffect(() => {
     if (health.isSuccess) void crossCheckEngine();
   }, [health.isSuccess]);
@@ -76,7 +80,6 @@ function Shell() {
           <p style={{ fontSize: 12, color: "var(--muted)" }}>
             Conectando con <code>{API_BASE}</code>
           </p>
-          <ResetApiBase />
         </div>
       </div>
     );
@@ -88,6 +91,9 @@ function Shell() {
     <div className="shell">
       <header className="topbar">
         <strong>España en escenarios</strong>
+        <button type="button" className="rail-toggle" ref={railToggle}
+          aria-label="Abrir palancas" aria-controls="scenario-levers" aria-expanded={railOpen}
+          onClick={() => setRailOpen(true)}>☰ Palancas</button>
         <nav>
           <NavLink to="/" end>Inicio</NavLink>
           {cards.map((c) => (
@@ -105,7 +111,8 @@ function Shell() {
         <ThemeToggle />
       </header>
       <div className="body">
-        <LeverRail hotIds={hotIds} />
+        {isMobile && railOpen && <button className="rail-backdrop" aria-label="Cerrar panel de palancas" tabIndex={-1} onClick={closeRail} />}
+        <LeverRail hotIds={hotIds} mobile={isMobile} open={railOpen} onClose={closeRail} />
         <main className="main">
           <Warnings />
           <Routes>

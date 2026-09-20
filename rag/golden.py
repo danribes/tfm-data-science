@@ -1,4 +1,8 @@
-"""The golden question set the retriever is scored against.
+"""Development (golden) questions used to tune and score the retriever.
+
+These questions informed retrieval settings. Scores on them are development
+measurements, not independent held-out estimates. Freeze a separate set under
+the protocol in docs/eval/README_RAG.md before any final evaluation.
 
 Written by hand from the corpus that is actually ingested, not from what the
 corpus ought to contain. Each entry names the document that should surface,
@@ -41,6 +45,8 @@ class Question:
     unanswerable: bool = False
     topic: str = ""
     note: str = ""
+    #: Optional human-labeled answer-bearing passages, tied to a frozen index.
+    expect_chunk_ids: tuple[int, ...] = ()
 
 
 GOLDEN: tuple[Question, ...] = (

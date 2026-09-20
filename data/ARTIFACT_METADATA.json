@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "scenario_reference_date": "2026-07-31",
+  "scenario_reference_date_file": "gold/VINTAGE",
+  "metadata_recorded_at": "2026-09-20",
+  "date_definitions": {
+    "acquired_at": "Recorded download date of a source response, when known; blank means unknown. Existing dates are preserved from legacy manifests, not revalidated acquisition timestamps.",
+    "observation_cutoff": "Latest allowed observation period in an artifact, when established by its builder; not a download date.",
+    "built_at": "Recorded date the derived artifact was generated, when known; not the source publication date.",
+    "scenario_reference_date": "Reference date used by the scenario engine; does not assert that every later-added research artifact was acquired by that date."
+  },
+  "legacy_provenance": {
+    "path": "gold/provenance_vintage_manifest.csv",
+    "status": "Preserved historical source inventory. Its fetched_at values are acquisition records; most raw responses and transformations are absent from this repository.",
+    "refresh_scope": "scripts/refresh_vintage.py downloads the HTTP(S) source URLs in gold/manifest.csv only; it cannot reconstruct the legacy gold tables."
+  },
+  "unknown_dates": "Do not infer dates from file modification times or replace missing dates with the scenario reference date.",
+  "checksum_manifest": "artifact_checksums.json",
+  "checksum_scope": "Checksums identify committed artifacts; they do not establish original source authenticity or complete raw-to-gold reproducibility."
+}

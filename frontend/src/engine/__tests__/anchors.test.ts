@@ -48,8 +48,8 @@ describe("dual-engine contract: TS engine reproduces the committed phase-1 fixtu
   });
 
   it("A4 presets_series_2035_2050: 8 presets × 7 series × 2 years ± 1e-6", () => {
-    // e.g. S1 2035: u 10.699724 · pi 2.711975 · wrealIdx 106.847929 · cuota 851.980821
-    //              · esf 35.70086 · pens 16.6086 · saldo −10.687951
+    // Current calibration and corrected current-GDP fiscal accounting;
+    // independent accounting identities are exercised in spain.test.ts.
     for (const [pid, byYear] of Object.entries(anchors.presets_series_2035_2050)) {
       const scn = runScenario(presetLevers(pid));
       for (const [year, series] of Object.entries(byYear)) {

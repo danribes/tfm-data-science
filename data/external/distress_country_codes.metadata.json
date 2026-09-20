@@ -1,0 +1,12 @@
+{
+  "built_at": "2026-09-20",
+  "source": "Local iso-codes ISO 3166-1 names plus existing project aliases and five reviewed WDI code aliases",
+  "source_sha256": "f01b812b57fba9f31ff621bf33e7c7570a01964dbeb5be2167e94decf538c89f",
+  "source_local_path": "/usr/share/iso-codes/json/iso_3166-1.json",
+  "mapping_file": "distress_country_codes.csv",
+  "label_file": "bocboe_default_labels.csv.gz",
+  "label_sha256": "4ba38dc3bf781312db9e089980b561da8bbb093dfdcda3dd8bf7d3c8886cd5c8",
+  "network_used": false,
+  "acquired_at": null,
+  "note": "This is a frozen crosswalk for the committed BoC–BoE labels, not a newly downloaded World Bank country catalogue. PSE and XKX follow WDI identifiers; dissolved states are explicitly excluded. The source file is not a runtime dependency."
+}

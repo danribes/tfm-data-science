@@ -1,12 +1,12 @@
 """SQLite store: chunk text, FTS5 lexical index, and sqlite-vec dense index.
 
 One file, three indexes, no daemon. At ~17k chunks this is instant, and it
-means the copyrighted books never leave the machine — the whole corpus is a
-single file the user controls.
+keeps source documents and the index in a file the user controls. The chat
+layer sends selected excerpts to external inference providers.
 
-The schema is resumable on purpose: `documents.sha256` is unique, so a re-run
-skips books already ingested instead of duplicating them. An ingest killed by
-an OOM can simply be restarted.
+Content hashes detect unchanged documents. Ingestion replaces changed versions
+of the same collection/source path atomically. A failed document leaves its
+previous complete version available; it can be retried.
 """
 from __future__ import annotations
 
@@ -15,8 +15,6 @@ import sqlite3
 import struct
 from pathlib import Path
 from typing import Iterable, Sequence
-
-import sqlite_vec
 
 from rag import config
 
@@ -28,8 +26,25 @@ def _pack(vec: Sequence[float]) -> bytes:
 
 def connect(path: Path | None = None) -> sqlite3.Connection:
     p = Path(path or config.DB_PATH)
+    if config.PUBLIC_MODE:
+        # The public index is built separately from an explicit source allowlist.
+        # Read-only access also avoids creating an empty index on a bad path.
+        con = sqlite3.connect(p.resolve().as_uri() + "?mode=ro", uri=True)
+        try:
+            row = con.execute(
+                "SELECT value FROM public_corpus_meta WHERE key='corpus_scope'"
+            ).fetchone()
+            if row != ("public_project_docs",):
+                raise ValueError("El índice no es un corpus público del proyecto")
+            con.execute("PRAGMA cache_size=-8000")
+            return con
+        except Exception:
+            con.close()
+            raise
     p.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(p)
+    import sqlite_vec
+
     con.enable_load_extension(True)
     sqlite_vec.load(con)
     con.enable_load_extension(False)
@@ -91,14 +106,15 @@ def document_exists(con: sqlite3.Connection, sha256: str) -> bool:
 
 def add_document(con: sqlite3.Connection, *, collection: str, title: str,
                  source_path: str, sha256: str, pages: int,
-                 meta: dict | None = None) -> int:
+                 meta: dict | None = None, commit: bool = True) -> int:
     cur = con.execute(
         "INSERT INTO documents(collection, title, source_path, sha256, pages, meta)"
         " VALUES(?,?,?,?,?,?)",
         (collection, title, source_path, sha256, pages,
          json.dumps(meta or {}, ensure_ascii=False)),
     )
-    con.commit()
+    if commit:
+        con.commit()
     return int(cur.lastrowid)
 
 
@@ -125,14 +141,19 @@ def delete_document(con: sqlite3.Connection, sha256: str) -> None:
     row = con.execute("SELECT id FROM documents WHERE sha256=?", (sha256,)).fetchone()
     if not row:
         return
-    doc_id = row[0]
+    delete_document_id(con, row[0])
+
+
+def delete_document_id(con: sqlite3.Connection, doc_id: int, *, commit: bool = True) -> None:
+    """Delete exactly one document; optional deferred commit for replacement."""
     ids = [r[0] for r in con.execute("SELECT id FROM chunks WHERE doc_id=?", (doc_id,))]
     for cid in ids:
         con.execute("DELETE FROM chunks_fts WHERE rowid=?", (cid,))
         con.execute("DELETE FROM chunks_vec WHERE chunk_id=?", (cid,))
     con.execute("DELETE FROM chunks WHERE doc_id=?", (doc_id,))
     con.execute("DELETE FROM documents WHERE id=?", (doc_id,))
-    con.commit()
+    if commit:
+        con.commit()
 
 
 # ---- reads ------------------------------------------------------------------

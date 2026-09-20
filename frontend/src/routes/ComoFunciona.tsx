@@ -39,7 +39,7 @@ export default function ComoFunciona() {
           dejas quieta. Nadie sabe dónde estará el Euríbor en 2040. Lo que sí se
           puede hacer, y es lo que hace esta herramienta, es ser explícito sobre
           la aritmética que conecta ese tipo con la deuda pública, y enseñar el
-          margen de error en vez de esconderlo.
+          incertidumbre condicional y los límites de su evaluación.
         </p>
       </section>
 
@@ -55,7 +55,8 @@ export default function ComoFunciona() {
         </p>
         <p>
           De ahí sale la intuición central: mientras <code>r</code> sea menor que{" "}
-          <code>g</code>, la deuda se diluye sola aunque no haya superávit.
+          <code>g</code>, el crecimiento reduce el peso de la deuda heredada, aunque un déficit primario
+          puede hacer que la ratio total siga subiendo.
           Cuando <code>r</code> supera a <code>g</code>, hace falta superávit
           primario sólo para que la deuda no crezca.
         </p>
@@ -149,11 +150,10 @@ export default function ComoFunciona() {
           persistentes (AR(1)) sobre el tipo, el crecimiento y el saldo primario.
         </p>
         <p>
-          Lo que hay que mirar es <strong>la anchura de la banda</strong>, no la
-          mediana. Una mediana tranquila con una banda p5–p95 que se abre en
-          abanico significa que el resultado central es poco informativo. La
-          semilla está fijada (42), así que dos personas que muevan las mismas
-          palancas ven exactamente las mismas bandas.
+          La anchura p5–p95 resume el 90 % central de las simulaciones bajo
+          los supuestos calibrados. No es una cobertura predictiva validada sobre
+          observaciones reales ni incluye toda la incertidumbre paramétrica.
+          La semilla 42 permite reproducir las bandas, sin demostrar su precisión.
         </p>
       </section>
 

@@ -2,26 +2,26 @@
   "vintage": "2026-07-31",
   "params": {
     "IPV_LR": {
-      "value": 1.2262,
-      "se": 0.1817,
-      "ci_low": 0.9274,
-      "ci_high": 1.525,
-      "n": 1460,
-      "n_units": 20,
+      "value": 1.2151,
+      "se": 0.1911,
+      "ci_low": 0.9008,
+      "ci_high": 1.5295,
+      "n": 1387,
+      "n_units": 19,
       "calibrated_v16": 3.0,
       "verdict": "fuera de la banda (por encima)",
-      "source": "gold_ccaa_trimestral.csv · 20 CCAA × 2007-2026"
+      "source": "gold_ccaa_trimestral.csv · 17 CCAA + Ceuta y Melilla · 2007-2026"
     },
     "IPV_REV": {
-      "value": 0.2031,
-      "se": 0.0132,
-      "ci_low": 0.1814,
-      "ci_high": 0.2248,
-      "n": 1380,
-      "n_units": 20,
-      "calibrated_v16": 0.6,
+      "value": 0.2039,
+      "se": 0.0139,
+      "ci_low": 0.1811,
+      "ci_high": 0.2268,
+      "n": 1311,
+      "n_units": 19,
+      "calibrated_v16": 0.4,
       "verdict": "fuera de la banda (por encima)",
-      "source": "gold_ccaa_trimestral.csv · AR(1) sobre el crecimiento interanual"
+      "source": "gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual; v16: persistencia 0,60 = reversión 0,40"
     },
     "PB_PERSIST": {
       "value": 0.872,

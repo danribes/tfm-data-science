@@ -1,8 +1,8 @@
 # Build the frontend and publish it to GitHub Pages on every push to main.
 #
 # The API base is baked in at build time. It comes from the repository
-# variable API_BASE when set, and falls back to the Render service the
-# blueprint in render.yaml creates. The SPA fallback (404.html as a copy of
+# variable API_BASE when set, and falls back to the existing HF Space.
+# RAG_API_BASE optionally selects a separate RAG service. The SPA fallback (404.html as a copy of
 # index.html) is what lets deep links like /evidencia load on Pages, which
 # has no server-side rewrites.
 name: deploy-pages
@@ -41,7 +41,8 @@ jobs:
         working-directory: frontend
         env:
           VITE_BASE: /tfm-data-science/
-          VITE_API_BASE: ${{ vars.API_BASE || 'https://evo-espana-api.onrender.com' }}
+          VITE_API_BASE: ${{ vars.API_BASE || 'https://danribes-evo-espana-api.hf.space' }}
+          VITE_RAG_API_BASE: ${{ vars.RAG_API_BASE || vars.API_BASE || 'https://danribes-evo-espana-api.hf.space' }}
         run: |
           npx tsc --noEmit
           npx vite build

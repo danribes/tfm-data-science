@@ -1,4 +1,10 @@
 {
+  "evaluation": {
+    "split": "development",
+    "independent_held_out": false,
+    "human_verified": false,
+    "annotation": "Historical artifact, not rerun after output validation changes. One first cited sentence per answer, judged by a second model; not whole-answer correctness."
+  },
   "summary": {
     "unanswerable_total": 4,
     "unanswerable_refused": 4,

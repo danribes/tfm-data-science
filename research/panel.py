@@ -21,7 +21,7 @@ GOLD = Path(__file__).resolve().parents[1] / "data" / "gold"
 #: The blockers are econometric, not clerical — writing them down stops the
 #: next person re-attempting an estimate the data cannot deliver.
 IDENTIFIABLE: dict[str, str] = {
-    "IPV_LR": "sí — crecimiento medio del IPV en el panel CCAA (20 regiones × 77 trimestres)",
+    "IPV_LR": "sí — media de la muestra regional (17 CCAA + Ceuta y Melilla; no una tendencia estructural identificada)",
     "IPV_REV": "sí — reversión del IPV a su tendencia, AR(1) sobre la desviación",
     "PB_PERSIST": "sí — persistencia del saldo primario en el panel de 18 países (1960+)",
     "E_IPV_R": ("no — el Euríbor es nacional y el panel es regional: sin variación "
@@ -70,15 +70,18 @@ def _f(value: str) -> float | None:
 
 
 def housing_panel() -> Panel:
-    """CCAA quarterly house prices, CPI and wages — the best-powered panel here.
+    """Quarterly house prices, CPI and wages for 17 CCAA plus Ceuta and Melilla.
 
     `t` is a running quarter index so lags are well defined across year ends.
-    Rows without a house-price observation are dropped: they cannot contribute
-    to any estimate and keeping them would silently bias the lag structure.
+    The national aggregate is excluded: it is composed of the same regions,
+    not an independent observation or cluster. Rows without a house-price
+    observation are dropped; lags are subsequently matched by calendar time.
     """
     rows: list[dict] = []
     with open(GOLD / "gold_ccaa_trimestral.csv", encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
+            if r["ccaa"] == "Nacional":
+                continue
             ipv = _f(r["ipv"])
             if ipv is None:
                 continue

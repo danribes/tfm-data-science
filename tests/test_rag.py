@@ -18,6 +18,14 @@ from rag import config, extract, retrieve, store
 client = TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def isolated_corpus(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "DB_PATH", tmp_path / "isolated.db")
+    def no_model():
+        raise AssertionError("Unit tests must stub embeddings instead of loading a model")
+    monkeypatch.setattr("rag.embed.get_model", no_model)
+
+
 def fake_vector(text: str, dim: int = config.EMBED_DIM) -> list[float]:
     """Deterministic unit-norm pseudo-embedding derived from the text."""
     h = hashlib.sha256(text.encode()).digest()

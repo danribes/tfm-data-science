@@ -1,0 +1,192 @@
+{
+  "source": "data/gold/gold_ccaa_trimestral.csv",
+  "source_sha256": "4074bdaeade737c1f5957d02c8d279e347700beaf53f44e57f9ae64f48f9b818",
+  "regions": "17 CCAA + Ceuta y Melilla; Nacional excluido",
+  "estimand": "media del crecimiento interanual observado; % a/a",
+  "method": "bootstrap circular por bloques de trimestres sincronizados entre regiones",
+  "windows": [
+    {
+      "window": "2007–2026 · muestra completa",
+      "observations_from": "2008Q1",
+      "observations_to": "2026Q1",
+      "primary_region_clustered": {
+        "name": "2007–2026 · muestra completa",
+        "coef": 1.2151440736211714,
+        "se": 0.19113181469252624,
+        "n": 1387,
+        "n_units": 19,
+        "ci_low": 0.9007602149983529,
+        "ci_high": 1.5295279322439899,
+        "significant": true
+      },
+      "synchronized_time_blocks": [
+        {
+          "mean": 1.2151440736211712,
+          "se": 1.5435770564890436,
+          "ci_low": -1.3360351677454072,
+          "ci_high": 3.8504349307166743,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 4,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 1387,
+          "n_quarters": 73,
+          "n_regions": 19
+        },
+        {
+          "mean": 1.2151440736211712,
+          "se": 1.960859094610572,
+          "ci_low": -2.1391233823523126,
+          "ci_high": 4.491291250903919,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 8,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 1387,
+          "n_quarters": 73,
+          "n_regions": 19
+        },
+        {
+          "mean": 1.2151440736211712,
+          "se": 2.286195491215358,
+          "ci_low": -2.697358570772348,
+          "ci_high": 4.773305478503876,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 12,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 1387,
+          "n_quarters": 73,
+          "n_regions": 19
+        }
+      ]
+    },
+    {
+      "window": "2007–2013 · ajuste",
+      "observations_from": "2008Q1",
+      "observations_to": "2013Q4",
+      "primary_region_clustered": {
+        "name": "2007–2013 · ajuste",
+        "coef": -6.449696041530002,
+        "se": 0.37033523163523924,
+        "n": 456,
+        "n_units": 19,
+        "ci_low": -7.058843290473138,
+        "ci_high": -5.8405487925868655,
+        "significant": true
+      },
+      "synchronized_time_blocks": [
+        {
+          "mean": -6.449696041530003,
+          "se": 1.826469381234213,
+          "ci_low": -9.560419532491329,
+          "ci_high": -3.5241648229200986,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 4,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 456,
+          "n_quarters": 24,
+          "n_regions": 19
+        },
+        {
+          "mean": -6.449696041530003,
+          "se": 1.9495991974921296,
+          "ci_low": -9.70161048489561,
+          "ci_high": -3.551071859791087,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 8,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 456,
+          "n_quarters": 24,
+          "n_regions": 19
+        },
+        {
+          "mean": -6.449696041530003,
+          "se": 1.8078132115280972,
+          "ci_low": -9.52103027929521,
+          "ci_high": -3.4698300167843454,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 12,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 456,
+          "n_quarters": 24,
+          "n_regions": 19
+        }
+      ]
+    },
+    {
+      "window": "2014–2026 · recuperación",
+      "observations_from": "2014Q1",
+      "observations_to": "2026Q1",
+      "primary_region_clustered": {
+        "name": "2014–2026 · recuperación",
+        "coef": 4.969351476960522,
+        "se": 0.2592558493811709,
+        "n": 931,
+        "n_units": 19,
+        "ci_low": 4.542913552797518,
+        "ci_high": 5.395789401123526,
+        "significant": true
+      },
+      "synchronized_time_blocks": [
+        {
+          "mean": 4.969351476960522,
+          "se": 0.8251333931580845,
+          "ci_low": 3.719398757380645,
+          "ci_high": 6.382131455703577,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 4,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 931,
+          "n_quarters": 49,
+          "n_regions": 19
+        },
+        {
+          "mean": 4.969351476960522,
+          "se": 0.9346177155652169,
+          "ci_low": 3.561395617711894,
+          "ci_high": 6.671201700159031,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 8,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 931,
+          "n_quarters": 49,
+          "n_regions": 19
+        },
+        {
+          "mean": 4.969351476960522,
+          "se": 0.863202107066081,
+          "ci_low": 3.675256824871142,
+          "ci_high": 6.431222206911885,
+          "confidence": 0.9,
+          "interval": "percentile",
+          "block_quarters": 12,
+          "n_boot": 500,
+          "seed": 42,
+          "n": 931,
+          "n_quarters": 49,
+          "n_regions": 19
+        }
+      ]
+    }
+  ],
+  "interpretation": "Sensibilidad complementaria: no sustituye las bandas primarias. Mantiene fijas las regiones observadas y remuestrea el tiempo, conservando la covariación nacional y la dependencia dentro de bloques de 4, 8 y 12 trimestres. Las bandas son condicionales a la ventana y a estos supuestos; no son intervalos de predicción ni validan una tendencia estructural de largo plazo.",
+  "limitations": [
+    "El bootstrap por bloques supone estabilidad dentro de cada ventana; la muestra completa mezcla una crisis y una recuperación.",
+    "Los bloques circulares unen artificialmente el final con el inicio de la ventana y no preservan dependencia más allá de su longitud.",
+    "500 réplicas permiten una comprobación acotada; los extremos de las bandas tienen error Monte Carlo y no justifican precisión fina."
+  ]
+}

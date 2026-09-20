@@ -17,6 +17,15 @@ import pytest
 from rag import chat, config, evaluate, golden, store
 
 
+@pytest.fixture(autouse=True)
+def isolated_rag_environment(tmp_path, monkeypatch):
+    """A future unit-test regression must not load a model or the real corpus."""
+    monkeypatch.setattr(config, "DB_PATH", tmp_path / "isolated.db")
+    def no_model():
+        raise AssertionError("Unit tests must stub embeddings; real models belong to integration evaluation")
+    monkeypatch.setattr("rag.embed.get_model", no_model)
+
+
 # ---- the golden set has to be well-formed before it can measure anything ----
 
 def test_every_answerable_question_names_a_document():
@@ -283,8 +292,9 @@ def test_english_probe_is_skipped_when_there_is_nothing_to_translate():
     from unittest.mock import patch
     from rag import retrieve
 
-    with patch.object(retrieve, "_dense", wraps=retrieve._dense) as spy:
-        retrieve.search("praxeología", "libros", 4)
+    with patch.object(retrieve, "_lexical", return_value=[]), \
+         patch.object(retrieve, "_dense", return_value=[]) as spy:
+        retrieve.search("praxeología", "libros", 4, con=object())
         assert spy.call_count == 1        # Spanish probe only
 
 
@@ -292,9 +302,11 @@ def test_english_probe_runs_when_a_term_is_present():
     from unittest.mock import patch
     from rag import retrieve
 
-    with patch.object(retrieve, "_dense", wraps=retrieve._dense) as spy:
-        retrieve.search("¿qué es la brecha del producto?", "libros", 4)
+    with patch.object(retrieve, "_lexical", return_value=[]), \
+         patch.object(retrieve, "_dense", return_value=[]) as spy:
+        retrieve.search("¿qué es la brecha del producto?", "libros", 4, con=object())
         assert spy.call_count == 2        # Spanish probe plus English probe
+        assert spy.call_args.kwargs["text"] == "output gap"
 
 
 # ---- the chat-level evaluator's own instruments -----------------------------
@@ -338,13 +350,96 @@ def test_citation_report_is_calm_about_an_empty_answer():
     assert rep["n_sentences"] == 0 and rep["cited_share"] == 0.0
 
 
-def test_the_committed_chat_eval_shows_no_inventions_and_no_dangling_refs():
+def test_committed_development_artifact_has_consistent_counts_and_scope():
     import json
 
     from rag import eval_chat as ec
 
     d = json.loads((ec.OUT / "rag-chat-eval.json").read_text(encoding="utf-8"))
     s = d["summary"]
-    assert s["unanswerable_refused"] == s["unanswerable_total"]
-    assert s["answers_with_dangling_refs"] == 0
-    assert s["mean_cited_share"] > 0.8
+    assert 0 <= s["unanswerable_refused"] <= s["unanswerable_total"]
+    assert 0 <= s["fidelity_supported"] <= s["fidelity_checked"]
+    assert 0 <= s["mean_cited_share"] <= 1
+    assert d["evaluation"]["independent_held_out"] is False
+
+
+def test_provider_failure_is_not_a_successful_answer():
+    from rag.eval_chat import ChatEval
+
+    evaluation = ChatEval(answers=[{
+        "grounded": True, "provider": None, "error": "unavailable",
+        "refused": False, "citations": {"cited_share": 0, "dangling_refs": []},
+    }])
+    summary = evaluation.summary()
+    assert summary["answered"] == 0
+    assert summary["generation_failures"] == 1
+
+
+def test_provider_failure_is_not_counted_as_unanswerable_refusal(monkeypatch):
+    from rag import eval_chat
+
+    monkeypatch.setattr(chat, "ask", lambda *a, **kw: chat.Answer(
+        text="No hay información por un fallo del proveedor", passages=[],
+        grounded=False, provider=None, model=None, error="network"))
+    report = eval_chat.run(sample_answerable=0)
+    assert report.summary()["unanswerable_refused"] == 0
+
+
+def test_retrieval_metadata_records_all_three_fusion_weights():
+    metadata = evaluate.evaluation_metadata()
+    assert metadata["independent_held_out"] is False
+    assert metadata["retrieval_config"]["dense_english"] == config.W_DENSE_EN
+
+
+def test_heldout_template_cannot_be_scored_as_completed_evidence():
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "docs/eval/rag-heldout-template.jsonl"
+    with pytest.raises(ValueError, match="frozen annotations"):
+        evaluate.load_frozen_questions(path)
+
+
+def test_external_labels_are_tied_to_the_frozen_index(tmp_path):
+    import json
+
+    path = tmp_path / "test.jsonl"
+    row = {"id": "q1", "question": "Pregunta independiente", "collection": "libros",
+           "split": "held_out", "annotation_status": "frozen", "annotator": "reviewer",
+           "frozen_at": "2026-09-20T00:00:00Z", "corpus_sha256": "a" * 64,
+           "unanswerable": False, "expect_docs": ["Manual"], "expect_chunk_ids": [7]}
+    path.write_text(json.dumps(row))
+    loaded = evaluate.load_frozen_questions(path, "a" * 64)
+    assert loaded[0].expect_chunk_ids == (7,)
+    with pytest.raises(ValueError, match="snapshot differs"):
+        evaluate.load_frozen_questions(path, "b" * 64)
+    path.write_text(json.dumps(row) + "\n" + json.dumps(row))
+    with pytest.raises(ValueError, match="duplicate id"):
+        evaluate.load_frozen_questions(path, "a" * 64)
+
+
+def test_document_hit_can_be_a_passage_miss(monkeypatch):
+    from rag import retrieve
+
+    retrieved = retrieve.Passage(3, "Un capítulo no relacionado", "Manual", "libros",
+                                 "academico", 1, None, 1.0, 0, 0)
+    monkeypatch.setattr(retrieve, "search", lambda *a, **kw: [retrieved])
+    question = golden.Question("q1", "Pregunta", "libros", expect_docs=("Manual",),
+                               expect_chunk_ids=(7,))
+    result = evaluate.score_question(question, 8)
+    summary = evaluate.RetrievalReport([result]).summary()["overall"]
+    assert summary["hit_rate"] == 1
+    assert summary["passage_hit_rate"] == 0
+    assert summary["passage_mrr"] == 0
+
+
+def test_bm25_ablation_never_loads_dense_model(monkeypatch):
+    from rag import retrieve
+
+    monkeypatch.setattr(config, "W_DENSE", 0)
+    monkeypatch.setattr(config, "W_DENSE_EN", 0)
+    monkeypatch.setattr(retrieve, "_lexical", lambda *args: [])
+    def unexpected_dense(*args, **kwargs):
+        raise AssertionError("dense retrieval is disabled")
+    monkeypatch.setattr(retrieve, "_dense", unexpected_dense)
+    assert retrieve.search("multiplicador fiscal", con=object()) == []
+    assert retrieve._rrf([([1], 1), ([2], 0)]) == {1: 1 / 61}

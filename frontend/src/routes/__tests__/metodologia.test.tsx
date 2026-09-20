@@ -9,11 +9,11 @@ const ui = () => render(<QueryClientProvider client={queryClient}><Metodologia /
 describe("Metodología — provenance, parity, honesty", () => {
   beforeEach(() => queryClient.clear());
 
-  it("renders the 31 constants with provenance", async () => {
+  it("renders the 34 constants with provenance", async () => {
     ui();
     await waitFor(() => expect(screen.getByText("MULT")).toBeInTheDocument());
-    // 31 data rows + header
-    expect(screen.getAllByRole("row")).toHaveLength(32);
+    // 34 data rows + header
+    expect(screen.getAllByRole("row")).toHaveLength(35);
     expect(screen.getAllByText(/v16 calibration/).length).toBeGreaterThan(10);
   });
 

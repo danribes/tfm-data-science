@@ -1,0 +1,175 @@
+{
+  "engine_version": "1.1.0",
+  "scope": "Invariant and boundary probes of the local model; not predictive validation",
+  "deterministic_seed": 20260920,
+  "n_scenarios": 1289,
+  "n_corner_cases": 1024,
+  "n_random_cases": 256,
+  "n_years": 25,
+  "n_series": 40,
+  "nonfinite": [],
+  "max_nominal_debt_identity_error": 6.252776074688882e-13,
+  "max_reported_debt_flow_error": 2.2737367544323206e-13,
+  "violations": {
+    "negative_gross_debt": {
+      "count": 24,
+      "example": {
+        "case": "corner196",
+        "value": -3.9869524890525985,
+        "levers": {
+          "r": 0.0,
+          "prima": 0.0,
+          "sp": 4.0,
+          "lam": 2.5,
+          "pm": -50.0,
+          "tau": -5.0,
+          "z": -2.0,
+          "ext": 6.0,
+          "dem": -1.0,
+          "idx": -1.5
+        }
+      }
+    }
+  },
+  "extremes": {
+    "b": {
+      "min": -11.059976436601628,
+      "min_case": "corner228",
+      "max": 1135.84841127157,
+      "max_case": "corner898"
+    },
+    "u": {
+      "min": 1.036509966744009,
+      "min_case": "corner68",
+      "max": 19.866444915924887,
+      "max_case": "corner696"
+    },
+    "ujuv": {
+      "min": 2.401593592945869,
+      "min_case": "corner68",
+      "max": 46.030552870197965,
+      "max_case": "corner696"
+    },
+    "arop": {
+      "min": 19.915080481709204,
+      "min_case": "corner68",
+      "max": 37.47154470375869,
+      "max_case": "corner696"
+    },
+    "sobre": {
+      "min": 0.2588326847862428,
+      "min_case": "corner548",
+      "max": 37.19325212087829,
+      "max_case": "corner192"
+    },
+    "precio": {
+      "min": 29215.15903324703,
+      "min_case": "corner672",
+      "max": 2814687.152168051,
+      "max_case": "corner68"
+    },
+    "esf": {
+      "min": 4.014497115882855,
+      "min_case": "corner548",
+      "max": 209.20571620528312,
+      "max_case": "corner192"
+    },
+    "pens": {
+      "min": 5.744526880803424,
+      "min_case": "corner68",
+      "max": 61.1115981158246,
+      "max_case": "corner675"
+    },
+    "gnom": {
+      "min": -4.049647168000001,
+      "min_case": "corner640",
+      "max": 12.405595711999998,
+      "max_case": "corner100"
+    }
+  },
+  "interest_base_2026": {
+    "reported_pct_current_gdp": 2.7396708615682477,
+    "independent_euros_pct_current_gdp": 2.739670861568248,
+    "saldo_pct_current_gdp": -4.089670861568248,
+    "v16_previous_gdp_interest": 2.83008
+  },
+  "spread_20pp_excess": {
+    "actual_addon_bps": 80.0,
+    "expected_addon_bps": 80.0,
+    "effective_interest_addon_pp": 0.1120000000000001
+  },
+  "omega_zero_baseline_inflation": 3.0,
+  "mc_runs": 44,
+  "mc_failed": [],
+  "mc_min_p5": -100.55178318638926,
+  "mc_seed": 101,
+  "mc_paths_per_run": 257,
+  "mc_shown_per_run": 60,
+  "mc_parameter_pairs": [
+    {
+      "rho": 0,
+      "shock_scale": 1
+    },
+    {
+      "rho": 0.96,
+      "shock_scale": 0
+    },
+    {
+      "rho": 0.96,
+      "shock_scale": 1
+    },
+    {
+      "rho": 0.96,
+      "shock_scale": 1.5
+    }
+  ],
+  "mc_scenario_cases": [
+    "base",
+    "S0",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "corner228",
+    "corner898"
+  ],
+  "mc_max_zero_shock_identity_error": 0.0,
+  "optional_feedback": {
+    "scope": "Python-only function overrides, not HTTP or frontend controls",
+    "runs": 99,
+    "nonfinite": [],
+    "omega": [
+      0,
+      0.5,
+      1
+    ],
+    "alpha_spread": [
+      0,
+      0.01,
+      0.04
+    ],
+    "b_crit": 110,
+    "max_debt": 9271.789965043514
+  },
+  "french_zero_rate": 333.3333333333333,
+  "interpretation": [
+    "Negative values violate the label gross debt; the unrestricted recursion continues below zero without modeling assets. The API and UI warn when visible outputs leave this domain.",
+    "No clipping was applied. Finite values and invariant success do not establish economic plausibility or forecast calibration.",
+    "The French mortgage helper handles zero interest by equal principal payments; exposed mortgage rates remain positive because Euribor minimum zero has a positive fixed mortgage differential.",
+    "Monte Carlo zero-shock identity is against its own documented drift/fiscal-reaction backbone, not the distinct deterministic display path."
+  ],
+  "source_sha256": {
+    "engine/spain.py": "02c9be372243b6fa5c7b3b0e2274c3b29ad3882cc43d9e0b32df1a1b0e477245",
+    "engine/montecarlo.py": "2f277f7252aea1cc0f7613e87c8861b854fa5ba3e917ba893a329cc650948477",
+    "engine/constants.py": "89798c1722265c7bfea4d7fc59748494185ae92719b929e9053de6d9bbe0267c",
+    "engine/levers.py": "94e79cc97b230cbfe3446177ee1cd22d06b94b44fcdd680169e8322a4a298c77",
+    "tools/check_model.py": "c241603753cc314c3c1d6fbdce787ae6eeeffda0d55f0e85d6451d5be6b587ff",
+    "data/gold/estimated_params.json": "b6e1d374553cce657bd9c9c0626347fbf564756d6ed39ccd3e60452dd80e4561",
+    "data/gold/kpis_perfiles.json": "6cb2f2f2450112b41238d1f54102e00b07ccf8837d28a988643d3daf6ad58f61",
+    "data/gold/gold_escenarios_deuda.csv": "84770467db88f43e7d929e580e9fefc20ec4be3707f9264b3d87ea9a5a37543c",
+    "data/gold/gold_projections.csv": "088baaa8ddfd5f51777a766f7d469f4253e7c5f0d0061d3a121603589a97d674"
+  }
+}

@@ -34,6 +34,10 @@ _NOISE = re.compile(
 )
 _WS = re.compile(r"[ \t ]+")
 _MULTINL = re.compile(r"\n{3,}")
+# Rug plots can extract as thousands of standalone vertical bars. Remove only
+# long consecutive runs, preserving isolated bars, equations and bitwise code.
+_RUG_LINE = re.compile(r"[| ]+")
+_RUG_MIN_LINES = 8
 
 
 def clean_page(text: str) -> str:
@@ -43,7 +47,20 @@ def clean_page(text: str) -> str:
         if not ln or _NOISE.match(ln):
             continue
         lines.append(ln)
-    return _MULTINL.sub("\n\n", "\n".join(lines)).strip()
+    without_rugs: list[str] = []
+    i = 0
+    while i < len(lines):
+        if _RUG_LINE.fullmatch(lines[i]):
+            end = i + 1
+            while end < len(lines) and _RUG_LINE.fullmatch(lines[end]):
+                end += 1
+            if end - i < _RUG_MIN_LINES:
+                without_rugs.extend(lines[i:end])
+            i = end
+        else:
+            without_rugs.append(lines[i])
+            i += 1
+    return _MULTINL.sub("\n\n", "\n".join(without_rugs)).strip()
 
 
 def pdf_pages(path: Path) -> Iterator[tuple[int, str]]:
@@ -77,7 +94,7 @@ def markdown_pages(path: Path) -> Iterator[tuple[int, str]]:
 _HEADING = re.compile(
     r"^(?:#{1,6}\s+.+"                       # markdown heading
     r"|(?:CAP[IÍ]TULO|CHAPTER|PARTE|PART|SECCI[OÓ]N|SECTION)\s+[\dIVXLC]+.*"
-    r"|\d{1,2}\.\d{1,2}\s+\S.*)$",           # 12.3 Numbered section
+    r"|\d{1,2}\.\d{1,2}\s+[^\W\d_].*)$",  # numbered title starts with a Unicode letter
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -88,60 +105,70 @@ def _heading_in(text: str) -> str | None:
 
 
 def chunk_pages(pages: Iterator[tuple[int, str]]) -> Iterator[dict]:
-    """Accumulate page text into overlapping chunks, tracking the last heading.
+    """Yield overlapping chunks with the origin of their first non-space character.
 
-    Chunks are sized in characters (a cheap proxy for tokens) and closed on a
-    paragraph boundary where possible, so a citation lands on readable prose
-    rather than mid-sentence.
+    Character spans travel with the bounded text buffer, including retained
+    overlap. A heading changes the section only at its actual position, so a
+    heading encountered later cannot relabel an earlier passage.
     """
     target = config.CHUNK_TOKENS * config.CHARS_PER_TOKEN
     overlap = config.CHUNK_OVERLAP * config.CHARS_PER_TOKEN
 
-    buf: list[str] = []
+    buf = ""
     buf_len = 0
-    first_page = None
+    # Each span is (start, end, PDF page number, section at that position).
+    spans: list[tuple[int, int, int, str | None]] = []
     section: str | None = None
     ordinal = 0
 
-    def emit(text: str, page: int | None, sec: str | None, ordn: int) -> dict | None:
+    def emit(text: str, ordn: int) -> dict | None:
         t = text.strip()
         if len(t) < config.MIN_CHUNK_CHARS:
             return None
+        offset = len(text) - len(text.lstrip())
+        _, _, page, sec = next(span for span in spans if span[0] <= offset < span[1])
         return {"ordinal": ordn, "page": page, "section": sec,
                 "text": t[: config.MAX_CHUNK_CHARS]}
 
     for page_no, text in pages:
-        if first_page is None:
-            first_page = page_no
-        head = _heading_in(text)
-        if head:
-            section = head
-
         for para in text.split("\n\n"):
             para = para.strip()
             if not para:
                 continue
-            buf.append(para)
+            start = len(buf) + (2 if buf else 0)
+            buf += ("\n\n" if buf else "") + para
             buf_len += len(para) + 2
 
+            region = 0
+            for head in _HEADING.finditer(para):
+                if head.start() > region:
+                    spans.append((start + region, start + head.start(), page_no, section))
+                section = head.group(0).strip()[:120]
+                region = head.start()
+            spans.append((start + region, start + len(para), page_no, section))
+
             while buf_len >= target:
-                joined = "\n\n".join(buf)
-                cut = joined[:target]
-                # prefer to break on a paragraph, else a sentence
+                cut = buf[:target]
+                # Keep the existing paragraph/sentence breaks and overlap size.
                 brk = cut.rfind("\n\n")
                 if brk < target * 0.5:
                     brk = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
                     brk = brk + 1 if brk > target * 0.5 else target
-                piece, rest = joined[:brk], joined[max(0, brk - overlap):]
-                ch = emit(piece, first_page, section, ordinal)
+                piece = buf[:brk]
+                rest_start = max(0, brk - overlap)
+                rest = buf[rest_start:]
+                ch = emit(piece, ordinal)
                 if ch:
                     ordinal += 1
                     yield ch
-                buf = [rest] if rest.strip() else []
+                spans = [(max(0, a - rest_start), b - rest_start, page, sec)
+                         for a, b, page, sec in spans if b > rest_start]
+                buf = rest if rest.strip() else ""
                 buf_len = len(rest)
-                first_page = page_no
+                if not buf:
+                    spans = []
 
     if buf:
-        ch = emit("\n\n".join(buf), first_page, section, ordinal)
+        ch = emit(buf, ordinal)
         if ch:
             yield ch

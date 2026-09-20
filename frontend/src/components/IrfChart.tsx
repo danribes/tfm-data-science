@@ -6,12 +6,8 @@ import { nf } from "../lib/fmt";
 import { useReducedMotion } from "../lib/motion";
 import type { IrfOut } from "../api/types";
 
-/** Estimated impulse response against the decay the engine assumes.
- *
- *  The two curves answer the same question — how long does a house-price shock
- *  last — from different sources, so they belong on one axis. Reporting the
- *  estimate alone would leave the reader to do the comparison by memory.
- */
+/** Descriptive cumulative price change with an amplitude-matched annual model
+ * comparison. Agreement at the first year is imposed, not evidence of fit. */
 export function IrfChart({ irf, height = 260 }: { irf: IrfOut; height?: number }) {
   const reduced = useReducedMotion();
   const engineAt = new Map(irf.engine_path.map((p) => [p.h, p.coef]));
@@ -19,8 +15,7 @@ export function IrfChart({ irf, height = 260 }: { irf: IrfOut; height?: number }
     years: p.years,
     band: [p.ci_low, p.ci_high] as [number, number],
     coef: p.coef,
-    // null leaves a gap rather than drawing a line to zero: before the anchor
-    // the engine's annual rule simply makes no claim.
+    // Only annual points exist; no quarterly interpolation is assumed.
     motor: engineAt.get(p.h) ?? null,
   }));
   const anchorYears = irf.anchor_h / 4;
@@ -30,7 +25,7 @@ export function IrfChart({ irf, height = 260 }: { irf: IrfOut; height?: number }
       <div className="legend">
         <span><i style={{ background: "var(--band-out)", height: 8 }} />banda 90 %</span>
         <span><i style={{ background: "var(--s1)" }} />estimado en el panel</span>
-        <span><i style={{ background: "var(--s2)" }} />supuesto del motor</span>
+        <span><i style={{ background: "var(--s2)" }} />motor · puntos anuales normalizados</span>
       </div>
       <ResponsiveContainer width="100%" height={height} initialDimension={{ width: 660, height }}>
         <ComposedChart data={data} margin={{ top: 12, right: 12, bottom: 4, left: 0 }}>
@@ -49,13 +44,13 @@ export function IrfChart({ irf, height = 260 }: { irf: IrfOut; height?: number }
             formatter={(v, name) =>
               Array.isArray(v) ? `${nf(Number(v[0]), 2)} … ${nf(Number(v[1]), 2)}`
                 : [nf(Number(v), 2), String(name)]}
-            labelFormatter={(y) => `${nf(Number(y), 2)} años tras el choque`} />
+            labelFormatter={(y) => `${nf(Number(y), 2)} años desde t`} />
           <Area dataKey="band" fill="var(--band-out)" fillOpacity={0.75} stroke="none"
             isAnimationActive={!reduced} animationDuration={200} />
           <Line dataKey="coef" name="estimado" stroke="var(--s1)" strokeWidth={2} dot={false}
             isAnimationActive={!reduced} animationDuration={200} />
-          <Line dataKey="motor" name="motor" stroke="var(--s2)" strokeWidth={2}
-            strokeDasharray="4 3" dot={false} connectNulls={false}
+          <Line dataKey="motor" name="motor normalizado" stroke="none"
+            dot={{ r: 3, fill: "var(--s2)", stroke: "var(--s2)" }} connectNulls={false}
             isAnimationActive={!reduced} animationDuration={200} />
         </ComposedChart>
       </ResponsiveContainer>

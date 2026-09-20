@@ -1,0 +1,1660 @@
+{
+  "engine_version": "1.1.0",
+  "evaluation_kind": "descriptive_reproducibility",
+  "predictive_validation_completed": false,
+  "source_sha256": "f32158d89186643d50047b0c62ede5e92653c9b991c4949b4835739c8a1ab40f",
+  "features": [
+    "debt_gdp",
+    "overall_balance_gdp",
+    "gdp_growth",
+    "unemployment",
+    "inflation"
+  ],
+  "n_eligible": 5461,
+  "n_complete": 4091,
+  "n_countries": 173,
+  "years": [
+    1991,
+    2020
+  ],
+  "normalization": {
+    "debt_gdp": {
+      "mean": 52.86235639208018,
+      "std": 41.788285530172125
+    },
+    "overall_balance_gdp": {
+      "mean": -2.3286482522610608,
+      "std": 14.247069637574805
+    },
+    "gdp_growth": {
+      "mean": 3.658327554036506,
+      "std": 5.792391124457665
+    },
+    "unemployment": {
+      "mean": 7.8088796914297545,
+      "std": 5.773275546049221
+    },
+    "inflation": {
+      "mean": 6.754470470211418,
+      "std": 20.13718387647328
+    }
+  },
+  "inverse_covariance_standardized": [
+    [
+      1.0594724215273579,
+      0.17243579570378195,
+      0.09426096507119451,
+      -0.07845965102284866,
+      -0.11577250956600323
+    ],
+    [
+      0.1724357957037819,
+      1.0289865891761203,
+      0.015263506470385628,
+      0.014904825369757176,
+      -0.007201268843063605
+    ],
+    [
+      0.09426096507119448,
+      0.015263506470385603,
+      1.0232316326428443,
+      0.1002603124341752,
+      0.04609720503594661
+    ],
+    [
+      -0.0784596510228486,
+      0.01490482536975718,
+      0.10026031243417528,
+      1.018916026508341,
+      -0.016904386358599803
+    ],
+    [
+      -0.11577250956600321,
+      -0.007201268843063579,
+      0.04609720503594662,
+      -0.016904386358599813,
+      1.0169282021229422
+    ]
+  ],
+  "missingness_policy": "complete cases; no average imputation",
+  "distance": "Mahalanobis in standardized coordinates; no lever bonus",
+  "legacy_stats_used": false,
+  "limitations": "Vecinos descriptivos; sin validación predictiva independiente. La búsqueda usa cinco variables completas y excluye España. El tipo bancario de préstamo no es un rendimiento soberano y no entra en la distancia. No se estima r−g soberano ni sostenibilidad de la deuda. Episodios cercanos del mismo país pueden solaparse.",
+  "baseline_matches": {
+    "2026": [
+      {
+        "rank": 1,
+        "iso3": "ITA",
+        "country_name": "Italia",
+        "match_year": 2001,
+        "distance": 0.178721,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 108.5,
+          "overall_balance_gdp": -3.2,
+          "gdp_growth": 2.00643329837733,
+          "unemployment": 9.599,
+          "inflation": 2.78516542713554,
+          "lending_rate": 7.28775,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 105.9,
+            "gdp_growth": 0.26992966378873,
+            "overall_balance_gdp": -2.9,
+            "r_minus_g": null,
+            "truncated": false
+          }
+        ],
+        "outcome_truncated": false,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "Sí",
+            "direction": "converge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "49.9",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Italia en 2001: La deuda pasó de 108.5% a 105.9% del PIB en 1 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      },
+      {
+        "rank": 2,
+        "iso3": "CAN",
+        "country_name": "Canadá",
+        "match_year": 1995,
+        "distance": 0.219523,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 100.1,
+          "overall_balance_gdp": -5.5,
+          "gdp_growth": 2.68232826962129,
+          "unemployment": 9.489,
+          "inflation": 2.14876033057849,
+          "lending_rate": 8.64583333333333,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 100.2,
+            "gdp_growth": 1.68896122145787,
+            "overall_balance_gdp": -3.1,
+            "r_minus_g": null,
+            "truncated": false
+          }
+        ],
+        "outcome_truncated": false,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "69.1",
+            "direction": "converge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Canadá en 1995: La deuda pasó de 100.1% a 100.2% del PIB en 1 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      },
+      {
+        "rank": 3,
+        "iso3": "FRA",
+        "country_name": "Francia",
+        "match_year": 2017,
+        "distance": 0.261902,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 98.8,
+          "overall_balance_gdp": -3.4,
+          "gdp_growth": 2.08361485997399,
+          "unemployment": 9.409,
+          "inflation": 1.03228275064681,
+          "lending_rate": null,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 98.5,
+            "gdp_growth": 1.64590872395887,
+            "overall_balance_gdp": -2.3,
+            "r_minus_g": null,
+            "truncated": false
+          }
+        ],
+        "outcome_truncated": false,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "Sí",
+            "direction": "converge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "65.4",
+            "direction": "converge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Francia en 2017: La deuda pasó de 98.8% a 98.5% del PIB en 1 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      }
+    ],
+    "2036": [
+      {
+        "rank": 1,
+        "iso3": "ITA",
+        "country_name": "Italia",
+        "match_year": 1994,
+        "distance": 0.21639,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 130.8,
+          "overall_balance_gdp": -8.8,
+          "gdp_growth": 2.15102367074849,
+          "unemployment": 11.086,
+          "inflation": 4.05184218065716,
+          "lending_rate": 11.9838333333333,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 119.1,
+            "gdp_growth": 2.88683671925843,
+            "overall_balance_gdp": -7.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 2,
+            "debt_gdp": 118.9,
+            "gdp_growth": 1.34558477192847,
+            "overall_balance_gdp": -6.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 3,
+            "debt_gdp": 116.5,
+            "gdp_growth": 1.92572122608527,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 4,
+            "debt_gdp": 113.9,
+            "gdp_growth": 1.8043732818638,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 5,
+            "debt_gdp": 113.1,
+            "gdp_growth": 1.67799157943422,
+            "overall_balance_gdp": -1.8,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 6,
+            "debt_gdp": 108.7,
+            "gdp_growth": 3.88209885062652,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 7,
+            "debt_gdp": 108.5,
+            "gdp_growth": 2.00643329837733,
+            "overall_balance_gdp": -3.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 8,
+            "debt_gdp": 105.9,
+            "gdp_growth": 0.26992966378873,
+            "overall_balance_gdp": -2.9,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 9,
+            "debt_gdp": 105.1,
+            "gdp_growth": 0.0665538088732092,
+            "overall_balance_gdp": -3.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 10,
+            "debt_gdp": 104.7,
+            "gdp_growth": 1.4740217064723,
+            "overall_balance_gdp": -3.5,
+            "r_minus_g": null,
+            "truncated": false
+          }
+        ],
+        "outcome_truncated": false,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "40.4",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Italia en 1994: La deuda pasó de 130.8% a 104.7% del PIB en 10 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      },
+      {
+        "rank": 2,
+        "iso3": "BEL",
+        "country_name": "Bélgica",
+        "match_year": 1994,
+        "distance": 0.281926,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 137.1,
+          "overall_balance_gdp": -5.3,
+          "gdp_growth": 3.22697145426247,
+          "unemployment": 9.645,
+          "inflation": 2.377540844764,
+          "lending_rate": null,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 131.3,
+            "gdp_growth": 2.38475724870135,
+            "overall_balance_gdp": -4.5,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 2,
+            "debt_gdp": 129.0,
+            "gdp_growth": 1.32143214432601,
+            "overall_balance_gdp": -4.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 3,
+            "debt_gdp": 124.3,
+            "gdp_growth": 3.79367165541437,
+            "overall_balance_gdp": -2.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 4,
+            "debt_gdp": 119.2,
+            "gdp_growth": 1.96183240455609,
+            "overall_balance_gdp": -1.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 5,
+            "debt_gdp": 115.4,
+            "gdp_growth": 3.54271798823922,
+            "overall_balance_gdp": -0.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 6,
+            "debt_gdp": 109.6,
+            "gdp_growth": 3.71670510672588,
+            "overall_balance_gdp": -0.1,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 7,
+            "debt_gdp": 108.2,
+            "gdp_growth": 1.09960362419645,
+            "overall_balance_gdp": 0.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 8,
+            "debt_gdp": 105.4,
+            "gdp_growth": 1.70689430349601,
+            "overall_balance_gdp": 0.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 9,
+            "debt_gdp": 101.7,
+            "gdp_growth": 1.03795518162204,
+            "overall_balance_gdp": -1.9,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 10,
+            "debt_gdp": 97.2,
+            "gdp_growth": 3.57120671942319,
+            "overall_balance_gdp": -0.2,
+            "r_minus_g": null,
+            "truncated": false
+          }
+        ],
+        "outcome_truncated": false,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "113.2",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Bélgica en 1994: La deuda pasó de 137.1% a 97.2% del PIB en 10 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      },
+      {
+        "rank": 3,
+        "iso3": "BEL",
+        "country_name": "Bélgica",
+        "match_year": 1995,
+        "distance": 0.313779,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 131.3,
+          "overall_balance_gdp": -4.5,
+          "gdp_growth": 2.38475724870135,
+          "unemployment": 9.337,
+          "inflation": 1.46796699090272,
+          "lending_rate": null,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 129.0,
+            "gdp_growth": 1.32143214432601,
+            "overall_balance_gdp": -4.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 2,
+            "debt_gdp": 124.3,
+            "gdp_growth": 3.79367165541437,
+            "overall_balance_gdp": -2.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 3,
+            "debt_gdp": 119.2,
+            "gdp_growth": 1.96183240455609,
+            "overall_balance_gdp": -1.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 4,
+            "debt_gdp": 115.4,
+            "gdp_growth": 3.54271798823922,
+            "overall_balance_gdp": -0.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 5,
+            "debt_gdp": 109.6,
+            "gdp_growth": 3.71670510672588,
+            "overall_balance_gdp": -0.1,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 6,
+            "debt_gdp": 108.2,
+            "gdp_growth": 1.09960362419645,
+            "overall_balance_gdp": 0.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 7,
+            "debt_gdp": 105.4,
+            "gdp_growth": 1.70689430349601,
+            "overall_balance_gdp": 0.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 8,
+            "debt_gdp": 101.7,
+            "gdp_growth": 1.03795518162204,
+            "overall_balance_gdp": -1.9,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 9,
+            "debt_gdp": 97.2,
+            "gdp_growth": 3.57120671942319,
+            "overall_balance_gdp": -0.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 10,
+            "debt_gdp": 95.1,
+            "gdp_growth": 2.32173792911834,
+            "overall_balance_gdp": -2.7,
+            "r_minus_g": null,
+            "truncated": false
+          }
+        ],
+        "outcome_truncated": false,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "116.4",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Bélgica en 1995: La deuda pasó de 131.3% a 95.1% del PIB en 10 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      }
+    ],
+    "2050": [
+      {
+        "rank": 1,
+        "iso3": "JPN",
+        "country_name": "Japón",
+        "match_year": 2012,
+        "distance": 1.2376,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 197.1,
+          "overall_balance_gdp": -8.2,
+          "gdp_growth": 1.64893452981225,
+          "unemployment": 4.358,
+          "inflation": -0.0440645104432602,
+          "lending_rate": 1.4075,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 201.2,
+            "gdp_growth": 1.99727653399265,
+            "overall_balance_gdp": -7.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 2,
+            "debt_gdp": 203.6,
+            "gdp_growth": 0.905915486065865,
+            "overall_balance_gdp": -5.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 3,
+            "debt_gdp": 200.1,
+            "gdp_growth": 1.79997735783475,
+            "overall_balance_gdp": -3.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 4,
+            "debt_gdp": 202.1,
+            "gdp_growth": 0.704986495111257,
+            "overall_balance_gdp": -3.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 5,
+            "debt_gdp": 203.1,
+            "gdp_growth": 1.62345062245441,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 6,
+            "debt_gdp": 203.7,
+            "gdp_growth": 0.834143845965585,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 7,
+            "debt_gdp": 206.3,
+            "gdp_growth": -0.308496921143259,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 8,
+            "debt_gdp": 228.8,
+            "gdp_growth": -4.28327942675573,
+            "overall_balance_gdp": -9.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 9,
+            "debt_gdp": 222.7,
+            "gdp_growth": 3.56419531474475,
+            "overall_balance_gdp": -6.3,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 10,
+            "debt_gdp": 227.8,
+            "gdp_growth": 1.33164750653741,
+            "overall_balance_gdp": -4.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 11,
+            "debt_gdp": 220.3,
+            "gdp_growth": 0.720785304749811,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 12,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 13,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 14,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 15,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 16,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 17,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 18,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 19,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 20,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 21,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 22,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 23,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 24,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          }
+        ],
+        "outcome_truncated": true,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "30.2",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Japón en 2012: La deuda pasó de 197.1% a 220.3% del PIB en 11 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      },
+      {
+        "rank": 2,
+        "iso3": "JPN",
+        "country_name": "Japón",
+        "match_year": 2013,
+        "distance": 1.242391,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 201.2,
+          "overall_balance_gdp": -7.6,
+          "gdp_growth": 1.99727653399265,
+          "unemployment": 4.038,
+          "inflation": 0.335037912184741,
+          "lending_rate": 1.30375,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 203.6,
+            "gdp_growth": 0.905915486065865,
+            "overall_balance_gdp": -5.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 2,
+            "debt_gdp": 200.1,
+            "gdp_growth": 1.79997735783475,
+            "overall_balance_gdp": -3.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 3,
+            "debt_gdp": 202.1,
+            "gdp_growth": 0.704986495111257,
+            "overall_balance_gdp": -3.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 4,
+            "debt_gdp": 203.1,
+            "gdp_growth": 1.62345062245441,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 5,
+            "debt_gdp": 203.7,
+            "gdp_growth": 0.834143845965585,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 6,
+            "debt_gdp": 206.3,
+            "gdp_growth": -0.308496921143259,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 7,
+            "debt_gdp": 228.8,
+            "gdp_growth": -4.28327942675573,
+            "overall_balance_gdp": -9.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 8,
+            "debt_gdp": 222.7,
+            "gdp_growth": 3.56419531474475,
+            "overall_balance_gdp": -6.3,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 9,
+            "debt_gdp": 227.8,
+            "gdp_growth": 1.33164750653741,
+            "overall_balance_gdp": -4.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 10,
+            "debt_gdp": 220.3,
+            "gdp_growth": 0.720785304749811,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 11,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 12,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 13,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 14,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 15,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 16,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 17,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 18,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 19,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 20,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 21,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 22,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 23,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 24,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          }
+        ],
+        "outcome_truncated": true,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "33.6",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Japón en 2013: La deuda pasó de 201.2% a 220.3% del PIB en 10 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      },
+      {
+        "rank": 3,
+        "iso3": "JPN",
+        "country_name": "Japón",
+        "match_year": 2010,
+        "distance": 1.346589,
+        "dominant_lever": null,
+        "match_snapshot": {
+          "debt_gdp": 178.6,
+          "overall_balance_gdp": -9.1,
+          "gdp_growth": 4.13645589222239,
+          "unemployment": 5.102,
+          "inflation": -0.728243207517779,
+          "lending_rate": 1.59833333333333,
+          "interest_rate_10y": null,
+          "r_minus_g": null
+        },
+        "outcome": [
+          {
+            "year_offset": 1,
+            "debt_gdp": 190.6,
+            "gdp_growth": -0.20035785332982,
+            "overall_balance_gdp": -9.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 2,
+            "debt_gdp": 197.1,
+            "gdp_growth": 1.64893452981225,
+            "overall_balance_gdp": -8.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 3,
+            "debt_gdp": 201.2,
+            "gdp_growth": 1.99727653399265,
+            "overall_balance_gdp": -7.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 4,
+            "debt_gdp": 203.6,
+            "gdp_growth": 0.905915486065865,
+            "overall_balance_gdp": -5.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 5,
+            "debt_gdp": 200.1,
+            "gdp_growth": 1.79997735783475,
+            "overall_balance_gdp": -3.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 6,
+            "debt_gdp": 202.1,
+            "gdp_growth": 0.704986495111257,
+            "overall_balance_gdp": -3.6,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 7,
+            "debt_gdp": 203.1,
+            "gdp_growth": 1.62345062245441,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 8,
+            "debt_gdp": 203.7,
+            "gdp_growth": 0.834143845965585,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 9,
+            "debt_gdp": 206.3,
+            "gdp_growth": -0.308496921143259,
+            "overall_balance_gdp": -3.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 10,
+            "debt_gdp": 228.8,
+            "gdp_growth": -4.28327942675573,
+            "overall_balance_gdp": -9.0,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 11,
+            "debt_gdp": 222.7,
+            "gdp_growth": 3.56419531474475,
+            "overall_balance_gdp": -6.3,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 12,
+            "debt_gdp": 227.8,
+            "gdp_growth": 1.33164750653741,
+            "overall_balance_gdp": -4.2,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 13,
+            "debt_gdp": 220.3,
+            "gdp_growth": 0.720785304749811,
+            "overall_balance_gdp": -2.4,
+            "r_minus_g": null,
+            "truncated": false
+          },
+          {
+            "year_offset": 14,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 15,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 16,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 17,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 18,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 19,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 20,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 21,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 22,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 23,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          },
+          {
+            "year_offset": 24,
+            "debt_gdp": null,
+            "gdp_growth": null,
+            "overall_balance_gdp": null,
+            "r_minus_g": null,
+            "truncated": true
+          }
+        ],
+        "outcome_truncated": true,
+        "diffs": [
+          {
+            "dimension": "emu_member",
+            "label": "Zona euro",
+            "spain_value": "Sí (2026)",
+            "analog_value": "No",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "fx_regime",
+            "label": "Régimen cambiario histórico",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "ext_debt_share",
+            "label": "Deuda externa / deuda total",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "democracy",
+            "label": "Calidad institucional observada",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "debt_maturity",
+            "label": "Vencimiento de la deuda",
+            "spain_value": "sin datos comparables",
+            "analog_value": "sin datos comparables",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "trade_openness",
+            "label": "Apertura comercial (% PIB)",
+            "spain_value": "71.8 (2023)",
+            "analog_value": "28.2",
+            "direction": "diverge"
+          },
+          {
+            "dimension": "tfp_trend",
+            "label": "Tendencia TFP (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          },
+          {
+            "dimension": "labor_productivity",
+            "label": "Productividad laboral (% anual, media 5 años)",
+            "spain_value": "sin datos",
+            "analog_value": "sin datos",
+            "direction": "neutral"
+          }
+        ],
+        "debt_payable_verdict": "not_assessed",
+        "narrative": "Japón en 2010: La deuda pasó de 178.6% a 220.3% del PIB en 13 años. La similitud descriptiva no demuestra que España vaya a seguir esa trayectoria."
+      }
+    ]
+  }
+}

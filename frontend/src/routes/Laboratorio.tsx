@@ -71,8 +71,8 @@ export default function Laboratorio() {
           scenario={seriesOf(scn, seriesKey)} redLines={bound} unit={f.unit} dec={f.dec} />
         <Caption>
           La línea continua es tu escenario; la punteada es la base congelada del
-          vintage. La distancia entre ambas es lo único que has causado tú — todo
-          lo demás ya estaba en los datos.
+          vintage. La diferencia recoge el efecto de tus supuestos dentro del modelo;
+          no es una estimación causal sobre la economía real.
         </Caption>
       </div>
 
@@ -84,14 +84,24 @@ export default function Laboratorio() {
           {mc.isError && <div className="banner err">Monte Carlo no disponible — el resto de la app sigue funcionando.</div>}
           {mc.isPending && !mc.data && <p style={{ fontSize: 14 }}>Calculando abanico…</p>}
           {mc.data && <FanChart years={mc.data.years} percentiles={mc.data.percentiles} />}
+          {mc.data && [...Object.values(mc.data.percentiles), ...(mc.data.paths ?? [])]
+            .some((series) => series.some((value) => value < 0)) && (
+              <div className="banner" role="status">
+                Algunas trayectorias o bandas mostradas alcanzan deuda negativa,
+                fuera del dominio de deuda bruta. El modelo no representa la
+                acumulación de activos ni la respuesta de política al agotar la deuda.
+              </div>
+            )}
           <Caption>
-            Lo que informa aquí es la anchura de la banda, no la mediana. Si las
-            bandas se abren en abanico, el resultado central importa poco.
+            La banda p5–p95 contiene el 90 % central de las trayectorias simuladas,
+            condicionado a los choques y reglas elegidos. No se ha validado una
+            cobertura predictiva del 90 % sobre datos reales.
           </Caption>
           <p className="src" style={{ whiteSpace: "normal" }}>
-            El abanico se calcula en el servidor (Python). Validación: envolvente dorada
+            El abanico se calcula en el servidor (Python). Comprobación de reproducción: envolvente dorada
             gold_escenarios_deuda_mc.csv con tolerancia ±2 pp en 2030/2050/2070 — los pines de
-            semilla 42 del fixture atan solo al motor Python.
+            semilla 42 del fixture atan solo al motor Python. Reproducir otra simulación
+            no demuestra precisión predictiva; la incertidumbre paramétrica no está incluida.
           </p>
         </div>
         <div className="card">
@@ -114,8 +124,8 @@ export default function Laboratorio() {
       </div>
 
       {/* --- Budget & Debt Flow Sankey Diagrams --- */}
-      <BudgetFlowChart levers={levers} />
-      <DebtAmortizationFlowChart levers={levers} />
+      <BudgetFlowChart levers={levers} horizon={horizon} />
+      <DebtAmortizationFlowChart levers={levers} horizon={horizon} />
 
       <EmpiricalTwin />
 

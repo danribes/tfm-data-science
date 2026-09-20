@@ -10,9 +10,19 @@ legacy/
 
 # RAG corpus — libros con copyright y su índice vectorial. Nunca al repo público.
 data/rag/
+data/crack23/
 *.db
 *.db-wal
 *.db-shm
+
+# Local book acquisition/probe records may contain source-text anchors.
+# Keep these alongside the private corpus, outside both public deployments.
+docs/eval/rag-book-additions-*.json
+docs/eval/rag-staged-book-probes-*.json
+docs/eval/rag-staged-books-*.json
+
+# Superseded local screenshots are not part of the reviewed presentation.
+docs/deck/media/_archive/
 
 # Secrets — never committed. ANTHROPIC_API_KEY lives here for local runs.
 .env

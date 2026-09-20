@@ -6,14 +6,17 @@ so it carries a cache breakpoint; the volatile facts go last, after it. That
 ordering is what makes this affordable: the cached prefix reads at 0.1x.
 
 If anything goes wrong — no key, no network, a refusal, a malformed response —
-this module raises, and the caller falls back to `explain.fallback`. It never
-returns partial or invented prose.
+this module raises, and the caller falls back to `explain.fallback`. Successful
+responses pass shape and numeric-inventory checks. These checks do
+not prove semantic fidelity or that numbers are attached to the right concept.
 """
 from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 
 from engine import constants as c
 from explain.facts import ExplanationFacts
@@ -157,6 +160,74 @@ class NarrationUnavailable(RuntimeError):
     """Raised for every failure path so the caller can fall back cleanly."""
 
 
+_NUMBER = re.compile(r"(?<![\w])[-+−]?\d+(?:[.,]\d+)*(?![\w])")
+
+
+def _number_values(token: str) -> set[Decimal]:
+    """Accept ES/EN decimal and grouping marks; compare magnitudes only."""
+    token = token.replace("−", "-")
+    candidates = {token}
+    if "," in token and "." in token:
+        decimal, grouping = ((",", ".") if token.rfind(",") > token.rfind(".")
+                             else (".", ","))
+        candidates = {token.replace(grouping, "").replace(decimal, ".")}
+    elif "," in token or "." in token:
+        sep = "," if "," in token else "."
+        candidates = {token.replace(sep, ".")}
+        if all(len(part) == 3 for part in token.split(sep)[1:]):
+            candidates.add(token.replace(sep, ""))
+    out = set()
+    for candidate in candidates:
+        try:
+            out.add(abs(Decimal(candidate)))
+        except InvalidOperation:
+            continue
+    return out
+
+
+def validate_narration(data: dict, facts: ExplanationFacts) -> None:
+    """Reject new numeric magnitudes, allowing 0–4 decimal-place rounding.
+
+    This is an inventory check only: signs, units, associations, written-out
+    numbers and causal claims still need semantic/human evaluation. Ambiguous
+    decimal separators accept either conventional interpretation. The caller
+    falls back to deterministic prose on failure.
+    """
+    keys = {"resumen", "mecanismo", "advertencia"}
+    if not isinstance(data, dict) or set(data) != keys or any(
+        not isinstance(data[k], str) or not data[k].strip() for k in keys
+    ):
+        raise NarrationUnavailable("malformed narration fields")
+
+    allowed: set[Decimal] = set()
+
+    def collect(value):
+        if isinstance(value, dict):
+            for v in value.values():
+                collect(v)
+        elif isinstance(value, (list, tuple)):
+            for v in value:
+                collect(v)
+        elif isinstance(value, (int, float)) and not isinstance(value, bool):
+            number = abs(Decimal(str(value)))
+            if number.is_finite():
+                allowed.add(number)
+                for decimals in range(5):
+                    allowed.add(Decimal(str(round(value, decimals))).copy_abs())
+        elif isinstance(value, str):
+            for token in _NUMBER.findall(value):
+                allowed.update(_number_values(token))
+
+    collect(facts.to_dict())
+    collect(SYSTEM)
+    for block in data.values():
+        # Remove ordinal list labels, which are formatting rather than facts.
+        block = re.sub(r"(?m)^\s*\d+[.)]\s+", "", block)
+        for token in _NUMBER.findall(block):
+            if not (_number_values(token) & allowed):
+                raise NarrationUnavailable(f"number absent from supplied facts: {token}")
+
+
 def _facts_block(facts: ExplanationFacts) -> str:
     return json.dumps(facts.to_dict(), ensure_ascii=False, indent=1, sort_keys=True)
 
@@ -203,8 +274,8 @@ def narrate(facts: ExplanationFacts, *, timeout: float = 30.0) -> NarrationResul
     except Exception as exc:  # network, auth, rate limit, bad request
         raise NarrationUnavailable(f"{type(exc).__name__}: {exc}") from exc
 
-    if response.stop_reason == "refusal":
-        raise NarrationUnavailable("model declined the request")
+    if response.stop_reason in {"refusal", "max_tokens"}:
+        raise NarrationUnavailable("model declined or truncated the response")
 
     text = next((b.text for b in response.content if b.type == "text"), None)
     if not text:
@@ -212,6 +283,7 @@ def narrate(facts: ExplanationFacts, *, timeout: float = 30.0) -> NarrationResul
 
     try:
         data = json.loads(text)
+        validate_narration(data, facts)
         return NarrationResult(
             resumen=data["resumen"],
             mecanismo=data["mecanismo"],

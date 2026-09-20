@@ -51,6 +51,7 @@ export interface ScenarioRequest { levers?: Partial<Levers>; horizon?: number }
 export interface RedLineStatusOut extends RedLineDef { value: number; status: string }
 export interface PersonaDependentsOut { pill: string; headline: string; series: Record<string, number[]> }
 export interface ScenarioResponse extends ApiMeta {
+  warnings?: string[];
   horizon: number;
   years: number[];
   baseline: Record<string, number[]>;
@@ -129,15 +130,17 @@ export interface IrfPointOut extends EstimateOut { h: number; years: number }
 export interface EnginePathPointOut {
   h: number;
   years: number;
-  /** null antes del ancla: la regla del motor es anual. */
+  /** null en horizontes no anuales; h=0 es el cambio acumulado nulo. */
   coef: number | null;
 }
 export interface IrfOut {
   horizons: IrfPointOut[];
   engine_path: EnginePathPointOut[];
   anchor_h: number;
+  engine_reversion: number;
   unit: string;
   note: string;
+  comparison_note: string;
 }
 
 export interface EvidenceResponse extends ApiMeta {
@@ -177,11 +180,17 @@ export interface PredictionResponse extends ApiMeta {
 export interface DistressFeatureOut { feature: string; label: string; mean: number; std: number }
 export interface DistressCountryOut {
   iso3: string; year: number; probability: number; base_rate: number;
+  /** probability is a legacy field name for an uncalibrated classifier output. */
+  score_kind?: "uncalibrated_classifier_score"; calibration_status?: "not_evaluated";
   /** false cuando el país no está en la base de impagos — el caso de España. */
   in_label_set: boolean; coverage: string;
 }
 export interface DistressResponse extends ApiMeta {
   available: boolean;
+  score_kind?: "uncalibrated_classifier_score";
+  calibration_status?: "not_evaluated";
+  validation_scheme?: "country_grouped_cross_validation_not_temporal";
+  importance_scope?: "training_sample_permutation_importance";
   n: number; n_positive: number; base_rate: number; n_countries: number;
   auc: number; auc_std: number; pr_auc: number; pr_auc_lift: number;
   beats_chance: boolean;
@@ -266,6 +275,9 @@ export interface RagCollection {
   chunks: number;
 }
 export interface RagCollectionsResponse extends ApiMeta {
+  default_collection?: string;
+  retrieval_mode?: "lexical" | "hybrid";
+  corpus_scope?: "public_project_docs" | "private_local";
   collections: RagCollection[];
   total_documents: number;
   total_chunks: number;
@@ -321,6 +333,9 @@ export interface MonteCarloRequest {
 }
 export type PercentileKey = "p5" | "p25" | "p50" | "p75" | "p95";
 export interface MonteCarloResponse extends ApiMeta {
+  warnings?: string[];
+  uncertainty_kind?: "conditional_simulation";
+  empirical_coverage_validated?: boolean;
   years: number[];
   percentiles: Record<PercentileKey, number[]>;
   n_paths: number;
@@ -355,16 +370,19 @@ export interface AnalogMatch {
   match_year: number;
   distance: number;
   dominant_lever: string | null;
-  match_snapshot: Record<string, number>;
+  match_snapshot: Record<string, number | null>;
   outcome: AnalogOutcomePoint[];
   outcome_truncated: boolean;
   diffs: StructuralDiff[];
-  debt_payable_verdict: "auto" | "requires_surplus" | "borderline";
+  debt_payable_verdict: "auto" | "requires_surplus" | "borderline" | "not_assessed";
   narrative: string | null;
 }
 
 export interface AnalogResponse extends ApiMeta {
   horizon: number;
+  query_year?: number;
+  features?: string[];
+  limitations?: string;
   query_snapshot: Record<string, number>;
   matches: AnalogMatch[];
   rag_available: boolean;

@@ -11,63 +11,99 @@ import type {
   ScenarioResponse, SensitivityResponse, StateDependenceResponse, VintageResponse,
 } from "./types";
 
-/** Where this build points by default: the public API, or localhost in dev. */
-const BUILD_API_BASE: string = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+/** The scenario API never follows a library connection override. */
+export const API_BASE: string = (import.meta.env.VITE_API_BASE || "http://localhost:8000").replace(/\/+$/, "");
+export const DEFAULT_API_BASE = API_BASE;
+export const DEFAULT_RAG_API_BASE: string = (import.meta.env.VITE_RAG_API_BASE || API_BASE).replace(/\/+$/, "");
+const LEGACY_KEY = "evo.apiBase";
+const RAG_KEY = "evo.ragApiBase";
+const AUTH_KEY = "evo.ragAuth";
 
-const API_OVERRIDE_KEY = "evo.apiBase";
+function cleanBase(raw: string): string {
+  const url = new URL(raw.trim());
+  if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
+    throw new Error("Usa una dirección HTTP o HTTPS sin credenciales, parámetros ni fragmentos.");
+  }
+  if (location.protocol === "https:" && url.protocol !== "https:") {
+    throw new Error("Esta página requiere una dirección HTTPS para la biblioteca.");
+  }
+  return url.href.replace(/\/+$/, "");
+}
 
-/** `?api=reset` clears the override before anything renders.
- *
- *  The in-app button cannot be the only way out. The health check gates the
- *  whole app, so once an override stops answering, every escape that depends on
- *  the app rendering is already gone — the reader is left on a retry screen
- *  with no way back. A URL they can type always works. */
-function consumeResetParam(): boolean {
+function initialCustomBase(): string | null {
   try {
     const params = new URLSearchParams(location.search);
-    if (params.get("api") !== "reset") return false;
-    localStorage.removeItem(API_OVERRIDE_KEY);
-    params.delete("api");
-    const qs = params.toString();
-    history.replaceState(null, "", location.pathname + (qs ? `?${qs}` : "") + location.hash);
-    return true;
+    if (params.get("api") === "reset" || params.get("rag") === "reset") {
+      localStorage.removeItem(LEGACY_KEY);
+      localStorage.removeItem(RAG_KEY);
+      sessionStorage.removeItem(AUTH_KEY);
+      if (params.get("api") === "reset") params.delete("api");
+      if (params.get("rag") === "reset") params.delete("rag");
+      const qs = params.toString();
+      history.replaceState(null, "", location.pathname + (qs ? `?${qs}` : "") + location.hash);
+      return null;
+    }
+    // Earlier versions used this setting for a corpus tunnel but accidentally
+    // redirected health/scenario too. Preserve that URL for the library only.
+    const stored = localStorage.getItem(RAG_KEY) || localStorage.getItem(LEGACY_KEY);
+    localStorage.removeItem(LEGACY_KEY);
+    const base = stored?.trim() ? cleanBase(stored) : null;
+    if (base) localStorage.setItem(RAG_KEY, base);
+    return base;
   } catch {
-    return false;
+    return null;
   }
 }
 
-function readOverride(): string | null {
-  if (consumeResetParam()) return null;
+export interface RagConnection {
+  baseUrl: string;
+  customBaseUrl: string | null;
+  hasToken: boolean;
+  /** Cache identity; never contains a credential. */
+  revision: number;
+}
+const initialBase = initialCustomBase();
+let ragToken = "";
+try {
+  const stored = JSON.parse(sessionStorage.getItem(AUTH_KEY) || "null");
+  if (initialBase && initialBase !== API_BASE && stored?.baseUrl === initialBase && typeof stored.token === "string") {
+    ragToken = stored.token;
+  } else sessionStorage.removeItem(AUTH_KEY);
+} catch { /* unavailable session storage */ }
+let ragConnection: RagConnection = {
+  baseUrl: initialBase ?? DEFAULT_RAG_API_BASE,
+  customBaseUrl: initialBase,
+  hasToken: !!ragToken,
+  revision: 0,
+};
+const ragListeners = new Set<() => void>();
+export const getRagConnection = () => ragConnection;
+export function subscribeRagConnection(listener: () => void): () => void {
+  ragListeners.add(listener);
+  return () => { ragListeners.delete(listener); };
+}
+
+/** Credentials belong to this tab session and one explicit custom endpoint.
+ *  They are never baked into a public build or sent to the scenario API. */
+export function setRagConnection(url: string | null, token = ""): void {
+  const base = url?.trim() ? cleanBase(url) : null;
+  const secret = base && base !== API_BASE ? token.trim() : "";
   try {
-    const v = localStorage.getItem(API_OVERRIDE_KEY);
-    return v && v.trim() ? v.trim().replace(/\/+$/, "") : null;
-  } catch {
-    return null; // private mode / blocked storage
-  }
-}
-
-/** Live binding: importers see reassignments made by `setApiBase`.
- *
- *  The copyrighted corpus never ships to the public deploy, so the only way to
- *  query it from the published frontend is to point this at a tunnel to the
- *  machine that holds the index. The URL of a cloudflared quick tunnel is new
- *  on every run, which is why this is runtime state and not a build-time env. */
-export let API_BASE: string = readOverride() ?? BUILD_API_BASE;
-
-/** Repoint every API call. `null` restores the build-time default. */
-export function setApiBase(url: string | null): void {
-  const clean = url?.trim().replace(/\/+$/, "") || null;
+    localStorage.removeItem(LEGACY_KEY);
+    if (base) localStorage.setItem(RAG_KEY, base);
+    else localStorage.removeItem(RAG_KEY);
+  } catch { /* settings still apply to this page view */ }
   try {
-    if (clean) localStorage.setItem(API_OVERRIDE_KEY, clean);
-    else localStorage.removeItem(API_OVERRIDE_KEY);
-  } catch {
-    /* storage unavailable — the override still applies for this page view */
-  }
-  API_BASE = clean ?? BUILD_API_BASE;
+    if (secret) sessionStorage.setItem(AUTH_KEY, JSON.stringify({ baseUrl: base, token: secret }));
+    else sessionStorage.removeItem(AUTH_KEY);
+  } catch { /* memory only when storage is unavailable */ }
+  ragToken = secret;
+  ragConnection = {
+    baseUrl: base ?? DEFAULT_RAG_API_BASE, customBaseUrl: base,
+    hasToken: !!secret, revision: ragConnection.revision + 1,
+  };
+  ragListeners.forEach((listener) => listener());
 }
-
-/** The build-time target, for telling the reader what "restore" would mean. */
-export const DEFAULT_API_BASE = BUILD_API_BASE;
 
 export class ApiError extends Error {
   endpoint: string;
@@ -102,18 +138,29 @@ async function failure(endpoint: string, res: Response): Promise<ApiError> {
   return new ApiError(endpoint, detail, { status: res.status });
 }
 
-async function request<T>(endpoint: string, init?: RequestInit): Promise<T> {
+async function response(endpoint: string, init?: RequestInit, rag = false): Promise<Response> {
+  const base = rag ? ragConnection.baseUrl : API_BASE;
+  const headers = new Headers(init?.headers);
+  headers.set("Content-Type", "application/json");
+  const authenticated = rag && ragConnection.customBaseUrl && base !== API_BASE && !!ragToken;
+  if (authenticated) headers.set("Authorization", `Bearer ${ragToken}`);
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}${endpoint}`, {
-      headers: { "Content-Type": "application/json" },
-      ...init,
+    res = await fetch(`${base}${endpoint}`, {
+      ...init, headers,
+      // A credential is bound to this endpoint, not to a redirect destination.
+      ...(authenticated ? { redirect: "error" as const } : {}),
     });
   } catch (cause) {
+    if (init?.signal?.aborted) throw cause;
     throw new ApiError(endpoint, "sin conexión", { cause });
   }
   if (!res.ok) throw await failure(endpoint, res);
-  return (await res.json()) as T;
+  return res;
+}
+
+async function request<T>(endpoint: string, init?: RequestInit, rag = false): Promise<T> {
+  return (await (await response(endpoint, init, rag)).json()) as T;
 }
 
 export const api = {
@@ -141,14 +188,14 @@ export const api = {
   prediction: () => request<PredictionResponse>("/prediction"),
   distress: () => request<DistressResponse>("/distress"),
   stateDependence: () => request<StateDependenceResponse>("/state-dependence"),
-  ragCollections: () => request<RagCollectionsResponse>("/rag/collections"),
-  ragEval: () => request<RagEvalResponse>("/rag/eval"),
+  ragCollections: () => request<RagCollectionsResponse>("/rag/collections", undefined, true),
+  ragEval: () => request<RagEvalResponse>("/rag/eval", undefined, true),
   regimes: () => request<RegimesResponse>("/regimes"),
   demography: () => request<DemographyResponse>("/demography"),
   ragSearch: (body: RagSearchRequest, signal?: AbortSignal) =>
-    request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }),
+    request<RagSearchResponse>("/rag/search", { method: "POST", body: JSON.stringify(body), signal }, true),
   ragChat: (body: RagChatRequest, signal?: AbortSignal) =>
-    request<RagChatResponse>("/rag/chat", { method: "POST", body: JSON.stringify(body), signal }),
+    request<RagChatResponse>("/rag/chat", { method: "POST", body: JSON.stringify(body), signal }, true),
 };
 
 /** Events emitted by /rag/chat/stream, in order: one `passages`, many
@@ -174,13 +221,12 @@ export async function ragChatStream(
   handlers: RagStreamHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
-  const res = await fetch(`${API_BASE}/rag/chat/stream`, {
+  const res = await response("/rag/chat/stream", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
     signal,
-  });
-  if (!res.ok) throw await failure("/rag/chat/stream", res);
+  }, true);
   if (!res.body) throw new ApiError("/rag/chat/stream", "respuesta sin cuerpo", { status: res.status });
 
   const reader = res.body.getReader();

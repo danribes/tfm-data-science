@@ -4,8 +4,8 @@ import {
 import { nf } from "../lib/fmt";
 import { useReducedMotion } from "../lib/motion";
 
-export function ProjectionChart({ years, baseline, scenario, redLines = [], unit = "", dec = 1, height = 260, labels }: {
-  years: number[]; baseline: number[]; scenario: number[];
+export function ProjectionChart({ years, baseline, scenario, redLines = [], unit = "", dec = 1, height = 260, labels, historical = false }: {
+  years: number[]; baseline: (number | null)[]; scenario: (number | null)[]; historical?: boolean;
   redLines?: { value: number; label: string }[]; unit?: string; dec?: number; height?: number;
   /** Verbatim x-axis captions, one per point, for series whose periods are not
    *  calendar years ("2021-07", "2020-Q2"). Without them the Histórico panel
@@ -20,8 +20,8 @@ export function ProjectionChart({ years, baseline, scenario, redLines = [], unit
   return (
     <div>
       <div className="legend">
-        <span><i style={{ background: "var(--lab)" }} />escenario actual</span>
-        <span><s />base congelada (vintage)</span>
+        <span><i style={{ background: "var(--lab)" }} />{historical ? "dato histórico observado" : "escenario actual"}</span>
+        {!historical && <span><s />base congelada (vintage)</span>}
         {redLines.length > 0 && <span><s style={{ borderColor: "var(--div-neg)" }} />línea roja</span>}
       </div>
       <ResponsiveContainer width="100%" height={height} initialDimension={{ width: 660, height }}>
@@ -37,10 +37,10 @@ export function ProjectionChart({ years, baseline, scenario, redLines = [], unit
             <ReferenceLine key={rl.label} y={rl.value} stroke="var(--div-neg)" strokeDasharray="4 3"
               label={{ value: rl.label, fontSize: 13.5, fill: "var(--div-neg)", position: "insideTopRight" }} />
           ))}
-          <Line type="linear" dataKey="base" stroke="var(--baseline)" strokeWidth={1.6}
-            strokeDasharray="5 4" dot={false} isAnimationActive={false} name="base" />
+          {!historical && <Line type="linear" dataKey="base" stroke="var(--baseline)" strokeWidth={1.6}
+            strokeDasharray="5 4" dot={false} isAnimationActive={false} name="base" />}
           <Line type="linear" dataKey="esc" stroke="var(--lab)" strokeWidth={2.4} dot={false}
-            isAnimationActive={!reduced} animationDuration={200} name="escenario" />
+            isAnimationActive={!reduced} animationDuration={200} name={historical ? "observado" : "escenario"} />
         </LineChart>
       </ResponsiveContainer>
     </div>

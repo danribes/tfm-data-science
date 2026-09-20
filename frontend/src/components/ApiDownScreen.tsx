@@ -1,4 +1,4 @@
-import { API_BASE, DEFAULT_API_BASE, setApiBase } from "../api/client";
+import { API_BASE } from "../api/client";
 
 export function ApiDownScreen({ error }: { error: unknown }) {
   return (
@@ -17,20 +17,7 @@ export function ApiDownScreen({ error }: { error: unknown }) {
         {error instanceof Error && (
           <p className="src" style={{ whiteSpace: "normal" }}>Detalle: {error.message}</p>
         )}
-        {API_BASE !== DEFAULT_API_BASE && (
-          <p style={{ fontSize: 12, marginTop: 10 }}>
-            <button
-              type="button"
-              className="link-btn"
-              onClick={() => {
-                setApiBase(null);
-                location.reload();
-              }}
-            >
-              Volver a la API pública
-            </button>
-          </p>
-        )}
+
       </div>
     </div>
   );

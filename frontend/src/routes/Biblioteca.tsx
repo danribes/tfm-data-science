@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { RagReportCard } from "../components/RagReportCard";
-import { api, ragChatStream } from "../api/client";
+import { ragChatStream } from "../api/client";
+import { selectRagCollection, useRagCollections, useRagConnection } from "../api/hooks";
+import { RagConnectionSettings } from "../components/RagConnectionSettings";
+import { PUBLIC_RAG_EXAMPLES, RagCorpusNotice } from "../components/RagCorpusNotice";
 import type { Authority, Passage, RagChatResponse } from "../api/types";
 import { useScenarioStore } from "../state/scenarioStore";
 import { nf } from "../lib/fmt";
@@ -51,22 +53,20 @@ function toFailure(e: unknown): Failure {
 }
 
 export default function Biblioteca() {
-  const collections = useQuery({
-    queryKey: ["rag", "collections"],
-    queryFn: api.ragCollections,
-    staleTime: Infinity,
-  });
-  // 503 is the API's deliberate answer on the public deploy: the copyrighted
-  // corpus and its index never leave the local machine. Anything else is a
-  // real outage.
+  const connection = useRagConnection();
+  const collections = useRagCollections();
+  const isPublic = collections.data?.corpus_scope === "public_project_docs";
   const collFailure = collections.isError ? toFailure(collections.error) : null;
-  const unavailable = collFailure?.status === 503;
+  const [selectedCollection, setCollection] = useState<string | null>(null);
+  const active = collections.data?.collections.find((item) => item.id === selectedCollection)
+    ?? selectRagCollection(collections.data?.collections, collections.data?.default_collection);
+  const collection = active?.id ?? "";
+  const unavailable = !active || active.chunks === 0 || collections.isError;
 
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
 
   const [question, setQuestion] = useState("");
-  const [collection, setCollection] = useState("libros");
   const [withScenario, setWithScenario] = useState(false);
   const [answer, setAnswer] = useState<RagChatResponse | null>(null);
   const [passages, setPassages] = useState<Passage[]>([]);
@@ -76,10 +76,12 @@ export default function Biblioteca() {
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<Failure | null>(null);
 
-  // One streamed request rather than two round trips. The server emits the
-  // passages as soon as retrieval finishes (~0,8 s) and then the answer word by
-  // word, so time-to-first-content is under a second instead of the ~5,5 s it
-  // took to wait for the whole generation.
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => {
+    setCollection(null); setAsked(""); setStreamed(""); setPassages([]); setAnswer(null); setFailure(null); setBusy(false);
+    return () => controller.current?.abort();
+  }, [connection.revision]);
+
   const submit = (q: string) => {
     const text = q.trim();
     if (text.length < 2 || busy || unavailable) return;
@@ -91,6 +93,8 @@ export default function Biblioteca() {
     setFailure(null);
     setBusy(true);
 
+    const request = new AbortController();
+    controller.current = request;
     ragChatStream(
       {
         question: text,
@@ -112,9 +116,10 @@ export default function Biblioteca() {
             model: final.model, error: final.error ?? null,
           } as RagChatResponse),
       },
+      request.signal,
     )
-      .catch((e: unknown) => setFailure(toFailure(e)))
-      .finally(() => setBusy(false));
+      .catch((e: unknown) => { if (!request.signal.aborted) setFailure(toFailure(e)); })
+      .finally(() => { if (!request.signal.aborted) setBusy(false); });
   };
 
   const shown = passages;
@@ -122,7 +127,6 @@ export default function Biblioteca() {
   // agree, but `done` is authoritative if a provider died mid-stream).
   const answerText = answer?.answer ?? streamed;
 
-  const active = collections.data?.collections.find((c) => c.id === collection);
   const empty = active && active.chunks === 0;
 
   return (
@@ -138,12 +142,16 @@ export default function Biblioteca() {
         </span>
       </div>
 
+      <RagConnectionSettings />
       <div className="card">
+        <RagCorpusNotice data={collections.data} />
         <p className="biblio-intro">
-          Pregunta sobre economía y te respondo <strong>sólo con lo que hay en el
-          corpus</strong>, citando el pasaje. Si el corpus no cubre la pregunta,
-          lo digo en vez de rellenar el hueco: una respuesta sin cita parece
-          fundamentada y no lo está.
+          {isPublic ? "Pregunta sobre el modelo, sus resultados o su metodología" : "Pregunta sobre economía, estadística o recuperación de información"}
+          {" "}y te respondo <strong>a partir de los pasajes
+          recuperados</strong>, con referencias a las fuentes. Comprueba que las
+          citas respalden la respuesta: la IA puede equivocarse o abstenerse si
+          falta información. Las colecciones disponibles dependen del servicio conectado;
+          los pasajes seleccionados se envían al proveedor de IA configurado.
         </p>
 
         <div className="biblio-colls">
@@ -152,6 +160,7 @@ export default function Biblioteca() {
               key={c.id}
               type="button"
               className={c.id === collection ? "coll on" : "coll"}
+              disabled={busy}
               onClick={() => setCollection(c.id)}
               title={c.note}
             >
@@ -164,8 +173,7 @@ export default function Biblioteca() {
         {active && <p className="biblio-note">{active.note}</p>}
         {empty && (
           <div className="banner">
-            Esta colección aún no está indexada. Ejecuta{" "}
-            <code>python -m rag.ingest --collection {collection}</code>.
+            Esta colección no tiene pasajes disponibles.
           </div>
         )}
 
@@ -180,7 +188,7 @@ export default function Biblioteca() {
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="¿por qué sube la deuda cuando el tipo supera al crecimiento?"
+            placeholder={isPublic ? "¿Qué parámetros del modelo están estimados con datos?" : "¿por qué sube la deuda cuando el tipo supera al crecimiento?"}
             aria-label="Pregunta"
             disabled={unavailable}
           />
@@ -196,11 +204,11 @@ export default function Biblioteca() {
             onChange={(e) => setWithScenario(e.target.checked)}
           />
           Enviar también el escenario que tengo puesto — la respuesta podrá
-          enlazar la teoría citada con los números que hay ahora en pantalla.
+          enlazar las fuentes citadas con los números que hay ahora en pantalla.
         </label>
 
         <div className="biblio-eg">
-          {EXAMPLES.map((q) => (
+          {(isPublic ? PUBLIC_RAG_EXAMPLES : EXAMPLES).map((q) => (
             <button key={q} type="button" onClick={() => submit(q)} disabled={unavailable}>
               {q}
             </button>
@@ -208,25 +216,18 @@ export default function Biblioteca() {
         </div>
       </div>
 
-      {(unavailable || failure?.status === 503) && (
-        <div className="banner">
-          <strong>La biblioteca sólo está disponible en el despliegue local.</strong>{" "}
-          El corpus tiene derechos de autor y su índice vectorial no se publica;
-          esta instancia pública sirve el motor pero no la biblioteca. Motivo del
-          servidor: <em>{(failure ?? collFailure)?.detail}</em>
+      {collFailure && (
+        <div className="banner err" role="alert">
+          No se pudo cargar el índice de la biblioteca: {collFailure.detail}
         </div>
       )}
-      {collFailure && !unavailable && (
-        <div className="banner err">
-          No se pudo cargar el índice de la biblioteca ({collFailure.detail}).
-          ¿Está la API en marcha?
+      {failure && (
+        <div className="banner err" role="alert">
+          No se pudo consultar la biblioteca: {failure.detail}
         </div>
       )}
-      {failure && failure.status !== 503 && (
-        <div className="banner err">
-          No se pudo consultar la biblioteca ({failure.detail}). ¿Está el índice
-          construido y la API en marcha?
-        </div>
+      {collections.isSuccess && !active && (
+        <div className="banner">El servicio no anuncia ninguna colección con pasajes disponibles.</div>
       )}
 
       {(asked || answer) && (
@@ -253,7 +254,7 @@ export default function Biblioteca() {
           {shown.length > 0 && (
             <>
               <h4 className="biblio-src">
-                {answer ? "Pasajes citados" : "Pasajes recuperados"}{" "}
+                Pasajes recuperados{" "}
                 <small>{shown.length}</small>
               </h4>
               <ol className="psg-list">
@@ -269,8 +270,8 @@ export default function Biblioteca() {
               {answer.provider ? (
                 <>
                   Redactado por <code>{answer.model}</code> a partir de los
-                  pasajes de arriba. El modelo elige las palabras; las fuentes
-                  son las citadas.
+                  pasajes de arriba. Las referencias se comprueban, pero la
+                  fidelidad de cada afirmación requiere revisar las fuentes.
                 </>
               ) : (
                 <>

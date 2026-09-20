@@ -210,6 +210,9 @@ def test_explain_carries_the_vintage_meta():
 def test_narration_failure_falls_back_rather_than_erroring(monkeypatch):
     """A dead API key must degrade the text, never break the endpoint."""
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    import importlib
+    narration = importlib.import_module("explain.narrate")
+    monkeypatch.setattr(narration, "_load_env_file", lambda: None)
     r = client.post("/explain", json={"levers": {"r": 4.8}, "narrate": True})
     assert r.status_code == 200
     body = r.json()

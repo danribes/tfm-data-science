@@ -23,8 +23,7 @@ from research import estimate, panel
 #: anything: the full-sample estimate averages a crash and a recovery into one
 #: number, and a single number invites the reader to believe the average is a
 #: description of either half. It is a description of neither.
-#: Quarters in a year. The impulse response is anchored here because IPV_REV
-#: is an annual rule and a cumulative projection is zero at h = 0.
+#: Quarters in a year. Only annual points compare to the annual engine rule.
 ANNUAL_H = 4
 
 IPV_WINDOWS: tuple[tuple[str, int, int], ...] = (
@@ -97,9 +96,9 @@ def compare_ipv_growth() -> Comparison | None:
             subs.append(Subperiod(label=label, estimate=sub))
 
     return Comparison(
-        constant="IPV_LR", label="Crecimiento a largo plazo del precio de la vivienda",
+        constant="IPV_LR", label="Crecimiento medio del IPV en la muestra regional",
         calibrated=c.IPV_LR_V16, estimate=est,
-        source="gold_ccaa_trimestral.csv · 20 CCAA × 2007-2026",
+        source="gold_ccaa_trimestral.csv · 17 CCAA + Ceuta y Melilla · 2007-2026",
         subperiods=tuple(subs),
     )
 
@@ -108,7 +107,8 @@ def compare_ipv_reversion() -> Comparison | None:
     """IPV_REV — how fast house-price growth reverts towards its long run.
 
     Regressing next year's growth on this year's gives a persistence phi; the
-    engine's reversion parameter is the complement, 1 - phi.
+    engine's reversion rate is the complement, 1 - phi. The legacy v16 value
+    0.60 was instead a persistence factor, equivalent to a 0.40 reversion rate.
     """
     p = panel.yoy(panel.housing_panel(), "ipv", periods=4)
     by_unit: dict[str, dict[int, dict]] = {}
@@ -133,33 +133,65 @@ def compare_ipv_reversion() -> Comparison | None:
     )
     return Comparison(
         constant="IPV_REV", label="Reversión anual del IPV hacia su tendencia",
-        calibrated=c.IPV_REV_V16, estimate=rev,
-        source="gold_ccaa_trimestral.csv · AR(1) sobre el crecimiento interanual",
+        calibrated=1.0 - c.IPV_REV_V16, estimate=rev,
+        source=("gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual; "
+                "v16: persistencia 0,60 = reversión 0,40"),
     )
 
 
-def ipv_shock_response(horizons: int = 12) -> dict | None:
-    """How long a regional house-price shock lasts, horizon by horizon.
+def _cumulative_engine_path(anchor: float, reversion: float,
+                            horizons: int) -> list[dict]:
+    """An annual, amplitude-matched comparison in cumulative log-price units.
 
-    The shock is a region's year-on-year house-price growth *minus the average
+    The first future year's growth gap is chosen to match the empirical h=4
+    change. Later annual growth gaps retain (1-reversion), just as in the
+    engine. Prices compound relative to the same baseline without a growth
+    gap. The observed price at t is the reference, so the already realised
+    growth at t contributes nothing. No quarterly interpolation is assumed.
+
+    This matches a descriptive shape, not the response to an identified
+    one-point innovation: the regression predictor is overlapping past-year
+    growth. Its first future-year movement must be estimated, not equated to
+    the already observed annual growth gap.
+    """
+    persistence = 1.0 - reversion
+    # Use the engine's unperturbed, potentially changing baseline growth.
+    # g[1], not the already realised g[0], produces the first price change.
+    def reference_growth(year: int) -> float:
+        return c.IPV_LR + (c.V0["ipv"] - c.IPV_LR) * persistence ** year
+
+    first_gap = (100.0 + reference_growth(1)) * math.expm1(anchor / 100.0)
+    annual = {0: 0.0}
+    cumulative = 0.0
+    for year in range(1, horizons // ANNUAL_H + 1):
+        growth_gap = first_gap * persistence ** (year - 1)
+        cumulative += 100.0 * math.log1p(growth_gap / (100.0 + reference_growth(year)))
+        annual[year * ANNUAL_H] = cumulative
+    return [{"h": h, "years": h / ANNUAL_H, "coef": annual.get(h)}
+            for h in range(horizons + 1)]
+
+
+def ipv_shock_response(horizons: int = 12) -> dict | None:
+    """Descriptive future price changes conditional on past regional growth.
+
+    The predictor is a region's year-on-year house-price growth *minus the average
     across regions in the same quarter*. Subtracting the quarter mean removes
     whatever hit the whole country at once — rates, the cycle, a national
-    policy — and leaves the part that is specific to one region. That is what
-    makes this estimable at all: the panel is regional, so only regional
-    variation is identified. It is a statement about persistence, not a
-    structural multiplier, and it is labelled as one.
+    policy. This does not make the predictor exogenous. Its four-quarter
+    window overlaps across observations, so it is not a quarterly innovation.
+    The fitted relationship describes regional persistence, not a multiplier.
 
     The response is demeaned the same way — a region's log price minus the
     average log price across regions that quarter — so shock and response are
     the same kind of object. Without that, the common national trend sits in
     the residual and every band widens until nothing is distinguishable.
 
-    B_h is therefore the % gap in the level after a one-point idiosyncratic
-    surge in annual growth. The engine's own assumption is returned on the same
-    axis: it shrinks a deviation by IPV_REV per year, so (1 - IPV_REV)^((h-4)/4)
-    of the one-year response should survive to quarter h. The anchor is h = 4
-    and not h = 0 because a cumulative-change projection is zero at h = 0 by
-    construction; one year is also the period IPV_REV is quoted in.
+    B_h is the association between a one-point past annual growth gap and the
+    future cumulative change log(P[t+h])-log(P[t]), relative to the regional
+    mean. A decaying growth gap accumulates into a level gap; it does not imply
+    a decaying cumulative response. The annual engine comparison is amplitude
+    matched at h=4 and compounds subsequent growth gaps. It is not a separately
+    identified causal response and the shared anchor is not validation.
     """
     p = panel.yoy(panel.housing_panel(), "ipv", periods=4)
 
@@ -194,20 +226,20 @@ def ipv_shock_response(horizons: int = 12) -> dict | None:
             {"h": h, "years": h / 4.0, **est.to_dict()}
             for h, est in enumerate(irf)
         ],
-        "engine_path": [
-            # Undefined before the anchor: the engine's rule is annual, and
-            # extrapolating it back to sub-year horizons would invent a claim
-            # the constant does not make.
-            {"h": h, "years": h / 4.0,
-             "coef": (anchor * (1.0 - c.IPV_REV) ** ((h - ANNUAL_H) / 4.0)
-                      if h >= ANNUAL_H else None)}
-            for h in range(len(irf))
-        ],
+        "engine_path": _cumulative_engine_path(anchor, c.IPV_REV, len(irf) - 1),
+        "engine_reversion": c.IPV_REV,
         "anchor_h": ANNUAL_H,
-        "unit": "% de desviación del precio por punto de choque",
-        "note": ("choque idiosincrásico regional: crecimiento del IPV menos la "
-                 "media de las CCAA en ese trimestre, con la respuesta "
-                 "descontada de la misma media"),
+        "unit": "puntos logarítmicos de cambio acumulado por pp de crecimiento previo",
+        "note": ("asociación entre crecimiento interanual regional del IPV "
+                 "y cambio futuro del log-precio desde t; ambas variables "
+                 "descontadas de su media regional por trimestre"),
+        "comparison_note": (
+            "Comparación descriptiva de forma: el primer año se iguala a la "
+            "estimación, y los siguientes acumulan brechas de crecimiento "
+            "anual que revierten según el motor. El nivel en t es la base: "
+            "el crecimiento ya observado no se vuelve a contar. Sólo se "
+            "muestran puntos anuales; el crecimiento interanual solapado "
+            "no identifica un choque trimestral ni un efecto causal."),
     }
 
 

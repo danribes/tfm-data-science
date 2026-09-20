@@ -20,7 +20,9 @@ from research import estimate, panel, validate
 
 def test_housing_panel_shape():
     p = panel.housing_panel()
-    assert len(p.units) == 20
+    assert len(p.units) == 19  # 17 CCAA plus the two autonomous cities
+    assert "Nacional" not in p.units
+    assert {"Ceuta", "Melilla"} <= set(p.units)
     assert len(p) > 1400
     assert all(r["ipv"] is not None for r in p.rows)
 
@@ -135,7 +137,7 @@ def test_ipv_growth_is_estimated_from_the_regional_panel():
     assert cmp_ is not None
     assert cmp_.constant == "IPV_LR"
     assert cmp_.calibrated == c.IPV_LR_V16   # the comparison contests v16, not the default
-    assert cmp_.estimate.n_units == 20
+    assert cmp_.estimate.n_units == 19
     assert math.isfinite(cmp_.estimate.coef)
 
 
@@ -180,6 +182,8 @@ def test_ipv_reversion_is_the_complement_of_persistence():
     assert cmp_ is not None
     # Reversion is 1 - phi, so the band must be the mirrored persistence band.
     assert cmp_.estimate.ci_low < cmp_.estimate.coef < cmp_.estimate.ci_high
+    # v16 stored the factor retained, whereas the new estimate is removed/year.
+    assert cmp_.calibrated == pytest.approx(0.40)
 
 
 def test_verdict_names_the_side_when_the_calibration_falls_outside():
@@ -206,22 +210,69 @@ def test_impulse_response_starts_at_zero_and_is_estimated_at_every_horizon():
     assert hs[-1]["n"] < hs[0]["n"]
 
 
-def test_engine_path_is_silent_before_its_anchor():
-    """IPV_REV is an annual rule. Extrapolating it to sub-year horizons would
-    put a claim on the chart that the constant does not make."""
+def test_engine_path_accumulates_growth_only_at_annual_horizons():
+    """A growth gap can decay while its cumulative price effect keeps growing."""
     irf = validate.ipv_shock_response(horizons=8)
     assert irf is not None
     anchor = irf["anchor_h"]
-    before = [p for p in irf["engine_path"] if p["h"] < anchor]
-    after = [p for p in irf["engine_path"] if p["h"] >= anchor]
-    assert before and all(p["coef"] is None for p in before)
+    nonannual = [p for p in irf["engine_path"] if p["h"] % 4]
+    after = [p for p in irf["engine_path"] if p["h"] >= anchor and p["h"] % 4 == 0]
+    assert irf["engine_path"][0]["coef"] == 0.0
+    assert nonannual and all(p["coef"] is None for p in nonannual)
     assert all(p["coef"] is not None for p in after)
-    # At the anchor the two curves meet, so the chart compares decay, not level.
+    # At the anchor the two curves meet by construction, not empirical agreement.
     at_anchor = next(p for p in irf["horizons"] if p["h"] == anchor)
     assert after[0]["coef"] == pytest.approx(at_anchor["coef"])
-    # And from there the engine's path only shrinks.
+    # Positive annual excess growth accumulates even as its increments decay.
     coefs = [p["coef"] for p in after]
-    assert all(b < a for a, b in zip(coefs, coefs[1:]))
+    assert all(b > a for a, b in zip(coefs, coefs[1:]))
+    assert irf["engine_reversion"] == c.IPV_REV
+    assert "descriptiva" in irf["comparison_note"]
+
+
+@pytest.mark.parametrize("anchor", [1.0, -1.0])
+def test_cumulative_engine_path_compounds_relative_prices_from_t(anchor, monkeypatch):
+    """Compare with explicit price paths, so growth and level units cannot swap."""
+    reversion, baseline_growth = 0.2, 3.0
+    monkeypatch.setattr(c, "IPV_LR", baseline_growth)
+    monkeypatch.setitem(c.V0, "ipv", baseline_growth)
+    first_gap = (100 + baseline_growth) * math.expm1(anchor / 100)
+    reference, scenario = 100.0, 100.0
+    path = {p["h"]: p["coef"]
+            for p in validate._cumulative_engine_path(anchor, reversion, 12)}
+    assert path[0] == 0.0  # realised growth through t is outside the response
+    for year in range(1, 4):
+        gap = first_gap * (1 - reversion) ** (year - 1)
+        scenario *= 1 + (baseline_growth + gap) / 100
+        reference *= 1 + baseline_growth / 100
+        assert path[4 * year] == pytest.approx(100 * math.log(scenario / reference))
+    assert path[4] == pytest.approx(anchor)
+
+
+def test_cumulative_comparison_matches_two_engine_runs_with_a_growth_perturbation(monkeypatch):
+    """The reference engine also has a decaying initial growth gap of its own."""
+    from engine.levers import Levers
+    from engine.spain import run_scenario
+
+    reversion = 0.2
+    reference = run_scenario(Levers(), ipv_rev=reversion)
+    with monkeypatch.context() as m:
+        m.setitem(c.V0, "ipv", c.V0["ipv"] + 1.0)
+        perturbed = run_scenario(Levers(), ipv_rev=reversion)
+    anchor = 100 * math.log(perturbed["precio"][1] / reference["precio"][1])
+    path = {p["h"]: p["coef"]
+            for p in validate._cumulative_engine_path(anchor, reversion, 12)}
+    for year in range(4):
+        assert path[year * 4] == pytest.approx(
+            100 * math.log(perturbed["precio"][year] / reference["precio"][year]))
+
+
+def test_cumulative_engine_path_zero_and_full_growth_reversion():
+    """No reversion keeps accumulating; full reversion preserves a level gap."""
+    no_reversion = validate._cumulative_engine_path(1.0, 0.0, 12)
+    full_reversion = validate._cumulative_engine_path(1.0, 1.0, 12)
+    assert [p["coef"] for p in no_reversion if p["h"] % 4 == 0] == pytest.approx([0, 1, 2, 3])
+    assert [p["coef"] for p in full_reversion if p["h"] % 4 == 0] == pytest.approx([0, 1, 1, 1])
 
 
 def test_impulse_response_uses_idiosyncratic_variation_only():

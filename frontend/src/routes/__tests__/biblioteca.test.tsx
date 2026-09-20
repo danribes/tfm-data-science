@@ -19,7 +19,7 @@ function ui() {
 describe("Biblioteca — chat con citas", () => {
   it("lists every collection with its authority", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     expect(screen.getByText("Canal crack23")).toBeInTheDocument();
     expect(screen.getByText("Método y diseño del propio modelo")).toBeInTheDocument();
     // The authority tag is the point: a channel must not look like a textbook.
@@ -36,7 +36,7 @@ describe("Biblioteca — chat con citas", () => {
 
   it("answers a question and cites the passage it used", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.type(screen.getByLabelText("Pregunta"), "por qué sube la deuda");
     await userEvent.click(screen.getByRole("button", { name: "preguntar" }));
 
@@ -47,7 +47,7 @@ describe("Biblioteca — chat con citas", () => {
 
   it("says the corpus does not cover it instead of inventing an answer", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.type(screen.getByLabelText("Pregunta"), "qué dice sobre la fusión fría");
     await userEvent.click(screen.getByRole("button", { name: "preguntar" }));
 
@@ -58,17 +58,17 @@ describe("Biblioteca — chat con citas", () => {
 
   it("discloses which model wrote the answer", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.click(screen.getAllByRole("button", { name: /multiplicador fiscal/ })[0]);
     await waitFor(() =>
       expect(screen.getByText(/gemini-2\.5-flash/)).toBeInTheDocument(),
     );
-    expect(screen.getByText(/El modelo elige las palabras/)).toBeInTheDocument();
+    expect(screen.getByText(/fidelidad de cada afirmación requiere revisar las fuentes/)).toBeInTheDocument();
   });
 
   it("an example question fills the box and asks it", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.click(screen.getAllByRole("button", { name: /proyecciones locales/ })[0]);
     await waitFor(() => expect(screen.getByText(/La deuda crece cuando/)).toBeInTheDocument());
     expect((screen.getByLabelText("Pregunta") as HTMLInputElement).value)
@@ -127,7 +127,7 @@ describe("Biblioteca — chat con citas", () => {
       }),
     );
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.click(screen.getAllByRole("button", { name: /multiplicador fiscal/ })[0]);
 
     // Passages first, with the interim wording…
@@ -142,35 +142,27 @@ describe("Biblioteca — chat con citas", () => {
 
   it("the scenario toggle is off by default", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     expect(screen.getByRole("checkbox")).not.toBeChecked();
   });
 
   it("refuses to send an empty question", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     expect(screen.getByRole("button", { name: "preguntar" })).toBeDisabled();
   });
 
-  // The public deploy ships without the RAG stack on purpose (copyrighted corpus,
-  // local-only index). The API says so with a 503 + detail; the page must relay
-  // that reason instead of asking whether the index is built.
-  const DETAIL_503 =
-    "La biblioteca no está disponible en este despliegue: el corpus con derechos " +
-    "de autor y su índice vectorial viven sólo en la máquina local. (ModuleNotFoundError)";
+  const DETAIL_503 = "El servicio está preparando el índice público. Inténtalo más tarde.";
 
-  it("explains the library is local-only when /rag/collections answers 503", async () => {
+  it("shows the backend reason when collections are temporarily unavailable", async () => {
     server.use(
       http.get("http://localhost:8000/rag/collections", () =>
         HttpResponse.json({ detail: DETAIL_503 }, { status: 503 }),
       ),
     );
     ui();
-    await waitFor(() =>
-      expect(screen.getByText(/sólo está disponible en el despliegue local/i)).toBeInTheDocument(),
-    );
-    expect(screen.getByText(/ModuleNotFoundError/)).toBeInTheDocument();
-    expect(screen.queryByText(/¿Está el índice construido/)).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(DETAIL_503));
+    expect(screen.queryByText(/sólo está disponible en el despliegue local/i)).not.toBeInTheDocument();
     expect(screen.getByLabelText("Pregunta")).toBeDisabled();
   });
 
@@ -181,12 +173,12 @@ describe("Biblioteca — chat con citas", () => {
       ),
     );
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.type(screen.getByLabelText("Pregunta"), "por qué sube la deuda");
     await userEvent.click(screen.getByRole("button", { name: "preguntar" }));
 
     await waitFor(() =>
-      expect(screen.getByText(/sólo está disponible en el despliegue local/i)).toBeInTheDocument(),
+      expect(screen.getByRole("alert")).toHaveTextContent(DETAIL_503),
     );
     expect(screen.queryByText(/¿Está el índice construido/)).not.toBeInTheDocument();
   });
@@ -198,7 +190,7 @@ describe("Biblioteca — chat con citas", () => {
       ),
     );
     ui();
-    await waitFor(() => expect(screen.getByText("Manuales de economía")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Economía y métodos")).toBeInTheDocument());
     await userEvent.type(screen.getByLabelText("Pregunta"), "por qué sube la deuda");
     await userEvent.click(screen.getByRole("button", { name: "preguntar" }));
 

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { api } from "../api/client";
-import { baseline } from "../engine/spain";
+import { baseline, SERIES_KEYS, YEARS } from "../engine/spain";
 
 export const STALE_LIMIT_DAYS = 90;
 
@@ -22,14 +22,19 @@ export const useAppHealth = create<AppHealth>()((set) => ({
   addWarning: (text) => set((s) => ({ extraWarnings: [...s.extraWarnings, text] })),
 }));
 
-/** Spec §3 cross-check: POST /scenario at base once, compare b at 2026/2035/2050 (idx 0/9/24). */
+/** Compare every baseline series/year: debt alone cannot detect housing or fiscal drift. */
 export async function crossCheckEngine(): Promise<void> {
   try {
     const res = await api.scenario({ levers: {}, horizon: 2050 });
     const local = baseline();
-    const mismatch = [0, 9, 24].some(
-      (i) => Math.abs((res.scenario.b?.[i] ?? Number.NaN) - local.b[i]) > 1e-6,
-    );
+    const mismatch = res.years.length !== YEARS.length
+      || res.years.some((year, i) => year !== YEARS[i])
+      || SERIES_KEYS.some((key) => {
+        const remote = res.scenario[key];
+        return !Array.isArray(remote) || remote.length !== YEARS.length
+          || remote.some((value, i) => !Number.isFinite(value)
+            || Math.abs(value - local[key][i]) > 1e-6);
+      });
     useAppHealth.getState().setEngineMismatch(mismatch);
   } catch {
     // API down is handled by the blocking screen; a failed cross-check is not a mismatch.

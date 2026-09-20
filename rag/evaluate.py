@@ -21,13 +21,79 @@ would defeat the point of building this.
 from __future__ import annotations
 
 import json
+import hashlib
 import sqlite3
 import unicodedata
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 
 from rag import config, golden, retrieve, store
 from rag.golden import Question
+
+
+def evaluation_metadata() -> dict:
+    """Record configuration without implying a historical artifact used it."""
+    return {
+        "evaluated_at": datetime.now(timezone.utc).isoformat(),
+        "split": "development",
+        "independent_held_out": False,
+        "note": "Golden questions informed tuning; these are development scores.",
+        "golden_sha256": hashlib.sha256(Path(golden.__file__).read_bytes()).hexdigest(),
+        "retrieval_config": {
+            "model": config.MODEL_NAME, "embedding_dim": config.EMBED_DIM,
+            "dense": config.W_DENSE, "dense_english": config.W_DENSE_EN,
+            "lexical": config.W_LEXICAL, "rrf_k": config.RRF_K,
+            "candidates": config.CANDIDATES, "max_per_document": config.MAX_PER_DOCUMENT,
+            "chunk_tokens": config.CHUNK_TOKENS, "chunk_overlap": config.CHUNK_OVERLAP,
+            "use_glossary": config.USE_GLOSSARY,
+        },
+        "limitations": [
+            "Document-title hits do not establish passage relevance or answer correctness.",
+            "A model name does not pin its remote revision; archive the local model snapshot.",
+        ],
+    }
+
+
+def load_frozen_questions(path: Path, corpus_sha256: str | None = None) -> tuple[Question, ...]:
+    """Load an externally annotated set; provenance claims need human audit."""
+    questions = []
+    ids = set()
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if (row.get("annotation_status") != "frozen" or row.get("split") != "held_out"
+                or not row.get("annotator") or not row.get("frozen_at")
+                or not row.get("corpus_sha256")):
+            raise ValueError(f"line {lineno}: requires frozen annotations and provenance")
+        if corpus_sha256 is not None and row["corpus_sha256"] != corpus_sha256:
+            raise ValueError(f"line {lineno}: corpus snapshot differs from the annotated index")
+        if not row.get("id") or row["id"] in ids or not str(row.get("question", "")).strip():
+            raise ValueError(f"line {lineno}: missing question or duplicate id")
+        if row.get("collection") not in config.COLLECTIONS:
+            raise ValueError(f"line {lineno}: unknown collection")
+        if not isinstance(row.get("unanswerable", False), bool) or any(
+            not isinstance(cid, int) or isinstance(cid, bool) or cid < 1
+            for cid in row.get("expect_chunk_ids", [])
+        ):
+            raise ValueError(f"line {lineno}: invalid answerability or passage labels")
+        if row.get("unanswerable") and (row.get("expect_docs") or row.get("expect_chunk_ids")):
+            raise ValueError(f"line {lineno}: unanswerable question must not name supporting passages")
+        if not row.get("unanswerable", False) and (
+            not row.get("expect_docs") or not row.get("expect_chunk_ids")
+        ):
+            raise ValueError(f"line {lineno}: answerable questions require document and passage labels")
+        question_fields = {key: row[key] for key in Question.__dataclass_fields__ if key in row}
+        for key in ("expect_docs", "forbidden_docs", "expect_chunk_ids"):
+            if key in question_fields:
+                question_fields[key] = tuple(question_fields[key])
+        question_fields["expect_terms"] = tuple(tuple(x) for x in row.get("expect_terms", []))
+        questions.append(Question(**question_fields))
+        ids.add(row["id"])
+    if not questions:
+        raise ValueError("question file is empty")
+    return tuple(questions)
 
 
 def _fold(text: str) -> str:
@@ -51,6 +117,8 @@ class QuestionResult:
     trap_hit: str | None = None
     titles: tuple[str, ...] = ()
     top_score: float = 0.0
+    passage_ids: tuple[int, ...] = ()
+    passage_rank: int | None = None
 
     @property
     def hit(self) -> bool:
@@ -73,6 +141,9 @@ class QuestionResult:
             "n_passages": self.n_passages, "term_recall": self.term_recall,
             "terms_missed": list(self.terms_missed), "trap_hit": self.trap_hit,
             "titles": list(self.titles), "top_score": self.top_score,
+            "passage_ids": list(self.passage_ids),
+            "passage_rank": self.passage_rank,
+            "passage_hit": bool(self.passage_rank) if self.passage_rank is not None else None,
         }
 
 
@@ -106,6 +177,10 @@ def score_question(q: Question, top_k: int,
         n_passages=len(passages), terms_found=found, terms_missed=missed,
         trap_hit=trap, titles=titles,
         top_score=passages[0].score if passages else 0.0,
+        passage_ids=tuple(p.chunk_id for p in passages),
+        passage_rank=(next((i for i, p in enumerate(passages, 1)
+                            if p.chunk_id in q.expect_chunk_ids), 0)
+                      if q.expect_chunk_ids else None),
     )
 
 
@@ -118,12 +193,18 @@ class RetrievalReport:
         n = len(results)
         if not n:
             return {"n": 0}
+        labeled = [r for r in results if r.passage_rank is not None]
         return {
             "n": n,
             "hit_rate": sum(r.hit for r in results) / n,
             "mrr": sum(r.rr for r in results) / n,
             "top1": sum(r.rank == 1 for r in results) / n,
             "term_recall": sum(r.term_recall for r in results) / n,
+            "passage_labeled_n": len(labeled),
+            "passage_hit_rate": (sum(bool(r.passage_rank) for r in labeled) / len(labeled)
+                                 if labeled else None),
+            "passage_mrr": (sum(1 / r.passage_rank if r.passage_rank else 0
+                                for r in labeled) / len(labeled) if labeled else None),
         }
 
     def summary(self) -> dict:
@@ -233,11 +314,17 @@ def audit_corpus(db_path: Path | None = None) -> dict:
                    FROM documents d LEFT JOIN chunks c ON c.doc_id = d.id
                    GROUP BY d.collection ORDER BY d.collection""")
         }
+        # Logical source manifest, portable across database copies. This does
+        # not fingerprint model weights or prove an unchanged vector index.
+        documents = list(con.execute(
+            "SELECT collection, title, sha256 FROM documents ORDER BY collection, title, sha256"))
+        manifest_hash = hashlib.sha256(json.dumps(documents, ensure_ascii=False).encode()).hexdigest()
     finally:
         con.close()
 
     return {
         "documents": n_docs, "chunks": n_chunks,
+        "source_manifest_sha256": manifest_hash,
         "embeddings": n_vec, "fts_rows": n_fts,
         # Every chunk must be reachable by both retrievers. A shortfall here
         # means one half of the hybrid is silently searching less than it says.
@@ -250,13 +337,29 @@ def audit_corpus(db_path: Path | None = None) -> dict:
     }
 
 
-def run_all(top_k: int | None = None) -> dict:
-    ret = evaluate_retrieval(top_k)
+def run_all(top_k: int | None = None, question_path: Path | None = None) -> dict:
+    from rag.extract import sha256_file
+    snapshot_sha = sha256_file(config.DB_PATH) if question_path else None
+    questions = load_frozen_questions(question_path, snapshot_sha) if question_path else None
+    if questions is not None and not any(not q.unanswerable for q in questions):
+        raise ValueError("retrieval evaluation requires at least one answerable question")
+    ret = evaluate_retrieval(top_k, tuple(q for q in questions if not q.unanswerable)
+                             if questions is not None else None)
+    metadata = evaluation_metadata()
+    if question_path:
+        metadata.update({"split": "externally_declared_held_out",
+                         "independent_held_out": None,
+                         "questions_sha256": hashlib.sha256(question_path.read_bytes()).hexdigest(),
+                         "corpus_snapshot_sha256": snapshot_sha,
+                         "note": "External frozen labels; independence must be verified from the preregistered protocol."})
     return {
+        "evaluation": metadata,
         "model": config.MODEL_NAME,
-        "weights": {"dense": config.W_DENSE, "lexical": config.W_LEXICAL},
+        "weights": {"dense": config.W_DENSE, "dense_english": config.W_DENSE_EN,
+                    "lexical": config.W_LEXICAL},
         "retrieval": ret.summary(),
         "questions": [r.to_dict() for r in ret.results],
+        "auxiliary_checks_split": "development (golden questions and fixed guardrail probes)",
         "isolation": evaluate_isolation(),
         "guardrail": evaluate_guardrail(),
         "corpus": audit_corpus(),
@@ -274,10 +377,13 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Evalúa el recuperador del RAG.")
     ap.add_argument("--top-k", type=int, default=config.TOP_K)
     ap.add_argument("--json", type=Path, help="escribe el informe completo")
+    ap.add_argument("--questions", type=Path, help="JSONL externo con anotaciones congeladas; ver README_RAG.md")
     args = ap.parse_args()
 
-    out = run_all(args.top_k)
+    out = run_all(args.top_k, args.questions)
     ov = out["retrieval"]["overall"]
+
+    print(f"alcance: {out['evaluation']['split']} — {out['evaluation']['note']}")
 
     print(f"modelo {out['model']}  ·  top_k={out['retrieval']['top_k']}  "
           f"·  pesos denso/léxico {out['weights']['dense']}/{out['weights']['lexical']}\n")
@@ -288,6 +394,9 @@ def main() -> None:
               f"{s['top1']:>6.0%} {s['term_recall']:>9.0%}")
     print(f"{'TOTAL':<16} {ov['n']:>3} {ov['hit_rate']:>6.0%} {ov['mrr']:>6.2f} "
           f"{ov['top1']:>6.0%} {ov['term_recall']:>9.0%}  {_bar(ov['hit_rate'])}")
+    if ov["passage_labeled_n"]:
+        print(f"pasajes anotados: n={ov['passage_labeled_n']} · "
+              f"hit={ov['passage_hit_rate']:.2%} · MRR={ov['passage_mrr']:.3f}")
 
     if out["retrieval"]["misses"]:
         print("\nsin acierto: " + ", ".join(out["retrieval"]["misses"]))

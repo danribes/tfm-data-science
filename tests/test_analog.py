@@ -1,113 +1,88 @@
-"""Analog search engine tests (spec §6.1)."""
+"""Scientific regression checks for descriptive historical matching."""
+import numpy as np
+import pandas as pd
 import pytest
 from engine.analog import (
-    ANALOG_PANEL, find_analogs, debt_payable_verdict, structural_diffs,
+    ANALOG_PANEL, QUERY_FEATURES, _fit_metric, _query_vector,
+    find_analogs, structural_diffs, _outcome_trajectory,
 )
 from engine.levers import Levers, preset_levers
+from engine.spain import run_scenario
 
 
-def test_analog_panel_schema():
-    required = [
-        "iso3", "year", "debt_gdp", "overall_balance_gdp", "interest_rate_10y",
-        "gdp_growth", "unemployment", "inflation", "r_minus_g",
-        "emu_member", "fx_regime", "ext_debt_share", "democracy",
-        "trade_openness", "tfp_growth_5y", "labor_prod_growth_5y",
-    ]
-    for col in required:
-        assert col in ANALOG_PANEL.columns, f"missing column: {col}"
-    assert ANALOG_PANEL["debt_gdp"].notna().all(), "null debt_gdp in panel"
-    assert len(ANALOG_PANEL[ANALOG_PANEL["iso3"] != "ESP"]) >= 100
+def test_distance_is_invariant_to_measurement_units():
+    # Changing debt from percentage points to a fraction must not change
+    # Mahalanobis distance. The previous raw-covariance/z-score mix failed this.
+    rng = np.random.default_rng(17)
+    x = rng.normal(size=(100, len(QUERY_FEATURES)))
+    x[:, 1] += x[:, 0] * .5
+    frame = pd.DataFrame(x, columns=QUERY_FEATURES)
+    def distance(f):
+        stats, inv = _fit_metric(f)
+        delta = np.array([(f.iloc[0][k] - f.iloc[1][k]) / stats[k]['std'] for k in QUERY_FEATURES])
+        return float(np.sqrt(delta @ inv @ delta))
+    expected = distance(frame)
+    frame['debt_gdp'] *= .01
+    assert distance(frame) == pytest.approx(expected, rel=1e-12)
 
 
-def test_analog_no_spain():
-    matches = find_analogs(Levers(), horizon=10)
-    assert all(m["iso3"] != "ESP" for m in matches)
+def test_mahalanobis_matches_raw_coordinate_reference():
+    frame = ANALOG_PANEL.dropna(subset=QUERY_FEATURES)
+    stats, inv = _fit_metric(frame)
+    raw = frame[QUERY_FEATURES].to_numpy()
+    difference = raw[0] - raw[1]
+    z_difference = difference / np.array([stats[k]['std'] for k in QUERY_FEATURES])
+    assert z_difference @ inv @ z_difference == pytest.approx(
+        difference @ np.linalg.inv(np.cov(raw.T)) @ difference, rel=1e-9)
 
 
-def test_analog_search_returns_3():
-    for levers in [Levers(), preset_levers("S7")]:
+def test_query_compares_total_balance_and_selected_year():
+    run = run_scenario(preset_levers('S7'))
+    q = _query_vector(run, 2040)
+    assert q['overall_balance_gdp'] == run['saldo'][14]
+    assert q['overall_balance_gdp'] != run['pb'][14]
+    assert q['debt_gdp'] == run['b'][14]
+    assert 'interest_rate_10y' not in q
+
+
+def test_analog_schema_and_comparable_complete_matches():
+    assert set(QUERY_FEATURES) <= set(ANALOG_PANEL.columns)
+    assert 'lending_rate' in ANALOG_PANEL
+    for levers in [Levers(), preset_levers('S7')]:
         matches = find_analogs(levers, horizon=10)
         assert len(matches) == 3
-        assert [m["rank"] for m in matches] == [1, 2, 3]
+        assert [m['rank'] for m in matches] == [1, 2, 3]
+        assert [m['distance'] for m in matches] == sorted(m['distance'] for m in matches)
+        for m in matches:
+            assert m['iso3'] != 'ESP'
+            assert m['match_year'] <= 2020
+            assert all(m['match_snapshot'][f] is not None for f in QUERY_FEATURES)
+            assert m['match_snapshot']['interest_rate_10y'] is None
+            assert m['match_snapshot']['r_minus_g'] is None
+            assert m['debt_payable_verdict'] == 'not_assessed'
+            assert all(p['r_minus_g'] is None for p in m['outcome'])
 
 
-def test_analog_outcome_truncation():
-    # Any match with year > 2020 is filtered out, so matches are ≤ 2020.
-    # With horizon=24, some matches will extend past 2023 and be truncated.
-    analogs = find_analogs(Levers(), horizon=24)
-    assert len(analogs) == 3
-    all_points = [pt for m in analogs for pt in m["outcome"]]
-    assert any(pt["truncated"] for pt in all_points), \
-        "Expected at least one truncated point with horizon=24 (panel ends ~2023)"
+def test_future_missing_observations_remain_missing():
+    points, truncated = _outcome_trajectory('ESP', 2023, 3)
+    assert truncated
+    assert all(p['truncated'] and p['debt_gdp'] is None for p in points)
 
 
-def test_analog_diff_directions():
-    matches = find_analogs(Levers(), horizon=10)
-    valid = {"converge", "diverge", "neutral"}
-    for m in matches:
-        for d in m["diffs"]:
-            assert d["direction"] in valid, (
-                f"invalid direction {d['direction']!r} in {d['dimension']}"
-            )
+def test_unobserved_structural_proxies_are_not_facts():
+    row = pd.Series({'emu_member': 0, 'democracy': 10., 'fx_regime': 'fixed', 'ext_debt_share': 42.})
+    diffs = {d['dimension']: d for d in structural_diffs(row)}
+    for key in ['democracy', 'fx_regime', 'ext_debt_share', 'debt_maturity']:
+        assert diffs[key]['direction'] == 'neutral'
+        assert diffs[key]['analog_value'] == 'sin datos comparables'
+    assert diffs['emu_member']['direction'] == 'diverge'
+    assert {'tfp_trend', 'labor_productivity'} <= set(diffs)
 
 
-def test_dominant_lever_bonus_fires():
-    """With prima=350, the bonus fires for high-yield panel rows."""
-    base_levers = Levers()
-    stressed = Levers(prima=350.0)
-    base_analogs = find_analogs(base_levers, horizon=5)
-    stressed_analogs = find_analogs(stressed, horizon=5)
-    # The dominant lever should be 'prima' when prima is maxed out
-    assert stressed_analogs[0]["dominant_lever"] == "prima"
-    # The distance should differ between base and stressed (query vector changes)
-    assert base_analogs[0]["distance"] != stressed_analogs[0]["distance"]
-
-
-def test_r_minus_g_in_outcome():
-    matches = find_analogs(Levers(), horizon=10)
-    for m in matches:
-        for pt in m["outcome"]:
-            if not pt["truncated"]:
-                assert "r_minus_g" in pt
-                # r_minus_g may be None when both interest_rate_10y and gdp_growth are missing
-                assert pt["r_minus_g"] is None or isinstance(pt["r_minus_g"], float)
-
-
-def test_debt_payable_verdict_auto():
-    assert debt_payable_verdict(-1.2) == "auto"   # r < g by >0.5pp
-
-
-def test_debt_payable_verdict_surplus():
-    assert debt_payable_verdict(1.8) == "requires_surplus"  # r > g by >0.5pp
-
-
-def test_debt_payable_verdict_borderline():
-    assert debt_payable_verdict(0.3) == "borderline"   # |r-g| ≤ 0.5
-    assert debt_payable_verdict(-0.4) == "borderline"
-
-
-def test_tfp_diff_present():
-    matches = find_analogs(Levers(), horizon=10)
-    for m in matches:
-        dims = {d["dimension"] for d in m["diffs"]}
-        assert "tfp_trend" in dims
-        assert "labor_productivity" in dims
-
-
-def test_match_snapshot_has_r_minus_g():
-    matches = find_analogs(Levers(), horizon=10)
-    for m in matches:
-        assert "r_minus_g" in m["match_snapshot"]
-        assert len(m["match_snapshot"]) == 7
-
-
-def test_nan_imputation_gives_zero_z():
-    """NaN panel features must produce z-score 0.0 in distance, not (0-mean)/std."""
-    from engine.analog import _normalize, QUERY_FEATURES, _STATS
-    # If NaN is imputed as raw 0 and normalized, debt_gdp would be (0-mean)/std ≈ -2.4
-    # The correct imputed z-score is 0.0 exactly.
-    # Verify _normalize(mean, feature) == 0.0 (the correct imputation target)
-    for f in QUERY_FEATURES:
-        if f in _STATS and _STATS[f]["std"] > 0:
-            imputed = _normalize(_STATS[f]["mean"], f)
-            assert abs(imputed) < 1e-10, f"normalizing the mean of {f} should give 0.0, got {imputed}"
+def test_missing_macro_rows_cannot_appear_as_average_neighbors(monkeypatch):
+    import engine.analog as module
+    missing = ANALOG_PANEL.iloc[0].copy()
+    missing['iso3'], missing['year'] = 'ZZZ', 2010
+    missing['gdp_growth'] = np.nan
+    monkeypatch.setattr(module, 'ANALOG_PANEL', pd.concat([ANALOG_PANEL, pd.DataFrame([missing])], ignore_index=True))
+    assert all(m['iso3'] != 'ZZZ' for m in find_analogs(Levers()))

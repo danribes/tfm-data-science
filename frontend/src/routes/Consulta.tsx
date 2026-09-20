@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { ragChatStream, setApiBase, API_BASE, DEFAULT_API_BASE } from "../api/client";
+import { ragChatStream } from "../api/client";
+import { selectRagCollection, useRagCollections, useRagConnection } from "../api/hooks";
+import { RagConnectionSettings } from "../components/RagConnectionSettings";
+import { PUBLIC_RAG_EXAMPLES, RagCorpusNotice } from "../components/RagCorpusNotice";
 import type { Passage, RagChatResponse } from "../api/types";
 
 type Failure = { status?: number; detail: string };
@@ -32,60 +35,16 @@ export default function Consulta() {
   const [failure, setFailure] = useState<Failure | null>(null);
   const answerRef = useRef<HTMLDivElement>(null);
 
-  const [tunnel, setTunnel] = useState(
-    API_BASE === DEFAULT_API_BASE ? "" : API_BASE,
-  );
-  const [linked, setLinked] = useState(API_BASE !== DEFAULT_API_BASE);
-  const [showLink, setShowLink] = useState(false);
-
-  /** Why a URL cannot work from *this* page, or null when it can.
-   *
-   *  Both rejections are failures the browser reports as an opaque network
-   *  error, so catching them here is the difference between a clear sentence
-   *  and a reader staring at a retry screen. */
-  const rejectReason = (raw: string): string | null => {
-    let u: URL;
-    try {
-      u = new URL(raw);
-    } catch {
-      return "No parece una dirección válida. Debe empezar por https://";
-    }
-    if (location.protocol === "https:" && u.protocol === "http:") {
-      return "Esta página va por HTTPS y el navegador bloquea las llamadas a http:// (contenido mixto). Usa la dirección https:// del túnel.";
-    }
-    if (
-      /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(u.hostname) &&
-      !/^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname)
-    ) {
-      return "localhost apunta al ordenador de quien mira la página, no al tuyo. Necesitas la dirección pública del túnel.";
-    }
-    return null;
-  };
-
-  const [linkErr, setLinkErr] = useState<string | null>(null);
-
-  const connect = () => {
-    const url = tunnel.trim().replace(/\/+$/, "");
-    if (!url) return;
-    const bad = rejectReason(url);
-    if (bad) {
-      setLinkErr(bad);
-      return;
-    }
-    setLinkErr(null);
-    setApiBase(url);
-    setTunnel(url);
-    setLinked(true);
-    setFailure(null);
-  };
-
-  const disconnect = () => {
-    setApiBase(null);
-    setTunnel("");
-    setLinked(false);
-    setFailure(null);
-    setLinkErr(null);
-  };
+  const connection = useRagConnection();
+  const collections = useRagCollections();
+  const isPublic = collections.data?.corpus_scope === "public_project_docs";
+  const collection = selectRagCollection(collections.data?.collections, collections.data?.default_collection);
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => {
+    setAsked(""); setStreamed(""); setPassages([]); setAnswer(null); setFailure(null); setBusy(false);
+    return () => controller.current?.abort();
+  }, [connection.revision]);
+  const collectionFailure = collections.isError ? toFailure(collections.error) : null;
 
   const answerText = answer?.answer ?? streamed;
 
@@ -97,7 +56,7 @@ export default function Consulta() {
 
   const submit = (q: string) => {
     const text = q.trim();
-    if (text.length < 2 || busy) return;
+    if (text.length < 2 || busy || !collection) return;
     setAsked(text);
     setQuestion("");
     setAnswer(null);
@@ -106,45 +65,47 @@ export default function Consulta() {
     setFailure(null);
     setBusy(true);
 
+    const request = new AbortController();
+    controller.current = request;
     ragChatStream(
-      { question: text, collection: "libros", top_k: 6 },
+      { question: text, collection: collection.id, top_k: 6 },
       {
         onPassages: (ps) => setPassages(ps),
         onDelta: (piece) => setStreamed((prev) => prev + piece),
         onDone: (final) =>
           setAnswer({
             vintage: "", computed_not_advice: true,
-            question: text, collection: "libros",
+            question: text, collection: collection.id,
             answer: final.answer, passages: [],
             grounded: final.grounded, provider: final.provider,
             model: final.model, error: final.error ?? null,
           } as RagChatResponse),
       },
+      request.signal,
     )
-      .catch((e: unknown) => setFailure(toFailure(e)))
-      .finally(() => setBusy(false));
+      .catch((e: unknown) => { if (!request.signal.aborted) setFailure(toFailure(e)); })
+      .finally(() => { if (!request.signal.aborted) setBusy(false); });
   };
 
-  const unavailable = failure?.status === 503;
+  const displayedFailure = failure ?? collectionFailure;
 
   return (
     <div className="consulta">
       <div className="head">
         <h1>Consulta económica</h1>
         <span className="meta">
-          Respondo con los textos del corpus de referencia — con cita o sin respuesta.
+          {isPublic
+            ? "Consulta la documentación del proyecto — con cita o sin respuesta."
+            : "Respondo con los textos del corpus de referencia — con cita o sin respuesta."}
         </span>
-        <button
-          type="button"
-          className={linked ? "corpus-pill on" : "corpus-pill"}
-          onClick={() => setShowLink((v) => !v)}
-          title={linked ? API_BASE : "Conectar con el corpus de la máquina local"}
-        >
-          {linked ? "● corpus local" : "○ corpus no conectado"}
-        </button>
+        <span className={collection ? "corpus-pill on" : "corpus-pill"}>
+          {collection ? `● ${collection.label}` : collections.isPending ? "Consultando biblioteca…" : "Biblioteca no disponible"}
+        </span>
       </div>
+      <RagConnectionSettings />
 
       <div className="card consulta-card">
+        <RagCorpusNotice data={collections.data} />
         <form
           className="consulta-form"
           onSubmit={(e) => {
@@ -156,14 +117,15 @@ export default function Consulta() {
             className="consulta-input"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Escribe tu pregunta de economía…"
-            disabled={busy}
+            placeholder={isPublic ? "Pregunta por el modelo o su metodología…" : "Escribe tu pregunta de economía…"}
+            disabled={busy || !collection}
+            aria-label="Pregunta económica"
             autoFocus
           />
           <button
             type="submit"
             className="consulta-btn"
-            disabled={busy || question.trim().length < 2}
+            disabled={busy || !collection || question.trim().length < 2}
           >
             {busy ? "…" : "Preguntar"}
           </button>
@@ -171,11 +133,12 @@ export default function Consulta() {
 
         {!asked && (
           <ul className="consulta-examples">
-            {EXAMPLES.map((ex) => (
+            {(isPublic ? PUBLIC_RAG_EXAMPLES : EXAMPLES).map((ex) => (
               <li key={ex}>
                 <button
                   type="button"
                   className="example-chip"
+                  disabled={busy || !collection}
                   onClick={() => submit(ex)}
                 >
                   {ex}
@@ -185,74 +148,13 @@ export default function Consulta() {
           </ul>
         )}
 
-        {failure && (
-          <div className="banner err">
-            {unavailable ? (
-              <>
-                La biblioteca no está disponible en este despliegue público: el
-                corpus con derechos de autor y su índice vectorial viven sólo en
-                la máquina local.{" "}
-                <button
-                  type="button"
-                  className="link-btn"
-                  onClick={() => setShowLink(true)}
-                >
-                  Conectar con la máquina local
-                </button>{" "}
-                si tienes la dirección del túnel.
-              </>
-            ) : (
-              `Error: ${failure.detail}`
-            )}
+        {displayedFailure && (
+          <div className="banner err" role="alert">
+            No se pudo consultar la biblioteca: {displayedFailure.detail}
           </div>
         )}
-
-        {(showLink || linked) && (
-          <div className={linked ? "tunnel on" : "tunnel"}>
-            <label className="tunnel-lab" htmlFor="tunnel-url">
-              Corpus local — dirección del túnel
-            </label>
-            <div className="tunnel-row">
-              <input
-                id="tunnel-url"
-                className="tunnel-input"
-                value={tunnel}
-                onChange={(e) => setTunnel(e.target.value)}
-                placeholder="https://algo-aleatorio.trycloudflare.com"
-                spellCheck={false}
-              />
-              {linked ? (
-                <button type="button" className="tunnel-btn off" onClick={disconnect}>
-                  Desconectar
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="tunnel-btn"
-                  onClick={connect}
-                  disabled={!tunnel.trim()}
-                >
-                  Conectar
-                </button>
-              )}
-            </div>
-            {linkErr && <p className="tunnel-err">{linkErr}</p>}
-            <p className="tunnel-note">
-              {linked ? (
-                <>
-                  Conectado a <code>{API_BASE}</code>. El corpus se sirve desde
-                  la máquina local y sólo responde mientras el túnel esté
-                  abierto.
-                </>
-              ) : (
-                <>
-                  Los libros tienen derechos de autor y no se publican: se
-                  consultan a través de un túnel temporal a la máquina donde
-                  vive el índice.
-                </>
-              )}
-            </p>
-          </div>
+        {collections.isSuccess && !collection && (
+          <div className="banner">El servicio no anuncia ninguna colección con pasajes disponibles.</div>
         )}
 
         {asked && (

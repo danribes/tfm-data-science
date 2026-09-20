@@ -11,11 +11,19 @@ set -euo pipefail
 STAGE="${1:?uso: assemble.sh <dir-destino>}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
+# Reusing a populated stage could publish stale files removed from the
+# allowlist (including earlier private RAG reports). Fail without deleting
+# anything; callers must supply a new directory or an existing empty one.
+if [[ -e "$STAGE" || -L "$STAGE" ]]; then
+  if [[ ! -d "$STAGE" || -L "$STAGE" || -n "$(find "$STAGE" -mindepth 1 -maxdepth 1 -print -quit)" ]]; then
+    echo "error: el destino debe ser un directorio nuevo o vacío: $STAGE" >&2
+    exit 1
+  fi
+fi
 mkdir -p "$STAGE"
 
-# Code the API imports at runtime. rag/ ships as source so the guarded lazy
-# imports resolve the module and fail on the missing heavy deps, which is what
-# turns a would-be 500 into the clean 503.
+# Runtime code, including the lightweight public lexical RAG. The private
+# corpus and embedding models are never inputs to this assembly.
 for d in api engine explain research rag data tools; do
   mkdir -p "$STAGE/$d"
   find "$ROOT/$d" -name "*.py" -not -path "*/__pycache__/*" | while read -r f; do
@@ -30,12 +38,22 @@ cp -r "$ROOT/data/gold" "$STAGE/data/gold"
 cp -r "$ROOT/data/external" "$STAGE/data/external"
 cp "$ROOT/data/live/indicator_catalog.yaml" "$STAGE/data/live/"
 
-# Committed research artifacts: prediction, distress, state-dependence,
-# regimes, RAG report card. Without them the endpoints answer "not generated".
+# Only the research artifacts read by the public endpoints. Do not glob this
+# directory: private RAG acquisition/probe reports may contain book passages.
 mkdir -p "$STAGE/docs/eval"
-cp "$ROOT"/docs/eval/*.json "$STAGE/docs/eval/"
+for report in t1-dl-global distress state_dependence regimes; do
+  cp "$ROOT/docs/eval/$report.json" "$STAGE/docs/eval/"
+done
+
+# Build from the original project README, before installing the Space README.
+# The builder reads a fixed allowlist of six project-authored Markdown files;
+# it needs only Python's standard library, never the local books/index.
+cp "$ROOT/rag/public_sources.json" "$STAGE/rag/"
+PYTHONPATH="$ROOT" python -m rag.public_corpus \
+  --source-root "$ROOT" --out "$STAGE/data/rag/public.db"
 
 cp "$ROOT/requirements-deploy.txt" "$STAGE/"
+cp "$ROOT/requirements-lock.txt" "$STAGE/"
 cp "$ROOT/deploy/hf/Dockerfile" "$STAGE/Dockerfile"
 cp "$ROOT/deploy/hf/README-space.md" "$STAGE/README.md"
 

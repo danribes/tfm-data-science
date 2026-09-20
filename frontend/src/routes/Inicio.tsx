@@ -74,19 +74,15 @@ export default function Inicio() {
           />
         )}
         <Caption>
-          Cada hebra fina es <strong>un futuro completo y coherente</strong>: la
-          misma economía, con los choques de un año arrastrándose a los
-          siguientes. No son escenarios que alguien haya elegido, son lo que sale
-          de repetir la identidad de deuda miles de veces con perturbaciones
-          plausibles. La línea gruesa es la mediana.
+          Cada hebra es una trayectoria simulada bajo los supuestos del modelo.
+          La línea gruesa es la mediana. Los choques AR(1), su dispersión y la
+          reacción fiscal están calibrados; la semilla fija permite reproducirlos.
         </Caption>
         <Caption>
-          Lo que enseña este gráfico no es dónde acaba la mediana, sino que{" "}
-          <strong>las hebras no viajan juntas</strong>. Donde se apelotonan, el
-          modelo distingue bien; donde se abren en abanico, está diciendo que no
-          puede separar futuros muy distintos. Fíjate en que casi ninguna vuelve
-          a bajar: la deuda no se devuelve, se diluye con crecimiento o no se
-          diluye.
+          Las bandas p5–p95 contienen el 90 % central de las simulaciones.
+          <strong> Su cobertura sobre resultados reales no se ha validado.</strong>
+          No incluyen toda la incertidumbre sobre parámetros, políticas o rupturas
+          estructurales. Su anchura depende de los supuestos de simulación.
         </Caption>
       </div>
 
@@ -118,22 +114,17 @@ export default function Inicio() {
         <DebtVsGdpChart scn={scn} years={YEARS} />
         <SnowballStrip scn={scn} k={k} />
         <Caption>
-          Las dos curvas salen del mismo punto y crecen a ritmos distintos: la
-          deuda se capitaliza al <strong>tipo efectivo</strong> que paga el
-          Estado, la economía crece al <strong>PIB nominal</strong>. Mientras el
-          crecimiento gane, la deuda se diluye sola aunque no se devuelva un
-          euro. Cuando pierde, la zona sombreada — la parte que el crecimiento no
-          absorbe — se ensancha cada año por sí sola, sin que nadie gaste más.
-          Eso es la bola de nieve, y es la razón de que una deuda se vuelva
-          impagable sin ninguna decisión nueva de gasto.
+          El diferencial entre el tipo efectivo y el crecimiento nominal afecta
+          a la deuda heredada. Un diferencial negativo ayuda a reducir su ratio,
+          pero un déficit primario puede compensar ese efecto y hacerla subir.
+          La trayectoria completa también depende del saldo primario.
         </Caption>
         <Caption>
           Están en índice y no en euros a propósito: el vintage congelado no trae
           un PIB nominal en euros (<code>gold_bienestar_pais.csv</code> trae PIB
           per cápita en PPS, que es otra unidad), y multiplicarlo daría una cifra
           con aire de oficial que los datos no sostienen. El índice responde igual
-          a la pregunta: la distancia entre las curvas <em>es</em> la ratio de
-          deuda.
+          a la pregunta: la evolución relativa de las curvas ayuda a interpretar la ratio de deuda.
         </Caption>
         <Caption>
           El <strong>7 % del bono a 10 años</strong> es el punto de no retorno

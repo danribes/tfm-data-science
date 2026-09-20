@@ -10,7 +10,7 @@ from engine import generic as g
 
 def test_vintage_and_version():
     assert c.VINTAGE == "2026-07-31"
-    assert c.ENGINE_VERSION == "1.0.0"
+    assert c.ENGINE_VERSION == "1.1.0"
 
 
 def test_spain_constants_verbatim_v16():
@@ -20,9 +20,8 @@ def test_spain_constants_verbatim_v16():
     assert (c.A_Z, c.A_TAU, c.A_LAM) == (1.10, 0.30, 0.45)
     assert (c.REFI, c.TERM) == (0.14, 0.17)
     assert c.DIFF == 1.4757            # build_v16.py bisection (extract L1055-1073)
-    # IPV_LR/IPV_REV no longer default to v16: both calibrated values fall
-    # outside the 90 % band of their own panel estimate, so the engine runs on
-    # the estimates and keeps the v16 pair named for reproducing the old path.
+    # The current defaults are panel estimates. Keep legacy values named for
+    # reproducibility; v16's 0.60 was persistence, not the current reversion rate.
     assert (c.IPV_LR_V16, c.IPV_REV_V16, c.E_IPV_R, c.E_IPV_G) == (3.0, 0.60, 2.6, 1.1)
     assert c.RJUV == 2.317
     assert c.PM_DECAY == 0.45
@@ -121,7 +120,7 @@ def test_preset_levers_raises_on_unknown_id():
 from engine.spain import N_YEARS, SERIES_KEYS, Y0, baseline, french, run_scenario
 
 #: Reproduce the v16 housing path, which every pinned expectation encodes.
-_V16_HOUSING = {"ipv_lr": c.IPV_LR_V16, "ipv_rev": c.IPV_REV_V16}
+_V16_HOUSING = {"ipv_lr": c.IPV_LR_V16, "ipv_rev": 1.0 - c.IPV_REV_V16}
 
 
 def test_series_shape():
@@ -158,9 +157,58 @@ def test_debt_identity_reproduces_gold_central():
     assert run["b"][2050 - Y0] == pytest.approx(223.841410, abs=1e-4)
 
 
+@pytest.mark.parametrize("preset_id", [p["id"] for p in PRESETS])
+def test_reported_fiscal_flows_match_nominal_accounts(preset_id):
+    """Reconstruct euro accounts independently, then divide by current GDP.
+
+    This deliberately differs from v16 interest/saldo pins, which divided
+    interest payments by the previous year's GDP.
+    """
+    run = run_scenario(preset_levers(preset_id))
+    nominal_gdp = 100.0
+    nominal_debt = c.load_central()[Y0 - 1]["deuda"]
+    for k in range(N_YEARS):
+        nominal_gdp *= 1 + run["gnom"][k] / 100
+        interest_payment = nominal_debt * run["ief"][k] / 100
+        primary_surplus = run["pb"][k] * nominal_gdp / 100
+        overall_surplus = primary_surplus - interest_payment
+        nominal_debt -= overall_surplus
+        assert run["int"][k] == pytest.approx(100 * interest_payment / nominal_gdp)
+        assert run["saldo"][k] == pytest.approx(100 * overall_surplus / nominal_gdp)
+        assert run["b"][k] == pytest.approx(100 * nominal_debt / nominal_gdp)
+        assert run["deficitAbs"][k] == pytest.approx(max(0, -100 * overall_surplus / nominal_gdp))
+
+
+def test_endogenous_spread_uses_percentage_points_and_lagged_debt():
+    initial_debt = c.load_central()[Y0 - 1]["deuda"]
+    # A 20 pp excess at 4 bp/pp must add 80 bp, not 0.8 bp.
+    threshold = initial_debt - 20.0
+    run = run_scenario(Levers(), alpha_spread=0.04, b_crit=threshold)
+    assert run["spread"][0] == pytest.approx(c.BASE_LEVERS["prima"] + 80.0)
+    assert run["bono"][0] == pytest.approx(c.V0["bono"] + 0.8)
+    assert run["ief"][0] == pytest.approx(c.load_central()[Y0]["r_efectivo"] + c.REFI * 0.8)
+    # Following years apply the same bp/pp unit to the already-observed debt.
+    assert run["spread"][1] == pytest.approx(c.BASE_LEVERS["prima"] + 4.0 * (run["b"][0] - threshold))
+    below = run_scenario(Levers(), alpha_spread=0.04, b_crit=1000.0)
+    assert below == baseline()
+
+
+def test_zero_omega_anchors_deviations_at_frozen_inflation():
+    run = run_scenario(Levers(), omega=0)
+    assert run["pi"] == [3.0] * N_YEARS
+    # The weight removes lagged persistence, not contemporaneous shocks.
+    shocked = run_scenario(Levers(pm=50.0), omega=0)
+    assert shocked["pi"][0] == run_scenario(Levers(pm=50.0), omega=1)["pi"][0]
+    assert shocked["pi"][0] > 3.0
+
+
 def test_french_amortization():
     # extract L93 / L1012-1013: cuota = P*i/(1-(1+i)^-n), i = tipo/1200
     assert french(171444.46 * 0.8, 2.80 + 1.4757, 300) == pytest.approx(744.9991, abs=1e-3)
+
+
+def test_zero_interest_loan_repays_only_principal():
+    assert french(120_000, 0.0, 300) == 400.0
 
 
 def test_lever_signs():
@@ -211,14 +259,15 @@ def test_persona_dependents_shape():
 # One pinned numeric check per persona at BASE levers. Values computed while
 # drafting this plan by executing the verbatim v16 run() semantics (extract
 # L95-175) against the committed gold slice; k is the year index (0=2026,
-# 4=2030, 9=2035, 24=2050).
+# 4=2030, 9=2035, 24=2050). Legacy interest/saldo pins are intentionally
+# excluded: current-GDP accounting is checked independently above.
 BASE_PINS = [
-    ("01", "bono", 0, 3.42), ("01", "b", 24, 223.8414), ("01", "int", 4, 3.3436),
+    ("01", "bono", 0, 3.42), ("01", "b", 24, 223.8414),
     ("02", "cuota", 0, 744.9971), ("02", "bls", 0, 10.0),
     ("03", "esf", 0, 42.5764), ("03", "precio", 4, 217954.5876),
     ("04", "g", 0, 2.7), ("04", "auton", 0, 14.5),
     ("05", "d1", 0, 10.9), ("05", "nomreal", 24, 100.0),
-    ("06", "saldo", 4, -5.8136), ("06", "u", 0, 10.1),
+    ("06", "u", 0, 10.1),
     ("07", "p51", 0, 3.0), ("07", "p2", 0, 5.7), ("07", "d3", 0, 1.4),
     ("08", "arop", 0, 28.5), ("08", "edu", 0, 4.1), ("08", "dep", 24, 59.0),
     ("09", "pens", 9, 16.4858), ("09", "dep", 9, 41.7),
@@ -276,22 +325,41 @@ def test_sensitivity_matrix_structure_and_signs():
 
 
 def test_housing_default_is_the_panel_estimate():
-    """The engine must not ship a calibration its own evidence layer rejects.
+    """Defaults use frozen descriptive estimates; v16 remains reproducible.
 
-    Both v16 housing constants fall outside the 90 % band of their estimate, so
-    the default is the estimate and the v16 pair is reachable by argument.
+    Compatibility below refers only to the primary region-clustered bands.
+    Time-block sensitivity is reported separately, not silently substituted.
     """
     est = c.load_estimated()
     assert c.IPV_LR == pytest.approx(est["IPV_LR"]["value"])
     assert c.IPV_REV == pytest.approx(est["IPV_REV"]["value"])
-    # Each v16 value sits outside its own estimated band — the reason for this.
-    for name, v16 in (("IPV_LR", c.IPV_LR_V16), ("IPV_REV", c.IPV_REV_V16)):
+    # Compare equivalent quantities inside the primary estimate's own band.
+    for name, v16 in (("IPV_LR", c.IPV_LR_V16), ("IPV_REV", 1.0 - c.IPV_REV_V16)):
         row = est[name]
         assert not (row["ci_low"] <= v16 <= row["ci_high"]), name
 
-    # Slower trend growth and weaker reversion must give a cheaper 2050 house.
+    # This vintage's lower trend offsets its more persistent initial growth gap.
     default = run_scenario(Levers())
-    v16run = run_scenario(Levers(), ipv_lr=c.IPV_LR_V16, ipv_rev=c.IPV_REV_V16)
+    v16run = run_scenario(Levers(), **_V16_HOUSING)
     assert default["precio"][24] < v16run["precio"][24]
     # …and the v16 keyword path must still reproduce v16 exactly.
     assert v16run["precio"][24] == pytest.approx(400982, abs=1.0)
+
+
+def test_housing_reversion_removes_the_fraction_instead_of_retaining_it():
+    """A 20% reversion rate retains 80% of the initial annual growth gap."""
+    run = run_scenario(Levers(), ipv_lr=2.0, ipv_rev=0.2)
+    initial_gap = c.V0["ipv"] - 2.0
+    assert run["ipv"][0] == c.V0["ipv"]
+    assert run["ipv"][1] == pytest.approx(2.0 + 0.8 * initial_gap)
+    assert run["ipv"][2] == pytest.approx(2.0 + 0.64 * initial_gap)
+
+
+def test_housing_zero_and_full_reversion_have_distinct_boundary_behavior():
+    persistent = run_scenario(Levers(), ipv_lr=2.0, ipv_rev=0.0)
+    immediate = run_scenario(Levers(), ipv_lr=2.0, ipv_rev=1.0)
+    assert persistent["ipv"] == pytest.approx([c.V0["ipv"]] * N_YEARS)
+    assert immediate["ipv"][1:] == pytest.approx([2.0] * (N_YEARS - 1))
+    # The base price is observed at t; applying t's growth again double-counts it.
+    assert immediate["precio"][0] == c.V0["precio"]
+    assert immediate["precio"][1] == pytest.approx(c.V0["precio"] * 1.02)

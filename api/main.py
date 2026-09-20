@@ -46,7 +46,8 @@ from research import backtest as research_backtest
 from engine.constants import (CONSTANTS_TABLE, ENGINE_VERSION, GOLD_DIR, VINTAGE,
                                load_kpis, load_olddep_variants)
 from engine.levers import PRESETS, Levers, validate_levers
-from engine.analog import find_analogs
+from engine.diagnostics import debt_domain_warnings
+from engine.analog import find_analogs, _query_vector, QUERY_FEATURES, LIMITATIONS
 from engine.montecarlo import run_montecarlo
 from engine.redlines import RED_LINES, evaluate_redlines
 from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
@@ -54,15 +55,11 @@ from engine.spain import (PERSONAS, SERIES_KEYS, Y0, Y1, baseline,
 
 
 def _rag_unavailable(exc: Exception) -> HTTPException:
-    """The public deploy ships without the RAG stack on purpose: the corpus
-    holds copyrighted books that never leave the local machine, and the
-    embedding model would not fit the free tier anyway. Absent pieces answer
-    503 with the reason instead of a traceback."""
+    """Report an unavailable runtime without claiming a corpus is published."""
     return HTTPException(
         status_code=503,
-        detail=("La biblioteca no está disponible en este despliegue: el corpus "
-                "con derechos de autor y su índice vectorial viven sólo en la "
-                f"máquina local. ({type(exc).__name__})"))
+        detail=("La biblioteca no está disponible en este despliegue: faltan "
+                f"dependencias o el índice configurado. ({type(exc).__name__})"))
 
 app = FastAPI(title="evo core API", version=ENGINE_VERSION)
 
@@ -86,6 +83,10 @@ def _warm_embedder() -> None:
     are swallowed: a machine with no model cache should still serve the engine
     endpoints, just with a slow first RAG call.
     """
+    from rag import config as rag_config
+    if rag_config.PUBLIC_MODE:
+        return
+
     import threading
 
     def _load() -> None:
@@ -153,6 +154,7 @@ def scenario(req: ScenarioRequest) -> ScenarioResponse:
     deltas = {k: [s - b for s, b in zip(run[k], base[k])] for k in run}
     k = req.horizon - Y0
     return ScenarioResponse(
+        warnings=debt_domain_warnings(run["b"]),
         horizon=req.horizon,
         years=list(range(Y0, Y1 + 1)),
         baseline=base,
@@ -170,6 +172,9 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
     mc = run_montecarlo(levers, n_paths=req.n_paths, seed=req.seed, n_show=req.n_show)
     n = req.horizon - 2026 + 1
     return MonteCarloResponse(
+        warnings=debt_domain_warnings(
+            value for series in [*mc.percentiles.values(), *mc.paths]
+            for value in series[:n]),
         years=mc.years[:n],
         percentiles={p: v[:n] for p, v in mc.percentiles.items()},
         n_paths=mc.n_paths,
@@ -182,7 +187,7 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
 def scenario_analog(req: ScenarioRequest) -> AnalogResponse:
     levers = Levers(**req.levers.model_dump())
     horizon = max(1, min(req.horizon - Y0, 24))
-    matches_raw = find_analogs(levers, horizon=horizon)
+    matches_raw = find_analogs(levers, horizon=horizon, query_year=req.horizon)
 
     matches_out: list[AnalogMatch] = []
     for m in matches_raw:
@@ -204,20 +209,15 @@ def scenario_analog(req: ScenarioRequest) -> AnalogResponse:
         ))
 
     run = run_scenario(levers)
-    q_snap = {
-        "debt_gdp":            run["b"][0],
-        "overall_balance_gdp": run["pb"][0],
-        "interest_rate_10y":   run["bono"][0],
-        "gdp_growth":          run["g"][0],
-        "unemployment":        run["u"][0],
-        "inflation":           run["pi"][0],
-        "r_minus_g":           run["bono"][0] - run["g"][0],
-    }
+    q_snap = _query_vector(run, req.horizon)
 
     return AnalogResponse(
         vintage=VINTAGE,
         computed_not_advice=True,
         horizon=horizon,
+        query_year=req.horizon,
+        features=QUERY_FEATURES,
+        limitations=LIMITATIONS,
         query_snapshot=q_snap,
         matches=matches_out,
         rag_available=False,
@@ -315,6 +315,7 @@ def distress() -> DistressResponse:
                   "Genéralo con `python -m research.distress`."))
 
     raw = json.loads(_DISTRESS_REPORT.read_text(encoding="utf-8"))
+    from research.distress import SCORE_NOTE
     esp = raw.get("spain")
     return DistressResponse(
         available=True,
@@ -326,6 +327,7 @@ def distress() -> DistressResponse:
         importances=[DistressFeatureOut(**i) for i in raw["importances"]],
         spain=DistressCountryOut(**{k: v for k, v in esp.items()
                                     if k != "features"}) if esp else None,
+        note=SCORE_NOTE,
     )
 
 
@@ -362,6 +364,14 @@ _RAG_CHAT_EVAL = GOLD_DIR.parents[1] / "docs" / "eval" / "rag-chat-eval.json"
 @app.get("/rag/eval", response_model=RagEvalResponse)
 def rag_eval() -> RagEvalResponse:
     """The library's report card: retrieval and chat, from committed artifacts."""
+    from rag import config as rag_config
+    if rag_config.PUBLIC_MODE:
+        return RagEvalResponse(
+            available=False,
+            note=("Los resultados de la biblioteca privada con recuperación "
+                  "híbrida no evalúan este corpus público de documentación "
+                  "propia y búsqueda por palabras. No hay una evaluación "
+                  "de calidad publicada para este modo."))
     if not (_RAG_EVAL.exists() and _RAG_CHAT_EVAL.exists()):
         return RagEvalResponse(
             available=False,
@@ -531,27 +541,32 @@ def rag_collections() -> RagCollectionsResponse:
         ))
     return RagCollectionsResponse(collections=out,
                                   total_documents=st["documents"],
-                                  total_chunks=st["chunks"])
+                                  total_chunks=st["chunks"],
+                                  retrieval_mode=rag_config.RETRIEVAL_MODE,
+                                  corpus_scope=rag_config.CORPUS_SCOPE,
+                                  default_collection=rag_config.DEFAULT_COLLECTION)
 
 
 @app.post("/rag/search", response_model=RagSearchResponse)
 def rag_search(req: RagSearchRequest) -> RagSearchResponse:
-    """Hybrid retrieval, no generation — the passages on their own."""
+    """Configured retrieval, no generation — the passages on their own."""
     try:
         from rag import config as rag_config, retrieve as rag_retrieve
     except ImportError as exc:
         raise _rag_unavailable(exc) from exc
 
-    if req.collection not in rag_config.COLLECTIONS:
+    collection = (rag_config.DEFAULT_COLLECTION if req.collection is None
+                  else req.collection)
+    if collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
-                            detail=f"colección desconocida: {req.collection}")
+                            detail=f"colección no disponible: {collection}")
     try:
-        hits = rag_retrieve.search(req.query, req.collection, req.top_k)
+        hits = rag_retrieve.search(req.query, collection, req.top_k)
     except Exception as exc:
         raise HTTPException(status_code=503,
                             detail=f"corpus no disponible: {exc}") from exc
     return RagSearchResponse(
-        query=req.query, collection=req.collection,
+        query=req.query, collection=collection,
         passages=[PassageOut(**h.to_dict()) for h in hits],
     )
 
@@ -580,27 +595,29 @@ def _scenario_facts(req: RagChatRequest) -> dict:
 
 @app.post("/rag/chat", response_model=RagChatResponse)
 def rag_chat(req: RagChatRequest) -> RagChatResponse:
-    """Answer from the corpus, with citations. Never answers ungrounded."""
+    """Answer from retrieved context; citation checks do not prove entailment."""
     try:
         from rag import chat as rag_chat_mod, config as rag_config
     except ImportError as exc:
         raise _rag_unavailable(exc) from exc
 
-    if req.collection not in rag_config.COLLECTIONS:
+    collection = (rag_config.DEFAULT_COLLECTION if req.collection is None
+                  else req.collection)
+    if collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
-                            detail=f"colección desconocida: {req.collection}")
+                            detail=f"colección no disponible: {collection}")
 
     facts = _scenario_facts(req) if req.include_scenario else None
 
     try:
-        ans = rag_chat_mod.ask(req.question, req.collection, top_k=req.top_k,
+        ans = rag_chat_mod.ask(req.question, collection, top_k=req.top_k,
                                scenario_facts=facts)
     except Exception as exc:
         raise HTTPException(status_code=503,
                             detail=f"corpus no disponible: {exc}") from exc
 
     return RagChatResponse(
-        question=req.question, collection=req.collection, answer=ans.text,
+        question=req.question, collection=collection, answer=ans.text,
         passages=[PassageOut(**p) for p in ans.passages],
         grounded=ans.grounded, provider=ans.provider, model=ans.model,
         error=ans.error,
@@ -619,9 +636,11 @@ def rag_chat_stream(req: RagChatRequest) -> StreamingResponse:
     except ImportError as exc:
         raise _rag_unavailable(exc) from exc
 
-    if req.collection not in rag_config.COLLECTIONS:
+    collection = (rag_config.DEFAULT_COLLECTION if req.collection is None
+                  else req.collection)
+    if collection not in rag_config.COLLECTIONS:
         raise HTTPException(status_code=422,
-                            detail=f"colección desconocida: {req.collection}")
+                            detail=f"colección no disponible: {collection}")
 
     facts = _scenario_facts(req) if req.include_scenario else None
 
@@ -641,7 +660,7 @@ def rag_chat_stream(req: RagChatRequest) -> StreamingResponse:
         def produce() -> None:
             try:
                 for item in rag_chat_mod.stream(
-                        req.question, req.collection, top_k=req.top_k,
+                        req.question, collection, top_k=req.top_k,
                         scenario_facts=facts):
                     q.put(item)
             except Exception as exc:

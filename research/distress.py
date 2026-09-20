@@ -1,18 +1,18 @@
 """Early warning of sovereign distress: what the countries that ended badly
 looked like beforehand.
 
-This is the probabilistic complement to the 7 % bond-yield red line. The yield
+This is an exploratory classifier alongside the 7 % bond-yield red line. The yield
 says what the market demands today; this says how closely a country's macro
 position resembles those that went on to default, judged on 418 real onsets
 across 65 years.
 
-Three decisions do most of the work, and each of them makes the number smaller
-and the exercise honest:
+Three design choices limit label leakage and define the evaluation sample:
 
   onset, not state — 49 % of country-years in the database are "in default",
       because a default lasts years. Predicting that is almost the same as
       reading last year's value. The label here is the *first* year of a spell:
-      3,9 % of eligible rows, and a genuine early-warning problem.
+      3,9 % of the raw label rows. The eligible modelling panel has a different
+      event frequency after joining features and excluding ongoing defaults.
 
   forecast, not description — features are read at t and the label at t+1.
       A model given this year's collapse to explain this year's default has
@@ -45,6 +45,17 @@ OUT = ROOT / "docs" / "eval"
 
 LABELS = EXTERNAL / "bocboe_default_labels.csv.gz"
 FEATURES = EXTERNAL / "wb_macro_panel.csv.gz"
+COUNTRY_NAMES = EXTERNAL / "distress_country_codes.csv"
+
+SCORE_KIND = "uncalibrated_classifier_score"
+CALIBRATION_STATUS = "not_evaluated"
+SCORE_NOTE = (
+    "Puntuación exploratoria de 0 a 1; no es una probabilidad de impago calibrada. "
+    "La validación agrupa países, pero no separa el tiempo. No se ha validado "
+    "su calibración ni su transferencia a España, cuya cobertura es incompleta. "
+    "La tasa de eventos del panel no permite calcular cuántas veces menor es "
+    "el riesgo de España."
+)
 
 #: Names the World Bank spells differently, or entities it no longer lists.
 #: Written out rather than fuzzy-matched: a fuzzy match that silently pairs
@@ -110,26 +121,36 @@ def _norm(s: str) -> str:
 
 
 def _wb_names() -> dict[str, str]:
-    """Normalised World Bank country name → ISO3, from the committed panel."""
-    import requests
-    r = requests.get("https://api.worldbank.org/v2/country",
-                     params={"format": "json", "per_page": 400}, timeout=60)
-    return {_norm(c["name"]): c["id"] for c in r.json()[1]
-            if c["region"]["value"] != "Aggregates"}
+    """Frozen label-name → WDI country-code crosswalk; never contacts a service.
+
+    The historical function name is retained for callers. The CSV documents
+    exact ISO-name matches and reviewed aliases, including dissolved states.
+    """
+    if not COUNTRY_NAMES.is_file():
+        raise FileNotFoundError(f"Missing frozen country mapping: {COUNTRY_NAMES}")
+    rows = pd.read_csv(COUNTRY_NAMES, keep_default_na=False)
+    lookup: dict[str, str] = {}
+    for row in rows.itertuples():
+        if not row.iso3:             # explicitly excluded dissolved states
+            continue
+        key = _norm(row.country)
+        if not re.fullmatch(r"[A-Z]{3}", row.iso3):
+            raise ValueError(f"Invalid country code for {row.country}: {row.iso3}")
+        if key in lookup and lookup[key] != row.iso3:
+            raise ValueError(f"Conflicting frozen country mapping: {row.country}")
+        lookup[key] = row.iso3
+    return lookup
 
 
 def load_labels(name_map: dict[str, str] | None = None) -> pd.DataFrame:
     """Default onsets keyed by ISO3.
 
-    Countries that cannot be mapped are dropped and counted, never guessed.
+    Only explicitly excluded dissolved states may remain unmapped. A missing
+    or incomplete crosswalk fails visibly instead of silently shrinking the
+    training panel when a remote service is unavailable.
     """
     lab = pd.read_csv(LABELS)
-    lookup = dict(name_map or {})
-    if not lookup:
-        try:
-            lookup = _wb_names()
-        except Exception:
-            lookup = {}
+    lookup = _wb_names() if name_map is None else dict(name_map)
 
     def to_iso3(name: str) -> str | None:
         if name in ALIASES:
@@ -137,6 +158,10 @@ def load_labels(name_map: dict[str, str] | None = None) -> pd.DataFrame:
         return lookup.get(_norm(name))
 
     lab["iso3"] = lab.country.map(to_iso3)
+    excluded = {name for name, code in ALIASES.items() if code is None}
+    unknown = sorted(set(lab.loc[lab.iso3.isna(), "country"]) - excluded)
+    if unknown:
+        raise ValueError("Country mapping incomplete; review these labels: " + ", ".join(unknown))
     return lab
 
 
@@ -186,8 +211,7 @@ class Result:
 
     @property
     def beats_chance(self) -> bool:
-        """A grouped AUC has sampling noise; one standard deviation clear of
-        0,5 is the weakest claim worth making."""
+        """Descriptive rule using fold dispersion, not a significance test or CI."""
         return self.auc - self.auc_std > 0.5
 
     def to_dict(self) -> dict:
@@ -199,6 +223,11 @@ class Result:
             "importances": self.importances, "unmapped": self.unmapped,
             "years": list(self.years), "beats_chance": self.beats_chance,
             "seed": SEED,
+            "score_kind": SCORE_KIND,
+            "calibration_status": CALIBRATION_STATUS,
+            "validation_scheme": "country_grouped_cross_validation_not_temporal",
+            "importance_scope": "training_sample_permutation_importance",
+            "note": SCORE_NOTE,
         }
 
 
@@ -279,11 +308,13 @@ def _feature_frame() -> pd.DataFrame:
 
 def score_country(iso3: str, panel: pd.DataFrame | None = None,
                   features: pd.DataFrame | None = None) -> dict | None:
-    """Distress probability for one country's latest well-covered year.
+    """Exploratory score for one country's latest sufficiently covered year.
 
     Fitted on every *other* country, so the country being asked about is never
     one the model was trained on. For a country with no default history that is
     automatic — it has no labels to train on — but it is enforced either way.
+    ``probability`` is retained as a compatibility field for predict_proba's
+    raw output. It has not been calibrated for the country being scored.
     """
     d = panel if panel is not None else build_panel()
     f = features if features is not None else _feature_frame()
@@ -306,6 +337,7 @@ def score_country(iso3: str, panel: pd.DataFrame | None = None,
     p = float(m.predict_proba(last[cols].to_numpy(dtype=float).reshape(1, -1))[0, 1])
     return {
         "iso3": iso3, "year": int(last.year), "probability": p,
+        "score_kind": SCORE_KIND, "calibration_status": CALIBRATION_STATUS,
         "base_rate": float(d.y.mean()),
         "in_label_set": bool((d.iso3 == iso3).any()),
         "coverage": f"{int(last.cover)}/{len(cols)}",
@@ -331,13 +363,13 @@ def main() -> None:
           f"({r.pr_auc_lift:.1f}×)")
     print(f"veredicto: {'supera al azar' if r.beats_chance else 'NO supera al azar'}")
 
-    print("\nprobabilidad estimada, último año con datos:")
+    print("\npuntuación exploratoria (0–1), último año con datos; sin calibración:")
     for iso3 in ("ESP", "ITA", "GRC", "ARG"):
         s_ = score_country(iso3, d)
         if s_:
             tag = "" if s_["in_label_set"] else "  (fuera del conjunto etiquetado)"
-            print(f"  {iso3} {s_['year']}: {s_['probability']:.2%} "
-                  f"(base {s_['base_rate']:.2%}, cobertura {s_['coverage']}){tag}")
+            print(f"  {iso3} {s_['year']}: {s_['probability']:.4f} "
+                  f"(cobertura {s_['coverage']}){tag}")
     print("\nimportancia por permutación (caída de AUC):")
     for i in r.importances[:6]:
         print(f"  {i['label'][:44]:<46} {i['mean']:+.4f} ± {i['std']:.4f}")

@@ -4,34 +4,24 @@ import { ProjectionChart } from "./ProjectionChart";
 import { AnalogDiffRow } from "./AnalogDiffRow";
 import { LEVER_SPECS } from "../engine/levers";
 
-const VERDICT_LABEL: Record<string, { text: string; color: string }> = {
-  auto:              { text: "AUTO-LIQUIDABLE",   color: "#22c55e" },
-  requires_surplus:  { text: "REQUIERE SUPERÁVIT", color: "#ef4444" },
-  borderline:        { text: "LÍMITE",             color: "#f59e0b" },
-};
-
-function fmt(v: number | null, dec = 1): string {
-  return v === null ? "—" : v.toFixed(dec).replace(".", ",");
+function fmt(v: number | null | undefined, dec = 1): string {
+  return v == null ? "—" : v.toFixed(dec).replace(".", ",");
 }
 
 export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
   const [active, setActive] = useState(0);
   if (!matches.length) return null;
-  const m = matches[active];
+  const m = matches[active] ?? matches[0];
 
-  const validOutcome = m.outcome.filter((pt) => !pt.truncated);
+  const validOutcome = m.outcome;
   const outcomeYears = validOutcome.map((pt) => m.match_year + pt.year_offset);
-  const debtOutcome  = validOutcome.map((pt) => pt.debt_gdp ?? 0);
-  const rmgOutcome   = validOutcome.map((pt) => pt.r_minus_g ?? 0);
-
-  const verd = VERDICT_LABEL[m.debt_payable_verdict] ?? { text: m.debt_payable_verdict, color: "inherit" };
+  const debtOutcome  = validOutcome.map((pt) => pt.debt_gdp);
   const snap = m.match_snapshot;
-  const rmg  = snap.r_minus_g ?? 0;
 
   const fallbackNarrative =
     m.narrative ??
     `${m.country_name} en ${m.match_year}: datos históricos disponibles para ${m.outcome.filter((p) => !p.truncated).length} años. ` +
-    `Diferencias estructurales: ${m.diffs.filter((d) => d.direction === "diverge").map((d) => d.label).join(", ") || "ninguna relevante"}.`;
+    `Diferencias estructurales: ${m.diffs.filter((d) => d.direction === "diverge").map((d) => d.label).join(", ") || "sin diferencias documentadas"}.`;
 
   return (
     <div className="card" style={{ marginTop: 12 }}>
@@ -69,19 +59,7 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
               : "—"}
           </span>
         </div>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            padding: "2px 8px",
-            borderRadius: 4,
-            background: verd.color + "22",
-            color: verd.color,
-            border: `1px solid ${verd.color}`,
-          }}
-        >
-          {verd.text}
-        </span>
+        <span className="meta">Similitud descriptiva</span>
       </div>
 
       {/* Snapshot KPIs */}
@@ -89,7 +67,7 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
         {[
           ["Deuda", snap.debt_gdp, "%PIB"],
           ["Saldo total", snap.overall_balance_gdp, "%PIB"],
-          ["Bono 10A", snap.interest_rate_10y, "%"],
+          ["Tipo de préstamo bancario (contexto)", snap.lending_rate, "%"],
           ["Crec. real", snap.gdp_growth, "%"],
           ["Paro", snap.unemployment, "%"],
           ["Inflación", snap.inflation, "%"],
@@ -100,21 +78,13 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 6, fontSize: 13 }}>
-        <strong>r − g = {rmg >= 0 ? "+" : ""}{fmt(rmg)}</strong>
-        {" "}→{" "}
-        <span style={{ color: verd.color }}>
-          {m.debt_payable_verdict === "auto"
-            ? "deuda se autoliquida (r < g)"
-            : m.debt_payable_verdict === "requires_surplus"
-            ? "requiere superávit primario (r > g)"
-            : "en el límite (|r − g| < 0,5 pp)"}
-        </span>
-      </div>
+      <p className="src">La sostenibilidad de la deuda no se estima: el panel carece de
+        un coste efectivo soberano comparable. El tipo de préstamo bancario no entra en la búsqueda.</p>
 
       {/* Trajectory chart */}
       <h5 style={{ marginTop: 14, marginBottom: 4 }}>Trayectoria ({m.outcome.length} años)</h5>
       <ProjectionChart
+        historical
         years={outcomeYears}
         baseline={debtOutcome}
         scenario={debtOutcome}
@@ -123,18 +93,6 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
         height={180}
         labels={outcomeYears.map(String)}
       />
-      <div style={{ marginTop: 8 }}>
-        <span style={{ fontSize: 12, color: "var(--muted)" }}>r − g histórico</span>
-        <ProjectionChart
-          years={outcomeYears}
-          baseline={rmgOutcome}
-          scenario={rmgOutcome}
-          unit="pp"
-          dec={2}
-          height={120}
-          labels={outcomeYears.map(String)}
-        />
-      </div>
       {m.outcome_truncated && (
         <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
           ⚠ Datos disponibles solo hasta {Math.max(...m.outcome.filter((p) => !p.truncated).map((p) => m.match_year + p.year_offset), m.match_year)}. Puntos restantes sin datos.
@@ -151,7 +109,7 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
               <th style={{ textAlign: "left" }}>Dimensión</th>
               <th style={{ textAlign: "right" }}>España</th>
               <th style={{ textAlign: "right" }}>Análogo</th>
-              <th style={{ textAlign: "right" }}>Efecto</th>
+              <th style={{ textAlign: "right" }}>Comparación descriptiva</th>
             </tr>
           </thead>
           <tbody>

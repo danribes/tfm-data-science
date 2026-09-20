@@ -111,6 +111,15 @@
       "d_ext_debt_gni": null,
       "d_reserves_mo": -0.20769218980805015,
       "d_gdp_growth": -3.2278901484281004
-    }
-  }
+    },
+    "score_kind": "uncalibrated_classifier_score",
+    "calibration_status": "not_evaluated"
+  },
+  "score_kind": "uncalibrated_classifier_score",
+  "calibration_status": "not_evaluated",
+  "validation_scheme": "country_grouped_cross_validation_not_temporal",
+  "importance_scope": "training_sample_permutation_importance",
+  "note": "Puntuación exploratoria de 0 a 1; no es una probabilidad de impago calibrada. La validación agrupa países, pero no separa el tiempo. No se ha validado su calibración ni su transferencia a España, cuya cobertura es incompleta. La tasa de eventos del panel no permite calcular cuántas veces menor es el riesgo de España.",
+  "metadata_updated_at": "2026-09-20",
+  "metrics_recomputed": false
 }

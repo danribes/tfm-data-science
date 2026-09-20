@@ -1,5 +1,8 @@
-"""Spain semi-structural engine — faithful Python port of v16 `run(L)`
+"""Spain semi-structural engine — based on v16 `run(L)`
 (docs/superpowers/plans/references/v16-engine-extract.md S1, L95-175).
+
+Current revisions correct housing reversion and the GDP denominator of
+interest payments; the original v16 output is not preserved for those series.
 
 Deviation semantics: the baseline freezes the vintage (gold central scenario +
 V0 KPIs); the engine computes deviations from it. The baseline is NOT a
@@ -30,6 +33,8 @@ SERIES_KEYS = [
 
 def french(principal: float, annual_rate_pct: float, n_months: int) -> float:
     """French amortization monthly payment (extract L93)."""
+    if annual_rate_pct == 0:
+        return principal / n_months
     i = annual_rate_pct / 1200.0
     return principal * i / (1 - (1 + i) ** (-n_months))
 
@@ -50,18 +55,24 @@ def run_scenario(
 
     omega        – adaptive-expectations weight in the hybrid Phillips curve.
                    1.0 (default) = pure adaptive (v16 baseline, unchanged).
-                   0.0 = fully anchored to the 2 % ECB target.
-                   Intermediate values follow Galí-Gertler (1999): fraction
-                   omega of firms are backward-looking, (1-omega) are anchored.
-                   Effective inertia = omega * THETA.
+                   0.0 = no lagged inflation-deviation persistence. The anchor
+                   is frozen V0["pi"] (3 %), not a separately modelled ECB target;
+                   contemporaneous shocks still move inflation. Intermediate
+                   weights are a reduced-form sensitivity inspired by hybrid
+                   Phillips curves. Effective inertia = omega * THETA.
 
     alpha_spread – endogenous sovereign spread sensitivity (pp bono per pp of
                    debt above b_crit).  0.0 (default) = exogenous spread
-                   (v16 baseline, unchanged).  0.04 replicates the Spain
-                   2010-12 episode (≈4 bp per pp of debt above the threshold).
+                   (v16 baseline, unchanged).  0.04 is an illustrative
+                   sensitivity of 4 bp per pp of debt above the threshold.
 
     b_crit       – debt/GDP threshold (% PIB) that activates spread feedback.
                    Default: c.B_CRIT = 110.0.
+
+    ipv_rev      – fraction of a housing-growth deviation removed each year.
+                   Persistence is 1 - ipv_rev. The v16 constant stored a
+                   persistence factor of 0.60; reproduce that path with
+                   ipv_lr=c.IPV_LR_V16 and ipv_rev=1-c.IPV_REV_V16.
     """
     L, B, V0 = levers, c.BASE_LEVERS, c.V0
     central, olddep = c.load_central(), c.load_olddep()
@@ -71,7 +82,7 @@ def run_scenario(
     _omega        = c.OMEGA        if omega        is None else omega
     _alpha_spread = c.ALPHA_SPREAD if alpha_spread is None else alpha_spread
     _b_crit       = c.B_CRIT      if b_crit       is None else b_crit
-    # Default to the panel estimates; pass the *_V16 values to reproduce v16.
+    # The estimated rate is 1 - phi; v16's similarly named constant was phi.
     _ipv_lr       = c.IPV_LR       if ipv_lr       is None else ipv_lr
     _ipv_rev      = c.IPV_REV      if ipv_rev      is None else ipv_rev
 
@@ -95,7 +106,7 @@ def run_scenario(
         gap_u = c.OKUN * lvl                                    # slack: u below u*
         u = V0["u"] + u_star_dev - gap_u
         # Hybrid Phillips: omega=1 → pure adaptive (v16 baseline);
-        # omega<1 → anchored fraction pulls pi_dev toward 0 (ECB target).
+        # omega<1 → less persistence of deviations around frozen V0["pi"].
         pi_dev = (_theta_eff * pi_dev + c.KAPPA * gap_u
                   + c.GAMMA * (L.pm - B["pm"]) * c.PM_DECAY ** k)
         pi = V0["pi"] + pi_dev
@@ -104,7 +115,8 @@ def run_scenario(
 
         # Endogenous sovereign spread: alpha_spread=0 → exogenous (v16 baseline).
         # Uses b from the *previous* year so the loop stays one-pass (no iteration).
-        _spread_addon = _alpha_spread * max(0.0, b - _b_crit) / 100
+        # Both the coefficient's yield output and the debt gap are in pp.
+        _spread_addon = _alpha_spread * max(0.0, b - _b_crit)
         bono = L.r + c.TERM + L.prima / 100 + _spread_addon
 
         # debt identity b_t = b_{t-1}(1+i)/(1+g) − sp, with 14 %/yr refinancing
@@ -113,7 +125,8 @@ def run_scenario(
         pb = gc["pb"] + L.sp - gc["presion_demog"] * L.dem
         b_prev = b
         b = b_prev * (1 + ief / 100) / (1 + gnom / 100) - pb
-        intr = b_prev * ief / 100
+        # Interest = i_t * D_{t-1} / Y_t, whereas b_prev uses Y_{t-1}.
+        intr = b_prev * ief / 100 / (1 + gnom / 100)
         saldo = pb - intr
 
         # wage setting (WS)
@@ -124,7 +137,7 @@ def run_scenario(
             wr_idx *= 1 + wreal / 100
 
         # housing
-        ipv = (_ipv_lr + (V0["ipv"] - _ipv_lr) * _ipv_rev ** k
+        ipv = (_ipv_lr + (V0["ipv"] - _ipv_lr) * (1.0 - _ipv_rev) ** k
                - c.E_IPV_R * (L.r - B["r"]) + c.E_IPV_G * (g - V0["g"]))
         if k > 0:
             precio *= 1 + ipv / 100
@@ -454,4 +467,3 @@ def sensitivity_matrix(
         "target_series": target_info,
         "matrix": matrix,
     }
-

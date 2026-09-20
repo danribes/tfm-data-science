@@ -25,13 +25,16 @@ export function AnalogPanel({
   const [open, setOpen] = useState(true);
 
   const mut = useMutation({
-    mutationFn: () => fetchAnalog({ levers, horizon }),
+    mutationFn: (request: AnalogRequest) => fetchAnalog(request),
   });
 
   function handleSearch() {
     setOpen(true);
-    mut.mutate();
+    mut.mutate({ levers, horizon });
   }
+
+  const key = (r: AnalogRequest) => JSON.stringify([r.horizon, Object.entries(r.levers ?? {}).sort()]);
+  const stale = mut.data && mut.variables && key(mut.variables) !== key({ levers, horizon });
 
   return (
     <div className="card" style={{ marginTop: 24 }}>
@@ -51,8 +54,7 @@ export function AnalogPanel({
             <div>
               <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
                 Busca los 3 episodios históricos más similares al escenario activo y muestra
-                cómo evolucionaron, en qué se diferencia España, y por qué el resultado puede
-                converger o divergir.
+                su evolución posterior. La semejanza histórica no predice la trayectoria de España.
               </p>
               <button
                 aria-label="Buscar análogo histórico"
@@ -88,10 +90,15 @@ export function AnalogPanel({
             <>
               {!mut.data.rag_available && (
                 <p style={{ fontSize: 11, color: "var(--muted)", marginBottom: 8 }}>
-                  ⚠ Análisis narrativo solo disponible en despliegue local.
+                  Descripción determinista basada en datos históricos.
                 </p>
               )}
+              <p className="src">Consulta del escenario en {mut.data.query_year ?? horizon} ·
+                deuda, saldo total, crecimiento real, paro e inflación. {mut.data.limitations}</p>
+              {stale && <p role="status">Estos resultados corresponden a un escenario anterior.
+                Actualiza la búsqueda para aplicar los cambios.</p>}
               <AnalogCard matches={mut.data.matches} />
+              <button onClick={handleSearch} disabled={mut.isPending}>Actualizar búsqueda</button>
             </>
           )}
         </div>

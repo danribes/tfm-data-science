@@ -492,6 +492,8 @@ def test_refresh_vintage_writes_new_dir_and_records_failures(tmp_path):
     assert (out_dir / "raw" / "ok.json").read_bytes() == b"{}"
     rows = list(csv.DictReader((out_dir / "manifest.csv").open()))
     assert rows[0]["status"] == "ok" and rows[0]["bytes"] == "2"
+    assert rows[0]["acquired_at"] and rows[0]["sha256"]
+    assert rows[0]["observation_cutoff"] == ""  # unknown until the raw series is parsed
     assert rows[1]["status"].startswith("error:")        # recorded, never fabricated
     assert not (out_dir / "raw" / "fail.json").exists()
     # the committed vintage is untouched
@@ -528,3 +530,41 @@ def test_refresh_vintage_sanitizes_traversal_in_source_and_rejects_bad_today(tmp
     with pytest.raises(ValueError):
         refresh(manifest_path=manifest, out_root=out_root,
                 fetch=fake_fetch, today="../../gold")
+
+
+def test_refresh_skips_derived_and_non_downloadable_manifest_entries(tmp_path):
+    from scripts.refresh_vintage import refresh
+
+    manifest = tmp_path / "manifest.csv"
+    manifest.write_text(
+        "source,url,raw_file,kind\n"
+        "analog,WB+IMF-WEO+PWT,,derived\n"
+        "stats,derived,,\n"
+        "published,https://example.org/derived.csv,,derived\n")
+
+    def forbidden_fetch(*args, **kwargs):
+        raise AssertionError("derived records must not be fetched")
+
+    out = refresh(manifest, tmp_path / "vintages", fetch=forbidden_fetch, today="2099-01-03")
+    rows = list(csv.DictReader((out / "manifest.csv").open()))
+    assert len(rows) == 3
+    assert all(row["status"].startswith("skipped:") for row in rows)
+    assert list((out / "raw").iterdir()) == []
+
+
+def test_public_integrity_snapshot_is_independent_of_private_book_reports(tmp_path, monkeypatch):
+    from scripts import check_data_integrity as integrity
+
+    monkeypatch.setattr(integrity, "ROOT", tmp_path)
+    for directory in ("data/gold", "data/external", "docs/eval"):
+        (tmp_path / directory).mkdir(parents=True)
+    (tmp_path / "data/ARTIFACT_METADATA.json").write_text("{}")
+    public = tmp_path / "docs/eval/distress.json"
+    public.write_text('{"available": true}')
+    before = integrity.snapshot()
+    for name in ("rag-book-additions-2026-09-20.json", "rag-staged-book-probes-2026-09-20.json",
+                 "rag-staged-books-2026-09-20.json"):
+        (tmp_path / "docs/eval" / name).write_text('{"anchor": "private source text"}')
+    assert integrity.snapshot() == before
+    public.write_text('{"available": false}')
+    assert integrity.snapshot() != before

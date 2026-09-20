@@ -17,7 +17,7 @@ def test_health_shape():
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json() == {"status": "ok", "vintage": "2026-07-31",
-                        "engine_version": "1.0.0", "computed_not_advice": True}
+                        "engine_version": "1.1.0", "computed_not_advice": True}
 
 
 def test_vintage_shape():
@@ -80,7 +80,8 @@ def test_scenario_shape_and_zero_deviation():
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"vintage", "computed_not_advice", "horizon", "years",
-                         "baseline", "scenario", "deltas", "personas", "redlines"}
+                         "baseline", "scenario", "deltas", "personas", "redlines", "warnings"}
+    assert body["warnings"] == []
     assert body["computed_not_advice"] is True
     assert body["horizon"] == 2050
     assert body["years"] == list(range(2026, 2051))
@@ -119,7 +120,7 @@ def test_montecarlo_endpoint_shape_and_bounds():
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"vintage", "computed_not_advice", "years", "percentiles",
-                         "n_paths", "seed", "paths"}
+                         "n_paths", "seed", "paths", "uncertainty_kind", "empirical_coverage_validated", "warnings"}
     assert body["years"][0] == 2026 and body["years"][-1] == 2070
     assert set(body["percentiles"]) == {"p5", "p25", "p50", "p75", "p95"}
     # reproducibility across calls with the same seed
@@ -134,6 +135,25 @@ def test_montecarlo_horizon_truncates_years():
     body = client.post("/scenario/montecarlo", json={"n_paths": 300, "horizon": 2050}).json()
     assert body["years"][-1] == 2050
     assert all(len(v) == len(body["years"]) for v in body["percentiles"].values())
+
+
+def test_negative_debt_is_reported_as_outside_gross_debt_model_domain():
+    levers = {"r": 0, "prima": 0, "sp": 4, "lam": 2.5, "pm": -50,
+              "tau": -5, "z": -2, "ext": 6, "dem": -1, "idx": -1.5}
+    deterministic = client.post("/scenario", json={"levers": levers}).json()
+    assert min(deterministic["scenario"]["b"]) < 0
+    assert "deuda negativa" in deterministic["warnings"][0]
+    mc = client.post("/scenario/montecarlo", json={
+        "levers": levers, "n_paths": 100, "n_show": 0, "seed": 42,
+    }).json()
+    assert min(mc["percentiles"]["p5"]) < 0
+    assert "deuda negativa" in mc["warnings"][0]
+    # Warnings describe only returned MC years, not an unrequested future tail.
+    short = client.post("/scenario/montecarlo", json={
+        "levers": levers, "n_paths": 100, "n_show": 0, "seed": 42, "horizon": 2030,
+    }).json()
+    assert min(short["percentiles"]["p5"]) > 0
+    assert short["warnings"] == []
 
 
 def test_sensitivity_matrix_endpoints():
@@ -305,23 +325,23 @@ def test_evidence_ships_the_impulse_response_with_the_engine_on_the_same_axis():
     assert irf is not None
     assert len(irf["horizons"]) == len(irf["engine_path"])
     anchor = irf["anchor_h"]
-    # Null before the anchor is the contract the chart relies on to leave a gap
-    # rather than draw the engine's line down to zero.
-    assert all(p["coef"] is None for p in irf["engine_path"] if p["h"] < anchor)
-    assert all(p["coef"] is not None for p in irf["engine_path"] if p["h"] >= anchor)
-    assert irf["unit"] and irf["note"]
+    # The engine is annual; only t and complete years have defined values.
+    assert irf["engine_path"][0]["coef"] == 0.0
+    assert all(p["coef"] is None for p in irf["engine_path"] if p["h"] % anchor)
+    assert all(p["coef"] is not None for p in irf["engine_path"] if p["h"] % anchor == 0)
+    assert irf["unit"] and irf["note"] and irf["comparison_note"]
+    assert 0.0 < irf["engine_reversion"] < 1.0
 
 
-def test_evidence_impulse_response_contradicts_the_calibrated_reversion():
-    """The finding, asserted so a change of sign cannot pass silently: in the
-    regional panel the shock keeps building while the engine assumes decay."""
+def test_evidence_cumulative_comparison_does_not_turn_growth_decay_into_level_decay():
+    """A positive first-year association accumulates under positive persistence."""
     irf = client.get("/evidence").json()["irf"]
     at = {p["h"]: p for p in irf["horizons"]}
     anchor, last = at[irf["anchor_h"]], irf["horizons"][-1]
-    assert last["coef"] > anchor["coef"]
     engine_last = irf["engine_path"][-1]["coef"]
-    assert engine_last < anchor["coef"]
-    assert last["ci_low"] > 0          # and it is distinguishable from nothing
+    assert anchor["coef"] > 0
+    assert engine_last > anchor["coef"]
+    assert irf["engine_path"][irf["anchor_h"]]["coef"] == pytest.approx(anchor["coef"])
 
 
 # ---- sensitivity: comparable across levers, or not comparable at all -------
@@ -393,7 +413,7 @@ def test_prediction_says_so_when_the_evaluation_has_not_been_run(monkeypatch):
     assert "research.dl_global" in body["note"]
 
 
-# ---- /distress: el complemento probabilístico del 7 % ----
+# ---- /distress: puntuación exploratoria sin calibración ----
 
 def test_distress_serves_the_committed_evaluation():
     body = client.get("/distress").json()
@@ -402,16 +422,20 @@ def test_distress_serves_the_committed_evaluation():
     assert 0.5 < body["auc"] < 1.0
     assert body["years"] == [1960, 2023]
     assert body["importances"][0]["label"]
+    assert body["score_kind"] == "uncalibrated_classifier_score"
+    assert body["calibration_status"] == "not_evaluated"
+    assert body["validation_scheme"] == "country_grouped_cross_validation_not_temporal"
+    assert "no es una probabilidad" in body["note"]
 
 
 def test_distress_scores_spain_as_out_of_sample():
-    """Spain is not in the default database, and the endpoint must say so:
-    that fact is what makes the probability an honest out-of-sample number."""
+    """Country exclusion prevents label leakage; it does not prove calibration."""
     esp = client.get("/distress").json()["spain"]
     assert esp is not None
     assert esp["iso3"] == "ESP"
     assert esp["in_label_set"] is False
     assert 0.0 < esp["probability"] < 0.5
+    assert esp["calibration_status"] == "not_evaluated"
 
 
 def test_distress_says_so_when_the_model_has_not_been_trained(monkeypatch):
@@ -572,9 +596,30 @@ def test_analog_endpoint_smoke():
     assert body["rag_available"] is False
 
 
-def test_analog_narrative_none_without_rag():
+def test_analog_narrative_is_descriptive_without_rag():
     r = client.post("/scenario/analog", json={})
     assert r.status_code == 200
     body = r.json()
     assert body["rag_available"] is False
-    assert all(m["narrative"] is None for m in body["matches"])
+    assert all("similitud descriptiva" in m["narrative"] for m in body["matches"])
+
+
+def test_analog_uses_requested_scenario_year_and_total_balance():
+    r = client.post("/scenario/analog", json={"horizon": 2040})
+    assert r.status_code == 200
+    body = r.json()
+    from engine.spain import baseline
+    expected = baseline()
+    assert body["query_year"] == 2040
+    assert body["query_snapshot"]["overall_balance_gdp"] == pytest.approx(expected["saldo"][14])
+    assert body["query_snapshot"]["debt_gdp"] == pytest.approx(expected["b"][14])
+    assert "interest_rate_10y" not in body["features"]
+    assert all(m["debt_payable_verdict"] == "not_assessed" for m in body["matches"])
+    assert all(m["match_snapshot"]["r_minus_g"] is None for m in body["matches"])
+
+
+def test_montecarlo_describes_conditional_not_empirically_validated_bands():
+    r = client.post("/scenario/montecarlo", json={"n_paths": 100})
+    assert r.status_code == 200
+    assert r.json()["uncertainty_kind"] == "conditional_simulation"
+    assert r.json()["empirical_coverage_validated"] is False

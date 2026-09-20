@@ -21,22 +21,22 @@ describe("generated constants match the Python engine and the committed vintage"
     expect(C.REFI).toBe(0.14);
     expect(C.TERM).toBe(0.17);
     expect(C.DIFF).toBe(1.4757);
-    expect(C.IPV_LR).toBe(3.0);
-    expect(C.IPV_REV).toBe(0.6);
+    expect(C.IPV_LR).toBe(anchors.housing.long_run_growth);
+    expect(C.IPV_REV).toBe(anchors.housing.annual_reversion_rate);
     expect(C.E_IPV_R).toBe(2.6);
     expect(C.E_IPV_G).toBe(1.1);
     expect(C.RJUV).toBe(2.317);
     expect(C.PM_DECAY).toBe(0.45);
     expect(C.CAL_SALARIO_MES).toBe(1749.79);
   });
-  it("31 provenance rows for Metodología", () => {
-    expect(C.CONSTANTS_META).toHaveLength(31);
+  it("34 provenance rows for Metodología", () => {
+    expect(C.CONSTANTS_META).toHaveLength(34);
     expect(C.CONSTANTS_META[0]).toMatchObject({ name: "MULT", value: 1.4, unit: "x" });
     expect(C.CONSTANTS_META.map((r) => r.name)).toContain("MC_SIG_R");
   });
   it("vintage-anchored values", () => {
     expect(VINTAGE).toBe(anchors.vintage); // "2026-07-31"
-    expect(ENGINE_VERSION).toBe("1.0.0");
+    expect(ENGINE_VERSION).toBe(anchors.engine_version);
     expect(V0.u).toBe(10.1);
     expect(V0.pi).toBe(3.0);
     expect(V0.g).toBe(2.7);

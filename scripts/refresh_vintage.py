@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import csv
 import datetime
+import hashlib
 import re
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import requests
 
@@ -26,6 +28,7 @@ def refresh(manifest_path: Path = GOLD_MANIFEST, out_root: Path = VINTAGES_ROOT,
     today = today or datetime.date.today().isoformat()
     if not _DATE_RE.fullmatch(today):
         raise ValueError(f"today must be YYYY-MM-DD, got {today!r}")
+    datetime.date.fromisoformat(today)
     out_dir = out_root / today
     raw_dir = out_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
@@ -34,21 +37,31 @@ def refresh(manifest_path: Path = GOLD_MANIFEST, out_root: Path = VINTAGES_ROOT,
     with manifest_path.open(encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
             entry = {"source": row["source"], "url": row["url"],
-                     "fetched": datetime.datetime.now().isoformat(timespec="seconds"),
-                     "bytes": 0, "raw_file": "", "status": ""}
+                     "acquired_at": "", "observation_cutoff": "", "built_at": "",
+                     "bytes": 0, "raw_file": "", "processed_file": "",
+                     "kind": row.get("kind") or "source", "sha256": "", "status": ""}
+            url = urlsplit(row["url"])
+            if entry["kind"] == "derived" or url.scheme not in {"http", "https"} or not url.netloc:
+                entry.update(kind="derived" if entry["kind"] == "derived" else "source",
+                             status="skipped: derived artifact or no downloadable HTTP(S) URL")
+                new_rows.append(entry)
+                continue
             try:
                 resp = fetch(row["url"], timeout=30)
                 resp.raise_for_status()
                 name = Path(row["raw_file"]).name or Path(f"{row['source']}.bin").name
                 (raw_dir / name).write_bytes(resp.content)
-                entry.update(bytes=len(resp.content), raw_file=f"raw/{name}", status="ok")
+                entry.update(bytes=len(resp.content), raw_file=f"raw/{name}", status="ok",
+                             acquired_at=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+                             sha256=hashlib.sha256(resp.content).hexdigest())
             except Exception as exc:
                 entry["status"] = f"error: {exc}"
             new_rows.append(entry)
 
     with (out_dir / "manifest.csv").open("w", newline="", encoding="utf-8") as fh:
-        writer = csv.DictWriter(fh, fieldnames=["source", "url", "fetched",
-                                                "bytes", "raw_file", "status"])
+        writer = csv.DictWriter(fh, lineterminator="\n", fieldnames=["source", "url", "acquired_at",
+                                                "observation_cutoff", "built_at", "bytes",
+                                                "raw_file", "processed_file", "kind", "sha256", "status"])
         writer.writeheader()
         writer.writerows(new_rows)
     return out_dir

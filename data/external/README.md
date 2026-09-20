@@ -20,7 +20,7 @@ predecirlos?» dejaría de tener una respuesta comprobable de un vistazo.
 | Observaciones | 208.640 |
 | Periodo | 1968–2026 |
 | Fuentes | FHFA metro (410), FHFA estado (51), Zillow (894), Reino Unido (405) |
-| SHA-256 del CSV sin comprimir | `ed033bb7b1944b70…` |
+| SHA-256 del CSV sin comprimir | `ed033bb7b1944b706514b365ebbdb8b301c555f6f7b422be6b18ad4a8f5e3dd0` |
 | Origen | `evo_final_work_old/storage/processed/` (pipeline de la entrega anterior) |
 
 **Ninguna serie es española.** Esa es la propiedad que hace útil el corpus: un
@@ -44,3 +44,8 @@ tal cual, sin descomprimir a mano.
 
 El nivel del índice no es comparable entre series y no hace falta que lo sea: el
 protocolo trabaja siempre con diferencias logarítmicas.
+
+La copia comprimida está sellada en `data/artifact_checksums.json`. El pipeline
+anterior y sus descargas originales no están incluidos en este repositorio:
+se puede repetir la evaluación con este archivo congelado, pero no reconstruir
+su adquisición completa aquí. Véase `docs/REPRODUCIBILITY.md`.

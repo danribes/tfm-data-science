@@ -17,6 +17,9 @@ test("smoke: boot → lever → persona → persistence → theme → no console
   // (the name matches both the nav pill and Inicio's card link — either navigates)
   await page.getByRole("link", { name: /Bonista/ }).first().click();
   await expect(page.getByText("💼 Inversor en bonos: ¿me pagarán los 10 años?")).toBeVisible();
+  // Profiles now open on their questions; the optional complete panel owns
+  // the scenario KPIs and charts exercised below.
+  await page.getByRole("button", { name: /ver el panel completo del perfil/i }).click();
   // "106,3" appears in the Deuda tile AND the semaphore row — .first() avoids strict-mode
   await expect(page.getByText("106,3").first()).toBeVisible(); // b 2026 base
   const pathBefore = await page.locator("path.recharts-curve").last().getAttribute("d");
@@ -42,4 +45,31 @@ test("smoke: boot → lever → persona → persistence → theme → no console
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
   expect(errors).toEqual([]);
+});
+
+test("mobile: open controls, adjust horizon/lever, close with button and Escape", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Abrir palancas", exact: true });
+  await expect(toggle).toBeVisible();
+  await toggle.click();
+  const rail = page.getByRole("dialog", { name: "Palancas del escenario" });
+  await expect(rail).toBeInViewport();
+  await page.getByRole("slider", { name: "Tipo de interés · Euríbor 12m" }).fill("4.8");
+  await page.getByRole("group", { name: "Horizonte" }).getByRole("button", { name: "2030", exact: true }).click();
+  await expect(page).toHaveURL(/r=4\.8/);
+  await page.getByRole("button", { name: "Cerrar palancas", exact: true }).click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toBeFocused();
+  await page.locator('a[href="/persona/03"]').first().click();
+  await page.getByRole("button", { name: /ver el panel completo del perfil/i }).click();
+  const tile = page.locator(".out").first();
+  await expect(tile).toBeVisible();
+  const box = await tile.boundingBox();
+  expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+  await toggle.click();
+  await expect(page.getByRole("button", { name: "2030", exact: true })).toHaveClass(/on/);
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toBeFocused();
 });

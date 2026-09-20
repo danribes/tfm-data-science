@@ -21,7 +21,14 @@ on:
       - "rag/**"
       - "data/**"
       - "docs/eval/**"
+      - "README.md"
+      - "docs/MEMORIA_TFM.md"
+      - "docs/RESULTS.md"
+      - "docs/METHODOLOGY_CHANGES.md"
+      - "docs/REPRODUCIBILITY.md"
+      - "docs/DEFENSA_TFM.md"
       - "requirements-deploy.txt"
+      - "requirements-lock.txt"
       - "deploy/hf/**"
       - ".github/workflows/deploy-hf-space.yml"
   workflow_dispatch:
@@ -36,6 +43,11 @@ jobs:
           python-version: "3.12"
       - name: Assemble the Space content
         run: ./deploy/hf/assemble.sh /tmp/hf-stage
+      - name: Check the assembled public API with slim dependencies
+        run: |
+          python -m venv /tmp/hf-check
+          /tmp/hf-check/bin/python -m pip install -r /tmp/hf-stage/requirements-deploy.txt
+          /tmp/hf-check/bin/python deploy/hf/smoke.py /tmp/hf-stage
       - name: Push to the Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -50,25 +62,17 @@ jobs:
           python - <<'PY'
           import os
           from huggingface_hub import HfApi
+          from huggingface_hub.errors import RepositoryNotFoundError
 
           api = HfApi(token=os.environ["HF_TOKEN"])
           owner = api.whoami()["name"]
           repo_id = f"{owner}/evo-espana-api"
 
           try:
-              api.create_repo(repo_id, repo_type="space", space_sdk="docker",
-                              exist_ok=True)
-          except Exception as exc:
-              if "402" in str(exc):
-                  # Discovered live on 2026-08-10: Docker Spaces on free CPU now
-                  # require an HF PRO subscription. The sync degrades to a
-                  # skip-with-notice instead of a red X on every push; the
-                  # committed render.yaml is the free path.
-                  print("::warning::HF exige PRO para Spaces Docker (402). "
-                        "Sync omitido; usa el blueprint de Render (render.yaml) "
-                        "o suscribe PRO y relanza.")
-                  raise SystemExit(0)
-              raise
+              api.repo_info(repo_id, repo_type="space")
+          except RepositoryNotFoundError:
+              # Do not turn a failed deployment into a green, skipped run.
+              api.create_repo(repo_id, repo_type="space", space_sdk="docker")
           # delete_patterns mirrors removals: a file dropped from the staging
           # dir must also leave the Space, or stale code serves forever.
           api.upload_folder(repo_id=repo_id, repo_type="space",

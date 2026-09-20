@@ -9,10 +9,20 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+# The public deployment is a deliberately smaller corpus and uses lexical
+# retrieval. Never infer this mode from missing dependencies or model errors.
+MODE = os.environ.get("EVO_RAG_MODE", "hybrid")
+if MODE not in {"hybrid", "public_lexical"}:
+    raise ValueError(f"EVO_RAG_MODE desconocido: {MODE!r}")
+PUBLIC_MODE = MODE == "public_lexical"
+RETRIEVAL_MODE = "lexical" if PUBLIC_MODE else "hybrid"
+CORPUS_SCOPE = "public_project_docs" if PUBLIC_MODE else "private_local"
+DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "libros"
+
 # ---- corpora ----------------------------------------------------------------
 
 DATA_ROOT = Path(os.environ.get(
-    "EVO_RAG_DATA", "/home/dan/projects/evo_final_work_data"))
+    "EVO_RAG_DATA", Path(__file__).resolve().parents[1].with_name("evo_final_work_data")))
 
 BOOKS_DIR = DATA_ROOT / "econ_pdfs"
 BOOKS_MANIFEST = BOOKS_DIR / "CORPUS_MANIFEST.csv"
@@ -23,9 +33,9 @@ CRACK_DIR = DATA_ROOT / "crack23"
 #: channel with the same authority as Mankiw would discredit the whole answer.
 COLLECTIONS = {
     "libros": {
-        "label": "Manuales de economía",
+        "label": "Economía y métodos",
         "authority": "academico",
-        "note": "Textos con copyright — nunca salen de la máquina local.",
+        "note": "Documentos e índice almacenados localmente; los pasajes recuperados se envían al proveedor de IA configurado para redactar respuestas.",
     },
     "metodo": {
         "label": "Método y diseño del propio modelo",
@@ -44,9 +54,25 @@ COLLECTIONS = {
     },
 }
 
+if PUBLIC_MODE:
+    COLLECTIONS = {
+        "metodo": {
+            "label": "Método y resultados del proyecto",
+            "authority": "propio",
+            "note": "Documentación pública de este proyecto. Búsqueda por palabras (BM25), sin embeddings; los pasajes pueden enviarse al proveedor de IA para redactar la respuesta.",
+        },
+        "defensa_tfm": {
+            "label": "Defensa del TFM",
+            "authority": "propio",
+            "note": "Guía de defensa escrita para este proyecto; no es una fuente académica independiente. Búsqueda por palabras (BM25).",
+        },
+    }
+
 # ---- store ------------------------------------------------------------------
 
-DB_PATH = Path(os.environ.get("EVO_RAG_DB", DATA_ROOT / "rag" / "corpus.db"))
+_DEFAULT_DB = (Path(__file__).resolve().parents[1] / "data/rag/public.db"
+               if PUBLIC_MODE else DATA_ROOT / "rag" / "corpus.db")
+DB_PATH = Path(os.environ.get("EVO_RAG_DB", _DEFAULT_DB))
 
 # ---- chunking ---------------------------------------------------------------
 
@@ -62,15 +88,14 @@ MAX_CHUNK_CHARS = CHUNK_TOKENS * CHARS_PER_TOKEN * 2  # hard ceiling, safety
 
 #: multilingual-e5-large: 560M params, 1024 dims, ~1,1 GB in fp16.
 #:
-#: The size is load-bearing, not a default nobody thought about. This corpus is
-#: bilingual and lopsided — every Spanish-language book is Mises (39 % of
-#: `libros`), the textbooks are English — so a question asked in Spanish only
-#: reaches Mankiw if the embedder genuinely bridges ES↔EN. The `-base` variant
-#: does not: measured on this corpus it ranked passages by language rather than
-#: by topic, sending "qué es el multiplicador fiscal" to Mises on taxation while
-#: the identical English query correctly returned Mankiw ch. 34. Pure-dense
-#: retrieval showed the same failure, which ruled out the fusion weights and
-#: indicted the model.
+#: Historical development observation: the initial bilingual corpus was
+#: dominated by Mises among Spanish sources and textbooks among English ones.
+#: In that snapshot the `-base` variant ranked passages strongly by language:
+#: "qué es el multiplicador fiscal" reached Mises on taxation, whereas the
+#: English query reached Mankiw ch. 34. This motivated the `-large` model.
+#: The corpus has since gained Spanish institutional sources and methods
+#: references; these comments are not current language shares or held-out
+#: evidence. Re-evaluate against a frozen corpus before changing the model.
 #:
 #: bge-m3 would be the other natural choice and is NOT usable here: it ships its
 #: pooling layers as `.pt` files, and transformers refuses torch.load on
@@ -96,16 +121,17 @@ CANDIDATES = int(os.environ.get("EVO_RAG_CANDIDATES", "40"))  # per retriever
 RRF_K = 60          # reciprocal-rank-fusion constant, standard value
 MIN_SCORE = float(os.environ.get("EVO_RAG_MIN_SCORE", "0.0"))
 
-#: Fusion weights. Dense outranks lexical deliberately: this corpus is bilingual
-#: and lopsided — the Spanish-language books are all Mises (39 % of `libros`),
-#: while the textbooks are English. BM25 cannot cross languages, so an unweighted
-#: fusion sends every Spanish question to Mises regardless of topic. The
-#: embedder does bridge ES↔EN, so it gets the larger say; BM25 still earns its
-#: place on exact terminology ("Okun", "prima de riesgo").
+#: Fusion weights retain the historical development configuration. On the
+#: initial bilingual snapshot, unweighted fusion over-ranked Spanish Mises
+#: passages for Spanish queries; dense retrieval received greater weight to
+#: improve cross-language retrieval. Later corpus additions change the mix.
+#: These observations do not establish present-day performance; lexical search
+#: still contributes exact terminology ("Okun", "prima de riesgo").
 W_DENSE = float(os.environ.get("EVO_RAG_W_DENSE", "6.0"))
 W_LEXICAL = float(os.environ.get("EVO_RAG_W_LEXICAL", "1.0"))
 
-#: Weight of the English-only dense probe (see rag/glossary.py), set by sweep.
+#: Weight of the English-only dense probe (see rag/glossary.py), set by sweep
+#: on the development/golden set. Its reported scores are NOT held-out results.
 #:
 #: 0 is the old behaviour: hit@8 94 %, MRR 0,69. It climbs to 97 % / 0,76 at 4
 #: and then flattens, so 4 is the first value on the plateau rather than the
@@ -114,6 +140,7 @@ W_LEXICAL = float(os.environ.get("EVO_RAG_W_LEXICAL", "1.0"))
 #: a passage that never surfaces cannot be cited, while one at rank 3 still
 #: reaches the answer.
 W_DENSE_EN = float(os.environ.get("EVO_RAG_W_DENSE_EN", "4.0"))
+USE_GLOSSARY = os.environ.get("EVO_RAG_GLOSSARY", "1") == "1"
 
 #: No single book may take more than this many of the returned passages. Without
 #: it one 1.100-chunk volume can fill the whole answer and the citation list

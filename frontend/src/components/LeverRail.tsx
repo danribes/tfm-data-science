@@ -85,7 +85,9 @@ function DemVariantChips({ value, onPick }: { value: number; onPick: (v: number)
 }
 
 
-export function LeverRail({ hotIds = [] }: { hotIds?: string[] }) {
+export function LeverRail({ hotIds = [], mobile = false, open = false, onClose }: {
+  hotIds?: string[]; mobile?: boolean; open?: boolean; onClose?: () => void;
+}) {
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
   const setLever = useScenarioStore((s) => s.setLever);
@@ -93,7 +95,10 @@ export function LeverRail({ hotIds = [] }: { hotIds?: string[] }) {
   const resetAll = useScenarioStore((s) => s.resetAll);
   const commitLever = useThrottledLeverSet(setLever);
   return (
-    <aside className="rail" aria-label="Palancas del escenario">
+    <aside id="scenario-levers" className={mobile && open ? "rail open" : "rail"}
+      aria-label="Palancas del escenario" role={mobile && open ? "dialog" : undefined}
+      aria-modal={mobile && open ? true : undefined} inert={mobile && !open}>
+      {mobile && <button type="button" onClick={onClose}>Cerrar palancas</button>}
       <h4 style={{ margin: 0, fontSize: 16 }}>Palancas · variables independientes</h4>
       <PresetBar />
       <div className="levers">

@@ -27,19 +27,19 @@ function ui(children: React.ReactNode) {
 
 describe("AnalogPanel", () => {
   it("renders open by default — header toggle and search button both visible", () => {
-    ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
+    ui(<AnalogPanel levers={BASE_LEVERS} horizon={2036} />);
     expect(screen.getByRole("button", { name: /análogos históricos/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /buscar análogo histórico/i })).toBeInTheDocument();
   });
 
   it("collapses on header click — search button hidden", () => {
-    ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
+    ui(<AnalogPanel levers={BASE_LEVERS} horizon={2036} />);
     fireEvent.click(screen.getByRole("button", { name: /análogos históricos/i }));
     expect(screen.queryByRole("button", { name: /buscar análogo histórico/i })).toBeNull();
   });
 
   it("calls API and shows cards after clicking search button", async () => {
-    ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
+    ui(<AnalogPanel levers={BASE_LEVERS} horizon={2036} />);
     fireEvent.click(screen.getByRole("button", { name: /buscar análogo histórico/i }));
     await waitFor(() => expect(screen.getByText("Irlanda · 2010")).toBeInTheDocument());
     expect(screen.getByText(/Portugal.*2011/)).toBeInTheDocument();
@@ -47,11 +47,11 @@ describe("AnalogPanel", () => {
   });
 
   it("shows deterministic template when rag_available is false", async () => {
-    ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
+    ui(<AnalogPanel levers={BASE_LEVERS} horizon={2036} />);
     fireEvent.click(screen.getByRole("button", { name: /buscar análogo histórico/i }));
     await waitFor(() =>
       expect(
-        screen.getByText(/análisis narrativo solo disponible en despliegue local/i),
+        screen.getByText(/descripción determinista basada en datos históricos/i),
       ).toBeInTheDocument(),
     );
   });
@@ -60,7 +60,7 @@ describe("AnalogPanel", () => {
     server.use(
       http.post("*/scenario/analog", () => HttpResponse.error()),
     );
-    ui(<AnalogPanel levers={BASE_LEVERS} horizon={10} />);
+    ui(<AnalogPanel levers={BASE_LEVERS} horizon={2036} />);
     fireEvent.click(screen.getByRole("button", { name: /buscar análogo histórico/i }));
     await waitFor(() =>
       expect(screen.getByText(/error al buscar análogos/i)).toBeInTheDocument(),
@@ -170,5 +170,21 @@ describe("AnalogDiffRow", () => {
     );
     expect(screen.getByText("≈")).toBeInTheDocument();
     expect(screen.getByLabelText("neutral")).toBeInTheDocument();
+  });
+});
+
+
+describe("AnalogCard measurement limits", () => {
+  it("does not label lending rates or missing values as sovereign sustainability", () => {
+    const match: AnalogMatch = {
+      ...MOCK_MATCHES[0],
+      match_snapshot: {...MOCK_MATCHES[0].match_snapshot, interest_rate_10y: null, lending_rate: 5, r_minus_g: null},
+      debt_payable_verdict: "not_assessed",
+    };
+    render(<AnalogCard matches={[match]} />);
+    expect(screen.getByText(/la sostenibilidad de la deuda no se estima/i)).toBeInTheDocument();
+    expect(screen.getByText(/tipo de préstamo bancario \(contexto\)/i)).toBeInTheDocument();
+    expect(screen.queryByText(/auto-liquidable|r − g =|bono 10a/i)).toBeNull();
+    expect(screen.getByText(/dato histórico observado/i)).toBeInTheDocument();
   });
 });

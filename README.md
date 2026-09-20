@@ -1,252 +1,168 @@
 # España en escenarios
 
-**¿Qué recibe un país —y cada comunidad autónoma— a cambio del dinero público que gasta?**
+**Análisis macrofiscal condicional para España, con evaluación empírica y explicaciones trazables.**
 
-Herramienta abierta construida sobre datos oficiales: reúne un siglo de cuentas
-públicas, proyecta cómo evolucionan la deuda y la vivienda, y deja probar
-escenarios («¿y si los tipos suben 200 pb?») con su margen de error explícito.
+TFM de Inteligencia Artificial y Data Science · motor **1.1.0** · referencia del escenario **2026-07-31**.
 
-TFM de Data Science · motor `1.0.0` · vintage de datos **2026-07-31**
+El proyecto permite explorar qué implica un conjunto de supuestos sobre tipos,
+crecimiento, saldo primario y demografía para la deuda, la vivienda y doce
+perfiles ciudadanos. Combina un motor semiestructural, simulación Monte Carlo,
+contrastes empíricos, modelos de aprendizaje automático y recuperación de
+información económica. Las proyecciones son condicionales; los experimentos
+publican también resultados negativos y límites de identificación.
 
----
+## Material académico
 
-## La idea
+- [Borrador de memoria](docs/MEMORIA_TFM.md): preguntas, métodos, resultados,
+  discusión y bibliografía. Requiere revisión del autor y tutor; no se presenta
+  como una memoria ya aprobada.
+- [Matriz de evidencia](docs/RESULTS.md): modelos, baselines, particiones,
+  métricas y conclusiones permitidas.
+- [Guía de defensa](docs/DEFENSA_TFM.md) y [presentación](docs/deck/deck.marp.md).
+- [Reproducción](docs/REPRODUCIBILITY.md): entorno, datos, comandos y pasos
+  todavía ausentes para reconstruir el pipeline legado completo.
+- [Cambios metodológicos](docs/METHODOLOGY_CHANGES.md): correcciones del motor,
+  significado de las métricas y revisión del contrato API.
+- [Verificación local](docs/VERIFICATION.md): resultados de pruebas, build y
+  revisión de los artefactos de presentación.
+- [Comprobación funcional del modelo](docs/MODEL_CHECK.md): auditoría contable,
+  límites numéricos, navegador, recuperación documental y versión desplegada.
+- [Evaluación RAG](docs/eval/README_RAG.md): resultados de desarrollo y protocolo
+  para un test independiente aún pendiente.
 
-Casi todo el debate público sobre gasto, deuda y vivienda se hace con cifras
-sueltas y sin margen de error. Este proyecto hace lo contrario: fija un corte de
-datos oficiales (*vintage*), lo congela, y sobre él monta un motor macro
-transparente donde cualquiera puede mover diez palancas y ver —con bandas de
-incertidumbre y umbrales históricos— qué le pasa a la deuda, al paro, a la
-inflación y al esfuerzo de compra de vivienda.
+## Qué aporta y qué se ha medido
 
-Tres reglas que atraviesan todo el repositorio:
-
-1. **Nada se escribe a mano.** Los semáforos, los estados de las líneas rojas y
-   los titulares se *calculan* desde el escenario. No hay estados cosidos.
-2. **Todo dato lleva su fecha y su fuente.** El vintage está sellado en
-   `data/gold/VINTAGE` y cada descarga queda registrada en los manifiestos de
-   procedencia.
-3. **Los dos motores tienen que coincidir.** El motor Python y su port a
-   TypeScript están atados por un fixture de anclas: si divergen, los tests
-   fallan.
+| Componente | Evidencia y límite |
+|---|---|
+| Motor Python y TypeScript | Identidades, invariantes y anclas numéricas compartidas. La paridad comprueba la implementación, no la verdad de los supuestos. |
+| Vivienda regional | Media y persistencia estimadas en 17 CCAA + Ceuta y Melilla; se excluye el agregado nacional. La sensibilidad con bloques temporales muestra incertidumbre mucho mayor que la banda regional. |
+| Transferencia de una red de vivienda | Entrenamiento extranjero anterior a los orígenes de evaluación; resultado conservado: 5/17 victorias y MASE 0,400 frente a drift 0,395. No supera el baseline principal. |
+| Distress | AUC agrupada por país 0,674. Puntuación exploratoria sin calibración temporal o específica para España. |
+| RAG bilingüe | 34/35 aciertos de documento en preguntas usadas durante el ajuste; 10/12 afirmaciones muestreadas respaldadas según un juez LLM. No es evaluación independiente ni exactitud de respuestas completas. |
+| Monte Carlo | Bandas condicionales y sensibilidad a persistencia, escala de choques, número de trayectorias y semilla. Cobertura predictiva real no evaluada. |
+| Análogos | Distancia de Mahalanobis sobre cinco variables comparables y completas. Sin veredicto de sostenibilidad ni pretensión causal/predictiva. |
 
 ## Arquitectura
 
+```text
+data/gold + data/external → research/ → docs/eval/
+          │
+          └→ engine/ → api/ → frontend/
+                │               └→ motor TypeScript (anclas compartidas)
+                └→ explain/ ← rag/ (corpus e índice privados)
 ```
-data/gold/  ──►  engine/  ──►  api/  ──►  frontend/
- (vintage      (motor macro   (FastAPI)   (React + Vite + TS)
-  congelado)    determinista                    │
-                + Monte Carlo)                  └── frontend/src/engine/
-                                                    (port TS del motor)
-```
 
-- **`data/`** — la *gold slice*: CSV y JSON derivados de fuentes oficiales, más
-  la capa `data/live/` que consulta World Bank y Eurostat para el modo
-  multi-país.
-- **`engine/`** — el motor. `spain.py` (escenario determinista de España),
-  `montecarlo.py` (bandas de incertidumbre), `redlines.py` (umbrales históricos
-  evaluados), `levers.py` (palancas y presets), `generic.py` (motor genérico
-  para cualquier país), `constants.py` (única fuente de verdad de constantes).
-- **`api/`** — FastAPI. Expone el motor sin lógica propia: valida, llama, serializa.
-- **`frontend/`** — el panel. React 19 + Vite + Recharts + Zustand, en español.
+`engine/` contiene el motor, las palancas, umbrales, Monte Carlo y analogías;
+`research/` contiene estimación y experimentos; `explain/` separa hechos
+calculados de narración; `rag/` implementa recuperación y generación;
+`frontend/` presenta resultados, fuentes y limitaciones.
 
-### El contrato de doble motor
+## Ejecutar
 
-`frontend/src/engine/` es un port línea a línea de `engine/spain.py`. Existe para
-que mover una palanca en el navegador sea instantáneo, sin ida y vuelta al
-servidor. El riesgo obvio es que los dos motores se separen con el tiempo, así
-que están atados por un contrato ejecutable:
-
-`tests/fixtures/engine_anchors.json` guarda los valores que fijó el motor
-Python: la línea base, los ocho presets `S0`–`S7` y una sonda con las diez
-palancas movidas a la vez. Ambos lados lo leen —`tests/test_anchors.py` en
-Python, `src/engine/__tests__/anchors.test.ts` en TypeScript— y comprueban que
-reproducen los mismos números dentro de tolerancia.
-
-Tras cambiar el motor o el vintage, hay que regenerarlo:
+Entorno comprobado: Python 3.12 y Node 22. Las versiones Python están
+restringidas por `requirements-lock.txt`; npm utiliza `package-lock.json`.
+Para detalles sobre instalación limpia, PyTorch y dependencias opcionales,
+consultar [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
 
 ```bash
-.venv/bin/python scripts/generate_anchor_fixture.py
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m uvicorn api.main:app --port 8000
 ```
 
-## Arranque rápido
-
-Requisitos: **Python 3.12+** y **Node 20+** (desarrollado con 3.12 y Node 22).
-
-### 1. La API
-
-```bash
-python -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/uvicorn api.main:app --reload --port 8000
-```
-
-Documentación interactiva en `http://localhost:8000/docs`.
-
-### 2. El panel
+En otro terminal:
 
 ```bash
 cd frontend
-npm install
-npm run dev            # http://localhost:5173
+npm ci
+npm run dev
 ```
 
-`VITE_API_BASE` cambia la URL de la API (por defecto `http://localhost:8000`).
+La API publica su contrato en `http://localhost:8000/docs`. El panel usa
+`http://localhost:8000` salvo que se configure `VITE_API_BASE`. Para una demo con
+respuestas simuladas: `npm run build:mock` y `npm run preview` desde `frontend/`.
+Esas respuestas son fixtures de interfaz, no resultados de investigación.
 
-Para verlo **sin levantar la API**, el build simulado intercepta la red con MSW
-en el propio navegador:
+El corpus privado y su índice se localizan mediante `EVO_RAG_DATA` y
+`EVO_RAG_DB`. El modo local predeterminado es híbrido: E5 y búsqueda léxica.
+Los documentos se almacenan localmente; la generación remota envía los pasajes
+seleccionados al proveedor configurado.
+
+## Aplicación pública y biblioteca
+
+El despliegue utiliza GitHub Pages para el panel y Hugging Face Spaces para
+la API. `deploy/cf/` contiene herramientas de un despliegue alternativo que
+no está configurado; no es un servicio del que dependa la aplicación.
+
+La configuración del Space incorpora un modo `public_lexical`: busca con
+SQLite FTS5 en seis documentos propios del proyecto, enumerados en
+[`rag/public_sources.json`](rag/public_sources.json). Expone las colecciones
+`metodo` y `defensa_tfm`, con atribución `propio`. El ensamblado genera su índice
+desde esos archivos, sin acceder al corpus privado ni cargar embeddings.
+Los resultados históricos del RAG híbrido no evalúan este corpus público.
+
+La búsqueda y consulta de fragmentos públicos funcionan sin claves de IA.
+La redacción de respuestas requiere una clave de proveedor en los secretos
+del Space; si no está disponible, se muestran los pasajes y el motivo.
+Los libros privados siguen requiriendo su servicio local. La conexión RAG se
+configura por separado de la API del motor, desde Biblioteca o Consulta; un
+servicio RAG caído no impide utilizar los escenarios.
+
+Preparar estos cambios no actualiza el sitio publicado. El procedimiento y
+las comprobaciones previas a publicar están en
+[`deploy/hf/README.md`](deploy/hf/README.md); el estado observado se registra en
+[MODEL_CHECK.md](docs/MODEL_CHECK.md).
+
+## Verificar y regenerar
 
 ```bash
-npm run build:mock && npm run preview
+.venv/bin/python scripts/check_data_integrity.py
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 .venv/bin/python -m pytest
 ```
 
-## La API
+Desde `frontend/`: `npm test` y `npm run build`. Los tests ordinarios no requieren
+el corpus privado ni inferencia remota. Las pruebas opcionales de integración
+se seleccionan con `pytest -m integration`. Playwright requiere su navegador.
 
-| Método | Ruta | Qué devuelve |
-|---|---|---|
-| `GET` | `/health` | estado y versión del motor |
-| `GET` | `/vintage` | fecha del corte de datos y su procedencia |
-| `GET` | `/constants` | todas las constantes calibradas del motor |
-| `GET` | `/personas` | catálogo de perfiles |
-| `GET` | `/presets` | escenarios predefinidos `S0`–`S7` |
-| `GET` | `/redlines` | definiciones de las líneas rojas y sus anclas |
-| `POST` | `/scenario` | escenario determinista 2026–2050 dadas 10 palancas |
-| `POST` | `/scenario/montecarlo` | mismo escenario con bandas p5–p95 |
-| `GET` | `/countries` | países disponibles en el motor genérico |
-| `GET` | `/panel/{iso3}` | panel de indicadores de un país |
-| `POST` | `/scenario/generic/{iso3}` | escenario genérico para ese país |
-
-Las palancas fuera de rango devuelven `422` con el detalle de qué se salió y de
-qué envolvente.
-
-## El motor
-
-### Las diez palancas
-
-| Símbolo | Palanca | Unidad | Rango |
-|---|---|---|---|
-| `r` | Tipo de interés · Euríbor 12m | % | 0 – 6 |
-| `σ` | Prima de riesgo · spread ES–DE | pb | 0 – 400 |
-| `sp` | Saldo primario · Δ vs central | pp PIB | −4 – 4 |
-| `λ` | Productividad | %/año | −0,5 – 2,5 |
-| `pᵐ` | Precio importaciones/energía | % a/a | −50 – 100 |
-| `τ` | Presión fiscal · cuña laboral | pp | −5 – 5 |
-| `z` | Instituciones laborales | índice | −2 – 2 |
-| `Y*` | Demanda externa | % a/a | −4 – 6 |
-| `β₆₅` | Presión demográfica | × | −1 – 1 |
-| `ι` | Indexación pensiones/nóminas | IPC+pp | −1,5 – 1 |
-
-Los rangos no son decorativos: son las envolventes empíricas de lo que esas
-variables han hecho históricamente.
-
-### Los ocho presets
-
-`S0` base · `S1` tipos +200 pb · `S2` petróleo +50 % · `S3` consolidación ·
-`S4` productividad · `S5` desregulación laboral · `S6` envejecimiento ·
-`S7` adverso (tipos + petróleo + prima a la vez).
-
-### Las nueve líneas rojas
-
-Umbrales anclados a episodios reales, no a intuiciones. Cada uno cita su origen:
-
-| Línea | Ancla |
-|---|---|
-| Bono 10A > 7 % | zona de rescate: GRC/PRT/IRL pidieron rescate ahí; ES tocó 7,6 % en jul-2012 |
-| Paro > 26,9 % | máximo histórico de España (T1-2013) |
-| Déficit > 3 % PIB | umbral de Maastricht |
-| Déficit > 11,3 % PIB | suelo de 2009 |
-| Deuda > 105 % PIB | nivel de partida actual |
-| Deuda > 120 % PIB | ≈ pico COVID 2020 (119,3) |
-| Inflación > 10 % | pico de julio 2022 (10,8 %) |
-| Esfuerzo vivienda > 40 % | definición Eurostat de sobrecarga |
-| Pobreza infantil > 30 % | picos post-2013; media UE ≈19 % |
-
-El estado (`crossed` / `near` / `safe`) se **calcula** desde el escenario en cada
-año. `near` es el 10 % del umbral.
-
-### Monte Carlo
-
-4.000 trayectorias, 2026–2070, choques AR(1) con persistencia 0,96 sobre tipo,
-crecimiento y saldo primario. Semilla fija (42) para que los resultados sean
-reproducibles. El panel dibuja la banda p5–p95 como abanico: la anchura es el
-mensaje, no la mediana.
-
-## Los perfiles
-
-La misma economía cambia de significado según quién la mire. El motor define
-doce perfiles y el panel tiene publicados cuatro:
-
-**💼 Bonista** · **🏦 Banca** · **🔑 Comprador de vivienda** · **🗳️ Político**
-
-Cada uno trae sus propias cadenas causales (de qué palanca a qué consecuencia),
-su narrativa generada desde los números del escenario, y sus líneas rojas
-relevantes. Los perfiles pendientes —emprendedor, funcionario, infancia,
-jubilado, joven, autónomo y otros— sólo necesitan configuración: el renderizador
-ya es genérico.
-
-## Datos y procedencia
-
-El vintage `2026-07-31` está congelado en `data/gold/`:
-
-| Archivo | Contenido |
-|---|---|
-| `gold_fiscal_historico.csv` | serie larga de cuentas públicas |
-| `gold_projections.csv` | proyecciones demográficas por variante |
-| `gold_escenarios_deuda.csv` | sendas de deuda (central y alternativas) |
-| `gold_escenarios_deuda_mc.csv` | trayectorias Monte Carlo |
-| `gold_ccaa_trimestral.csv` | panel trimestral por comunidad autónoma |
-| `gold_asequibilidad_ccaa.csv` | asequibilidad de vivienda por CCAA |
-| `gold_cuota_teorica.csv` | cuota hipotecaria teórica |
-| `gold_bienestar_pais.csv` | indicadores de bienestar |
-| `gold_pobreza_infantil.csv` | pobreza infantil |
-| `kpis_perfiles.json` | KPIs y series por perfil |
-
-Fuentes: **Eurostat**, **INE**, **BCE**, **World Bank**, **OECD**, **Penn World
-Table** y **WEO**. Cada descarga —URL exacta, fecha, tamaño— queda en
-`manifest.csv` y `provenance_vintage_manifest.csv`. Para refrescar a un vintage
-nuevo sin tocar el actual:
+Para regenerar resultados y figuras, instalar primero las dependencias opcionales
+con `.venv/bin/python -m pip install -r requirements-regenerate.txt`.
+Después de revisar cambios intencionados del motor o sus parámetros, desde la raíz:
 
 ```bash
-.venv/bin/python scripts/refresh_vintage.py
+.venv/bin/python -m tools.gen_estimated_params
+node frontend/scripts/gen-constants.mjs
+.venv/bin/python scripts/generate_anchor_fixture.py
+.venv/bin/python -m research.housing_robustness
+.venv/bin/python -m research.uncertainty
+.venv/bin/python -m tools.evaluate_analogs
+.venv/bin/python docs/deck/build_deck.py
+.venv/bin/python scripts/check_data_integrity.py --update
 ```
 
-## Tests
+El generador TypeScript importa el motor Python local: no necesita levantar la
+API. `EVO_PYTHON` permite seleccionar otro intérprete. La actualización de
+checksums debe acompañarse de la revisión del diff de resultados.
 
-```bash
-.venv/bin/pytest                 # 113 tests: motor, API, datos, anclas, MC, líneas rojas
-cd frontend && npm test          # Vitest: paridad de motores, store/URL, componentes, rutas
-cd frontend && npm run e2e       # Playwright smoke sobre un preview con API simulada
-```
+## Datos y limitaciones
 
-Todo corre offline. La primera vez en una máquina nueva, Playwright necesita su
-navegador: `npx playwright install chromium`.
+La fecha de referencia del escenario no equivale a la fecha de adquisición de
+todas las fuentes. El manifiesto distingue adquisición, corte de observaciones
+y construcción. Las tablas congeladas permiten repetir cálculos; todavía falta
+incorporar parte del pipeline legado de transformación desde datos originales.
 
-## Estructura
+Los parámetros de comportamiento siguen siendo en gran parte calibraciones.
+Los resúmenes regionales estimados no prueban causalidad ni identifican por sí
+solos parámetros estructurales de largo plazo. Los umbrales son referencias de
+presentación, no probabilidades de crisis. Las bandas Monte Carlo omiten partes
+de la incertidumbre y el score de distress no es una probabilidad validada.
+Las combinaciones extremas que producen deuda negativa se señalan como salidas
+del dominio de deuda bruta; el modelo no incorpora activos ni la respuesta de
+política al agotar la deuda.
 
-```
-engine/      motor macro (Python) — constantes, palancas, escenario, MC, líneas rojas
-api/         FastAPI: 11 endpoints sobre el motor
-data/gold/   vintage congelado + manifiestos de procedencia
-data/live/   clientes World Bank / Eurostat para el modo multi-país
-frontend/    panel React + Vite + TS (incluye el port TS del motor)
-tests/       suite Python + fixture de anclas compartido con el frontend
-scripts/     regeneración de vintage y de anclas
-docs/        especificaciones de diseño y planes de implementación
-archive/     MVP anterior, conservado como referencia
-```
+Quedan pendientes la evaluación RAG independiente con revisión humana, el
+holdout final de vivienda, la validación temporal y calibración de distress,
+y la reconstrucción completa desde las fuentes originales. Sus protocolos y
+límites se publican; no se presentan como experimentos ya realizados.
 
-## Limitaciones conocidas
-
-Se declaran en la propia pestaña **Metodología** del panel, no sólo aquí:
-
-- Las constantes del motor son **calibraciones, no estimaciones**. Vienen de la
-  literatura y de la calibración v16; no se han estimado sobre estos datos.
-- La **mora bancaria** (NPL, Banco de España) todavía no está conectada: el
-  riesgo de crédito del perfil 🏦 se lee por proxy (paro más colateral).
-- Ocho de los doce perfiles están pendientes de configuración.
-- El escenario determinista llega a 2050; sólo el Monte Carlo se extiende a 2070.
-
-## Licencia
-
-Trabajo académico (TFM). Los datos proceden de fuentes públicas oficiales y
-conservan las condiciones de uso de cada organismo emisor.
+Trabajo académico. Los datos y documentos conservan las condiciones de uso de
+sus fuentes respectivas.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { BASE_LEVERS } from "../vintage";
+import { BASE_LEVERS, CENTRAL, V0 } from "../vintage";
+import { IPV_LR, IPV_REV } from "../constants";
 import { LEVER_SPECS, PRESETS, activePresetId, allAtBase, isMoved, presetLevers } from "../levers";
 import { N_YEARS, SERIES_KEYS, Y0, Y1, YEARS, baseline, french, runScenario } from "../spain";
 
@@ -46,6 +47,9 @@ describe("spain.ts — v16 chain, base year (fixture base_2026 pins)", () => {
   it("french(): cuota 2026 = 744.997065 (fixture cuota_2026_base 744.9971 ± 0.01)", () => {
     expect(french(171444 * 0.8, 2.8 + 1.4757, 300)).toBeCloseTo(744.9971, 2);
   });
+  it("a zero-interest loan repays only principal", () => {
+    expect(french(120000, 0, 300)).toBe(400);
+  });
   it("base 2026 values equal the fixture base_2026 block", () => {
     expect(base.u[0]).toBeCloseTo(10.1, 6);
     expect(base.pi[0]).toBeCloseTo(3.0, 6);
@@ -63,6 +67,31 @@ describe("spain.ts — v16 chain, base year (fixture base_2026 pins)", () => {
     for (const k of SERIES_KEYS) {
       for (let i = 0; i < 25; i++) expect(again[k][i]).toBe(base[k][i]);
     }
+  });
+  it.each(PRESETS.map((p) => p.id))("%s fiscal flows match independently reconstructed nominal accounts", (presetId) => {
+    const run = runScenario(presetLevers(presetId));
+    let nominalGdp = 100;
+    let nominalDebt = CENTRAL[Y0 - 1].deuda;
+    for (let k = 0; k < N_YEARS; k++) {
+      nominalGdp *= 1 + run.gnom[k] / 100;
+      const interestPayment = nominalDebt * run.ief[k] / 100;
+      const primarySurplus = run.pb[k] * nominalGdp / 100;
+      const overallSurplus = primarySurplus - interestPayment;
+      nominalDebt -= overallSurplus;
+      // Current-GDP accounting intentionally corrects the original v16 pins.
+      expect(run.int[k]).toBeCloseTo(100 * interestPayment / nominalGdp, 10);
+      expect(run.saldo[k]).toBeCloseTo(100 * overallSurplus / nominalGdp, 10);
+      expect(run.b[k]).toBeCloseTo(100 * nominalDebt / nominalGdp, 10);
+      expect(run.deficitAbs[k]).toBeCloseTo(Math.max(0, -100 * overallSurplus / nominalGdp), 10);
+    }
+  });
+  it("annual housing reversion removes the declared fraction of the growth gap", () => {
+    const gap = V0.ipv - IPV_LR;
+    expect(base.ipv[0]).toBeCloseTo(V0.ipv, 12);
+    expect(base.ipv[1] - IPV_LR).toBeCloseTo(gap * (1 - IPV_REV), 12);
+    expect(base.ipv[2] - IPV_LR).toBeCloseTo(gap * (1 - IPV_REV) ** 2, 12);
+    expect(base.precio[0]).toBe(V0.precio);
+    expect(base.precio[1]).toBeCloseTo(V0.precio * (1 + base.ipv[1] / 100), 9);
   });
   it("bono = r + TERM + prima/100 (base: 2.8 + 0.17 + 0.45 = 3.42)", () => {
     const s1 = runScenario({ ...BASE_LEVERS, r: 4.8 });

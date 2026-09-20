@@ -1,7 +1,8 @@
 import { QueryClient, keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { Levers } from "../engine/levers";
-import { api } from "./client";
+import { api, getRagConnection, subscribeRagConnection } from "./client";
+import type { RagCollection } from "./types";
 
 export const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity, retry: 1, refetchOnWindowFocus: false } },
@@ -28,17 +29,50 @@ export const useRedlines = () => useQuery({ queryKey: ["redlines"], queryFn: api
 export const usePrediction = () => useQuery({ queryKey: ["prediction"], queryFn: api.prediction, ...STATIC });
 export const useEvidence = () => useQuery({ queryKey: ["evidence"], queryFn: api.evidence, ...STATIC });
 
-/** Corpus passages for a concept. `enabled` is the point: the corpus is absent
- *  from the public deploy and answers 503 there, so this only fires when a
- *  reader actually opens the sources drawer rather than on every answer. */
-export const useRagSearch = (query: string | undefined, enabled: boolean) =>
-  useQuery({
-    queryKey: ["rag", "search", query],
-    queryFn: ({ signal }) => api.ragSearch({ query: query!, collection: "libros", top_k: 4 }, signal),
-    enabled: enabled && !!query && query.length > 2,
-    staleTime: Infinity,
-    retry: false,   // a missing corpus is a stable fact, not a blip
+export const useRagConnection = () =>
+  useSyncExternalStore(subscribeRagConnection, getRagConnection, getRagConnection);
+
+export function useRagCollections(enabled = true) {
+  const connection = useRagConnection();
+  return useQuery({
+    queryKey: ["rag", connection.baseUrl, connection.revision, "collections"],
+    queryFn: api.ragCollections,
+    enabled, staleTime: Infinity, retry: false, gcTime: 0,
   });
+}
+
+/** Respect the server default, then prefer academic material among the nonempty collections it
+ * actually advertises (a public corpus may have no collection named libros). */
+export function selectRagCollection(collections: RagCollection[] = [], defaultId?: string): RagCollection | undefined {
+  const available = collections.filter((collection) => collection.chunks > 0);
+  return available.find((collection) => collection.id === defaultId)
+    ?? available.find((collection) => collection.id === "libros")
+    ?? available.find((collection) => collection.authority === "academico")
+    ?? available.find((collection) => collection.authority !== "opinion")
+    ?? available[0];
+}
+
+/** Sources load only when the drawer opens; readiness and collection choice
+ * come from the selected library service, independently of scenario health. */
+export function useRagSearch(query: string | undefined, enabled: boolean) {
+  const connection = useRagConnection();
+  const collections = useRagCollections(enabled);
+  const collection = selectRagCollection(collections.data?.collections, collections.data?.default_collection);
+  const search = useQuery({
+    queryKey: ["rag", connection.baseUrl, connection.revision, "search", collection?.id, query],
+    queryFn: ({ signal }) => api.ragSearch({ query: query!, collection: collection!.id, top_k: 4 }, signal),
+    enabled: enabled && !!query && query.length > 2 && !!collection,
+    staleTime: Infinity, retry: false, gcTime: 0,
+  });
+  return {
+    ...search,
+    corpus: collections.data,
+    isError: collections.isError || search.isError,
+    error: collections.error ?? search.error,
+    isPending: collections.isPending || (!!collection && search.isPending),
+    emptyCollection: collections.isSuccess && !collection,
+  };
+}
 
 /** Debounced value: trails `value` by `ms` (spec §3: MC debounced 400 ms). */
 export function useDebounced<T>(value: T, ms: number): T {

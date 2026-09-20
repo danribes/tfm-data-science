@@ -28,9 +28,10 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 
 /* rail drawer below 1024px (spec §5) */
 .rail-toggle { display: none; }
+.rail-backdrop { position: fixed; inset: 0; z-index: 39; border: 0; background: #0006; }
 @media (max-width: 1024px) {
   .rail-toggle { display: inline-block; }
-  .rail { position: fixed; left: 0; top: 0; bottom: 0; z-index: 40; transform: translateX(-100%); transition: transform var(--dur) ease; box-shadow: var(--shadow-app); max-height: none; }
+  .rail { width: min(var(--rail-w), calc(100vw - 16px)); position: fixed; left: 0; top: 0; bottom: 0; z-index: 40; transform: translateX(-100%); transition: transform var(--dur) ease; box-shadow: var(--shadow-app); height: 100dvh; max-height: 100dvh; }
   .rail.open { transform: translateX(0); }
 }
 
@@ -40,6 +41,8 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .row3 { display: grid; grid-template-columns: 1.05fr 0.95fr 1.2fr; gap: 16px; }
 @media (max-width: 1440px) { .outs { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 1024px) { .row2, .row3 { grid-template-columns: 1fr; } .outs { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 640px) { .outs { grid-template-columns: minmax(0, 1fr); } }
 
 /* --- card primitive (v16 §C.3) --- */
 .card { border: 1px solid var(--grid); border-radius: var(--rad-card); background: var(--surface); padding: var(--sp-2); display: flex; flex-direction: column; min-width: 0; }

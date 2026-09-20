@@ -1,0 +1,165 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "data/ARTIFACT_METADATA.json": {
+      "bytes": 1536,
+      "sha256": "34b9aea0322e170ffde9b2ecfeeff90fa498a546ab21d0f7c015abce1229e5ff"
+    },
+    "data/external/README.md": {
+      "bytes": 2385,
+      "sha256": "6899e885ea3fc92a6a6e456a6f9a669e9654ed09632ee28f69d8a86fedc0561f"
+    },
+    "data/external/README_distress.md": {
+      "bytes": 2631,
+      "sha256": "d04d3ebe1caccdecef0007700449f68c3bc66130fc459122aecc8e37ba64703b"
+    },
+    "data/external/bocboe_default_labels.csv.gz": {
+      "bytes": 51739,
+      "sha256": "4ba38dc3bf781312db9e089980b561da8bbb093dfdcda3dd8bf7d3c8886cd5c8"
+    },
+    "data/external/distress_country_codes.csv": {
+      "bytes": 6663,
+      "sha256": "5366dfd040b521cb5a19855d1a648d624bc86c9c479934373f84f0e36146de49"
+    },
+    "data/external/distress_country_codes.metadata.json": {
+      "bytes": 781,
+      "sha256": "e0181ed0ee5d6a84674224e4f7ca077bd9df2e69d47fb263be8314cce1dde0b7"
+    },
+    "data/external/hpi_regional_global.csv.gz": {
+      "bytes": 1790627,
+      "sha256": "a81bb68c5e9a89dcac9f8a640a32abad2159a9916cc04fe2f296e51039cf1867"
+    },
+    "data/external/imf_debt_gdp.csv.gz": {
+      "bytes": 27356,
+      "sha256": "59bbea139bd6c3e6b7a6deafd2974c5fbe54f2ff0f95edd60a8a4913cda8630f"
+    },
+    "data/external/wb_macro_panel.csv.gz": {
+      "bytes": 829849,
+      "sha256": "78084e2f2b31c34d0ea685c19d812158a15f5f5e6252bfc68ce01b4253ff90cc"
+    },
+    "data/gold/VINTAGE": {
+      "bytes": 11,
+      "sha256": "fc11dbb2f6df891437cfa25b9af0b741a2ef3a9f21fc6de1330194fef258b8e7"
+    },
+    "data/gold/estimated_params.json": {
+      "bytes": 1016,
+      "sha256": "b6e1d374553cce657bd9c9c0626347fbf564756d6ed39ccd3e60452dd80e4561"
+    },
+    "data/gold/gold_analog_panel.csv": {
+      "bytes": 624686,
+      "sha256": "f32158d89186643d50047b0c62ede5e92653c9b991c4949b4835739c8a1ab40f"
+    },
+    "data/gold/gold_analog_panel_stats.json": {
+      "bytes": 606,
+      "sha256": "45d3f9682ae71f9b2153648b28be22c5e829face1bae051fff1d8085214bcb38"
+    },
+    "data/gold/gold_asequibilidad_ccaa.csv": {
+      "bytes": 50754,
+      "sha256": "f84b5d014d1092e118626357cdf32403e5db14157823180116db316e9ff7d83f"
+    },
+    "data/gold/gold_bienestar_pais.csv": {
+      "bytes": 26577,
+      "sha256": "d74e707cd43db35edef7f06ec49dd7dd2d28219bfa676a3ed1645484a18912f5"
+    },
+    "data/gold/gold_ccaa_trimestral.csv": {
+      "bytes": 226487,
+      "sha256": "4074bdaeade737c1f5957d02c8d279e347700beaf53f44e57f9ae64f48f9b818"
+    },
+    "data/gold/gold_cuota_teorica.csv": {
+      "bytes": 2648,
+      "sha256": "4881f2e088bd9047ea731034a09a39716d7d35ddc671f66e3617f653184ad881"
+    },
+    "data/gold/gold_escenarios_deuda.csv": {
+      "bytes": 7046,
+      "sha256": "84770467db88f43e7d929e580e9fefc20ec4be3707f9264b3d87ea9a5a37543c"
+    },
+    "data/gold/gold_escenarios_deuda_mc.csv": {
+      "bytes": 9279,
+      "sha256": "c14f009bf3c578a152fa2474bc43eddf0f3beef6b5d7bb24e7cb7d3026f97e8f"
+    },
+    "data/gold/gold_fiscal_historico.csv": {
+      "bytes": 100870,
+      "sha256": "49767047aba00e2e0747def46b01f0005a761f4b645425d8915d695691e9ba2e"
+    },
+    "data/gold/gold_pobreza_infantil.csv": {
+      "bytes": 384,
+      "sha256": "9b100b352f7681a95b538c96f8ee53273a422fba273ed9503966a90a91747483"
+    },
+    "data/gold/gold_projections.csv": {
+      "bytes": 579691,
+      "sha256": "088baaa8ddfd5f51777a766f7d469f4253e7c5f0d0061d3a121603589a97d674"
+    },
+    "data/gold/imf_GGXCNL_NGDP.json": {
+      "bytes": 104901,
+      "sha256": "40be9d7f91bb4d70c58a710f77e2267a9e0b9d51add2fe813c2d25899b24664c"
+    },
+    "data/gold/imf_GGXONLB_NGDP.json": {
+      "bytes": 46,
+      "sha256": "e7532f93e8716977332fc49e9680d0770d524ee2c39ba6c7842e535f4443efef"
+    },
+    "data/gold/imf_GGXWDG_NGDP.json": {
+      "bytes": 98046,
+      "sha256": "ee29ce0c80bcfda6875be68930b6b6d31c9b67d1834aa5c4e9aebec13a3cefd3"
+    },
+    "data/gold/kpis_perfiles.json": {
+      "bytes": 41668,
+      "sha256": "6cb2f2f2450112b41238d1f54102e00b07ccf8837d28a988643d3daf6ad58f61"
+    },
+    "data/gold/manifest.csv": {
+      "bytes": 3781,
+      "sha256": "4cdc52c30b09acc29d9bbdff3cecd6db5bbf4e6ae74cc1de74beee99b9d6a4f4"
+    },
+    "data/gold/provenance_vintage_manifest.csv": {
+      "bytes": 17742,
+      "sha256": "d70b52a38db07ac5365881563d41646de18dba2e78a38792a02b69d140b53d1f"
+    },
+    "docs/eval/README_RAG.md": {
+      "bytes": 9069,
+      "sha256": "9d8a686e294b27340a8ecc840d98eab110a523490f7d4dbf6c80559acb63a27e"
+    },
+    "docs/eval/analog-metric.json": {
+      "bytes": 51511,
+      "sha256": "7be84bca8f64546dbb447b3f0bf77e42eccbbc2d29044d7a5607f38af1849e0b"
+    },
+    "docs/eval/distress.json": {
+      "bytes": 3663,
+      "sha256": "75bed78488f6a81831baf7106b15a41ed7d9b5f987fd6135a621d3ce016dd68b"
+    },
+    "docs/eval/housing-robustness.json": {
+      "bytes": 6191,
+      "sha256": "0399516fb5ab5f03eaa7ccdb638778d5c7b454303c9eb29481e0f9280deec54e"
+    },
+    "docs/eval/model-audit.json": {
+      "bytes": 5126,
+      "sha256": "38bcd920c0130f6c418403f4a3ac5706f19ff81415e419bebb55257629a51e24"
+    },
+    "docs/eval/montecarlo-sensitivity.json": {
+      "bytes": 9445,
+      "sha256": "88db43e19d1db5d0e0a4a65ac8ab9e820e342ac19b09a772c11de73bac7505c8"
+    },
+    "docs/eval/rag-chat-eval.json": {
+      "bytes": 8695,
+      "sha256": "6bd433f95d6f6fd4a0721ee28cf212dcc2cdda109532918bf549cb59707b8744"
+    },
+    "docs/eval/rag-eval-2026-08-09.json": {
+      "bytes": 31373,
+      "sha256": "1d5d5cc3beb2478533cb017face3222c508df503410628f2559c7baea428326b"
+    },
+    "docs/eval/rag-heldout-template.jsonl": {
+      "bytes": 324,
+      "sha256": "f337d60c002b19e148d0bf2f7ab8733bad1befb5b05d702a9b07838a9ed5a8d3"
+    },
+    "docs/eval/regimes.json": {
+      "bytes": 8401,
+      "sha256": "7120dafc735688d602a2c75588b37ecd8270985af71c9ae9b22a3e6453ac1088"
+    },
+    "docs/eval/state_dependence.json": {
+      "bytes": 1648,
+      "sha256": "655569ad5ecc418970cefda7c3b15256365f40682b31f7f1efff58c88ad1e306"
+    },
+    "docs/eval/t1-dl-global.json": {
+      "bytes": 1414,
+      "sha256": "05004b9ac6e2e4790c1f89533fc64bf6fda61bcf0553aaf6959ecb2ae0d1f737"
+    }
+  }
+}

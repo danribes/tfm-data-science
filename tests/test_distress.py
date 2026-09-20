@@ -121,7 +121,7 @@ def test_dissolved_states_are_dropped_rather_than_mapped_to_a_successor():
     defaults in another country's record."""
     assert ds.ALIASES["Yugoslavia"] is None
     assert ds.ALIASES["Czechoslovakia"] is None
-    lab = ds.load_labels(name_map={})
+    lab = ds.load_labels()
     for name in ("Yugoslavia", "Czechoslovakia"):
         assert lab[lab.country == name].iso3.isna().all()
 
@@ -131,6 +131,25 @@ def test_country_names_are_mapped_explicitly_not_by_fuzzy_match():
     panel invisibly."""
     assert ds.ALIASES["Dem. Rep. of Congo (Kinshasa)"] == "COD"
     assert ds.ALIASES["Rep. of Congo (Brazzaville)"] == "COG"
+
+
+def test_frozen_mapping_reproduces_the_committed_sample_without_network(monkeypatch):
+    import requests
+
+    def unexpected_network(*args, **kwargs):
+        raise AssertionError("the frozen crosswalk must work offline")
+
+    monkeypatch.setattr(requests, "get", unexpected_network)
+    panel = ds.build_panel()
+    assert (len(panel), int(panel.y.sum()), panel.iso3.nunique()) == (3874, 377, 154)
+
+
+def test_missing_or_incomplete_mapping_fails_visibly(tmp_path, monkeypatch):
+    monkeypatch.setattr(ds, "COUNTRY_NAMES", tmp_path / "missing.csv")
+    with pytest.raises(FileNotFoundError, match="Missing frozen country mapping"):
+        ds.load_labels()
+    with pytest.raises(ValueError, match="Country mapping incomplete"):
+        ds.load_labels(name_map={})
 
 
 # ---- the split -------------------------------------------------------------
@@ -201,6 +220,8 @@ def test_a_country_with_no_default_history_can_still_be_scored():
     assert out is not None
     assert out["in_label_set"] is False
     assert 0.0 <= out["probability"] <= 1.0
+    assert out["score_kind"] == "uncalibrated_classifier_score"
+    assert out["calibration_status"] == "not_evaluated"
 
 
 def test_a_year_with_almost_no_data_is_not_scored():

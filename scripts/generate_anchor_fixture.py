@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root, for `python scripts/...` invocation
 
-from engine.constants import VINTAGE, load_central
+from engine.constants import VINTAGE, ENGINE_VERSION, IPV_LR, IPV_REV, load_central
 from engine.levers import Levers, PRESETS, preset_levers
 from engine.montecarlo import run_montecarlo
 from engine.spain import Y0, run_scenario
@@ -67,6 +67,8 @@ def main() -> None:
 
     fixture = {
         "vintage": VINTAGE,
+        "engine_version": ENGINE_VERSION,
+        "housing": {"long_run_growth": IPV_LR, "annual_reversion_rate": IPV_REV, "annual_persistence": 1 - IPV_REV},
         "generator": "scripts/generate_anchor_fixture.py",
         "debt_central": {str(y): {"engine": round(base["b"][y - Y0], 6),
                                   "gold_csv": central[y]["deuda"]}

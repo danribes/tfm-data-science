@@ -26,6 +26,21 @@ Fuente: Beers, Ndukwe y Berry (2025), *BoC–BoE Sovereign Default Database:
 What's new in 2025?*, Staff Analytical Note 2025-24, Bank of Canada.
 Reproducido con atribución según los términos de uso del Bank of Canada.
 
+### Cruce de países congelado
+
+`distress_country_codes.csv` fija los códigos usados para unir las etiquetas
+con el panel WDI. Se obtuvo sin red a partir de nombres ISO disponibles
+localmente y alias explícitos revisados; su procedencia está en
+`distress_country_codes.metadata.json`. No es una descarga nueva del catálogo
+del World Bank. Czechoslovakia y Yugoslavia se excluyen explícitamente.
+Un archivo ausente o un nombre desconocido causa un error; nunca se reduce
+silenciosamente la muestra por un fallo de red.
+
+El cruce reproduce las 3.874 filas, 377 eventos y 154 países del informe
+conservado, sin volver a entrenar. La salida de España es una puntuación
+exploratoria sin calibración evaluada; la validación agrupada por país no
+demuestra una probabilidad absoluta ni un riesgo relativo aplicable a España.
+
 ## `wb_macro_panel.csv.gz`
 
 Diez indicadores macro del World Bank WDI para 257 países, 1960–2024, 14.495

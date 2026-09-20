@@ -86,7 +86,13 @@ def mc_input_paths(levers: Levers) -> tuple[list[int], np.ndarray, np.ndarray, n
 
 def run_montecarlo(levers: Levers = Levers(), n_paths: int = c.MC_N_PATHS,
                    seed: int = c.MC_SEED_DEFAULT,
-                   n_show: int = N_SHOW_DEFAULT) -> McResult:
+                   n_show: int = N_SHOW_DEFAULT, *,
+                   shock_scale: float = 1.0, rho: float = c.MC_RHO) -> McResult:
+    """Conditional simulation; optional research controls leave default calibration intact."""
+    if not np.isfinite(shock_scale) or shock_scale < 0:
+        raise ValueError("shock_scale must be finite and non-negative")
+    if not np.isfinite(rho) or not 0 <= rho < 1:
+        raise ValueError("rho must be in [0, 1)")
     years, ief, gnom, pb = mc_input_paths(levers)
     b0 = c.load_central()[c.MC_START_YEAR - 1]["deuda"]     # 105.6 (2025)
 
@@ -105,9 +111,9 @@ def run_montecarlo(levers: Levers = Levers(), n_paths: int = c.MC_N_PATHS,
     keep = min(max(0, n_show), n_paths)
     shown: list[list[float]] = [[] for _ in range(keep)]
     for i in range(len(years)):
-        e_r = c.MC_RHO * e_r + rng.normal(0.0, c.MC_SIG_R, n_paths)
-        e_g = c.MC_RHO * e_g + rng.normal(0.0, c.MC_SIG_G, n_paths)
-        e_sp = c.MC_RHO * e_sp + rng.normal(0.0, c.MC_SIG_SP, n_paths)
+        e_r = rho * e_r + rng.normal(0.0, c.MC_SIG_R * shock_scale, n_paths)
+        e_g = rho * e_g + rng.normal(0.0, c.MC_SIG_G * shock_scale, n_paths)
+        e_sp = rho * e_sp + rng.normal(0.0, c.MC_SIG_SP * shock_scale, n_paths)
         dev = paths - b_det_prev
         pb_eff = (pb[i] + e_sp + c.MC_FB_UP * np.maximum(0.0, dev)
                   + c.MC_FB_DN * np.minimum(0.0, dev))
