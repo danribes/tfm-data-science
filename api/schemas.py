@@ -336,6 +336,15 @@ class RagSearchResponse(ApiMeta):
     query: str
     collection: str
     passages: list[PassageOut]
+    #: Con qué recuperador se respondió ESTA consulta, no el configurado.
+    #: "hybrid" | "lexical" | "lexical_degraded". El campo homónimo de
+    #: /rag/collections describe la capacidad configurada y no puede saber
+    #: esto: durante semanas anunció "hybrid" mientras el codificador remoto
+    #: estaba caído y todo se servía por BM25.
+    retrieval_mode: str = "hybrid"
+    #: True si el sondeo denso cayó y la mitad léxica respondió sola. Los
+    #: pasajes son válidos; el recuperador no es el que se evaluó.
+    degraded: bool = False
 
 
 class RagChatRequest(BaseModel):
@@ -355,6 +364,9 @@ class RagChatResponse(ApiMeta):
     answer: str
     passages: list[PassageOut]
     grounded: bool
+    #: Igual que en /rag/search: el recuperador que respondió de hecho.
+    retrieval_mode: str = "hybrid"
+    degraded: bool = False
     provider: str | None = None
     model: str | None = None
     error: str | None = None
@@ -373,6 +385,9 @@ class RagCollectionsResponse(ApiMeta):
     collections: list[RagCollectionOut]
     total_documents: int
     total_chunks: int
+    #: La capacidad CONFIGURADA, no lo que responderá la próxima consulta. Si
+    #: el codificador remoto está caído esto seguirá diciendo "hybrid": el
+    #: dato por consulta está en /rag/search y /rag/chat.
     retrieval_mode: str = "hybrid"
     corpus_scope: str = "private_local"
     default_collection: str = "libros"

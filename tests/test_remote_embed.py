@@ -180,3 +180,73 @@ def test_el_endpoint_por_defecto_no_es_el_host_retirado():
     # "Model not supported by provider hf-inference".
     assert config.REMOTE_EMBED_URL.endswith("/pipeline/feature-extraction")
     assert config.MODEL_NAME in config.REMOTE_EMBED_URL
+
+
+# --- que la respuesta diga con qué recuperador se respondió ------------------
+#
+# El campo `retrieval_mode` era el valor estático de la configuración: decía
+# "hybrid" mientras el codificador remoto estaba caído y todo salía por BM25.
+# Estas pruebas fijan que ahora informa del hecho, no de la intención.
+
+def test_reporta_hibrido_cuando_el_codificador_responde(corpus, monkeypatch):
+    from rag import retrieve
+    monkeypatch.setattr(retrieve, "_dense",
+                        lambda con, q, c, n, text=None: [1])
+    res = retrieve.search_reported("deuda", "libros", 3)
+    assert res.degraded is False
+    assert res.mode == "hybrid"
+
+
+def test_reporta_degradado_cuando_el_codificador_cae(corpus, monkeypatch):
+    from rag import retrieve
+
+    def muerto(*a, **k):
+        raise RuntimeError("sin codificador")
+
+    monkeypatch.setattr(retrieve, "_dense", muerto)
+    res = retrieve.search_reported("deuda", "libros", 3)
+    assert res.degraded is True
+    assert res.mode == "lexical_degraded"
+    # Los pasajes siguen siendo válidos: degradado no es vacío.
+    assert res.passages
+
+
+def test_la_degradacion_sobrevive_al_abanico_de_mixto(corpus, monkeypatch):
+    """`_mixto` anida una búsqueda por colección miembro. Un aviso que se
+    perdiera en esa anidación dejaría precisamente el caso desplegado —cuya
+    colección por defecto es `mixto`— informando «hybrid» mientras degrada."""
+    from rag import config, retrieve
+
+    def muerto(*a, **k):
+        raise RuntimeError("sin codificador")
+
+    monkeypatch.setattr(retrieve, "_dense", muerto)
+    res = retrieve.search_reported("deuda", config.MIXED_ID, 4)
+    assert res.degraded is True
+    assert res.mode == "lexical_degraded"
+
+
+def test_una_consulta_no_contagia_su_degradacion_a_la_siguiente(corpus, monkeypatch):
+    """El aviso vive en una variable de contexto, no en un global. Con un
+    booleano de módulo, la primera caída del codificador marcaría degradadas
+    todas las consultas posteriores del proceso."""
+    from rag import retrieve
+
+    def muerto(*a, **k):
+        raise RuntimeError("sin codificador")
+
+    monkeypatch.setattr(retrieve, "_dense", muerto)
+    assert retrieve.search_reported("deuda", "libros", 3).degraded is True
+
+    monkeypatch.setattr(retrieve, "_dense",
+                        lambda con, q, c, n, text=None: [1])
+    assert retrieve.search_reported("deuda", "libros", 3).degraded is False
+
+
+def test_search_sigue_devolviendo_una_lista(corpus, monkeypatch):
+    """Una decena de sitios dependen de ello; el aviso viaja aparte."""
+    from rag import retrieve
+    monkeypatch.setattr(retrieve, "_dense",
+                        lambda con, q, c, n, text=None: [1])
+    hits = retrieve.search("deuda", "libros", 3)
+    assert isinstance(hits, list)

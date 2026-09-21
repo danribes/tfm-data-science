@@ -230,14 +230,28 @@ Importa porque la alternativa era servir BM25 solo, y el hit@8 publicado se
 midió con fusión híbrida: quien evaluara la recuperación estaría juzgando un
 sistema distinto del que se describe.
 
-**Estado desplegado.** Falta `HF_TOKEN`, deliberadamente: el único token
-disponible tiene permiso de escritura sobre la cuenta entera y el Space sólo
-necesita inferencia. Hasta que se configure uno de sólo lectura, la mitad densa
-no puede codificar la pregunta y la recuperación degrada a BM25 — el índice
-lleva los vectores, pero no se están usando. **Cualquier resultado leído hoy
-del corpus es BM25, no la fusión híbrida con la que se midió el hit@8.** Es
-exactamente la degradación que `dense_or_lexical` existe para hacer visible en
-lugar de silenciosa.
+**Estado desplegado.** Durante un tiempo el despliegue respondió por BM25
+mientras anunciaba fusión híbrida, y conviene dejar escrito por qué, porque el
+fallo fue de diseño antes que de configuración. Faltaba el `HF_TOKEN` del
+Space, sí; pero cuando se añadió, la recuperación siguió degradada. La causa
+real era que `api-inference.huggingface.co`, el endpoint que el código llevaba
+escrito, fue retirado por Hugging Face. No devolvía un error legible: el nombre
+dejó de resolver en DNS, la llamada moría en `URLError`, `dense_or_lexical` lo
+capturaba como está previsto y la mitad densa quedaba apagada de forma
+permanente.
+
+Nada lo delataba porque `retrieval_mode` en la respuesta era el valor estático
+de la configuración: anunciaba `hybrid` porque así estaba configurado, no
+porque hubiese ocurrido. Un campo que informa de la intención en lugar del
+hecho es peor que no tenerlo, y es lo que permitió que esto pasara inadvertido.
+
+Ahora `/rag/search` y `/rag/chat` publican por consulta el recuperador que
+respondió de hecho —`hybrid`, `lexical` o `lexical_degraded`— junto a un
+`degraded` booleano. El campo homónimo de `/rag/collections` describe la
+capacidad configurada y no puede saberlo: se consulta sin pregunta. **Si una
+respuesta trae `retrieval_mode: lexical_degraded`, sus pasajes son válidos pero
+no salen de la fusión híbrida con la que se midió el hit@8, y no deben leerse
+como si lo fueran.**
 
 Preparar estos cambios no actualiza el sitio publicado. El procedimiento y
 las comprobaciones previas a publicar están en

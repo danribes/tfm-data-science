@@ -68,6 +68,12 @@ class Answer:
     # factual support. It can be True for abstentions or provider failures.
     grounded: bool
     error: str | None = None
+    #: El recuperador que respondió de hecho, no el configurado. Una respuesta
+    #: construida sobre pasajes de BM25 cuando se anunciaba fusión híbrida se
+    #: apoya en un sistema distinto del que se evaluó, y quien la lee tiene
+    #: derecho a saberlo.
+    retrieval_mode: str = "hybrid"
+    degraded: bool = False
 
 
 def _format_passages(passages: Sequence) -> str:
@@ -183,9 +189,11 @@ def stream(question: str, collection: str | None = None, *,
                        "provider": None, "model": None}
         return
 
-    passages = retrieve.search(question, collection, top_k)
+    _res = retrieve.search_reported(question, collection, top_k)
+    passages = _res.passages
     yield "passages", {"passages": [p.to_dict() for p in passages],
-                       "grounded": bool(passages)}
+                       "grounded": bool(passages),
+                       "retrieval_mode": _res.mode, "degraded": _res.degraded}
 
     if not passages:
         yield "done", {"answer": ("El corpus no cubre esta pregunta. Prueba a "
@@ -283,12 +291,14 @@ def ask(question: str, collection: str | None = None, *, top_k: int | None = Non
         return Answer(text=refusal, passages=[], provider=None, model=None,
                       grounded=False, error=None)
 
-    passages = retrieve.search(question, collection, top_k)
+    _res = retrieve.search_reported(question, collection, top_k)
+    passages, _mode, _deg = _res.passages, _res.mode, _res.degraded
     if not passages:
         return Answer(
             text=("El corpus no cubre esta pregunta. Prueba a reformularla o a "
                   "consultar otra colección."),
             passages=[], provider=None, model=None, grounded=False,
+            retrieval_mode=_mode, degraded=_deg,
         )
 
     user = f"PREGUNTA:\n{question}\n\nPASAJES:\n{_format_passages(passages)}"
@@ -312,7 +322,8 @@ def ask(question: str, collection: str | None = None, *, top_k: int | None = Non
             if text:
                 text = checked_answer(text, len(passages))
                 return Answer(text=text, passages=dicts, provider=prov["name"],
-                              model=prov["model"], grounded=True)
+                              model=prov["model"], grounded=True,
+                              retrieval_mode=_mode, degraded=_deg)
             last = f"{prov['name']}: respuesta vacía"
         except Exception as exc:
             last = f"{prov['name']}: {type(exc).__name__}"
@@ -324,4 +335,5 @@ def ask(question: str, collection: str | None = None, *, top_k: int | None = Non
         text=("No se ha obtenido una respuesta completa con referencias válidas. "
               "Puedes consultar los pasajes recuperados, sin redactar:"),
         passages=dicts, provider=None, model=None, grounded=True, error=last,
+        retrieval_mode=_mode, degraded=_deg,
     )

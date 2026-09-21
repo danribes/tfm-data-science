@@ -617,13 +617,14 @@ def rag_search(req: RagSearchRequest,
     if not rag_config.readable(collection, _rag_token(x_rag_token, authorization)):
         raise _rag_forbidden(collection)
     try:
-        hits = rag_retrieve.search(req.query, collection, req.top_k)
+        res = rag_retrieve.search_reported(req.query, collection, req.top_k)
     except Exception as exc:
         raise HTTPException(status_code=503,
                             detail=f"corpus no disponible: {exc}") from exc
     return RagSearchResponse(
         query=req.query, collection=collection,
-        passages=[PassageOut(**h.to_dict()) for h in hits],
+        passages=[PassageOut(**h.to_dict()) for h in res.passages],
+        retrieval_mode=res.mode, degraded=res.degraded,
     )
 
 
@@ -681,6 +682,7 @@ def rag_chat(req: RagChatRequest,
         passages=[PassageOut(**p) for p in ans.passages],
         grounded=ans.grounded, provider=ans.provider, model=ans.model,
         error=ans.error,
+        retrieval_mode=ans.retrieval_mode, degraded=ans.degraded,
     )
 
 

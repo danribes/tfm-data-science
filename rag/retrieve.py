@@ -15,6 +15,7 @@ the citation still says where it came from.
 """
 from __future__ import annotations
 
+import contextvars
 import re
 import sqlite3
 import struct
@@ -22,6 +23,43 @@ from dataclasses import dataclass, asdict
 from typing import Sequence
 
 from rag import config, glossary, store
+
+
+#: Si el sondeo denso cayó durante la consulta en curso.
+#:
+#: `search` devuelve una lista de pasajes y muchos sitios dependen de eso, así
+#: que el aviso viaja aparte en lugar de cambiar el tipo de retorno. Es una
+#: variable de contexto y no un global porque `_mixed` anida tres búsquedas y
+#: el servidor atiende varias peticiones a la vez: un booleano de módulo
+#: mezclaría la degradación de una consulta con la de otra.
+_DEGRADED: contextvars.ContextVar[list[bool] | None] = contextvars.ContextVar(
+    "rag_degraded", default=None)
+
+
+def _note_degraded() -> None:
+    box = _DEGRADED.get()
+    if box is not None:
+        box[0] = True
+
+
+@dataclass(frozen=True)
+class Retrieval:
+    """Los pasajes y, con ellos, con qué recuperador se obtuvieron.
+
+    Existe porque `retrieval_mode` en la respuesta era el valor estático de la
+    configuración: decía «hybrid» mientras se servía BM25, y el despliegue
+    estuvo semanas así sin que nada lo delatara. Un campo que informa de la
+    intención en vez del hecho es peor que no tenerlo.
+    """
+    passages: list[Passage]
+    degraded: bool
+
+    @property
+    def mode(self) -> str:
+        """Lo que de verdad respondió esta consulta."""
+        if config.PUBLIC_MODE:
+            return "lexical"
+        return "lexical_degraded" if self.degraded else "hybrid"
 
 
 @dataclass(frozen=True)
@@ -147,6 +185,24 @@ def _mixed(query: str, k: int, con: sqlite3.Connection | None = None) -> list[Pa
     return [best[cid] for cid in order[:k]]
 
 
+def search_reported(query: str, collection: str | None = None,
+                    top_k: int | None = None,
+                    con: sqlite3.Connection | None = None) -> Retrieval:
+    """`search`, diciendo además con qué recuperador se respondió.
+
+    Se ofrece aparte en lugar de cambiar `search`: una decena de sitios esperan
+    una lista de pasajes, y la cadena de citación no gana nada envolviéndola.
+    Quien publica una respuesta al lector —la API— usa ésta.
+    """
+    caja = [False]
+    ficha = _DEGRADED.set(caja)
+    try:
+        passages = search(query, collection, top_k, con=con)
+    finally:
+        _DEGRADED.reset(ficha)
+    return Retrieval(passages=passages, degraded=caja[0])
+
+
 def search(query: str, collection: str | None = None, top_k: int | None = None,
            con: sqlite3.Connection | None = None) -> list[Passage]:
     """Search one collection using the explicitly configured retrieval mode."""
@@ -196,8 +252,9 @@ def search(query: str, collection: str | None = None, top_k: int | None = None,
                   if not config.PUBLIC_MODE and terms and config.W_DENSE_EN > 0
                   else [])
         if degraded:
-            # Visible in the logs of whoever runs the service; the API layer
-            # surfaces it to the reader through retrieval_mode.
+            # A los registros de quien opera el servicio, y al que pregunta:
+            # `search_reported` lo recoge y la API lo publica por consulta.
+            _note_degraded()
             print("rag: dense probe unavailable, answering lexically",
                   file=__import__("sys").stderr)
 
