@@ -51,6 +51,19 @@ button{font:inherit;font-size:12.5px;padding:6px 13px;border:1px solid var(--gri
 border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
 .foot{font-size:12px;color:var(--muted)}
 .key{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
+.tag.prov{background:var(--chip);color:var(--accent);font-weight:700;letter-spacing:.03em}
+.tag.prov.motor{background:var(--code);color:var(--ink-2)}
+.tag.prov.dl,.tag.prov.ml{background:var(--chip-warn);color:var(--warn)}
+.tag.prov.knn{background:var(--chip-lab);color:var(--lab)}
+.tag.prov.llm{background:var(--code);color:var(--ink-2)}
+table.layers th{width:190px;vertical-align:top}
+table.layers td.lay{font-size:12.5px;color:var(--ink-2)}
+h3{color:var(--ink)}
+.scale{position:relative;height:10px;border-radius:5px;margin:14px 0 6px;
+background:linear-gradient(90deg,var(--good),var(--warn),var(--div-neg))}
+.scale .mark{position:absolute;top:-5px;width:3px;height:20px;background:var(--ink);border-radius:2px}
+.scale .tick{position:absolute;top:-3px;width:2px;height:16px;background:var(--surface);opacity:.9}
+.scalelab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
 .note{background:var(--chip-warn);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;
 padding:10px 14px;font-size:12.5px;color:var(--ink-2)}
 </style></head>
@@ -80,7 +93,7 @@ cambio, salen del motor cada vez que se genera este archivo
   escenario · Deuda %PIB</div></section>
 
 <section class="card"><h2>4 · El futuro, en números</h2>
-  <table><thead><tr><th>Serie</th><th class="num" colspan="2">2026 · hoy</th><th class="num" colspan="2">2030</th><th class="num" colspan="2">2040</th><th class="num" colspan="2">2050</th></tr></thead><tbody><tr><th scope="row">Deuda pública<small>%PIB</small></th><td class="num">105,8</td><td class="num d dn">−0,5</td><td class="num">110,3</td><td class="num d dn">−2,5</td><td class="num">145,1</td><td class="num d dn">−8,5</td><td class="num">206,9</td><td class="num d dn">−16,9</td></tr><tr><th scope="row">Paro<span class="tag warn" title="El motor no le da senda propia: se queda en su valor observado y sólo se desplaza en bloque">sin senda propia · plana por construcción</span><small>%</small></th><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td></tr><tr><th scope="row">IPCA<span class="tag warn" title="El motor no le da senda propia: se queda en su valor observado y sólo se desplaza en bloque">sin senda propia · plana por construcción</span><small>%</small></th><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td></tr><tr><th scope="row">Saldo público<small>%PIB</small></th><td class="num">-4,1</td><td class="num d dn">+0,0</td><td class="num">-5,6</td><td class="num d dn">+0,1</td><td class="num">-10,0</td><td class="num d dn">+0,3</td><td class="num">-14,2</td><td class="num d dn">+0,6</td></tr><tr><th scope="row">Precio vivienda<span class="tag rel" title="Subir es buena noticia para unos y mala para otros">signo según quién pregunte</span><small>€</small></th><td class="num">171.444</td><td class="num d zero">0</td><td class="num">237.751</td><td class="num d rel">+4.784</td><td class="num">331.859</td><td class="num d rel">+23.569</td><td class="num">401.839</td><td class="num d rel">+48.199</td></tr><tr><th scope="row">Cuota hipotecaria<small>€/mes</small></th><td class="num">745</td><td class="num d zero">0</td><td class="num">1.033</td><td class="num d up">+21</td><td class="num">1.442</td><td class="num d up">+102</td><td class="num">1.746</td><td class="num d up">+209</td></tr><tr><th scope="row">Salario medio<span class="tag rel" title="Subir es buena noticia para unos y mala para otros">signo según quién pregunte</span><small>€/año</small></th><td class="num">24.497</td><td class="num d zero">0</td><td class="num">29.101</td><td class="num d rel">+554</td><td class="num">44.763</td><td class="num d rel">+2.910</td><td class="num">68.853</td><td class="num d rel">+7.493</td></tr><tr><th scope="row">Esfuerzo vivienda<small>%</small></th><td class="num">42,6</td><td class="num d zero">0,0</td><td class="num">49,7</td><td class="num d up">+0,1</td><td class="num">45,1</td><td class="num d up">+0,3</td><td class="num">35,5</td><td class="num d up">+0,4</td></tr></tbody></table>
+  <table><thead><tr><th>Serie</th><th class="num" colspan="2">2026 · hoy</th><th class="num" colspan="2">2030</th><th class="num" colspan="2">2040</th><th class="num" colspan="2">2050</th></tr></thead><tbody><tr><th scope="row">Deuda pública<small>%PIB · <span class="tag prov motor" title="Identidad contable y reglas calibradas: ningún modelo aprendido interviene">motor</span></small></th><td class="num">105,8</td><td class="num d dn">−0,5</td><td class="num">110,3</td><td class="num d dn">−2,5</td><td class="num">145,1</td><td class="num d dn">−8,5</td><td class="num">206,9</td><td class="num d dn">−16,9</td></tr><tr><th scope="row">Paro<span class="tag warn" title="El motor no le da senda propia: se queda en su valor observado y sólo se desplaza en bloque">sin senda propia · plana por construcción</span><small>% · <span class="tag prov motor" title="Identidad contable y reglas calibradas: ningún modelo aprendido interviene">motor</span></small></th><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td></tr><tr><th scope="row">IPCA<span class="tag warn" title="El motor no le da senda propia: se queda en su valor observado y sólo se desplaza en bloque">sin senda propia · plana por construcción</span><small>% · <span class="tag prov motor" title="Identidad contable y reglas calibradas: ningún modelo aprendido interviene">motor</span></small></th><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td></tr><tr><th scope="row">Saldo público<small>%PIB · <span class="tag prov motor" title="Identidad contable y reglas calibradas: ningún modelo aprendido interviene">motor</span></small></th><td class="num">-4,1</td><td class="num d dn">+0,0</td><td class="num">-5,6</td><td class="num d dn">+0,1</td><td class="num">-10,0</td><td class="num d dn">+0,3</td><td class="num">-14,2</td><td class="num d dn">+0,6</td></tr><tr><th scope="row">Precio vivienda<span class="tag rel" title="Subir es buena noticia para unos y mala para otros">signo según quién pregunte</span><small>€ · <span class="tag prov" title="Dos constantes estimadas con econometría de panel entran en esta cadena">motor + panel</span></small></th><td class="num">171.444</td><td class="num d zero">0</td><td class="num">237.751</td><td class="num d rel">+4.784</td><td class="num">331.859</td><td class="num d rel">+23.569</td><td class="num">401.839</td><td class="num d rel">+48.199</td></tr><tr><th scope="row">Cuota hipotecaria<small>€/mes · <span class="tag prov" title="Dos constantes estimadas con econometría de panel entran en esta cadena">motor + panel</span></small></th><td class="num">745</td><td class="num d zero">0</td><td class="num">1.033</td><td class="num d up">+21</td><td class="num">1.442</td><td class="num d up">+102</td><td class="num">1.746</td><td class="num d up">+209</td></tr><tr><th scope="row">Salario medio<span class="tag rel" title="Subir es buena noticia para unos y mala para otros">signo según quién pregunte</span><small>€/año · <span class="tag prov motor" title="Identidad contable y reglas calibradas: ningún modelo aprendido interviene">motor</span></small></th><td class="num">24.497</td><td class="num d zero">0</td><td class="num">29.101</td><td class="num d rel">+554</td><td class="num">44.763</td><td class="num d rel">+2.910</td><td class="num">68.853</td><td class="num d rel">+7.493</td></tr><tr><th scope="row">Esfuerzo vivienda<small>% · <span class="tag prov" title="Dos constantes estimadas con econometría de panel entran en esta cadena">motor + panel</span></small></th><td class="num">42,6</td><td class="num d zero">0,0</td><td class="num">49,7</td><td class="num d up">+0,1</td><td class="num">45,1</td><td class="num d up">+0,3</td><td class="num">35,5</td><td class="num d up">+0,4</td></tr></tbody></table>
   <div class="acts"><button>Copiar tabla</button><button>Descargar CSV</button></div>
   <div class="key">
     <span>Cada par: valor del escenario y Δ frente a la base.</span>
@@ -91,6 +104,43 @@ cambio, salen del motor cada vez que se genera este archivo
   <table><tbody><tr><th scope="row">Productividad</th><td class="num">−16,9</td><td class="bar"><span style="width:100%"></span></td><td class="num">100 %</td></tr></tbody></table>
   <div class="foot" style="margin-top:8px">El motor vuelto a correr con una sola
   palanca cada vez. Total conjunto: −16,9 pp.</div></section>
+
+<section class="card"><h2>6 · Cómo se ha calculado cada cifra</h2>
+  <table class="layers"><tbody><tr><th scope="row"><span class="tag prov motor">MOTOR</span></th><td class="lay">Identidad contable de la deuda más reglas calibradas. Determinista: las mismas palancas dan siempre el mismo número, y se reproduce en Python y en el navegador con anclas compartidas.</td></tr><tr><th scope="row"><span class="tag prov panel">PANEL</span></th><td class="lay">Dos constantes de la cadena de vivienda estimadas con econometría de panel sobre 19 unidades: media de largo plazo 1,2151 % [0,9008; 1,5295] y reversión anual 0,2039 [0,1811; 0,2268]. Son los únicos parámetros del motor que vienen de los datos.</td></tr><tr><th scope="row"><span class="tag prov dl">APRENDIZAJE PROFUNDO</span></th><td class="lay">No interviene en estas cifras. La red se entrenó con 1.760 series extranjeras y no superó a una extrapolación de tendencia —MASE 0,4000 frente a 0,3953, gana en 5 de 17 comunidades cuando la regla exigía 12—. El resultado negativo se conserva; el modelo no se usa.</td></tr><tr><th scope="row"><span class="tag prov ml">CLASIFICADOR</span></th><td class="lay">Gradient boosting sobre 3.874 país-año de 154 países. Produce una puntuación exploratoria de tensión soberana, no una probabilidad calibrada, y no entra en la senda de deuda de esta tabla.</td></tr><tr><th scope="row"><span class="tag prov knn">ANÁLOGOS</span></th><td class="lay">Vecinos históricos por distancia de Mahalanobis sobre 4.091 observaciones de 173 países, con España excluida del conjunto de referencia. Descriptivo: la semejanza histórica no predice.</td></tr><tr><th scope="row"><span class="tag prov llm">RAG Y LENGUAJE</span></th><td class="lay">Cero cifras. La recuperación documental cita pasajes con documento y página; el modelo de lenguaje redacta sobre hechos ya calculados y una comprobación posterior rechaza cualquier magnitud que no esté en ellos.</td></tr></tbody></table>
+  <div class="note" style="margin-top:12px"><strong>La respuesta corta:</strong>
+  las cifras de la tabla salen de una identidad contable con reglas calibradas,
+  no de un modelo aprendido. De los parámetros del motor sólo dos vienen de los
+  datos, y afectan a la cadena de vivienda. La red neuronal no se usa porque no
+  superó a su referencia, el clasificador vive aparte y el modelo de lenguaje no
+  calcula: redacta sobre hechos ya calculados.</div></section>
+
+<section class="card"><h2>7 · España entre los demás</h2>
+  
+<h3 style="font-size:14px;margin:0 0 8px">Vecinos históricos más parecidos al escenario</h3>
+<table><thead><tr><th>País · año</th><th class="num">Deuda</th>
+<th class="num">Saldo</th><th class="num">Paro</th>
+<th class="num">Deuda 10 años después</th><th class="num">Distancia</th></tr></thead>
+<tbody><tr><th scope="row">Italia (ITA) · 1994</th><td class="num">130,8</td><td class="num">-8,8</td><td class="num">11,1</td><td class="num"><strong>104,7</strong></td><td class="num">0.271</td></tr><tr><th scope="row">Bélgica (BEL) · 1994</th><td class="num">137,1</td><td class="num">-5,3</td><td class="num">9,6</td><td class="num"><strong>97,2</strong></td><td class="num">0.345</td></tr><tr><th scope="row">LBN · 2013</th><td class="num">135,4</td><td class="num">-8,8</td><td class="num">8,5</td><td class="num"><strong>185,8</strong></td><td class="num">0.348</td></tr></tbody></table>
+<div class="foot" style="margin-top:8px">Distancia de Mahalanobis sobre cinco
+variables normalizadas. <strong>España está excluida del conjunto de
+referencia</strong> por construcción, y la semejanza histórica no predice: dos
+de estos tres países redujeron deuda después y el tercero la duplicó.</div>
+
+<h3 style="font-size:14px;margin:18px 0 8px">Puntuación de tensión soberana</h3>
+<div class="scale"><span class="mark" style="left:6.0%"></span>
+  <span class="tick" style="left:33.3%"></span></div>
+<div class="scalelab"><span>España 1,74 %
+  (puntuación bruta)</span>
+  <span>| frecuencia de eventos del panel 9,73 %</span></div>
+<div class="note" style="margin-top:10px">Sobre 3874 país-año de
+154 países, AUC 0,6736 con particiones por
+país. <strong>No es una probabilidad de impago.</strong> Es la salida bruta de un
+clasificador sin calibrar; España queda fuera del conjunto etiquetado y sólo
+8/12 de sus características están disponibles. No debe leerse
+como un 1,74 % de probabilidad de impago, ni
+compararse con la frecuencia del panel para decir que España está «tantas veces»
+mejor o peor: son magnitudes distintas y la transferencia entre países no está
+validada.</div></section>
 
 <div class="foot">Proyección condicional, no recomendación de compra, venta o voto.</div>
 </div></body></html>

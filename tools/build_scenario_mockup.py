@@ -47,6 +47,42 @@ ROWS = [("b", "Deuda pública"), ("u", "Paro"), ("pi", "IPCA"),
         ("saldo", "Saldo público"), ("precio", "Precio vivienda"),
         ("cuota", "Cuota hipotecaria"), ("salario", "Salario medio"),
         ("esf", "Esfuerzo vivienda")]
+
+#: De dónde sale cada cifra. No es decoración: es la pregunta que más veces se
+#: hace sobre un trabajo con «IA» en el título, y la respuesta honesta para
+#: casi todas estas filas es «de una identidad contable», no de un modelo
+#: aprendido. Comprobado, no supuesto: las seis series marcadas PANEL son las
+#: que cambian al sustituir IPV_LR e IPV_REV por sus valores heredados.
+PANEL_DEPENDENT = {"ipv", "precio", "cuota", "esf", "hip", "sobre"}
+
+LAYERS = [
+    ("motor", "MOTOR",
+     "Identidad contable de la deuda más reglas calibradas. Determinista: "
+     "las mismas palancas dan siempre el mismo número, y se reproduce en "
+     "Python y en el navegador con anclas compartidas."),
+    ("panel", "PANEL",
+     "Dos constantes de la cadena de vivienda estimadas con econometría de "
+     "panel sobre 19 unidades: media de largo plazo 1,2151 % "
+     "[0,9008; 1,5295] y reversión anual 0,2039 [0,1811; 0,2268]. Son los "
+     "únicos parámetros del motor que vienen de los datos."),
+    ("dl", "APRENDIZAJE PROFUNDO",
+     "No interviene en estas cifras. La red se entrenó con 1.760 series "
+     "extranjeras y no superó a una extrapolación de tendencia —MASE 0,4000 "
+     "frente a 0,3953, gana en 5 de 17 comunidades cuando la regla exigía "
+     "12—. El resultado negativo se conserva; el modelo no se usa."),
+    ("ml", "CLASIFICADOR",
+     "Gradient boosting sobre 3.874 país-año de 154 países. Produce una "
+     "puntuación exploratoria de tensión soberana, no una probabilidad "
+     "calibrada, y no entra en la senda de deuda de esta tabla."),
+    ("knn", "ANÁLOGOS",
+     "Vecinos históricos por distancia de Mahalanobis sobre 4.091 "
+     "observaciones de 173 países, con España excluida del conjunto de "
+     "referencia. Descriptivo: la semejanza histórica no predice."),
+    ("llm", "RAG Y LENGUAJE",
+     "Cero cifras. La recuperación documental cita pasajes con documento y "
+     "página; el modelo de lenguaje redacta sobre hechos ya calculados y una "
+     "comprobación posterior rechaza cualquier magnitud que no esté en ellos."),
+]
 COLUMNS = (2026, 2030, 2040, 2050)
 READING_YEAR = 2035          # el año de lectura propuesto; los stocks van a Y1
 
@@ -95,14 +131,53 @@ def collect(levers: Levers) -> dict:
             "reader_relative": key in SIDES,
             # Sin senda propia: la línea base no se mueve en 25 años.
             "pinned": max(b) - min(b) < 1e-9,
+            "panel": key in PANEL_DEPENDENT,
             "cells": [{"year": y, "scn": s[y - Y0], "delta": s[y - Y0] - b[y - Y0]}
                       for y in COLUMNS],
         })
     contribs, _interaction, joint = decompose(levers, "b", 2050 - Y0) if moved else ([], 0.0, 0.0)
     return {"moved": moved, "rows": rows, "joint": joint,
+            "world": world(levers),
             "contrib": [{"name": c.lever_name, "delta": c.delta, "share": c.share}
                         for c in contribs],
             "path": {"years": list(range(Y0, 2051)), "base": base["b"], "scn": scn["b"]}}
+
+
+def world(levers: Levers) -> dict:
+    """España situada entre los demás países, por dos vías distintas.
+
+    Ninguna de las dos predice. Los análogos son descriptivos y excluyen a
+    España del conjunto de referencia por construcción; la puntuación de
+    tensión es la salida bruta de un clasificador entrenado en otros países,
+    sin calibrar, y España queda fuera del conjunto etiquetado. Decirlo aquí
+    importa más que la cifra: es la lectura que se presta a sobreinterpretar.
+    """
+    out: dict = {"analogs": [], "distress": None}
+    try:
+        from engine.analog import find_analogs
+        for a in find_analogs(levers, horizon=10):
+            snap = a.get("match_snapshot", {})
+            tail = a.get("outcome") or []
+            out["analogs"].append({
+                "iso3": a["iso3"], "name": a["country_name"], "year": a["match_year"],
+                "distance": a["distance"], "debt": snap.get("debt_gdp"),
+                "balance": snap.get("overall_balance_gdp"),
+                "unemployment": snap.get("unemployment"),
+                "after": (tail[-1].get("debt_gdp") if tail else None),
+                "after_years": (tail[-1].get("year_offset") if tail else None)})
+    except Exception as exc:                                   # noqa: BLE001
+        out["analogs_error"] = f"{type(exc).__name__}: {exc}"
+    try:
+        d = json.loads((ROOT / "docs/eval/distress.json").read_text(encoding="utf-8"))
+        sp = d.get("spain") or {}
+        out["distress"] = {
+            "score": sp.get("probability"), "year": sp.get("year"),
+            "base_rate": d.get("base_rate"), "n_countries": d.get("n_countries"),
+            "n_rows": d.get("n"), "auc": d.get("auc"),
+            "coverage": sp.get("coverage"), "in_label_set": sp.get("in_label_set")}
+    except Exception as exc:                                   # noqa: BLE001
+        out["distress_error"] = f"{type(exc).__name__}: {exc}"
+    return out
 
 
 def chart(path: dict, width: int = 720, height: int = 230, pad: int = 34) -> str:
@@ -182,9 +257,69 @@ button{font:inherit;font-size:12.5px;padding:6px 13px;border:1px solid var(--gri
 border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
 .foot{font-size:12px;color:var(--muted)}
 .key{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
+.tag.prov{background:var(--chip);color:var(--accent);font-weight:700;letter-spacing:.03em}
+.tag.prov.motor{background:var(--code);color:var(--ink-2)}
+.tag.prov.dl,.tag.prov.ml{background:var(--chip-warn);color:var(--warn)}
+.tag.prov.knn{background:var(--chip-lab);color:var(--lab)}
+.tag.prov.llm{background:var(--code);color:var(--ink-2)}
+table.layers th{width:190px;vertical-align:top}
+table.layers td.lay{font-size:12.5px;color:var(--ink-2)}
+h3{color:var(--ink)}
+.scale{position:relative;height:10px;border-radius:5px;margin:14px 0 6px;
+background:linear-gradient(90deg,var(--good),var(--warn),var(--div-neg))}
+.scale .mark{position:absolute;top:-5px;width:3px;height:20px;background:var(--ink);border-radius:2px}
+.scale .tick{position:absolute;top:-3px;width:2px;height:16px;background:var(--surface);opacity:.9}
+.scalelab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
 .note{background:var(--chip-warn);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;
 padding:10px 14px;font-size:12.5px;color:var(--ink-2)}
 """
+
+
+def render_world(w: dict) -> str:
+    """España situada entre los demás, con la advertencia pegada a la cifra."""
+    if w.get("analogs_error") or w.get("distress_error"):
+        return ('<div class="note">No se han podido construir las comparaciones '
+                f'internacionales: {w.get("analogs_error") or w.get("distress_error")}</div>')
+    def who(a: dict) -> str:
+        """El panel no trae nombre para todos los países; entonces queda el ISO."""
+        return a["name"] if a["name"] == a["iso3"] else f'{a["name"]} ({a["iso3"]})'
+
+    rows = "".join(
+        f'<tr><th scope="row">{who(a)} · {a["year"]}</th>'
+        f'<td class="num">{nf(a["debt"], 1)}</td>'
+        f'<td class="num">{nf(a["balance"], 1) if a["balance"] is not None else "—"}</td>'
+        f'<td class="num">{nf(a["unemployment"], 1) if a["unemployment"] is not None else "—"}</td>'
+        f'<td class="num"><strong>{nf(a["after"], 1) if a["after"] is not None else "—"}</strong></td>'
+        f'<td class="num">{a["distance"]:.3f}</td></tr>' for a in w["analogs"])
+    d = w["distress"] or {}
+    score, base = d.get("score"), d.get("base_rate")
+    pos = max(2.0, min(98.0, (score / (base * 3)) * 100)) if (score and base) else 50.0
+    return f"""
+<h3 style="font-size:14px;margin:0 0 8px">Vecinos históricos más parecidos al escenario</h3>
+<table><thead><tr><th>País · año</th><th class="num">Deuda</th>
+<th class="num">Saldo</th><th class="num">Paro</th>
+<th class="num">Deuda 10 años después</th><th class="num">Distancia</th></tr></thead>
+<tbody>{rows}</tbody></table>
+<div class="foot" style="margin-top:8px">Distancia de Mahalanobis sobre cinco
+variables normalizadas. <strong>España está excluida del conjunto de
+referencia</strong> por construcción, y la semejanza histórica no predice: dos
+de estos tres países redujeron deuda después y el tercero la duplicó.</div>
+
+<h3 style="font-size:14px;margin:18px 0 8px">Puntuación de tensión soberana</h3>
+<div class="scale"><span class="mark" style="left:{pos:.1f}%"></span>
+  <span class="tick" style="left:{min(98.0, 33.3):.1f}%"></span></div>
+<div class="scalelab"><span>España {nf(score * 100, 2) if score else "—"} %
+  (puntuación bruta)</span>
+  <span>| frecuencia de eventos del panel {nf(base * 100, 2) if base else "—"} %</span></div>
+<div class="note" style="margin-top:10px">Sobre {d.get("n_rows", "—")} país-año de
+{d.get("n_countries", "—")} países, AUC {nf(d.get("auc", 0), 4)} con particiones por
+país. <strong>No es una probabilidad de impago.</strong> Es la salida bruta de un
+clasificador sin calibrar; España queda fuera del conjunto etiquetado y sólo
+{d.get("coverage", "—")} de sus características están disponibles. No debe leerse
+como un {nf(score * 100, 2) if score else "—"} % de probabilidad de impago, ni
+compararse con la frecuencia del panel para decir que España está «tantas veces»
+mejor o peor: son magnitudes distintas y la transferencia entre países no está
+validada.</div>"""
 
 
 def render(data: dict) -> str:
@@ -213,15 +348,24 @@ def render(data: dict) -> str:
         if row["reader_relative"]:
             tags += ('<span class="tag rel" title="Subir es buena noticia para unos y mala '
                      'para otros">signo según quién pregunte</span>')
+        prov = ('<span class="tag prov" title="Dos constantes estimadas con '
+                'econometría de panel entran en esta cadena">motor + panel</span>'
+                if row["panel"] else
+                '<span class="tag prov motor" title="Identidad contable y reglas '
+                'calibradas: ningún modelo aprendido interviene">motor</span>')
         cells = "".join(
             f'<td class="num">{nf(c["scn"], row["dec"])}</td>'
             f'<td class="num d {tone(c["delta"], row)}">{signed(c["delta"], row["dec"])}</td>'
             for c in row["cells"])
         body += (f'<tr><th scope="row">{row["label"]}{tags}'
-                 f'<small>{row["unit"]}</small></th>{cells}</tr>')
+                 f'<small>{row["unit"]} · {prov}</small></th>{cells}</tr>')
 
     heads = "".join(f'<th class="num" colspan="2">{y}{" · hoy" if y == Y0 else ""}</th>'
                     for y in COLUMNS)
+    layers = "".join(
+        f'<tr><th scope="row"><span class="tag prov {cid}">{name}</span></th>'
+        f'<td class="lay">{text}</td></tr>' for cid, name, text in LAYERS)
+    world = render_world(data["world"])
     contrib = "".join(
         f'<tr><th scope="row">{c["name"]}</th>'
         f'<td class="num">{signed(c["delta"], 1)}</td>'
@@ -269,6 +413,18 @@ cambio, salen del motor cada vez que se genera este archivo
   <table><tbody>{contrib}</tbody></table>
   <div class="foot" style="margin-top:8px">El motor vuelto a correr con una sola
   palanca cada vez. Total conjunto: {signed(data["joint"], 1)} pp.</div></section>
+
+<section class="card"><h2>6 · Cómo se ha calculado cada cifra</h2>
+  <table class="layers"><tbody>{layers}</tbody></table>
+  <div class="note" style="margin-top:12px"><strong>La respuesta corta:</strong>
+  las cifras de la tabla salen de una identidad contable con reglas calibradas,
+  no de un modelo aprendido. De los parámetros del motor sólo dos vienen de los
+  datos, y afectan a la cadena de vivienda. La red neuronal no se usa porque no
+  superó a su referencia, el clasificador vive aparte y el modelo de lenguaje no
+  calcula: redacta sobre hechos ya calculados.</div></section>
+
+<section class="card"><h2>7 · España entre los demás</h2>
+  {world}</section>
 
 <div class="foot">Proyección condicional, no recomendación de compra, venta o voto.</div>
 </div></body></html>"""
