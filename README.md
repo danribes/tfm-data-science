@@ -186,9 +186,12 @@ independiente de sí mismo. Sus pasajes viajan al modelo en un bloque
 `CONTEXTO` sin numerar —lo que no lleva número no se puede citar— y la
 interfaz los muestra bajo «Documentación del propio trabajo consultada», fuera
 del recuento de fuentes. Cuando una pregunta se responde sólo con ellos, la
-respuesta no lleva ninguna cita y lo dice en prosa. El verificador de
-referencias sigue rechazando cualquier corchete numérico en ese caso: si no
-había nada citable, citar algo es inventarlo.
+respuesta no lleva ninguna cita. El modelo a veces cita de todas formas, y en
+ese caso el verificador quita la referencia y conserva la prosa: dejarla
+apuntaría a un pasaje que no existe, y rechazar la respuesta entera por un
+corchete de más descartaba explicaciones correctas. Un corchete mal formado
+sigue siendo un error, y fuera de este modo una referencia inventada sigue
+invalidando la respuesta.
 
 `crack23` se mantiene por separado y nunca se ordena contra un manual: la regla
 del recuperador no es «una colección cada vez» sino «no enfrentar autoridades

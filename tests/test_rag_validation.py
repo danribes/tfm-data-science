@@ -109,18 +109,41 @@ def test_sin_nada_que_citar_se_acepta_una_respuesta_sin_citas():
     assert checked_answer(texto, 0, context_only=True) == texto
 
 
-def test_en_modo_contexto_cualquier_cita_sigue_siendo_invalida():
-    """Lo que se relaja es la exigencia de citar, no el control de las citas.
+def test_en_modo_contexto_las_citas_colgantes_se_quitan():
+    """El modelo cita aunque se le diga que no, y en este modo no hay ningún
+    pasaje numerado al que apuntar.
 
-    Con cero pasajes citables, toda referencia numérica cae fuera de rango: en
-    ese modo la respuesta sólo se acepta si no cita absolutamente nada.
+    Rechazar la respuesta entera por un corchete de más tiraba una explicación
+    correcta: así fallaban en producción TODAS las preguntas sobre el método.
+    Dejar el corchete sería peor, porque apuntaría a un pasaje inexistente. Se
+    quita la referencia y se conserva la prosa.
     """
     from rag.validation import checked_answer
 
-    with pytest.raises(ValueError):
-        checked_answer("El motor simula 4.000 trayectorias [1].", 0, context_only=True)
+    assert checked_answer("El motor simula 4.000 trayectorias con semilla 42 [1].",
+                          0, context_only=True) == \
+        "El motor simula 4.000 trayectorias con semilla 42."
+    assert checked_answer("Son 4.000 trayectorias [1, 2] y la semilla es 42 [3].",
+                          0, context_only=True) == \
+        "Son 4.000 trayectorias y la semilla es 42."
+
+
+def test_en_modo_contexto_un_corchete_mal_formado_sigue_siendo_un_error():
+    """Lo que se limpia son referencias bien formadas que no apuntan a nada.
+    Un corchete roto sigue indicando que el modelo hizo algo raro."""
+    from rag.validation import checked_answer
+
     with pytest.raises(ValueError):
         checked_answer("Referencia rota [a1].", 0, context_only=True)
+
+
+def test_fuera_del_modo_contexto_una_cita_invalida_sigue_rechazandose():
+    """La limpieza no puede filtrarse al camino normal: ahí un [9] sobre tres
+    pasajes es una referencia inventada y debe rechazar la respuesta."""
+    from rag.validation import checked_answer
+
+    with pytest.raises(ValueError):
+        checked_answer("Una afirmación mal citada [9].", 3)
 
 
 def test_sin_modo_contexto_la_exigencia_de_citar_sigue_intacta():

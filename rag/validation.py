@@ -57,12 +57,26 @@ muestra esos pasajes bajo su propio epígrafe.
     for bracket in re.findall(r"\[[^\]\n]*\]", text):
         if re.search(r"\d", bracket) and not _CITE.fullmatch(bracket):
             raise ValueError("referencia numérica mal formada")
+    if context_only:
+        # El modelo cita aunque se le diga que no. Rechazar la respuesta entera
+        # por un corchete de más era tirar a la basura una explicación correcta
+        # —así fallaban en producción todas las preguntas sobre el método—, y
+        # dejar el corchete sería peor: apuntaría a un pasaje que no existe,
+        # porque en este modo no hay ninguno numerado.
+        #
+        # Se quita la referencia y se conserva la prosa. Es una intervención
+        # menor que la que ya hacía esta función, que sustituye respuestas
+        # enteras; y la interfaz dice, al lado, que la respuesta se apoya en
+        # documentación del propio trabajo y no cita fuentes.
+        if is_refusal(text):
+            return CORPUS_REFUSAL
+        limpio = re.sub(r"\s*" + _CITE.pattern, "", text)
+        return re.sub(r"\s+([.,;:])", r"\1", limpio).strip()
+
     refs = citation_references(text)
     if not refs:
         if is_refusal(text):
             return CORPUS_REFUSAL
-        if context_only:
-            return text
         raise ValueError("respuesta sin referencias a los pasajes")
     invalid = sorted({ref for ref in refs if not 1 <= ref <= n_passages})
     if invalid:
