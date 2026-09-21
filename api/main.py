@@ -596,13 +596,6 @@ def rag_collections(
             continue
         counts = st["by_collection"].get(cid, {})
         docs, chunks = counts.get("documents", 0), counts.get("chunks", 0)
-        if cid == rag_config.MIXED_ID:
-            # The mix owns no rows of its own. Reporting zero would make the
-            # interface grey it out as an empty collection, which is how a
-            # working default would look broken.
-            members = [st["by_collection"].get(m, {}) for m in rag_config.MIXED_MEMBERS]
-            docs = sum(m.get("documents", 0) for m in members)
-            chunks = sum(m.get("chunks", 0) for m in members)
         out.append(RagCollectionOut(
             id=cid, label=meta["label"], authority=meta["authority"],
             note=meta["note"], documents=docs, chunks=chunks,

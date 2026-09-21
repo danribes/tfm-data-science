@@ -27,7 +27,7 @@ REMOTE_EMBED = MODE == "remote_hybrid"
 PUBLIC_MODE = MODE == "public_lexical"
 RETRIEVAL_MODE = "lexical" if PUBLIC_MODE else "hybrid"
 CORPUS_SCOPE = "public_project_docs" if PUBLIC_MODE else "private_local"
-DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "mixto"
+DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "libros"
 
 #: Where a query is encoded when the model cannot be loaded locally. The model
 #: must be the one that produced the stored vectors: a query embedded by any
@@ -66,36 +66,33 @@ CRACK_DIR = DATA_ROOT / "crack23"
 #: que prohíbe es mezclar autoridades distintas. `libros` (académico), `metodo`
 #: y `defensa_tfm` (propios) se citan con peso comparable; `crack23` (opinión)
 #: se queda fuera por ese mismo motivo, y sigue consultable por separado.
-MIXED_ID = "mixto"
-MIXED_MEMBERS: tuple[str, ...] = ("libros", "metodo", "defensa_tfm")
-
+#: Sólo se cita lo que es una fuente.
+#:
+#: El corpus llevaba tres colecciones propias además de los manuales, y la
+#: vista por defecto las fundía todas. El problema no era la idea sino lo que
+#: había dentro: de los quince documentos propios, los de mayor tamaño eran
+#: planes de desarrollo —`phase2-frontend-implementation` con 88 fragmentos,
+#: `v16-engine-extract` con 41, cuatro documentos `*-design` más— frente a 23
+#: fragmentos entre la memoria, los resultados y la reproducibilidad. En un
+#: ranking por relevancia ganaba el registro de cómo se construyó la
+#: aplicación, así que una pregunta de economía volvía citando una nota de
+#: implementación como si fuera bibliografía. `DEFENSA_TFM` es el guion de la
+#: defensa: menos fuente todavía.
+#:
+#: Un trabajo que se cita a sí mismo como autoridad no demuestra nada. Lo que
+#: responde ahora son las 58 obras académicas, que es lo que un tribunal puede
+#: comprobar. Los documentos propios siguen en el repositorio y en el índice;
+#: lo que se ha retirado es su condición de fuente citable.
 COLLECTIONS = {
-    MIXED_ID: {
-        "label": "Manuales y método, juntos",
-        "authority": "mixto",
-        "note": "Funde los manuales de economía con la documentación propia del "
-                "proyecto. Cada pasaje conserva su colección y su autoridad, de "
-                "modo que la cita sigue diciendo de dónde sale.",
-    },
     "libros": {
         "label": "Economía y métodos",
         "authority": "academico",
-        "note": "Documentos e índice almacenados localmente; los pasajes recuperados se envían al proveedor de IA configurado para redactar respuestas.",
-    },
-    "metodo": {
-        "label": "Método y diseño del propio modelo",
-        "authority": "propio",
-        "note": "Specs, Metodología y Cómo funciona de esta app.",
-    },
-    "defensa_tfm": {
-        "label": "Defensa del TFM (Pregúntale al TFM)",
-        "authority": "defensa",
-        "note": "Defensa metodológica: derivaciones de las 10 palancas, Okun, Phillips, Monte Carlo y calibración.",
+        "note": "Manuales de economía y econometría. Documentos e índice almacenados localmente; los pasajes recuperados se envían al proveedor de IA configurado para redactar respuestas.",
     },
     "crack23": {
         "label": "Canal crack23",
         "authority": "opinion",
-        "note": "Transcripciones y resúmenes. Es opinión, no fuente académica.",
+        "note": "Transcripciones y resúmenes. Es opinión, no fuente académica, y nunca se mezcla con los manuales en una misma respuesta.",
     },
 }
 
@@ -285,6 +282,4 @@ def readable(collection: str, token: str | None) -> bool:
     The mix is readable only when every member is: otherwise it would be a
     side door into a gated collection.
     """
-    if collection == MIXED_ID:
-        return all(readable(m, token) for m in MIXED_MEMBERS)
     return not is_restricted(collection) or token_ok(token)

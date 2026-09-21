@@ -157,26 +157,38 @@ o Consulta; un servicio RAG caído no impide utilizar los escenarios.
 ### Corpus completo, servido abierto
 
 Por decisión explícita del autor (20-09-2026) el despliegue sirve el corpus
-entero sin credencial. Las cuatro colecciones responden a cualquier consulta:
+entero sin credencial. Dos colecciones responden a las consultas:
 
 | Colección | Documentos | Fragmentos | Autoría |
 |---|---:|---:|---|
 | `libros` | 58 | 17.402 | terceros, con derechos de autor |
 | `crack23` | 421 | 3.684 | terceros, divulgación |
-| `metodo` | 14 | 286 | propia |
-| `defensa_tfm` | 1 | 3 | propia |
 
-`corpus_scope` vale `full_open`. La colección por defecto es `mixto`, que no es
-una fuente sino una vista: funde `libros`, `metodo` y `defensa_tfm` en una sola
-respuesta, de modo que una pregunta se contesta a la vez con los manuales y con
-la documentación del propio proyecto.
+`corpus_scope` vale `full_open` y la colección por defecto es `libros`.
 
-La mezcla se hace con RRF sobre los rangos de cada colección —nunca sobre sus
-puntuaciones, que no son comparables— y cada pasaje conserva su colección y su
-autoridad, así que la cita sigue diciendo de dónde sale. `crack23` queda fuera
-de la mezcla: la regla del recuperador no es «una colección cada vez» sino «no
-enfrentar autoridades distintas», y la divulgación de opinión no se ordena
-contra un manual. Sigue consultable por separado.
+**Sólo se cita lo que es una fuente.** Hubo antes tres colecciones propias
+—`metodo`, `defensa_tfm`— y una vista `mixto` que las fundía con los manuales,
+de modo que una pregunta se contestaba a la vez con la literatura y con la
+documentación del proyecto. La idea era razonable; el contenido no la
+sostenía. De los quince documentos propios indexados, los de mayor tamaño eran
+planes de desarrollo: 88 fragmentos de un documento de implementación del
+frontend, 53 de otro del núcleo, 41 de un extracto del motor, frente a 23
+fragmentos entre la memoria, los resultados y la reproducibilidad. En un
+ranking por relevancia ganaba el registro de cómo se construyó la aplicación,
+así que una pregunta de economía volvía citando una nota de implementación
+—o el guion de la defensa— como si fuera bibliografía.
+
+Un trabajo que se cita a sí mismo como autoridad no demuestra nada. Lo que
+responde ahora son las 58 obras académicas, que es lo que un tribunal puede
+comprobar: manuales de economía y econometría, informes del Banco de España y
+del BCE. Los documentos propios siguen en el repositorio y en el índice; lo que
+se ha retirado es su condición de fuente citable.
+
+`crack23` se mantiene por separado y nunca se ordena contra un manual: la regla
+del recuperador no es «una colección cada vez» sino «no enfrentar autoridades
+distintas», y la divulgación de opinión no compite con la literatura. Cada
+pasaje conserva su colección y su autoridad, así que la cita siempre dice de
+dónde sale.
 
 **Qué significa.** `libros` son manuales de terceros con derechos de autor.
 Servirlos abiertos convierte `/rag/search` en un recuperador público de texto
@@ -186,7 +198,7 @@ que se lea como tal.
 
 **Riesgo asumido.** La política de contenidos de Hugging Face prohíbe alojar
 material infractor. Una denuncia puede retirar el Space, y con él el acceso a
-todo — también a las colecciones propias y a la API del motor. El procedimiento
+todo — también al corpus académico y a la API del motor. El procedimiento
 de retirada de abajo es, por tanto, además de una cortesía con los titulares de
 derechos, el plan de contingencia del propio trabajo.
 

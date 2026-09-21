@@ -8,10 +8,14 @@ be on a comparable scale, which they are not.
 
 Retrieval never ranks one authority against another. That is a correctness
 property, not an optimisation: a textbook and a YouTube transcript must never
-compete in the same list. Collections of comparable authority may be fused —
-`config.MIXED_ID` does exactly that for the manuals and the project's own
-documentation — and every passage carries its own collection and authority so
-the citation still says where it came from.
+compete in the same list. Every passage carries its own collection and
+authority so the citation always says where it came from.
+
+Only the academic corpus answers by default. An earlier version fused the
+manuals with the project's own documentation, but the bulk of that
+documentation was development notes, so a question about economics came back
+citing an implementation plan as if it were bibliography. A piece of work
+cannot cite itself as authority.
 """
 from __future__ import annotations
 
@@ -29,9 +33,9 @@ from rag import config, glossary, store
 #:
 #: `search` devuelve una lista de pasajes y muchos sitios dependen de eso, así
 #: que el aviso viaja aparte en lugar de cambiar el tipo de retorno. Es una
-#: variable de contexto y no un global porque `_mixed` anida tres búsquedas y
-#: el servidor atiende varias peticiones a la vez: un booleano de módulo
-#: mezclaría la degradación de una consulta con la de otra.
+#: variable de contexto y no un global porque el servidor atiende varias
+#: peticiones a la vez: un booleano de módulo mezclaría la degradación de una
+#: consulta con la de otra.
 _DEGRADED: contextvars.ContextVar[list[bool] | None] = contextvars.ContextVar(
     "rag_degraded", default=None)
 
@@ -151,40 +155,6 @@ def _rrf(rankings: Sequence[tuple[Sequence[int], float]],
     return scores
 
 
-def _mixed(query: str, k: int, con: sqlite3.Connection | None = None) -> list[Passage]:
-    """Fuse several collections into one ranking with RRF.
-
-    Each member is searched on its own first, so its internal lexical/dense
-    fusion is untouched; only the resulting rankings are merged. RRF needs
-    ranks and not scores, which is what makes this legitimate: the per-passage
-    scores of two collections are not on a comparable scale and are never
-    compared here.
-
-    What the module docstring forbids is mixing authorities, not mixing
-    sources. The members are the academic manuals and the project's own
-    documentation; `crack23` is opinion and stays out. Every passage keeps its
-    own collection and authority, so a citation still says where it came from.
-    """
-    own = con is None
-    con = con or store.connect()
-    try:
-        ranked = [search(query, m, k, con=con) for m in config.MIXED_MEMBERS
-                  if m in config.COLLECTIONS]
-    finally:
-        if own:
-            con.close()
-
-    fused_score: dict[int, float] = {}
-    best: dict[int, Passage] = {}
-    for hits in ranked:
-        for rank, passage in enumerate(hits, start=1):
-            fused_score[passage.chunk_id] = (fused_score.get(passage.chunk_id, 0.0)
-                                             + 1.0 / (config.RRF_K + rank))
-            best.setdefault(passage.chunk_id, passage)
-    order = sorted(fused_score, key=lambda cid: (-fused_score[cid], cid))
-    return [best[cid] for cid in order[:k]]
-
-
 def search_reported(query: str, collection: str | None = None,
                     top_k: int | None = None,
                     con: sqlite3.Connection | None = None) -> Retrieval:
@@ -209,9 +179,6 @@ def search(query: str, collection: str | None = None, top_k: int | None = None,
     collection = config.DEFAULT_COLLECTION if collection is None else collection
     if collection not in config.COLLECTIONS:
         raise ValueError(f"colección desconocida: {collection!r}")
-    if collection == config.MIXED_ID:
-        return _mixed(query, top_k or config.TOP_K, con)
-
     own = con is None
     con = con or store.connect()
     try:

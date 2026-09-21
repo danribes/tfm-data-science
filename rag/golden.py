@@ -273,34 +273,6 @@ GOLDEN: tuple[Question, ...] = (
         expect_terms=(("inmigra", "immigra", "migra"), ("salario", "wage")),
     ),
     # ---- the model's own method ----
-    Question(
-        id="metodo-palancas",
-        question="¿Qué palancas puede mover el usuario y en qué rangos?",
-        collection="metodo", topic="propio",
-        expect_docs=("v16-engine-extract", "consolidated-core", "phase2-frontend"),
-        expect_terms=(("palanca", "lever"),),
-    ),
-    Question(
-        id="metodo-lineas-rojas",
-        question="¿Qué son las líneas rojas del modelo y en qué umbrales están fijadas?",
-        collection="metodo", topic="propio",
-        expect_docs=("v16-engine-extract", "debt-scenario-personas", "consolidated-core"),
-        expect_terms=(("linea", "line"), ("umbral", "threshold")),
-    ),
-    Question(
-        id="metodo-vintage",
-        question="¿Qué significa que los datos estén congelados en un vintage?",
-        collection="metodo", topic="propio",
-        expect_docs=("consolidated-core", "README", "phase2-frontend"),
-        expect_terms=(("vintage",),),
-    ),
-    Question(
-        id="metodo-montecarlo",
-        question="¿Cuántas trayectorias simula el Monte Carlo y con qué semilla?",
-        collection="metodo", topic="propio",
-        expect_docs=("consolidated-core", "debt-scenario-personas", "v16-engine-extract"),
-        expect_terms=(("monte carlo",),),
-    ),
     # ---- the opinion channel, asked on its own terms ----
     Question(
         id="crack-euribor",
@@ -318,20 +290,6 @@ GOLDEN: tuple[Question, ...] = (
         expect_terms=(("deuda", "debt"),),
     ),
     # ---- TFM defense & methodology collection ----
-    Question(
-        id="defensa-doble-motor",
-        question="¿Cómo se garantiza que el motor Python y el motor TypeScript no diverjan?",
-        collection="defensa_tfm", topic="defensa",
-        expect_docs=("DEFENSA_TFM", "README", "v16-engine-extract"),
-        expect_terms=(("anclas", "fixture"), ("paridad", "doble motor")),
-    ),
-    Question(
-        id="defensa-monte-carlo-semilla",
-        question="¿Por qué se fija la semilla en 42 para la simulación Monte Carlo?",
-        collection="defensa_tfm", topic="defensa",
-        expect_docs=("DEFENSA_TFM", "README"),
-        expect_terms=(("semilla", "seed"), ("reproducibilidad", "reproducible")),
-    ),
     # ---- what the corpus cannot answer ----
     Question(
         id="fuera-cuota-autonomos",
@@ -435,6 +393,59 @@ def by_topic() -> dict[str, list[Question]]:
         out.setdefault(q.topic, []).append(q)
     return out
 
+
+#: Preguntas retiradas al dejar de citarse los documentos propios.
+#:
+#: Interrogaban a `metodo` y a `defensa_tfm`, que ya no son fuentes citables:
+#: eran planes de desarrollo y el guion de la defensa. Se conservan aquí, y no
+#: borradas, porque siguen describiendo qué debería saber contestar el sistema
+#: sobre su propio método si algún día vuelve a indexarse esa documentación
+#: —la del TFM, no el registro de cómo se construyó—. No entran en ninguna
+#: métrica: el hit@8 publicado siempre se midió sobre las 35 de `libros`.
+RETIRADAS: tuple[Question, ...] = (
+    Question(
+        id="metodo-palancas",
+        question="¿Qué palancas puede mover el usuario y en qué rangos?",
+        collection="metodo", topic="propio",
+        expect_docs=("v16-engine-extract", "consolidated-core", "phase2-frontend"),
+        expect_terms=(("palanca", "lever"),),
+    ),
+    Question(
+        id="metodo-lineas-rojas",
+        question="¿Qué son las líneas rojas del modelo y en qué umbrales están fijadas?",
+        collection="metodo", topic="propio",
+        expect_docs=("v16-engine-extract", "debt-scenario-personas", "consolidated-core"),
+        expect_terms=(("linea", "line"), ("umbral", "threshold")),
+    ),
+    Question(
+        id="metodo-vintage",
+        question="¿Qué significa que los datos estén congelados en un vintage?",
+        collection="metodo", topic="propio",
+        expect_docs=("consolidated-core", "README", "phase2-frontend"),
+        expect_terms=(("vintage",),),
+    ),
+    Question(
+        id="metodo-montecarlo",
+        question="¿Cuántas trayectorias simula el Monte Carlo y con qué semilla?",
+        collection="metodo", topic="propio",
+        expect_docs=("consolidated-core", "debt-scenario-personas", "v16-engine-extract"),
+        expect_terms=(("monte carlo",),),
+    ),
+    Question(
+        id="defensa-doble-motor",
+        question="¿Cómo se garantiza que el motor Python y el motor TypeScript no diverjan?",
+        collection="defensa_tfm", topic="defensa",
+        expect_docs=("DEFENSA_TFM", "README", "v16-engine-extract"),
+        expect_terms=(("anclas", "fixture"), ("paridad", "doble motor")),
+    ),
+    Question(
+        id="defensa-monte-carlo-semilla",
+        question="¿Por qué se fija la semilla en 42 para la simulación Monte Carlo?",
+        collection="defensa_tfm", topic="defensa",
+        expect_docs=("DEFENSA_TFM", "README"),
+        expect_terms=(("semilla", "seed"), ("reproducibilidad", "reproducible")),
+    ),
+)
 
 ANSWERABLE = tuple(q for q in GOLDEN if not q.unanswerable)
 UNANSWERABLE = tuple(q for q in GOLDEN if q.unanswerable)

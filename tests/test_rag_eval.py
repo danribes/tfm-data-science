@@ -58,15 +58,24 @@ def test_expected_terms_are_alternatives_not_bare_strings():
 
 
 def test_every_collection_is_exercised():
-    """Cada fuente real tiene preguntas doradas.
-
-    `mixto` queda fuera a propósito: no es una fuente, es una vista sobre
-    otras. Sus pasajes salen de las colecciones que sí se evalúan aquí, y
-    exigirle preguntas propias mediría dos veces el mismo material.
-    """
+    """Cada fuente citable tiene preguntas doradas, y ninguna sobra."""
     covered = {q.collection for q in golden.GOLDEN}
-    sources = set(config.COLLECTIONS) - {config.MIXED_ID}
-    assert covered == sources
+    assert covered == set(config.COLLECTIONS)
+
+
+def test_las_preguntas_retiradas_no_entran_en_ninguna_metrica():
+    """Interrogaban a colecciones que ya no son fuentes citables.
+
+    Se conservan porque describen qué debería saber contestar el sistema sobre
+    su propio método, pero no pueden contar: medir sobre una colección que no
+    responde daría un hit@8 falso. El publicado siempre se midió sobre las 35
+    preguntas de `libros`.
+    """
+    activas = {q.id for q in golden.GOLDEN}
+    for q in golden.RETIRADAS:
+        assert q.id not in activas, q.id
+        assert q.collection not in config.COLLECTIONS, q.collection
+    assert sum(1 for q in golden.GOLDEN if q.collection == "libros") == 35
 
 
 # ---- the metrics, on a corpus small enough to reason about ------------------

@@ -211,25 +211,18 @@ def test_reporta_degradado_cuando_el_codificador_cae(corpus, monkeypatch):
     assert res.passages
 
 
-def test_la_degradacion_sobrevive_al_abanico_de_mixto(corpus, monkeypatch):
-    """`_mixto` anida una búsqueda por colección miembro. Un aviso que se
-    perdiera en esa anidación dejaría precisamente el caso desplegado —cuya
-    colección por defecto es `mixto`— informando «hybrid» mientras degrada."""
-    from rag import config, retrieve
-
-    def muerto(*a, **k):
-        raise RuntimeError("sin codificador")
-
-    monkeypatch.setattr(retrieve, "_dense", muerto)
-    res = retrieve.search_reported("deuda", config.MIXED_ID, 4)
-    assert res.degraded is True
-    assert res.mode == "lexical_degraded"
-
-
 def test_una_consulta_no_contagia_su_degradacion_a_la_siguiente(corpus, monkeypatch):
     """El aviso vive en una variable de contexto, no en un global. Con un
     booleano de módulo, la primera caída del codificador marcaría degradadas
-    todas las consultas posteriores del proceso."""
+    todas las consultas posteriores del proceso.
+
+    Antes había además una prueba de que el aviso sobrevivía al abanico de la
+    colección `mixto`, que anidaba una búsqueda por miembro. Esa vista se
+    retiró al dejar de citarse los documentos propios, así que la prueba se
+    quitó en vez de reescribirla contra algo que ya no existe. La propiedad que
+    de verdad sostiene la elección —aislar consultas concurrentes— es la que
+    comprueba ésta.
+    """
     from rag import retrieve
 
     def muerto(*a, **k):
