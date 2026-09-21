@@ -183,20 +183,20 @@ def test_search_all_keeps_sources_separated(db, monkeypatch):
 def test_collections_endpoint_lists_everything_when_nothing_is_restricted():
     """Con el corpus abierto, el listado anuncia las dos colecciones."""
     ids = {c["id"] for c in client.get("/rag/collections").json()["collections"]}
-    assert ids == {"libros", "crack23"}
+    assert ids == {"libros", "metodo", "crack23"}
 
 
 def test_collections_endpoint_hides_the_restricted_ones_when_gated(monkeypatch):
     """Advertising a collection nobody can read is an invitation to try."""
     monkeypatch.setattr("rag.config.RESTRICTED_COLLECTIONS",
-                        frozenset({"crack23"}))
+                        frozenset({"libros", "crack23"}))
     ids = {c["id"] for c in client.get("/rag/collections").json()["collections"]}
-    assert ids == {"libros"}
+    assert ids == {"metodo"}
 
 
 def test_the_open_corpus_needs_no_credential():
     """Lo que la decisión de abrir el corpus significa, dicho como prueba."""
-    for coll in ("libros", "crack23"):
+    for coll in ("libros", "metodo", "crack23"):
         r = client.post("/rag/search", json={"query": "phillips", "collection": coll})
         assert r.status_code != 401, coll
 
@@ -205,8 +205,9 @@ def test_collections_endpoint_lists_everything_for_a_reviewer(gated, monkeypatch
     monkeypatch.setattr("rag.config.REVIEWER_TOKEN", "t0ken")
     body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()
     ids = {c["id"]: c for c in body["collections"]}
-    assert set(ids) == {"libros", "crack23"}
+    assert set(ids) == {"libros", "metodo", "crack23"}
     assert ids["libros"]["authority"] == "academico"
+    assert ids["metodo"]["authority"] == "propio"
     assert ids["crack23"]["authority"] == "opinion"
 
 
@@ -390,15 +391,86 @@ def test_solo_responden_las_fuentes_que_lo_son():
     una pregunta de economía volvía citando una nota de implementación como si
     fuera bibliografía.
     """
-    assert set(config.COLLECTIONS) == {"libros", "crack23"}
+    assert set(config.COLLECTIONS) == {"libros", "metodo", "crack23"}
     assert config.DEFAULT_COLLECTION == "libros"
 
 
-def test_no_queda_ninguna_coleccion_propia_citable():
-    for propia in ("metodo", "defensa_tfm", "mixto"):
-        assert propia not in config.COLLECTIONS, propia
-        r = client.post("/rag/search", json={"query": "phillips", "collection": propia})
-        assert r.status_code == 422, (propia, r.status_code)
+def test_no_queda_ninguna_coleccion_sin_fuente():
+    """La vista mixta y el guion de la defensa no vuelven."""
+    for fuera in ("defensa_tfm", "mixto"):
+        assert fuera not in config.COLLECTIONS, fuera
+        r = client.post("/rag/search", json={"query": "phillips", "collection": fuera})
+        assert r.status_code == 422, (fuera, r.status_code)
+
+
+def test_la_lista_de_citables_excluye_los_planes_de_desarrollo():
+    """La colección vuelve acotada a los documentos que SON el trabajo.
+
+    Lo que la hacía inservible no era citar la propia metodología —un TFM debe
+    poder explicar su método— sino que el registro de cómo se construyó la
+    aplicación era treinta veces mayor que la memoria y ganaba el ranking.
+    """
+    citables = config.CITABLE_DOCS["metodo"]
+    assert {"MEMORIA_TFM", "RESULTS", "REPRODUCIBILITY"} <= citables
+    for plan in ("v16-engine-extract", "2026-08-06-debt-scenario-personas-design",
+                 "2026-08-07-phase2-frontend-implementation", "v16-visual-grammar",
+                 "DEFENSA_TFM"):
+        assert plan not in citables, plan
+
+
+@pytest.fixture()
+def metodo_db(tmp_path, monkeypatch):
+    """Un `metodo` de juguete con una memoria y un plan de desarrollo.
+
+    Construido aquí y no leído del corpus real: ese corpus existe en la máquina
+    del autor y no en CI, y una prueba que dependa de él pasa donde no importa
+    y falla donde sí. El repositorio ya tropezó con eso.
+    """
+    con = store.connect(tmp_path / "m.db")
+    store.init_schema(con)
+    monkeypatch.setattr("rag.embed.embed_passages",
+                        lambda texts, batch_size=None: [fake_vector(t) for t in texts])
+    monkeypatch.setattr("rag.embed.embed_query", lambda t: fake_vector(t))
+    for titulo, textos in (
+        ("MEMORIA_TFM", ["El Monte Carlo simula 4.000 trayectorias con semilla 42."]),
+        ("v16-engine-extract", ["El Monte Carlo simula 4.000 trayectorias con semilla 42."]),
+    ):
+        doc = store.add_document(con, collection="metodo", title=titulo,
+                                 source_path=f"/x/{titulo}", sha256=titulo, pages=1)
+        store.add_chunks(con, doc,
+                         [{"ordinal": i, "page": 1, "section": "1", "text": t}
+                          for i, t in enumerate(textos)],
+                         [fake_vector(t) for t in textos])
+    con.commit()
+    yield con
+    con.close()
+
+
+def test_el_filtro_por_documento_actua_en_las_dos_mitades(metodo_db):
+    """Los dos documentos dicen lo mismo, así que sin filtro los dos salen.
+
+    El filtro tiene que estar en la mitad léxica y en la densa: dejarlo en una
+    sola haría que el documento excluido volviera por la otra.
+    """
+    from rag import retrieve
+
+    consulta = "monte carlo trayectorias semilla"
+    titulo = dict(metodo_db.execute(
+        "SELECT c.id, d.title FROM chunks c JOIN documents d ON d.id = c.doc_id"))
+
+    for fn in (retrieve._lexical, retrieve._dense):
+        ids = fn(metodo_db, consulta, "metodo", 20)
+        assert ids, fn.__name__
+        assert {titulo[i] for i in ids} == {"MEMORIA_TFM"}, (fn.__name__, [titulo[i] for i in ids])
+
+    # y sin filtro sí aparecería el plan: la prueba no es vacía
+    monkey = dict(config.CITABLE_DOCS)
+    config.CITABLE_DOCS.pop("metodo")
+    try:
+        ids = retrieve._lexical(metodo_db, consulta, "metodo", 20)
+        assert "v16-engine-extract" in {titulo[i] for i in ids}
+    finally:
+        config.CITABLE_DOCS.update(monkey)
 
 
 def test_la_opinion_sigue_separada_de_los_manuales():
@@ -408,3 +480,40 @@ def test_la_opinion_sigue_separada_de_los_manuales():
     assert config.COLLECTIONS["crack23"]["authority"] == "opinion"
     assert config.COLLECTIONS["libros"]["authority"] == "academico"
     assert config.DEFAULT_COLLECTION != "crack23"
+
+
+# ---- lo propio informa, pero no se cita -------------------------------------
+
+def test_la_documentacion_propia_no_se_numera():
+    """Puede explicar el método y no puede citarse como bibliografía.
+
+    Lo que no lleva número no se puede citar: los pasajes propios viajan en un
+    bloque CONTEXTO sin numerar, y el verificador de referencias cuenta sólo
+    los citables. Si contase todos, el modelo podría inventar un [4] que
+    apuntara a documentación propia y pasaría la comprobación.
+    """
+    from rag import chat
+
+    class P:
+        def __init__(self, coll):
+            self.collection = coll
+            self.text = "t"
+        def cite(self):
+            return "c"
+
+    libros, metodo = P("libros"), P("metodo")
+    assert chat.is_citable(libros) is True
+    assert chat.is_citable(metodo) is False
+
+    citables, contexto = chat.split_passages([libros, metodo, P("libros")])
+    assert len(citables) == 2 and len(contexto) == 1
+
+    # el bloque numerado nunca contiene lo propio
+    assert "[1]" in chat._format_passages(citables)
+    assert "[" not in chat._format_context(contexto)
+
+
+def test_el_prompt_prohibe_citar_el_contexto():
+    from rag import chat
+    assert "NO lo cites" in chat.SYSTEM or "NUNCA lo cites" in chat.SYSTEM
+    assert "evidencia académica independiente" in chat.SYSTEM

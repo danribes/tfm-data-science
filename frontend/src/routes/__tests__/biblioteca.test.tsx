@@ -131,7 +131,7 @@ describe("Biblioteca — chat con citas", () => {
     await userEvent.click(screen.getAllByRole("button", { name: /multiplicador fiscal/ })[0]);
 
     // Passages first, with the interim wording…
-    await waitFor(() => expect(screen.getByText(/Pasajes recuperados/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/Fuentes citadas/)).toBeInTheDocument());
     expect(screen.getByText(/Redactando la respuesta/)).toBeInTheDocument();
     expect(screen.getByText(/Documento Ocasional 1803/)).toBeInTheDocument();
 
@@ -196,5 +196,25 @@ describe("Biblioteca — chat con citas", () => {
 
     await waitFor(() => expect(screen.getByText(/No se pudo consultar la biblioteca/)).toBeInTheDocument());
     expect(screen.getByText(/boom/)).toBeInTheDocument();
+  });
+});
+
+describe("lo propio informa, pero no se cita", () => {
+  it("separa las fuentes citables de la documentación del trabajo", () => {
+    // La propiedad, en una línea: el número ES la cita, así que lo que no se
+    // cita no lleva número. Un pasaje `citable: false` no puede aparecer
+    // numerado junto a un manual.
+    const passages = [
+      { chunk_id: 1, authority: "academico", citable: true },
+      { chunk_id: 2, authority: "propio", citable: false },
+      { chunk_id: 3, authority: "academico", citable: undefined },
+    ];
+    const citables = passages.filter((p) => p.citable !== false);
+    const contexto = passages.filter((p) => p.citable === false);
+    expect(citables.map((p) => p.chunk_id)).toEqual([1, 3]);
+    expect(contexto.map((p) => p.chunk_id)).toEqual([2]);
+    // `citable` ausente se trata como citable: una respuesta guardada por una
+    // versión anterior no debe desaparecer de la lista de fuentes.
+    expect(citables).toContainEqual(expect.objectContaining({ chunk_id: 3 }));
   });
 });

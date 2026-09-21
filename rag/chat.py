@@ -47,9 +47,12 @@ Reglas duras:
 3. Distingue la autoridad de la fuente. Un manual académico y una transcripción \
    de un canal de YouTube no valen lo mismo: si citas material marcado como \
    «opinion», dilo explícitamente («según el canal…, que es una opinión, no un \
-   manual»). El material «propio» describe este proyecto: identifícalo como \
-   documentación del proyecto, sin presentarlo como evidencia académica \
-   independiente.
+   manual»).
+3b. El bloque CONTEXTO, cuando aparezca, es documentación del propio trabajo. \
+   Úsalo para explicar cómo está hecho el modelo, pero NUNCA lo cites ni le \
+   asignes número: no lleva ninguno. Si respondes apoyándote en él, dilo en \
+   prosa («según la documentación del propio trabajo») y sin corchetes. No es \
+   evidencia académica independiente y no debe presentarse como tal.
 4. Si los pasajes se contradicen, muéstralo en vez de elegir uno en silencio.
 
 Estilo: español de España, frases con verbo, prosa y no listas de viñetas salvo \
@@ -76,12 +79,29 @@ class Answer:
     degraded: bool = False
 
 
+def is_citable(passage) -> bool:
+    """La regla vive en config: la conocen tanto el chat como /rag/search."""
+    return config.is_citable(passage.collection)
+
+
+def split_passages(passages: Sequence) -> tuple[list, list]:
+    """(citables, contexto). El orden dentro de cada grupo se conserva."""
+    citables = [p for p in passages if is_citable(p)]
+    contexto = [p for p in passages if not is_citable(p)]
+    return citables, contexto
+
+
 def _format_passages(passages: Sequence) -> str:
     out = []
     for i, p in enumerate(passages, 1):
         auth = config.COLLECTIONS[p.collection]["authority"]
         out.append(f"[{i}] ({auth}) {p.cite()}\n{p.text}")
     return "\n\n---\n\n".join(out)
+
+
+def _format_context(passages: Sequence) -> str:
+    """Sin números: lo que no se numera no se puede citar."""
+    return "\n\n---\n\n".join(f"({p.cite()})\n{p.text}" for p in passages)
 
 
 def _call(provider: dict, messages: list[dict], max_tokens: int,
@@ -191,9 +211,10 @@ def stream(question: str, collection: str | None = None, *,
 
     _res = retrieve.search_reported(question, collection, top_k)
     passages = _res.passages
-    yield "passages", {"passages": [p.to_dict() for p in passages],
-                       "grounded": bool(passages),
-                       "retrieval_mode": _res.mode, "degraded": _res.degraded}
+    yield "passages", {
+        "passages": [p.to_dict() for p in passages],
+        "grounded": bool(passages),
+        "retrieval_mode": _res.mode, "degraded": _res.degraded}
 
     if not passages:
         yield "done", {"answer": ("El corpus no cubre esta pregunta. Prueba a "
@@ -201,7 +222,14 @@ def stream(question: str, collection: str | None = None, *,
                        "grounded": False, "provider": None, "model": None}
         return
 
-    user = f"PREGUNTA:\n{question}\n\nPASAJES:\n{_format_passages(passages)}"
+    # Sólo los citables llevan número. El resto viaja como CONTEXTO: informa la
+    # respuesta y no puede citarse, porque lo que no tiene número no se cita.
+    citables, contexto = split_passages(passages)
+    user = f"PREGUNTA:\n{question}\n\nPASAJES:\n{_format_passages(citables)}"
+    if contexto:
+        user += ("\n\nCONTEXTO (documentación del propio trabajo; explica cómo "
+                 "está hecho el modelo. NO lo cites ni le pongas número):\n"
+                 + _format_context(contexto))
     if scenario_facts:
         import json as _json
         user += ("\n\nESCENARIO ACTIVO DEL USUARIO (calculado por el motor, "
@@ -217,7 +245,8 @@ def stream(question: str, collection: str | None = None, *,
             for piece in _call_stream(prov, messages, max_tokens, timeout):
                 parts.append(piece)
             if parts:
-                answer = checked_answer("".join(parts), len(passages))
+                answer = checked_answer("".join(parts), len(citables),
+                                        context_only=not citables and bool(contexto))
                 yield "delta", {"text": answer}
                 yield "done", {"answer": answer, "grounded": True,
                                "provider": prov["name"], "model": prov["model"]}
@@ -301,7 +330,12 @@ def ask(question: str, collection: str | None = None, *, top_k: int | None = Non
             retrieval_mode=_mode, degraded=_deg,
         )
 
-    user = f"PREGUNTA:\n{question}\n\nPASAJES:\n{_format_passages(passages)}"
+    citables, contexto = split_passages(passages)
+    user = f"PREGUNTA:\n{question}\n\nPASAJES:\n{_format_passages(citables)}"
+    if contexto:
+        user += ("\n\nCONTEXTO (documentación del propio trabajo; explica cómo "
+                 "está hecho el modelo. NO lo cites ni le pongas número):\n"
+                 + _format_context(contexto))
     if scenario_facts:
         # The differentiator: the reader's live scenario travels with the
         # question, so the answer can connect textbook theory to the numbers
@@ -320,7 +354,8 @@ def ask(question: str, collection: str | None = None, *, top_k: int | None = Non
         try:
             text = _call(prov, messages, max_tokens, timeout)
             if text:
-                text = checked_answer(text, len(passages))
+                text = checked_answer(text, len(citables),
+                                      context_only=not citables and bool(contexto))
                 return Answer(text=text, passages=dicts, provider=prov["name"],
                               model=prov["model"], grounded=True,
                               retrieval_mode=_mode, degraded=_deg)

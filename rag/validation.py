@@ -33,12 +33,26 @@ def citation_references(text: str) -> list[int]:
             for ref in group.split(",")]
 
 
-def checked_answer(text: str, n_passages: int) -> str:
+def checked_answer(text: str, n_passages: int, *,
+                   context_only: bool = False) -> str:
     """Require references within the supplied context, or a fixed abstention.
 
 An uncited provider refusal is replaced in full, so a disclaimer followed by
 unsupported prose cannot bypass the reference check. Per-claim support and
 coverage are not established here.
+
+`context_only` es el caso en que no había NADA que citar: la pregunta se
+respondió con documentación del propio trabajo, que por decisión de diseño no
+lleva número y por tanto no puede referenciarse. Exigir una cita ahí no
+protegía nada —no existía ninguna cita posible— y tiraba a la basura una
+respuesta correcta, que es como se descubrió.
+
+Lo que sigue protegiendo: un corchete numérico mal formado sigue siendo un
+error, y como `n_passages` vale 0 en ese modo, CUALQUIER referencia numérica
+cae fuera del rango y también lo es. Es decir, en modo contexto la respuesta
+sólo se acepta si no cita nada en absoluto. Lo que se pierde es la garantía de
+que cada frase apunte a un pasaje; queda dicho aquí y en la interfaz, que
+muestra esos pasajes bajo su propio epígrafe.
     """
     for bracket in re.findall(r"\[[^\]\n]*\]", text):
         if re.search(r"\d", bracket) and not _CITE.fullmatch(bracket):
@@ -47,6 +61,8 @@ coverage are not established here.
     if not refs:
         if is_refusal(text):
             return CORPUS_REFUSAL
+        if context_only:
+            return text
         raise ValueError("respuesta sin referencias a los pasajes")
     invalid = sorted({ref for ref in refs if not 1 <= ref <= n_passages})
     if invalid:

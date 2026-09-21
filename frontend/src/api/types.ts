@@ -296,6 +296,10 @@ export interface Passage {
   section: string | null;
   score: number;
   cita: string;
+  /** Si puede citarse como fuente. La documentación del propio trabajo entra
+   *  como contexto —explica el método— pero no se numera ni se cita: un TFM no
+   *  es evidencia independiente de sí mismo. */
+  citable?: boolean;
 }
 
 export interface RagSearchRequest { query: string; collection?: string; top_k?: number }

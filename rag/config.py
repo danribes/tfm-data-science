@@ -83,11 +83,75 @@ CRACK_DIR = DATA_ROOT / "crack23"
 #: responde ahora son las 58 obras académicas, que es lo que un tribunal puede
 #: comprobar. Los documentos propios siguen en el repositorio y en el índice;
 #: lo que se ha retirado es su condición de fuente citable.
+#: Dentro de una colección, qué documentos pueden citarse. Ausente = todos.
+#:
+#: `metodo` vuelve, pero sólo con los documentos que SON el trabajo. Lo que la
+#: hacía inservible como fuente no era la idea de citar la propia metodología
+#: —un TFM debe poder explicar su método— sino que la colección mezclaba la
+#: memoria con el registro de cómo se construyó la aplicación, y ese registro
+#: era treinta veces mayor: 88 fragmentos de un documento de implementación del
+#: frontend, 53 del núcleo, 41 de un extracto del motor, frente a 23 entre la
+#: memoria, los resultados y la reproducibilidad. En un ranking por relevancia
+#: ganaba el andamio, no el edificio.
+#:
+#: Se filtra por documento en vez de reindexar: los fragmentos excluidos siguen
+#: en el índice y nunca se devuelven, así que la decisión es reversible sin
+#: reconstruir 201 MB. `DEFENSA_TFM` queda fuera por separado — es el guion de
+#: la defensa, no documentación del método.
+CITABLE_DOCS: dict[str, frozenset[str]] = {
+    "metodo": frozenset({
+        "MEMORIA_TFM",          # la memoria
+        "RESULTS",              # qué mide cada componente y con qué límite
+        "REPRODUCIBILITY",      # cómo se reproduce
+        "METHODOLOGY_CHANGES",  # qué cambió del método y por qué
+        "README",               # el contrato público del repositorio
+    }),
+}
+
+
+#: Autoridades cuyos pasajes NO se citan.
+#:
+#: La documentación del propio trabajo puede explicar el método —un TFM debe
+#: poder hacerlo— pero no es evidencia independiente de sí mismo, y numerarla
+#: junto a un manual la presenta como bibliografía. Entra como contexto.
+CONTEXT_ONLY_AUTHORITIES = frozenset({"propio", "defensa"})
+
+
+def is_citable(collection: str) -> bool:
+    """Si un pasaje de esta colección puede llevar número de cita."""
+    return (COLLECTIONS.get(collection, {}).get("authority", "")
+            not in CONTEXT_ONLY_AUTHORITIES)
+
+
+def citable_clause(collection: str) -> tuple[str, tuple[str, ...]]:
+    """Cláusula SQL y parámetros que restringen a los documentos citables.
+
+    Se consulta en cada búsqueda y no al importar. El modo público queda exento
+    porque su corpus ya viene curado documento a documento por
+    `rag/public_sources.json`: aplicarle la lista del corpus completo lo dejaba
+    sin resultados, filtrando por títulos que allí no existen.
+    """
+    if PUBLIC_MODE:
+        return "", ()
+    titulos = CITABLE_DOCS.get(collection)
+    if not titulos:
+        return "", ()
+    marcas = ",".join("?" * len(titulos))
+    return f" AND d.title IN ({marcas})", tuple(sorted(titulos))
+
+
 COLLECTIONS = {
     "libros": {
         "label": "Economía y métodos",
         "authority": "academico",
         "note": "Manuales de economía y econometría. Documentos e índice almacenados localmente; los pasajes recuperados se envían al proveedor de IA configurado para redactar respuestas.",
+    },
+    "metodo": {
+        "label": "Método del propio trabajo",
+        "authority": "propio",
+        "note": "La memoria, los resultados, la reproducibilidad y los cambios "
+                "de método. Documentación del TFM, no el registro de cómo se "
+                "construyó la aplicación: los planes de desarrollo quedan fuera.",
     },
     "crack23": {
         "label": "Canal crack23",
@@ -109,6 +173,7 @@ if PUBLIC_MODE:
             "note": "Guía de defensa escrita para este proyecto; no es una fuente académica independiente. Búsqueda por palabras (BM25).",
         },
     }
+
 
 # ---- store ------------------------------------------------------------------
 

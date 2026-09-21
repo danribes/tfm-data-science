@@ -354,6 +354,34 @@ GOLDEN: tuple[Question, ...] = (
                      "IPC usos"),
         expect_terms=(("anclad", "anchor", "objetivo"), ("inflacion", "inflation")),
     ),
+    Question(
+        id="metodo-palancas",
+        question="¿Qué palancas puede mover el usuario y en qué rangos?",
+        collection="metodo", topic="propio",
+        expect_docs=("v16-engine-extract", "consolidated-core", "phase2-frontend"),
+        expect_terms=(("palanca", "lever"),),
+    ),
+    Question(
+        id="metodo-lineas-rojas",
+        question="¿Qué son las líneas rojas del modelo y en qué umbrales están fijadas?",
+        collection="metodo", topic="propio",
+        expect_docs=("v16-engine-extract", "debt-scenario-personas", "consolidated-core"),
+        expect_terms=(("linea", "line"), ("umbral", "threshold")),
+    ),
+    Question(
+        id="metodo-vintage",
+        question="¿Qué significa que los datos estén congelados en un vintage?",
+        collection="metodo", topic="propio",
+        expect_docs=("consolidated-core", "README", "phase2-frontend"),
+        expect_terms=(("vintage",),),
+    ),
+    Question(
+        id="metodo-montecarlo",
+        question="¿Cuántas trayectorias simula el Monte Carlo y con qué semilla?",
+        collection="metodo", topic="propio",
+        expect_docs=("consolidated-core", "debt-scenario-personas", "v16-engine-extract"),
+        expect_terms=(("monte carlo",),),
+    ),
 )
 
 
@@ -402,35 +430,12 @@ def by_topic() -> dict[str, list[Question]]:
 #: sobre su propio método si algún día vuelve a indexarse esa documentación
 #: —la del TFM, no el registro de cómo se construyó—. No entran en ninguna
 #: métrica: el hit@8 publicado siempre se midió sobre las 35 de `libros`.
+#: Preguntas retiradas con la colección a la que interrogaban.
+#:
+#: `defensa_tfm` es el guion de la defensa, no documentación del método: se
+#: retiró como fuente citable y sus preguntas se conservan aquí, sin entrar en
+#: ninguna métrica, por si esa documentación vuelve a indexarse algún día.
 RETIRADAS: tuple[Question, ...] = (
-    Question(
-        id="metodo-palancas",
-        question="¿Qué palancas puede mover el usuario y en qué rangos?",
-        collection="metodo", topic="propio",
-        expect_docs=("v16-engine-extract", "consolidated-core", "phase2-frontend"),
-        expect_terms=(("palanca", "lever"),),
-    ),
-    Question(
-        id="metodo-lineas-rojas",
-        question="¿Qué son las líneas rojas del modelo y en qué umbrales están fijadas?",
-        collection="metodo", topic="propio",
-        expect_docs=("v16-engine-extract", "debt-scenario-personas", "consolidated-core"),
-        expect_terms=(("linea", "line"), ("umbral", "threshold")),
-    ),
-    Question(
-        id="metodo-vintage",
-        question="¿Qué significa que los datos estén congelados en un vintage?",
-        collection="metodo", topic="propio",
-        expect_docs=("consolidated-core", "README", "phase2-frontend"),
-        expect_terms=(("vintage",),),
-    ),
-    Question(
-        id="metodo-montecarlo",
-        question="¿Cuántas trayectorias simula el Monte Carlo y con qué semilla?",
-        collection="metodo", topic="propio",
-        expect_docs=("consolidated-core", "debt-scenario-personas", "v16-engine-extract"),
-        expect_terms=(("monte carlo",),),
-    ),
     Question(
         id="defensa-doble-motor",
         question="¿Cómo se garantiza que el motor Python y el motor TypeScript no diverjan?",

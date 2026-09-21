@@ -355,6 +355,10 @@ class PassageOut(BaseModel):
     #: "academico" | "propio" | "opinion" — se muestra al lector; un manual y un
     #: canal de YouTube no se citan con la misma autoridad.
     authority: str
+    #: Si puede citarse como fuente. La documentación del propio trabajo entra
+    #: como contexto —explica el método— pero no se numera ni se cita: un TFM
+    #: no es evidencia independiente de sí mismo.
+    citable: bool = True
     page: int | None = None
     section: str | None = None
     score: float

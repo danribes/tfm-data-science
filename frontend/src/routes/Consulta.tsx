@@ -176,15 +176,25 @@ export default function Consulta() {
 
             {passages.length > 0 && (
               <details className="consulta-passages">
+                {/* Se cuentan como «fuentes» sólo las que lo son. La
+                    documentación del propio trabajo se lista igual —para poder
+                    comprobarla— pero etiquetada aparte y fuera del recuento. */}
                 <summary>
-                  {passages.length} {passages.length === 1 ? "fuente" : "fuentes"}
+                  {(() => {
+                    const n = passages.filter((p) => p.citable !== false).length;
+                    const c = passages.length - n;
+                    return `${n} ${n === 1 ? "fuente" : "fuentes"}` +
+                      (c > 0 ? ` · ${c} de documentación propia` : "");
+                  })()}
                 </summary>
                 <ol className="passages-list">
                   {passages.map((p, i) => (
                     <li key={i} className={`psg ${p.authority}`}>
                       <span className="psg-cite">{p.cita}</span>
                       <span className={`psg-auth ${p.authority}`}>
-                        {AUTHORITY_LABEL[p.authority] ?? p.authority}
+                        {p.citable === false
+                          ? "documentación propia · no citable"
+                          : AUTHORITY_LABEL[p.authority] ?? p.authority}
                       </span>
                       <p className="psg-text">{p.text}</p>
                     </li>

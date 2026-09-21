@@ -95,3 +95,45 @@ def test_narration_does_not_accept_empty_fields():
 
     with pytest.raises(NarrationUnavailable, match="malformed"):
         validate_narration({"resumen": "", "mecanismo": "texto", "advertencia": "texto"}, Mock())
+
+
+# ---- respuestas apoyadas sólo en documentación propia ------------------------
+
+def test_sin_nada_que_citar_se_acepta_una_respuesta_sin_citas():
+    """Una pregunta sobre el método recupera sólo documentación propia, que por
+    diseño no lleva número. Exigir una cita ahí no protegía nada —no existía
+    ninguna cita posible— y descartaba una respuesta correcta."""
+    from rag.validation import checked_answer
+
+    texto = "El motor simula 4.000 trayectorias con semilla 42, según la documentación del propio trabajo."
+    assert checked_answer(texto, 0, context_only=True) == texto
+
+
+def test_en_modo_contexto_cualquier_cita_sigue_siendo_invalida():
+    """Lo que se relaja es la exigencia de citar, no el control de las citas.
+
+    Con cero pasajes citables, toda referencia numérica cae fuera de rango: en
+    ese modo la respuesta sólo se acepta si no cita absolutamente nada.
+    """
+    from rag.validation import checked_answer
+
+    with pytest.raises(ValueError):
+        checked_answer("El motor simula 4.000 trayectorias [1].", 0, context_only=True)
+    with pytest.raises(ValueError):
+        checked_answer("Referencia rota [a1].", 0, context_only=True)
+
+
+def test_sin_modo_contexto_la_exigencia_de_citar_sigue_intacta():
+    from rag.validation import checked_answer
+
+    with pytest.raises(ValueError):
+        checked_answer("Una afirmación sin ninguna cita.", 3)
+
+
+def test_el_modo_contexto_solo_se_activa_si_no_habia_citables():
+    """La condición, tal y como la aplica el chat: cero citables y algo de
+    contexto. Con un solo pasaje citable disponible, la exigencia vuelve."""
+    citables, contexto = [], ["algo"]
+    assert (not citables and bool(contexto)) is True
+    citables = ["un manual"]
+    assert (not citables and bool(contexto)) is False

@@ -166,23 +166,29 @@ entero sin credencial. Dos colecciones responden a las consultas:
 
 `corpus_scope` vale `full_open` y la colección por defecto es `libros`.
 
-**Sólo se cita lo que es una fuente.** Hubo antes tres colecciones propias
-—`metodo`, `defensa_tfm`— y una vista `mixto` que las fundía con los manuales,
-de modo que una pregunta se contestaba a la vez con la literatura y con la
-documentación del proyecto. La idea era razonable; el contenido no la
-sostenía. De los quince documentos propios indexados, los de mayor tamaño eran
-planes de desarrollo: 88 fragmentos de un documento de implementación del
-frontend, 53 de otro del núcleo, 41 de un extracto del motor, frente a 23
-fragmentos entre la memoria, los resultados y la reproducibilidad. En un
-ranking por relevancia ganaba el registro de cómo se construyó la aplicación,
-así que una pregunta de economía volvía citando una nota de implementación
-—o el guion de la defensa— como si fuera bibliografía.
+**Sólo se cita lo que es una fuente.** La colección `metodo` existe y se
+consulta —una aplicación que explica un modelo tiene que poder explicar su
+método— pero está acotada a los documentos que SON el trabajo: la memoria, los
+resultados, la reproducibilidad, los cambios de método y el README. Quedan
+fuera los planes de desarrollo y el guion de la defensa.
 
-Un trabajo que se cita a sí mismo como autoridad no demuestra nada. Lo que
-responde ahora son las 58 obras académicas, que es lo que un tribunal puede
-comprobar: manuales de economía y econometría, informes del Banco de España y
-del BCE. Los documentos propios siguen en el repositorio y en el índice; lo que
-se ha retirado es su condición de fuente citable.
+Hizo falta acotarla porque el contenido no sostenía la idea. De los quince
+documentos propios indexados, los mayores eran el registro de cómo se
+construyó la aplicación: 88 fragmentos de un documento de implementación del
+frontend, 53 del núcleo, 41 de un extracto del motor, frente a 23 entre la
+memoria, los resultados y la reproducibilidad. En un ranking por relevancia
+ganaba el andamio, no el edificio, y una pregunta de economía volvía citando
+una nota de implementación como si fuera bibliografía. Se filtra por documento
+y no reindexando, así que la lista es reversible sin reconstruir 201 MB.
+
+**Y lo propio informa, pero no se cita.** Un trabajo no es evidencia
+independiente de sí mismo. Sus pasajes viajan al modelo en un bloque
+`CONTEXTO` sin numerar —lo que no lleva número no se puede citar— y la
+interfaz los muestra bajo «Documentación del propio trabajo consultada», fuera
+del recuento de fuentes. Cuando una pregunta se responde sólo con ellos, la
+respuesta no lleva ninguna cita y lo dice en prosa. El verificador de
+referencias sigue rechazando cualquier corchete numérico en ese caso: si no
+había nada citable, citar algo es inventarlo.
 
 `crack23` se mantiene por separado y nunca se ordena contra un manual: la regla
 del recuperador no es «una colección cada vez» sino «no enfrentar autoridades

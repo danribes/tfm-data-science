@@ -88,7 +88,11 @@ class Passage:
         return " · ".join(bits)
 
     def to_dict(self) -> dict:
-        return {**asdict(self), "cita": self.cite()}
+        # `citable` viaja con el pasaje y no lo pone cada llamante: se anadio
+        # primero solo en el chat y /rag/search siguio devolviendo todo como
+        # citable, que es justo el error que este campo existe para evitar.
+        return {**asdict(self), "cita": self.cite(),
+                "citable": config.is_citable(self.collection)}
 
 
 #: FTS5 treats a bare query as a match expression, so user text like
@@ -109,13 +113,18 @@ def _lexical(con: sqlite3.Connection, query: str, collection: str,
     expr = _fts_query(glossary.expand(query) if config.USE_GLOSSARY else query)
     if not expr:
         return []
+    # Algunas colecciones sólo citan parte de sus documentos: ver
+    # config.CITABLE_DOCS. El filtro va en las dos mitades del recuperador,
+    # porque dejarlo en una sola haría que el documento excluido apareciera por
+    # la otra.
+    extra, titulos = config.citable_clause(collection)
     rows = con.execute(
         "SELECT c.id FROM chunks_fts f"
         " JOIN chunks c ON c.id = f.rowid"
         " JOIN documents d ON d.id = c.doc_id"
-        " WHERE chunks_fts MATCH ? AND d.collection = ?"
+        " WHERE chunks_fts MATCH ? AND d.collection = ?" + extra +
         " ORDER BY bm25(chunks_fts) LIMIT ?",
-        (expr, collection, limit),
+        (expr, collection, *titulos, limit),
     ).fetchall()
     return [r[0] for r in rows]
 
@@ -129,12 +138,13 @@ def _dense(con: sqlite3.Connection, query: str, collection: str,
     # Over-fetch then filter by collection: vec0 KNN cannot join in its own
     # WHERE clause, so a collection with few chunks would otherwise come back
     # empty when another collection dominates the global neighbourhood.
+    extra, titulos = config.citable_clause(collection)
     rows = con.execute(
         "SELECT v.chunk_id FROM chunks_vec v"
         " JOIN chunks c ON c.id = v.chunk_id"
         " JOIN documents d ON d.id = c.doc_id"
-        " WHERE v.embedding MATCH ? AND k = ? AND d.collection = ?",
-        (blob, limit * 4, collection),
+        " WHERE v.embedding MATCH ? AND k = ? AND d.collection = ?" + extra,
+        (blob, limit * 4, collection, *titulos),
     ).fetchall()
     return [r[0] for r in rows][:limit]
 

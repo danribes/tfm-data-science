@@ -17,12 +17,14 @@ const AUTHORITY_LABEL: Record<Authority, string> = {
   opinion: "opinión — no es fuente académica",
 };
 
-function PassageCard({ p, index }: { p: Passage; index: number }) {
+/** `index` ausente = pasaje de contexto: se muestra sin número, porque el
+ *  número es la cita y esto no se cita. */
+function PassageCard({ p, index }: { p: Passage; index?: number }) {
   const [open, setOpen] = useState(false);
   return (
     <li className={`psg ${p.authority}`}>
       <div className="psg-head">
-        <span className="psg-n">[{index}]</span>
+        {index !== undefined && <span className="psg-n">[{index}]</span>}
         <span className="psg-cite">{p.cita}</span>
         <span className={`psg-auth ${p.authority}`}>{AUTHORITY_LABEL[p.authority]}</span>
       </div>
@@ -123,6 +125,14 @@ export default function Biblioteca() {
   };
 
   const shown = passages;
+
+  // Sólo se numera lo citable. `citable` lo marca la API; si falta
+
+  // —una respuesta de una versión anterior— se asume citable.
+
+  const citables = shown.filter((p) => p.citable !== false);
+
+  const contexto = shown.filter((p) => p.citable === false);
   // While streaming, render what has arrived; once done, the final text (they
   // agree, but `done` is authoritative if a provider died mid-stream).
   const answerText = answer?.answer ?? streamed;
@@ -253,15 +263,42 @@ export default function Biblioteca() {
 
           {shown.length > 0 && (
             <>
+              {/* Dos listas, y no una ordenada por relevancia.
+                  Lo propio explica cómo está hecho el modelo, pero no es
+                  evidencia independiente de sí mismo: se numera sólo lo
+                  citable, porque el número ES la cita. */}
               <h4 className="biblio-src">
-                Pasajes recuperados{" "}
-                <small>{shown.length}</small>
+                Fuentes citadas <small>{citables.length}</small>
               </h4>
+              {citables.length === 0 && (
+                <p className="foot">
+                  Ninguna: la respuesta se apoya sólo en documentación del
+                  propio trabajo, que no se cita como fuente.
+                </p>
+              )}
               <ol className="psg-list">
-                {shown.map((p, i) => (
+                {citables.map((p, i) => (
                   <PassageCard key={p.chunk_id} p={p} index={i + 1} />
                 ))}
               </ol>
+              {contexto.length > 0 && (
+                <>
+                  <h4 className="biblio-src">
+                    Documentación del propio trabajo consultada{" "}
+                    <small>{contexto.length}</small>
+                  </h4>
+                  <p className="foot">
+                    Explica cómo está construido el modelo. No lleva número
+                    porque no se cita: un trabajo no es evidencia independiente
+                    de sí mismo.
+                  </p>
+                  <ol className="psg-list sin-cita">
+                    {contexto.map((p) => (
+                      <PassageCard key={p.chunk_id} p={p} />
+                    ))}
+                  </ol>
+                </>
+              )}
             </>
           )}
 
