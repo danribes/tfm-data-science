@@ -25,12 +25,25 @@ describe("App shell", () => {
       expect(screen.queryByText(/desajuste del motor/i)).toBeNull());
   });
 
-  it("theme toggle stamps data-theme and persists", async () => {
+  it("theme toggle cycles system → light → dark and persists the choice", async () => {
     render(<App />);
     await waitFor(() => screen.getByRole("button", { name: /tema/i }));
-    await userEvent.click(screen.getByRole("button", { name: /tema/i }));
+    const button = () => screen.getByRole("button", { name: /tema/i });
+
+    // Arranca siguiendo al sistema, que no guarda nada: la ausencia de valor
+    // es lo que hace que «sistema» sea el estado por defecto de verdad.
+    expect(localStorage.getItem("theme")).toBeNull();
+
+    await userEvent.click(button());
+    expect(document.documentElement.dataset.theme).toBe("light");
+    expect(localStorage.getItem("theme")).toBe("light");
+
+    await userEvent.click(button());
     expect(document.documentElement.dataset.theme).toBe("dark");
     expect(localStorage.getItem("theme")).toBe("dark");
+
+    await userEvent.click(button());
+    expect(localStorage.getItem("theme")).toBeNull();
   });
 
   it("API down → wake-up screen while retrying, then the blocking screen", async () => {
