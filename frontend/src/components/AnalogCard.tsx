@@ -81,18 +81,35 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
       <p className="src">La sostenibilidad de la deuda no se estima: el panel carece de
         un coste efectivo soberano comparable. El tipo de préstamo bancario no entra en la búsqueda.</p>
 
-      {/* Trajectory chart */}
-      <h5 style={{ marginTop: 14, marginBottom: 4 }}>Trayectoria ({m.outcome.length} años)</h5>
-      <ProjectionChart
-        historical
-        years={outcomeYears}
-        baseline={debtOutcome}
-        scenario={debtOutcome}
-        unit="%PIB"
-        dec={1}
-        height={180}
-        labels={outcomeYears.map(String)}
-      />
+      {/* Trajectory chart
+          Con un solo punto no hay trayectoria que dibujar: el gráfico salía
+          con un dato suelto y los ejes repitiendo el mismo año. Puede ocurrir
+          porque se pida un recorrido corto o porque la serie del país se
+          acabe. Se dice, en vez de pintar una línea de un punto. */}
+      <h5 style={{ marginTop: 14, marginBottom: 4 }}>
+        Trayectoria ({m.outcome.length} {m.outcome.length === 1 ? "año" : "años"})
+      </h5>
+      {debtOutcome.filter((v) => v !== null && v !== undefined).length < 2 ? (
+        <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "6px 0 0" }}>
+          Sin trayectoria que dibujar: sólo hay{" "}
+          {debtOutcome.filter((v) => v !== null && v !== undefined).length === 1
+            ? "un año con dato"
+            : "años sin dato"}{" "}
+          después de {m.match_year}. Con un único punto no se puede trazar una
+          línea, así que no se traza.
+        </p>
+      ) : (
+        <ProjectionChart
+          historical
+          years={outcomeYears}
+          baseline={debtOutcome}
+          scenario={debtOutcome}
+          unit="%PIB"
+          dec={1}
+          height={180}
+          labels={outcomeYears.map(String)}
+        />
+      )}
       {m.outcome_truncated && (
         <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
           ⚠ Datos disponibles solo hasta {Math.max(...m.outcome.filter((p) => !p.truncated).map((p) => m.match_year + p.year_offset), m.match_year)}. Puntos restantes sin datos.

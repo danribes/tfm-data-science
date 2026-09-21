@@ -16,6 +16,7 @@ import { BudgetFlowChart } from "../components/BudgetFlowChart";
 import { DebtAmortizationFlowChart } from "../components/DebtAmortizationFlowChart";
 import { EmpiricalTwin } from "../components/EmpiricalTwin";
 import { AnalogPanel } from "../components/AnalogPanel";
+import { anioDeConsulta } from "../lib/analogHorizon";
 
 export default function Laboratorio() {
   const [seriesKey, setSeriesKey] = useState<AnySeriesKey>("b");
@@ -129,7 +130,9 @@ export default function Laboratorio() {
 
       <EmpiricalTwin />
 
-      <AnalogPanel levers={levers} horizon={horizon} />
+      {/* Mismo suelo que en la portada: pedir el año de entrada devolvía
+          un recorrido de un año y la trayectoria salía con un solo punto. */}
+      <AnalogPanel levers={levers} horizon={anioDeConsulta(horizon)} />
 
       <div className="card" style={{ marginTop: 16 }}>
         <h4>Matriz de Sensibilidad y Elasticidades Marginales <small>∂Y / ∂L en 2030 y 2050</small></h4>

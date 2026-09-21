@@ -1,7 +1,7 @@
 import { useAnalogs } from "../api/hooks";
 import { nf } from "../lib/fmt";
 import { Caption } from "./Caption";
-import { Y0 } from "../engine/spain";
+import { anioDeConsulta } from "../lib/analogHorizon";
 import { useScenarioStore } from "../state/scenarioStore";
 
 /** España al lado de los demás países.
@@ -25,25 +25,10 @@ const COLS: { k: string; lab: string; dec: number }[] = [
   { k: "unemployment", lab: "Paro", dec: 1 },
 ];
 
-/** Nunca por debajo de una década de recorrido.
- *
- *  La API deriva dos cosas del año pedido: sobre qué foto del escenario busca
- *  parecidos, y cuántos años de después enseña. En el estado de entrada el año
- *  es Y0, y entonces las dos salen inservibles — busca países parecidos a la
- *  España observada de hoy, sin escenario, y enseña qué les pasó al año
- *  siguiente. Es el mismo aterrizaje en Y0 que ya se corrigió en las fichas de
- *  perfil: un resultado correcto que se lee como una función rota.
- *
- *  Esto no toca el año del panel —lo comparten otros componentes—; sólo pide
- *  el suyo. Un año que el lector haya elegido por encima de ese suelo se
- *  respeta.
- */
-const RECORRIDO_MIN = 10;
-
 export function SpainAmongOthers() {
   const levers = useScenarioStore((s) => s.levers);
   const horizon = useScenarioStore((s) => s.horizon);
-  const anio = Math.max(horizon, Y0 + RECORRIDO_MIN);
+  const anio = anioDeConsulta(horizon);
   const q = useAnalogs(levers, anio);
 
   if (q.isError) {

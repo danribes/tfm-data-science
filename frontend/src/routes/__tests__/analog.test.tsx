@@ -84,15 +84,13 @@ const MOCK_MATCHES: AnalogMatch[] = [1, 2, 3].map((rank) => ({
     inflation: 2,
     r_minus_g: 4,
   },
+  // Tres años, no uno. Con un solo punto no hay trayectoria que dibujar y la
+  // tarjeta lo dice en vez de pintar una línea imposible, así que un fixture
+  // de un punto probaba el caso degenerado y no el normal.
   outcome: [
-    {
-      year_offset: 1,
-      debt_gdp: 105,
-      gdp_growth: 1.2,
-      overall_balance_gdp: -3,
-      r_minus_g: 3.8,
-      truncated: false,
-    },
+    { year_offset: 1, debt_gdp: 105, gdp_growth: 1.2, overall_balance_gdp: -3, r_minus_g: 3.8, truncated: false },
+    { year_offset: 2, debt_gdp: 103.4, gdp_growth: 1.6, overall_balance_gdp: -2.4, r_minus_g: 3.1, truncated: false },
+    { year_offset: 3, debt_gdp: 100.9, gdp_growth: 1.9, overall_balance_gdp: -1.8, r_minus_g: 2.6, truncated: false },
   ],
   outcome_truncated: false,
   debt_payable_verdict: "auto",
@@ -186,5 +184,19 @@ describe("AnalogCard measurement limits", () => {
     expect(screen.getByText(/tipo de préstamo bancario \(contexto\)/i)).toBeInTheDocument();
     expect(screen.queryByText(/auto-liquidable|r − g =|bono 10a/i)).toBeNull();
     expect(screen.getByText(/dato histórico observado/i)).toBeInTheDocument();
+  });
+});
+
+
+describe("una trayectoria de un solo punto", () => {
+  it("se declara en vez de dibujarse", () => {
+    // El Laboratorio pedía el año de entrada, la API devolvía un recorrido de
+    // un año, y el gráfico salía con un dato suelto y los ejes repitiendo el
+    // mismo año. Con un punto no se puede trazar una línea.
+    const uno = { ...MOCK_MATCHES[0], outcome: [MOCK_MATCHES[0].outcome[0]] };
+    render(<AnalogCard matches={[uno] as never} />);
+    expect(screen.getByText(/Sin trayectoria que dibujar/)).toBeInTheDocument();
+    expect(screen.queryByText(/dato histórico observado/i)).toBeNull();
+    expect(screen.getByText(/Trayectoria \(1 año\)/)).toBeInTheDocument();
   });
 });
