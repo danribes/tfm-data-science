@@ -41,6 +41,10 @@ export function runScenario(L: Levers): Scenario {
   let salIdx = 1.0;
   let wrIdx = 1.0;
   let pensFac = 1.0;
+  // Contrafactual con la indexación en su base: la diferencia entre los dos es
+  // lo único que debe tocar el saldo primario. El nivel que el escenario
+  // central ya suponía está dentro de gc.pb.
+  let pensFacIdx0 = 1.0;
   let nomIdx = 1.0;
   let precio = V0.precio;
 
@@ -59,7 +63,26 @@ export function runScenario(L: Levers): Scenario {
     // debt identity b_t = b_{t-1}(1+i)/(1+g) − sp, with 14 %/yr refinancing
     di = di + C.REFI * ((bono - V0.bono) - di);
     const ief = gc.r_efectivo + di;
-    const pb = gc.pb + L.sp - gc.presion_demog * L.dem;
+    // Pensiones, antes del saldo y no después.
+    //
+    // Estaban al final del bucle, cuando `b` ya estaba guardada, así que la
+    // indexación movía el gasto mostrado y la deuda no se enteraba. Se compara
+    // contra el mismo escenario con idx en su base, no contra cero: gc.pb ya
+    // lleva el gasto que el escenario central suponía y la presión demográfica
+    // entra aparte por L.dem, así que restar el nivel entero contaría dos
+    // veces. Con idx en base el ajuste es exactamente cero.
+    if (k > 0) {
+      pensFac *= (1 + (pi + L.idx) / 100) / (1 + gnom / 100);
+      pensFacIdx0 *= (1 + (pi + B.idx) / 100) / (1 + gnom / 100);
+      nomIdx *= 1 + L.idx / 100;
+    }
+    const depIdx = 1 + (OLDDEP[y] / OLDDEP[Y0] - 1) * (1 + L.dem);
+    const dep = OLDDEP[Y0] * depIdx;
+    const pens = V0.pens * depIdx * pensFac;
+    // Un punto de PIB de gasto es un punto menos de saldo primario.
+    const pensGap = pens - V0.pens * depIdx * pensFacIdx0;
+
+    const pb = gc.pb + L.sp - gc.presion_demog * L.dem - pensGap;
     const bPrev = b;
     b = (bPrev * (1 + ief / 100)) / (1 + gnom / 100) - pb;
     // Current-GDP interest ratio: i_t * D_{t-1} / Y_t (v16 omitted GDP growth).
@@ -82,15 +105,6 @@ export function runScenario(L: Levers): Scenario {
     const cuota = french(precio * 0.8, L.r + C.DIFF, 300);
     const salmes = V0.salmes * salIdx;
     const esf = (cuota / salmes) * 100;
-
-    // pensions: mechanical identity pension x number / GDP
-    if (k > 0) {
-      pensFac *= (1 + (pi + L.idx) / 100) / (1 + gnom / 100);
-      nomIdx *= 1 + L.idx / 100;
-    }
-    const depIdx = 1 + (OLDDEP[y] / OLDDEP[Y0] - 1) * (1 + L.dem);
-    const dep = OLDDEP[Y0] * depIdx;
-    const pens = V0.pens * depIdx * pensFac;
 
     R.lvl.push(lvl); R.u.push(u); R.pi.push(pi); R.g.push(g);
     R.gnom.push(gnom); R.wnom.push(wnom); R.wreal.push(wreal);

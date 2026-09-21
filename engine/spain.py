@@ -96,6 +96,11 @@ def run_scenario(
     lvl = 0.0; pi_dev = 0.0; di = 0.0
     b = central[Y0 - 1]["deuda"]                      # 105.6 (2025)
     sal_idx = 1.0; wr_idx = 1.0; pens_fac = 1.0; nom_idx = 1.0
+    # Contrafactual: el mismo escenario con la indexación en su valor base.
+    # La diferencia entre los dos es lo que la palanca añade o quita de gasto,
+    # y es lo único que debe tocar el saldo: el nivel de pensiones que el
+    # escenario central ya suponía está dentro de gc['pb'].
+    pens_fac_idx0 = 1.0
     precio = V0["precio"]
 
     for k in range(N_YEARS):
@@ -122,7 +127,33 @@ def run_scenario(
         # debt identity b_t = b_{t-1}(1+i)/(1+g) − sp, with 14 %/yr refinancing
         di = di + c.REFI * ((bono - V0["bono"]) - di)
         ief = gc["r_efectivo"] + di
-        pb = gc["pb"] + L.sp - gc["presion_demog"] * L.dem
+        # Pensiones, antes del saldo y no después.
+        #
+        # Estaban calculadas al final del bucle, cuando `b` ya se había
+        # guardado, así que la indexación movía el gasto mostrado y la deuda no
+        # se enteraba: mover la palanca a −1,5 quitaba 6,6 pp de PIB de gasto
+        # al año durante veinticinco años y la deuda de 2050 salía idéntica
+        # hasta el tercer decimal. El gasto en pensiones sólo llegaba al saldo
+        # por el término exógeno de presión demográfica, calibrado a una
+        # indexación fija que la palanca no actualizaba.
+        #
+        # Se compara contra el mismo escenario con idx en su base, no contra
+        # cero: `gc["pb"]` ya lleva dentro el gasto en pensiones que el
+        # escenario central suponía, y la presión demográfica ya entra aparte
+        # por `L.dem`. Restar el nivel entero contaría dos veces; restar la
+        # desviación no. Con idx en base el ajuste es exactamente cero, así que
+        # la línea base y los ocho presets no se mueven.
+        if k > 0:
+            pens_fac *= (1 + (pi + L.idx) / 100) / (1 + gnom / 100)
+            pens_fac_idx0 *= (1 + (pi + B["idx"]) / 100) / (1 + gnom / 100)
+            nom_idx *= 1 + L.idx / 100
+        dep_idx = 1 + (olddep[y] / olddep[Y0] - 1) * (1 + L.dem)
+        dep = olddep[Y0] * dep_idx
+        pens = V0["pens"] * dep_idx * pens_fac
+        # Un punto de PIB de gasto es un punto menos de saldo primario.
+        pens_gap = pens - V0["pens"] * dep_idx * pens_fac_idx0
+
+        pb = gc["pb"] + L.sp - gc["presion_demog"] * L.dem - pens_gap
         b_prev = b
         b = b_prev * (1 + ief / 100) / (1 + gnom / 100) - pb
         # Interest = i_t * D_{t-1} / Y_t, whereas b_prev uses Y_{t-1}.
@@ -144,14 +175,6 @@ def run_scenario(
         cuota = french(precio * 0.8, L.r + c.DIFF, 300)
         salmes = V0["salmes"] * sal_idx
         esf = cuota / salmes * 100
-
-        # pensions: mechanical identity pension x number / GDP
-        if k > 0:
-            pens_fac *= (1 + (pi + L.idx) / 100) / (1 + gnom / 100)
-            nom_idx *= 1 + L.idx / 100
-        dep_idx = 1 + (olddep[y] / olddep[Y0] - 1) * (1 + L.dem)
-        dep = olddep[Y0] * dep_idx
-        pens = V0["pens"] * dep_idx * pens_fac
 
         R["lvl"].append(lvl); R["u"].append(u); R["pi"].append(pi); R["g"].append(g)
         R["gnom"].append(gnom); R["wnom"].append(wnom); R["wreal"].append(wreal)

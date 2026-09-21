@@ -58,8 +58,15 @@ def mc_input_paths(levers: Levers) -> tuple[list[int], np.ndarray, np.ndarray, n
     shock = (-(L.sp - B["sp"]) - c.E_R * (L.r - B["r"])
              + c.E_EXT * (L.ext - B["ext"]) - c.E_PM * (L.pm - B["pm"]))
 
+    # El mismo canal de pensiones que engine/spain.py. Sin él, el abanico y la
+    # senda central se contradicen en cuanto se mueve la indexación: la línea
+    # quedaría fuera de su propia banda.
+    olddep = c.load_olddep()
+    dep0 = olddep[c.MC_START_YEAR]
+
     ief, gnom, pb = [], [], []
     lvl = pi_dev = di = 0.0
+    pens_fac = pens_fac_idx0 = 1.0
     for k, y in enumerate(years):
         if y <= 2050:
             c_r, c_g = central[y]["r_efectivo"], central[y]["g_nominal"]
@@ -78,9 +85,17 @@ def mc_input_paths(levers: Levers) -> tuple[list[int], np.ndarray, np.ndarray, n
         di = di + c.REFI * ((bono - V0["bono"]) - di)
         drift = (c.MC_PB_DRIFT[0] if y <= 2030
                  else c.MC_PB_DRIFT[1] if y <= 2050 else c.MC_PB_DRIFT[2])
+        gnom_k = c_g + (g - V0["g"]) + pi_dev
+        pi = V0["pi"] + pi_dev
+        if k > 0:
+            pens_fac *= (1 + (pi + L.idx) / 100) / (1 + gnom_k / 100)
+            pens_fac_idx0 *= (1 + (pi + B["idx"]) / 100) / (1 + gnom_k / 100)
+        dep_idx = 1 + (olddep[y] / dep0 - 1) * (1 + L.dem)
+        pens_gap = V0["pens"] * dep_idx * (pens_fac - pens_fac_idx0)
+
         ief.append(c_r + di)
-        gnom.append(c_g + (g - V0["g"]) + pi_dev)
-        pb.append(c_pb + L.sp - c_dm * L.dem + drift)
+        gnom.append(gnom_k)
+        pb.append(c_pb + L.sp - c_dm * L.dem + drift - pens_gap)
     return years, np.asarray(ief), np.asarray(gnom), np.asarray(pb)
 
 

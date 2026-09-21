@@ -331,6 +331,14 @@ donde los tipos se expresan en tanto por uno y el saldo primario en puntos de PI
 
 Los intereses sobre el PIB corriente son $b_{t-1}i_t/(1+g_t)$, y el saldo total resta estos intereses al saldo primario. Una versión anterior omitía el denominador al calcular intereses y saldo total, aunque lo aplicaba correctamente en la identidad de deuda; corregirlo sitúa los intereses base de 2026 en 2,73967 % del PIB y el saldo total en −4,08967 %, sin alterar la senda de deuda. Esta misma base contable se usa ahora en ambos motores.
 
+El gasto en pensiones entra en el saldo primario por la desviación, no por el nivel. El escenario central ya incorpora una senda de gasto bajo una indexación supuesta, y la presión demográfica entra por su propio término, de modo que restar el nivel completo contabilizaría dos veces la misma partida. Lo que se resta del saldo es la diferencia entre el gasto que implica la indexación elegida y el que implicaría la indexación de referencia,
+
+$$pb_t = pb^{\text{central}}_t + sp - \delta_t\,\text{dem} - \bigl(P_t(\iota) - P_t(\iota_0)\bigr),$$
+
+donde $P_t(\iota)$ es la identidad contable de pensiones —pensión media por número de perceptores sobre PIB— evaluada en la indexación $\iota$. Con la palanca en su valor de referencia el término se anula exactamente, y la línea base y los ocho escenarios preconfigurados quedan inalterados.
+
+El canal importa por su magnitud: una indexación permanentemente un punto por encima de la de referencia añade unos 63 puntos de PIB a la deuda de 2050, y un punto y medio por debajo resta unos 78. Es el efecto más grande de cualquier palanca del modelo —la productividad, con el recorrido completo de su rango, mueve unos 17—, lo que refleja que el gasto en pensiones es la partida comprometida de mayor tamaño y la más sensible a una regla de revalorización. Una versión anterior calculaba las pensiones después de cerrar la identidad de deuda, de modo que la palanca cambiaba el gasto mostrado sin tocar la trayectoria fiscal.
+
 En combinaciones extremas la recurrencia puede producir deuda negativa: se señala como salida del dominio de deuda bruta, pues no se modelan activos públicos ni una reacción de política al agotar la deuda.
 
 La dinámica de precios de vivienda sigue una reversión hacia una media de largo plazo,
