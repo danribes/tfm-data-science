@@ -494,3 +494,13 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .lev .plain { font-size: 12px; line-height: 1.35; color: var(--ink-2); margin: 2px 0 6px; }
 .projtable tbody th .plain { display: block; font-weight: 400; font-size: 11.5px;
   line-height: 1.35; color: var(--ink-2); margin-top: 2px; max-width: 30ch; }
+
+/* La banda paramétrica: la explicación antes del dibujo.
+   El encabezado decía «4.000 sorteos · semilla 42», que sirve para reproducir
+   el resultado y no para entenderlo, y la leyenda sólo decía «p5–p95». */
+.band-intro { font-size: 14px; line-height: 1.55; color: var(--ink-2);
+  margin: 0 0 14px; max-width: 74ch; }
+/* El percentil, debajo del nombre en llano: el tribunal quiere verlo, el
+   lector no necesita empezar por ahí. */
+.projtable thead th small { display: block; font-weight: 400; font-size: 10px;
+  letter-spacing: 0; text-transform: none; color: var(--muted); }

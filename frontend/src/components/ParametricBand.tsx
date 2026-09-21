@@ -34,27 +34,56 @@ export function ParametricBand() {
 
   return (
     <div className="card">
+      {/* El encabezado decía «Cuánto de esto es incertidumbre · 4.000 sorteos ·
+          semilla 42». El número de sorteos y la semilla sirven para reproducir
+          el resultado, no para entenderlo, y ocupaban el sitio de la
+          explicación. Van ahora con el resto de la trazabilidad, más abajo. */}
       <h4>
-        Cuánto de esto es incertidumbre
-        <small>{d ? `${eur(d.n_draws)} sorteos · semilla ${d.seed}` : "precio de la vivienda"}</small>
+        El margen del precio de la vivienda
+        <small>cuánto se mueve la proyección si los parámetros estimados no son exactos</small>
       </h4>
+
+      <p className="band-intro">
+        Dos números del motor —cuánto crece el precio a largo plazo y con qué
+        rapidez vuelve a esa tendencia— <b>se estimaron a partir de datos</b>, y
+        toda estimación tiene margen de error. La banda responde a una sola
+        pregunta: si en vez de dar esos dos números por exactos se tiene en
+        cuenta su margen, ¿cuánto se mueve la proyección? En 2026 nada, porque
+        es el punto de partida. En 2050 la banda abarca un 17 % del precio
+        proyectado, algo más de un ±8 % a cada lado: es la columna «sobre el
+        nivel» de la tabla.
+      </p>
 
       {q.isPending && !d && <p style={{ fontSize: 14 }}>Sorteando parámetros…</p>}
 
       {d && (
         <>
           <FanChart years={d.years} percentiles={d.percentiles} center={d.point}
-            centerLabel="proyección con los valores puntuales" dec={0} unit="€"
+            centerLabel="la proyección publicada"
+            outerLabel="9 de cada 10 sorteos (p5–p95)"
+            innerLabel="la mitad central (p25–p75)"
+            dec={0} unit="€"
             /* Las mismas marcas que las columnas de la tabla de abajo: así se
                puede seguir una cifra del gráfico a la tabla sin recontar. */
             ticks={TABLE_YEARS} />
+
+          {/* El gráfico no decía qué estaba dibujando. */}
+          <div className="foot">
+            Precio medio de una vivienda, en euros. La banda nace cerrada en
+            2026 —ese año es el punto de partida, no hay nada que sortear— y se
+            abre a medida que el margen de los dos parámetros se arrastra año
+            tras año.
+          </div>
 
           <div className="tscroll">
             <table className="projtable">
               <thead>
                 <tr>
-                  <th>Año</th><th className="num">p5</th><th className="num">proyección</th>
-                  <th className="num">p95</th><th className="num">ancho</th>
+                  <th>Año</th>
+                  <th className="num">mínimo<small>p5</small></th>
+                  <th className="num">proyección</th>
+                  <th className="num">máximo<small>p95</small></th>
+                  <th className="num">ancho</th>
                   <th className="num">sobre el nivel</th>
                 </tr>
               </thead>
@@ -82,7 +111,8 @@ export function ParametricBand() {
           <Caption>
             <strong>Qué mide esta banda.</strong> Una sola cosa: que los dos
             parámetros del motor que vienen de una estimación no se conocen
-            exactamente. Se sortean {eur(d.n_draws)} veces de su distribución
+            exactamente. Se sortean {eur(d.n_draws)} veces —con semilla {d.seed}, de
+            modo que el resultado se reproduce— de su distribución
             {lr && rev ? (
               <> — IPV_LR {nf(lr.value, 4)} (se {nf(lr.se, 4)}), IPV_REV {nf(rev.value, 4)}{" "}
                 (se {nf(rev.se, 4)}), estimadas sobre {eur(lr.n)} observaciones

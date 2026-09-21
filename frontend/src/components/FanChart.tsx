@@ -14,9 +14,15 @@ import type { PercentileKey } from "../api/types";
  *  gráfico y la de la tabla no coincidieran por unos cientos de euros sin que
  *  nada explicara por qué.
  */
-export function FanChart({ years, percentiles, height = 260, center, centerLabel = "mediana p50", dec = 1, unit = "", ticks }: {
+export function FanChart({ years, percentiles, height = 260, center, centerLabel = "mediana p50", dec = 1, unit = "", ticks, outerLabel = "banda p5–p95", innerLabel = "banda p25–p75" }: {
   years: number[]; percentiles: Record<PercentileKey, number[]>; height?: number;
   center?: number[]; centerLabel?: string; dec?: number; unit?: string; ticks?: number[];
+  /** Los nombres de las dos cintas. Por defecto, los percentiles crudos: en el
+   *  abanico de deuda el lector ya viene de una sección que los explica. Donde
+   *  no sea así se pasan en castellano llano — «p5–p95» no significa nada para
+   *  quien no lo haya estudiado, y era toda la explicación que tenía el
+   *  gráfico de la banda paramétrica. */
+  outerLabel?: string; innerLabel?: string;
 }) {
   const reduced = useReducedMotion();
   const data = years.map((y, i) => ({
@@ -28,8 +34,8 @@ export function FanChart({ years, percentiles, height = 260, center, centerLabel
   return (
     <div>
       <div className="legend">
-        <span><i style={{ background: "var(--band-out)", height: 8 }} />banda p5–p95</span>
-        <span><i style={{ background: "var(--band-in)", height: 8 }} />banda p25–p75</span>
+        <span><i style={{ background: "var(--band-out)", height: 8 }} />{outerLabel}</span>
+        <span><i style={{ background: "var(--band-in)", height: 8 }} />{innerLabel}</span>
         <span><i style={{ background: "var(--s1)" }} />{centerLabel}</span>
       </div>
       <ResponsiveContainer width="100%" height={height} initialDimension={{ width: 660, height }}>
