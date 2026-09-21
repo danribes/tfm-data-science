@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { IrfChart } from "../components/IrfChart";
 import type { ComparisonOut } from "../api/types";
-import { nf, sg } from "../lib/fmt";
+import { eur, nf, sg } from "../lib/fmt";
 
 /** A calibrated value against its estimated confidence band.
  *
@@ -111,7 +111,7 @@ export default function Evidencia() {
                         {nf(c.ci_low, 2)} … {nf(c.ci_high, 2)}
                       </td>
                       <td className="num dim">
-                        {nf(c.n, 0)}
+                        {eur(c.n)}
                         <div className="ev-lab">{c.n_units} unidades</div>
                       </td>
                       <td className="ev-band"><BandBar c={c} /></td>
@@ -134,7 +134,7 @@ export default function Evidencia() {
                           <td className="num dim">
                             {nf(s.ci_low, 2)} … {nf(s.ci_high, 2)}
                           </td>
-                          <td className="num dim">{nf(s.n, 0)}</td>
+                          <td className="num dim">{eur(s.n)}</td>
                           <td className="ev-band">
                             <BandBar c={{ ...c, ...s, compatible: fits }} />
                           </td>
@@ -225,7 +225,7 @@ export default function Evidencia() {
                 <span className="dim">
                   [{nf(q.data.fiscal_persistence.ci_low, 2)} …{" "}
                   {nf(q.data.fiscal_persistence.ci_high, 2)}], n ={" "}
-                  {nf(q.data.fiscal_persistence.n, 0)}
+                  {eur(q.data.fiscal_persistence.n)}
                 </span>
                 . Es decir: el saldo de un año explica casi todo el del
                 siguiente.

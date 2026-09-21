@@ -63,3 +63,30 @@ describe("separador de millares en magnitudes grandes", () => {
     expect(sgEur(-1000)).not.toContain("-");
   });
 });
+
+describe("los recuentos llevan separador de millares", () => {
+  it("las cifras que se ven en pantalla, una por una", () => {
+    // El agrupamiento "auto" de es-ES suprime el separador entre 1000 y 9999,
+    // así que en Biblioteca convivían «17.402» y «3684», y en Evidencia los
+    // tamaños muestrales 1.387 y 931 se escribían con reglas distintas.
+    // Sólo a partir de cuatro cifras hay millar que separar: 931 y 456 se
+    // escriben igual con las dos funciones, y esperar un punto ahí era un
+    // error de la prueba, no del formato.
+    for (const n of [3684, 4000, 1387, 1311]) {
+      expect(eur(n)).toMatch(/\./);
+      expect(nf(n, 0)).not.toMatch(/\./);
+    }
+    for (const n of [931, 456]) {
+      expect(eur(n)).toBe(String(n));
+    }
+    expect(eur(3684)).toBe("3.684");
+    expect(eur(17402)).toBe("17.402");
+  });
+
+  it("no toca lo que no es un recuento", () => {
+    // Porcentajes, años y días se quedan con `nf`: «14 %» y «2050» no llevan
+    // separador, y forzarlo daría «2.050».
+    expect(nf(14, 0)).toBe("14");
+    expect(nf(2050, 0)).toBe("2050");
+  });
+});

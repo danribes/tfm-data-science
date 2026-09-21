@@ -5,7 +5,7 @@ import { baseline, YEARS } from "../engine/spain";
 import { ALL_SERIES_KEYS, seriesOf, type AnySeriesKey } from "../engine/derived";
 import { LEVER_SPECS } from "../engine/levers";
 import { BASE_LEVERS } from "../engine/vintage";
-import { nf, sg } from "../lib/fmt";
+import { eur, nf, sg } from "../lib/fmt";
 import { Caption } from "../components/Caption";
 import { FanChart } from "../components/FanChart";
 import { ProjectionChart } from "../components/ProjectionChart";
@@ -79,7 +79,7 @@ export default function Laboratorio() {
       <div className="row2" style={{ marginBottom: 16 }}>
         <div className="card">
           <h4>Abanico Monte Carlo · deuda/PIB hasta 2070
-            <small>{mc.data ? `${nf(mc.data.n_paths, 0)} trayectorias · semilla ${mc.data.seed}` : `${nf(4000, 0)} trayectorias · semilla 42`}</small>
+            <small>{mc.data ? `${eur(mc.data.n_paths)} trayectorias · semilla ${mc.data.seed}` : `${eur(4000)} trayectorias · semilla 42`}</small>
           </h4>
           {mc.isError && <div className="banner err">Monte Carlo no disponible — el resto de la app sigue funcionando.</div>}
           {mc.isPending && !mc.data && <p style={{ fontSize: 14 }}>Calculando abanico…</p>}

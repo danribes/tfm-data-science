@@ -35,7 +35,7 @@ describe("Laboratorio — series explorer + MC fan + raw levers", () => {
       { timeout: 3000 }, // 400 ms debounce + MSW round-trip
     );
     expect(screen.getByText(/±2 pp/)).toBeInTheDocument();
-    expect(screen.getByText(/4000 trayectorias/)).toBeInTheDocument();
+    expect(screen.getByText(/4\.000 trayectorias/)).toBeInTheDocument();
   });
 
   it("raw lever table shows current vs base (r: 2,80 both at boot)", () => {

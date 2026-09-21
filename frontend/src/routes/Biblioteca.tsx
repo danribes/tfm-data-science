@@ -6,7 +6,7 @@ import { RagConnectionSettings } from "../components/RagConnectionSettings";
 import { PUBLIC_RAG_EXAMPLES, RagCorpusNotice } from "../components/RagCorpusNotice";
 import type { Authority, Passage, RagChatResponse } from "../api/types";
 import { useScenarioStore } from "../state/scenarioStore";
-import { nf } from "../lib/fmt";
+import { eur } from "../lib/fmt";
 
 /** How much weight a source carries, shown rather than assumed.
  *  A textbook and a YouTube transcript both produce text; only one of them is
@@ -135,7 +135,7 @@ export default function Biblioteca() {
         <h1>Biblioteca</h1>
         <span className="meta">
           {collections.isSuccess
-            ? `${nf(collections.data.total_documents, 0)} documentos · ${nf(collections.data.total_chunks, 0)} pasajes indexados`
+            ? `${eur(collections.data.total_documents)} documentos · ${eur(collections.data.total_chunks)} pasajes indexados`
             : collections.isError
               ? "índice no disponible en este despliegue"
               : "cargando el índice…"}
@@ -166,7 +166,7 @@ export default function Biblioteca() {
             >
               <span className="coll-label">{c.label}</span>
               <span className={`coll-auth ${c.authority}`}>{c.authority}</span>
-              <span className="coll-n">{nf(c.chunks, 0)}</span>
+              <span className="coll-n">{eur(c.chunks)}</span>
             </button>
           ))}
         </div>

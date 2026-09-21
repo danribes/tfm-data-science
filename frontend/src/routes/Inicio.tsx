@@ -3,7 +3,7 @@ import { useMonteCarlo, usePersonas, useRedlines, useVintage } from "../api/hook
 import { Y1, YEARS, baseline } from "../engine/spain";
 import { evaluateRedlines } from "../engine/redlines";
 import { REFI } from "../engine/constants";
-import { nf, sg } from "../lib/fmt";
+import { eur, nf, sg } from "../lib/fmt";
 import { Caption } from "../components/Caption";
 import { DebtVsGdpChart, SnowballStrip } from "../components/DebtVsGdpChart";
 import { SpaghettiChart } from "../components/SpaghettiChart";
@@ -87,7 +87,7 @@ export default function Inicio() {
           El problema de la deuda
           <small>
             {mc.data
-              ? `${nf(mc.data.paths.length, 0)} de ${nf(mc.data.n_paths, 0)} trayectorias · semilla ${mc.data.seed}`
+              ? `${eur(mc.data.paths.length)} de ${eur(mc.data.n_paths)} trayectorias · semilla ${mc.data.seed}`
               : "trayectorias Monte Carlo"}
           </small>
         </h4>
