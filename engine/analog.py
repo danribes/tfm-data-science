@@ -22,6 +22,11 @@ _SERIES_TO_PANEL = {
     "u": "unemployment", "pi": "inflation",
 }
 
+#: Codigos de tres letras que no son paises. El panel de origen (WEO) mezcla
+#: paises y agrupaciones regionales; las de nombre largo ya las quita el filtro
+#: de tres letras, esta no.
+AGGREGATES: frozenset[str] = frozenset({"SSA"})
+
 _NAMES: dict[str, str] = {
     "AUT": "Austria", "BEL": "Bélgica", "CHE": "Suiza",
     "CZE": "República Checa", "DEU": "Alemania", "DNK": "Dinamarca",
@@ -37,6 +42,20 @@ _NAMES: dict[str, str] = {
     "ZAF": "Sudáfrica", "THA": "Tailandia", "IDN": "Indonesia",
     "EGY": "Egipto", "MAR": "Marruecos", "NGA": "Nigeria",
     "AUS": "Australia", "CAN": "Canadá",
+    # Anadidos tras comprobar cuales aparecen de verdad en los resultados: un
+    # barrido de palancas y horizontes devolvia LBN, STP, ZMB y GNB sin
+    # nombre, y la ficha los pintaba como «LBN LBN».
+    "LBN": "Líbano", "STP": "Santo Tomé y Príncipe", "ZMB": "Zambia",
+    "GNB": "Guinea-Bisáu", "GNQ": "Guinea Ecuatorial", "IRQ": "Irak",
+    # Y los europeos y de deuda alta que pueden salir con otras palancas.
+    "HRV": "Croacia", "CYP": "Chipre", "MLT": "Malta", "BGR": "Bulgaria",
+    "ROU": "Rumanía", "EST": "Estonia", "LVA": "Letonia", "LTU": "Lituania",
+    "SRB": "Serbia", "UKR": "Ucrania", "RUS": "Rusia", "ALB": "Albania",
+    "MNE": "Montenegro", "BIH": "Bosnia y Herzegovina",
+    "JAM": "Jamaica", "BRB": "Barbados", "LKA": "Sri Lanka",
+    "SGP": "Singapur", "CHN": "China", "IND": "India", "CHL": "Chile",
+    "URY": "Uruguay", "CRI": "Costa Rica", "PAN": "Panamá",
+    "DOM": "República Dominicana", "TUN": "Túnez", "JOR": "Jordania",
 }
 
 
@@ -70,6 +89,16 @@ def _fit_metric(frame: pd.DataFrame) -> tuple[dict, np.ndarray]:
 def _load() -> tuple[pd.DataFrame, dict, np.ndarray]:
     panel = pd.read_csv(GOLD_DIR / "gold_analog_panel.csv")
     panel = panel[panel.iso3.str.fullmatch(r"[A-Z]{3}")].copy()
+    # El filtro de tres letras quita los agregados con nombre largo
+    # —WEOWORLD, ADVEC, OEMDC, EURO— pero no los que tienen exactamente tres.
+    # SSA es Africa subsahariana: una region, no un pais, y colandose en una
+    # busqueda de paises analogos produciria «Espana se parece a Africa
+    # subsahariana en 2004». No afecta a la exclusion de Espana —no esta
+    # dentro de SSA— pero sigue sin ser un comparador valido.
+    #
+    # GNQ (Guinea Ecuatorial) e IRQ (Irak) tambien acaban en Q y SI son
+    # paises: el filtro es por lista, no por la forma del codigo.
+    panel = panel[~panel.iso3.isin(AGGREGATES)].copy()
     # Compatibility adapter for the preserved 2026-09-06 source artifact.
     if "lending_rate" not in panel and "interest_rate_10y" in panel:
         panel = panel.rename(columns={"interest_rate_10y": "lending_rate"})

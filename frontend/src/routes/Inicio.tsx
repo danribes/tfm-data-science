@@ -14,6 +14,7 @@ import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenari
 import { SHIPPED_IDS } from "../personas/registry";
 import { RegimeChart } from "../components/RegimeChart";
 import { DistressGauge } from "../components/DistressGauge";
+import { SpainAmongOthers } from "../components/SpainAmongOthers";
 import { LeverSummary, ProjectionTable } from "../components/ProjectionTable";
 import { ParametricBand } from "../components/ParametricBand";
 import { HowComputed } from "../components/HowComputed";
@@ -255,6 +256,12 @@ export default function Inicio() {
       {/* The probabilistic complement of the 7 % threshold, right after the
           thresholds themselves so the two readings sit together. */}
       <DistressGauge />
+
+      {/* Y los países contra los que se puntúa. La portada mostraba la
+          puntuación de España sola: un número en una escala, sin nadie al
+          lado. El buscador de análogos ya existía, pero sólo en el
+          Laboratorio y detrás de un botón. */}
+      <SpainAmongOthers />
 
       <div className="row2">
         {(personas.data?.personas ?? [])

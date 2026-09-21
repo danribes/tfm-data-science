@@ -218,3 +218,43 @@ def test_panel_series_son_las_que_de_verdad_dependen_de_los_estimados():
     b = run_scenario(Levers(), ipv_lr=c.IPV_LR_V16, ipv_rev=1.0 - c.IPV_REV_V16)
     movidas = {k for k in a if any(abs(x - y) > 1e-9 for x, y in zip(a[k], b[k]))}
     assert movidas == set(PANEL_SERIES)
+
+
+# --- el conjunto de análogos sólo debe contener países ----------------------
+
+def test_el_conjunto_de_analogos_no_contiene_agregados():
+    """El panel de origen mezcla países y agrupaciones regionales.
+
+    El filtro de tres letras quita las de nombre largo —WEOWORLD, ADVEC,
+    OEMDC, EURO— pero dejaba pasar SSA, que es África subsahariana. Una
+    búsqueda de países análogos que devuelva una región produce lecturas sin
+    sentido, y la ficha de portada las publicaría.
+    """
+    from engine.analog import AGGREGATES, ANALOG_PANEL
+
+    assert "SSA" in AGGREGATES
+    presentes = set(ANALOG_PANEL.iso3.unique())
+    assert presentes.isdisjoint(AGGREGATES)
+
+
+def test_espana_sigue_fuera_del_conjunto_de_referencia():
+    """La garantía que sostiene toda la lectura: España no se compara consigo
+    misma. Se vuelve a comprobar aquí porque el filtro de agregados toca el
+    mismo punto del cargador."""
+    from engine.analog import ANALOG_PANEL, QUERY_FEATURES
+
+    cand = ANALOG_PANEL[(ANALOG_PANEL.iso3 != "ESP") & (ANALOG_PANEL.year <= 2020)]
+    cand = cand.dropna(subset=QUERY_FEATURES)
+    assert "ESP" not in set(cand.iso3)
+    assert cand.iso3.nunique() == 172
+    assert len(cand) == 4070
+
+
+def test_los_analogos_que_salen_tienen_nombre():
+    """Sin nombre, la API devuelve el código y la tabla pintaba «LBN LBN»."""
+    from engine.analog import find_analogs
+    from engine.levers import Levers
+
+    for lv in (Levers(), Levers(lam=1.4), Levers(r=6.0), Levers(sp=-4.0)):
+        for m in find_analogs(lv, horizon=10):
+            assert m["country_name"] != m["iso3"], m["iso3"]

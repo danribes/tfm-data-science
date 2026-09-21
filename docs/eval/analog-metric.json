@@ -10,70 +10,70 @@
     "unemployment",
     "inflation"
   ],
-  "n_eligible": 5461,
-  "n_complete": 4091,
-  "n_countries": 173,
+  "n_eligible": 5440,
+  "n_complete": 4070,
+  "n_countries": 172,
   "years": [
     1991,
     2020
   ],
   "normalization": {
     "debt_gdp": {
-      "mean": 52.86235639208018,
-      "std": 41.788285530172125
+      "mean": 52.95230958230959,
+      "std": 41.869026358642195
     },
     "overall_balance_gdp": {
-      "mean": -2.3286482522610608,
-      "std": 14.247069637574805
+      "mean": -2.3317936117936116,
+      "std": 14.282840217407657
     },
     "gdp_growth": {
-      "mean": 3.658327554036506,
-      "std": 5.792391124457665
+      "mean": 3.656580365725117,
+      "std": 5.805094964986359
     },
     "unemployment": {
-      "mean": 7.8088796914297545,
-      "std": 5.773275546049221
+      "mean": 7.818465601965602,
+      "std": 5.786578207996359
     },
     "inflation": {
-      "mean": 6.754470470211418,
-      "std": 20.13718387647328
+      "mean": 6.762217734662853,
+      "std": 20.188473236852328
     }
   },
   "inverse_covariance_standardized": [
     [
-      1.0594724215273579,
-      0.17243579570378195,
-      0.09426096507119451,
-      -0.07845965102284866,
-      -0.11577250956600323
+      1.059308831645698,
+      0.1724237075514346,
+      0.09410303958678007,
+      -0.07779248610734159,
+      -0.11575437892201354
     ],
     [
-      0.1724357957037819,
-      1.0289865891761203,
-      0.015263506470385628,
-      0.014904825369757176,
-      -0.007201268843063605
+      0.17242370755143463,
+      1.028983618360146,
+      0.015469688805603477,
+      0.014964487332869909,
+      -0.007158276491959017
     ],
     [
-      0.09426096507119448,
-      0.015263506470385603,
-      1.0232316326428443,
-      0.1002603124341752,
-      0.04609720503594661
+      0.09410303958678003,
+      0.01546968880560349,
+      1.0231964335405503,
+      0.10026194944596943,
+      0.04619133723212246
     ],
     [
-      -0.0784596510228486,
-      0.01490482536975718,
-      0.10026031243417528,
-      1.018916026508341,
-      -0.016904386358599803
+      -0.07779248610734157,
+      0.014964487332869966,
+      0.10026194944596944,
+      1.0187934422656633,
+      -0.01686616587625837
     ],
     [
-      -0.11577250956600321,
-      -0.007201268843063579,
-      0.04609720503594662,
-      -0.016904386358599813,
-      1.0169282021229422
+      -0.11575437892201351,
+      -0.007158276491959026,
+      0.04619133723212246,
+      -0.01686616587625836,
+      1.016928678473474
     ]
   ],
   "missingness_policy": "complete cases; no average imputation",
@@ -87,7 +87,7 @@
         "iso3": "ITA",
         "country_name": "Italia",
         "match_year": 2001,
-        "distance": 0.178721,
+        "distance": 0.178294,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 108.5,
@@ -176,7 +176,7 @@
         "iso3": "CAN",
         "country_name": "Canadá",
         "match_year": 1995,
-        "distance": 0.219523,
+        "distance": 0.219086,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 100.1,
@@ -265,7 +265,7 @@
         "iso3": "FRA",
         "country_name": "Francia",
         "match_year": 2017,
-        "distance": 0.261902,
+        "distance": 0.261372,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 98.8,
@@ -356,7 +356,7 @@
         "iso3": "ITA",
         "country_name": "Italia",
         "match_year": 1994,
-        "distance": 0.21639,
+        "distance": 0.215856,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 130.8,
@@ -517,7 +517,7 @@
         "iso3": "BEL",
         "country_name": "Bélgica",
         "match_year": 1994,
-        "distance": 0.281926,
+        "distance": 0.281243,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 137.1,
@@ -678,7 +678,7 @@
         "iso3": "BEL",
         "country_name": "Bélgica",
         "match_year": 1995,
-        "distance": 0.313779,
+        "distance": 0.312999,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 131.3,
@@ -841,7 +841,7 @@
         "iso3": "JPN",
         "country_name": "Japón",
         "match_year": 2012,
-        "distance": 1.2376,
+        "distance": 1.235056,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 197.1,
@@ -1114,7 +1114,7 @@
         "iso3": "JPN",
         "country_name": "Japón",
         "match_year": 2013,
-        "distance": 1.242391,
+        "distance": 1.239762,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 201.2,
@@ -1387,7 +1387,7 @@
         "iso3": "JPN",
         "country_name": "Japón",
         "match_year": 2010,
-        "distance": 1.346589,
+        "distance": 1.344163,
         "dominant_lever": null,
         "match_snapshot": {
           "debt_gdp": 178.6,

@@ -276,7 +276,7 @@ Congelar el corte tiene un coste explícito: faltan datos que existen. El INE pu
 | Corpus inmobiliario extranjero | Series de EE. UU. y Reino Unido | objetivos ≤ 2019T3 | 1.760 series, 113.649 ventanas |
 | Panel de impago soberano | Indicadores WDI + etiquetas BoC–BoE | — | 3.874 país-año, 154 países, 377 eventos |
 | Panel de estado macroeconómico | Crecimiento compuesto a tres años | 1981–2021 | 2.816 país-año, 140 países |
-| Análogos históricos | Cinco variables normalizadas | 1991–2020 | 4.091 observaciones, 173 países |
+| Análogos históricos | Cinco variables normalizadas | 1991–2020 | 4.070 observaciones, 172 países |
 | Corpus documental | Manuales, metodología propia y opinión | — | 474 documentos, 17.848 fragmentos |
 
 El panel regional contiene 17 CCAA, Ceuta y Melilla. Se excluye Nacional porque agrega información de las mismas regiones. La media conjunta otorga igual peso a cada observación regional; no equivale a ponderar por población o transacciones. Los periodos de ajuste y recuperación se presentan por separado. [Construcción del panel](../research/panel.py).
@@ -388,7 +388,7 @@ Tres componentes describen la historia sin pretender predecirla, y se agrupan aq
 
 **Regímenes históricos.** Un modelo oculto de Markov gaussiano de dos estados, ajustado retrospectivamente sobre saldo fiscal e índice de vivienda, con Viterbi y posteriores suavizados. Etiqueta como «crisis» el estado de mayor varianza y publica episodios, por ejemplo vivienda 2008T1–2014T1. Es una segmentación descriptiva dependiente de la especificación, no un detector anticipado validado ni una etiqueta oficial de crisis. [Resultados](eval/regimes.json), [método](../research/regimes.py).
 
-**Vecinos históricos.** Un KNN con distancia de Mahalanobis sobre cinco variables normalizadas, con covarianza y diferencias en las mismas coordenadas, consultado en el año seleccionado, sobre 4.091 observaciones completas de 173 países entre 1991 y 2020, con España excluida del conjunto de referencia. No imputa huecos como valores observados y no aplica bonificación por palanca —un ajuste arbitrario que se retiró—. El tipo bancario de préstamo queda excluido del emparejamiento. No emite veredicto de sostenibilidad. La semejanza histórica no predice la trayectoria española. [Motor](../engine/analog.py), [informe](eval/analog-metric.json).
+**Vecinos históricos.** Un KNN con distancia de Mahalanobis sobre cinco variables normalizadas, con covarianza y diferencias en las mismas coordenadas, consultado en el año seleccionado, sobre 4.070 observaciones completas de 172 países entre 1991 y 2020, con España excluida del conjunto de referencia. No imputa huecos como valores observados y no aplica bonificación por palanca —un ajuste arbitrario que se retiró—. El tipo bancario de préstamo queda excluido del emparejamiento. No emite veredicto de sostenibilidad. La semejanza histórica no predice la trayectoria española. [Motor](../engine/analog.py), [informe](eval/analog-metric.json).
 
 ### 5.6 Recuperación documental y capa de lenguaje
 

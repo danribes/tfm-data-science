@@ -114,6 +114,24 @@ export function useParametric(levers: Levers, series = "precio", enabled = true)
   });
 }
 
+/** Vecinos históricos del escenario actual, cargados sin pedirlos.
+ *
+ *  `AnalogPanel` usa una mutación con botón porque en el Laboratorio el lector
+ *  está explorando. En la portada esto es contexto —España al lado de los
+ *  demás países— y un contexto que hay que solicitar a mano no acompaña a
+ *  nada.
+ */
+export function useAnalogs(levers: Levers, horizon: number, enabled = true) {
+  const debouncedLevers = useDebounced(levers, 400);
+  return useQuery({
+    queryKey: ["analogs", horizon, debouncedLevers],
+    queryFn: ({ signal }) => api.analog({ levers: debouncedLevers, horizon }, signal),
+    enabled,
+    staleTime: Infinity,
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useSensitivity(levers?: Levers) {
   const debouncedLevers = useDebounced(levers, 400);
   return useQuery({
