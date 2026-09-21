@@ -32,10 +32,18 @@ DEFAULT_COLLECTION = "metodo" if PUBLIC_MODE else "mixto"
 #: Where a query is encoded when the model cannot be loaded locally. The model
 #: must be the one that produced the stored vectors: a query embedded by any
 #: other is scored against an incompatible space and returns plausible noise.
+#: Hugging Face retiró `api-inference.huggingface.co`, que es donde apuntaba
+#: esto. No devolvía un error de API: el nombre dejó de resolver en DNS, así
+#: que la llamada moría en URLError y el sondeo denso quedaba permanentemente
+#: degradado a BM25 sin que nada en la respuesta lo dijera. El sustituto es el
+#: router de Inference Providers, y la ruta con `/pipeline/feature-extraction`
+#: es la que acepta este modelo: sin ese sufijo también responde, y la variante
+#: `/hf-inference/pipeline/feature-extraction/<modelo>` devuelve 400.
 REMOTE_EMBED_URL = os.environ.get(
     "EVO_RAG_EMBED_URL",
-    "https://api-inference.huggingface.co/pipeline/feature-extraction/"
-    + os.environ.get("EVO_RAG_MODEL", "intfloat/multilingual-e5-large"))
+    "https://router.huggingface.co/hf-inference/models/"
+    + os.environ.get("EVO_RAG_MODEL", "intfloat/multilingual-e5-large")
+    + "/pipeline/feature-extraction")
 REMOTE_EMBED_TOKEN = os.environ.get("HF_TOKEN", "").strip()
 REMOTE_EMBED_TIMEOUT = float(os.environ.get("EVO_RAG_EMBED_TIMEOUT", "20"))
 

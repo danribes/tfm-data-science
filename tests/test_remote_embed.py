@@ -159,3 +159,24 @@ def test_dense_runs_against_a_real_index_with_a_supplied_vector(corpus, monkeypa
     finally:
         con.close()
     assert isinstance(ids, list)
+
+
+def test_el_endpoint_por_defecto_no_es_el_host_retirado():
+    """`api-inference.huggingface.co` dejó de resolver en DNS.
+
+    Esto no falló como un error de API que alguien fuese a ver: la resolución
+    del nombre moría, `urlopen` lanzaba URLError, el sondeo denso lo capturaba
+    y la recuperación quedaba degradada a BM25 de forma permanente mientras la
+    respuesta seguía anunciando `retrieval_mode: hybrid`. El despliegue estuvo
+    así sin que ninguna prueba ni ninguna comprobación en vivo lo notara.
+
+    Una prueba sin red no puede detectar que un nombre deje de resolver mañana,
+    pero sí puede impedir que el valor por defecto vuelva al host retirado.
+    """
+    assert "api-inference.huggingface.co" not in config.REMOTE_EMBED_URL
+    assert config.REMOTE_EMBED_URL.startswith("https://router.huggingface.co/hf-inference/models/")
+    # El sufijo importa: sin él el router responde, pero la variante
+    # /hf-inference/pipeline/feature-extraction/<modelo> devuelve 400
+    # "Model not supported by provider hf-inference".
+    assert config.REMOTE_EMBED_URL.endswith("/pipeline/feature-extraction")
+    assert config.MODEL_NAME in config.REMOTE_EMBED_URL
