@@ -23,7 +23,11 @@ describe("Inicio — headline figures + global semaphore + persona cards", () =>
   it("shows vintage/coverage banner and the four headline figures at base", async () => {
     ui();
     await waitFor(() => expect(screen.getByText(/141 fuentes/)).toBeInTheDocument());
-    expect(screen.getByText(/vintage 2026-07-31/)).toBeInTheDocument();
+    // La portada lo dice como «Corte de datos», que es lo que significa.
+    // Lo que la prueba defiende es que el corte esté a la vista, no la
+    // palabra concreta: una página sin corte de datos se lee como actual.
+    expect(screen.getByText(/Corte de datos/)).toBeInTheDocument();
+    expect(screen.getByText(/2026-07-31/)).toBeInTheDocument();
     // baseline pins: deuda 2050 = 223,8 %PIB · paro 10,1 % · IPCA 3,0 %.
     // Scoped to the tiles: "10,1"/"3,0" also appear in the semaphore rows below.
     const tiles = document.querySelectorAll(".out");

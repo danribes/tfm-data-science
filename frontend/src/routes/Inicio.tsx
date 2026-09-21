@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useMonteCarlo, usePersonas, useRedlines, useVintage } from "../api/hooks";
+import { useMonteCarlo, usePersonas, useRedlines } from "../api/hooks";
 import { Y1, YEARS, baseline } from "../engine/spain";
 import { evaluateRedlines } from "../engine/redlines";
 import { REFI } from "../engine/constants";
@@ -14,6 +14,7 @@ import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenari
 import { SHIPPED_IDS } from "../personas/registry";
 import { RegimeChart } from "../components/RegimeChart";
 import { DistressGauge } from "../components/DistressGauge";
+import { Portada } from "../components/Portada";
 import { SpainAmongOthers } from "../components/SpainAmongOthers";
 import { LeverSummary, ProjectionTable } from "../components/ProjectionTable";
 import { ParametricBand } from "../components/ParametricBand";
@@ -27,7 +28,6 @@ const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean 
 ];
 
 export default function Inicio() {
-  const vintage = useVintage();
   const redlines = useRedlines();
   const personas = usePersonas();
   const scn = useScenario();
@@ -40,14 +40,15 @@ export default function Inicio() {
 
   return (
     <div>
+      {/* La portada abre el panel. No es una pantalla aparte y no hay que
+          pasar por ella: el escenario viene justo debajo. */}
+      <Portada />
+
       <div className="head">
-        <h1>España en escenarios</h1>
+        {/* El corte de datos lo dice ya la portada, justo encima: repetirlo
+            aquí lo dejaba dos veces en la misma pantalla. */}
+        <h2 className="head-h">El escenario</h2>
         <Stamp fresh={fresh} year={horizon} />
-        {vintage.isSuccess ? (
-          <span className="meta">vintage {vintage.data.vintage} · {nf(vintage.data.n_files, 0)} fuentes congeladas</span>
-        ) : vintage.isError ? (
-          <span className="meta">cobertura no disponible</span>
-        ) : null}
       </div>
 
       {/* La ficha abre la página.

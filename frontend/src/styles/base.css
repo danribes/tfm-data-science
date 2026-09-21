@@ -504,3 +504,43 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
    lector no necesita empezar por ahí. */
 .projtable thead th small { display: block; font-weight: 400; font-size: 10px;
   letter-spacing: 0; text-transform: none; color: var(--muted); }
+
+/* ---- Portada del panel --------------------------------------------------- */
+/* La aplicación abría directamente en el escenario: quien la veía por primera
+   vez no tenía ninguna frase que dijera qué hace. Va delante, no encima: el
+   panel sigue a un desplazamiento de distancia, sin un clic de por medio. */
+.portada { background: var(--surface); border: 1px solid var(--grid);
+  border-radius: var(--rad-card); padding: 26px 26px 20px; margin-bottom: 20px; }
+.portada h1 { font-size: 30px; margin: 0 0 10px; letter-spacing: -0.01em; }
+.portada-lead { font-size: 15.5px; line-height: 1.6; color: var(--ink-2);
+  margin: 0 0 22px; max-width: 78ch; }
+.portada-h2 { font-size: 12px; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--muted); margin: 22px 0 10px; font-weight: 700; }
+.portada-capas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.portada-capa { background: var(--card); border: 1px solid var(--grid);
+  border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 14px; }
+.portada-capa h3 { font-size: 13.5px; margin: 0 0 6px; color: var(--ink); }
+.portada-capa p { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0; }
+.portada-acredita { margin-top: 8px !important; color: var(--muted) !important;
+  border-top: 1px solid var(--grid); padding-top: 7px; }
+.portada-veredictos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.portada-veredicto { border: 1px solid var(--grid); border-radius: 8px;
+  padding: 10px 13px; font-size: 12.5px; display: flex; flex-direction: column; gap: 2px; }
+.portada-veredicto b { color: var(--ink); }
+.portada-veredicto span { color: var(--muted); }
+/* Verde y ámbar, no verde y rojo: «no alcanzada» y «no reclamada» son
+   hallazgos declarados, no fallos. */
+.portada-veredicto.ok { border-left: 3px solid var(--good); }
+.portada-veredicto.no { border-left: 3px solid var(--warn); }
+.portada-pie { font-size: 12px; color: var(--muted); margin: 18px 0 0;
+  border-top: 1px solid var(--grid); padding-top: 12px; }
+.head-h { font-size: 21px; margin: 0; }
+
+@media (max-width: 900px) {
+  .portada-capas, .portada-veredictos { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .portada-capas, .portada-veredictos { grid-template-columns: 1fr; }
+  .portada { padding: 18px; }
+  .portada h1 { font-size: 24px; }
+}
