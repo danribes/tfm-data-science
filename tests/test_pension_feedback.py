@@ -105,3 +105,45 @@ def test_la_indexacion_no_toca_tipos_ni_crecimiento():
     assert np.array_equal(ief_a, ief_b)
     assert np.array_equal(gnom_a, gnom_b)
     assert not np.array_equal(pb_b, mc_input_paths(Levers())[3])
+
+
+def test_la_tabla_de_sensibilidad_de_la_memoria_coincide_con_el_motor():
+    """§6.7 publica seis filas de deuda frente a indexación. Se recalculan.
+
+    Este repositorio ya pagó el precio de llevar figuras escritas a mano en un
+    documento: el deck tuvo ocho que hubo que cruzar una por una.
+    """
+    import re
+    from pathlib import Path
+
+    md = (Path(__file__).resolve().parents[1] / "docs/MEMORIA_TFM.md").read_text("utf-8")
+    seccion = md.split("### 6.7 Indexación de las pensiones")[1].split("### 6.8")[0]
+    filas = re.findall(
+        r"^\| ([−+]?\d+,\d+)(?: \(referencia\))? \| (\d+,\d+) \| (\d+,\d+) \| ([−+]\d+,\d+) \|$",
+        seccion, re.M)
+    assert len(filas) == 6, f"esperaba 6 filas, encontré {len(filas)}"
+
+    num = lambda t: float(t.replace("−", "-").replace("+", "").replace(",", "."))
+    base = run_scenario(Levers())["b"][-1]
+    for idx, pens, deuda, delta in filas:
+        s = run_scenario(Levers(idx=num(idx)))
+        assert num(pens) == pytest.approx(s["pens"][-1], abs=0.005), idx
+        assert num(deuda) == pytest.approx(s["b"][-1], abs=0.05), idx
+        assert num(delta) == pytest.approx(s["b"][-1] - base, abs=0.05), idx
+
+
+def test_el_artefacto_de_sensibilidad_cubre_todo_el_rango():
+    import json
+    from pathlib import Path
+
+    from engine.levers import LEVER_SPECS
+
+    d = json.loads((Path(__file__).resolve().parents[1]
+                    / "docs/eval/pension-indexation-sensitivity.json").read_text("utf-8"))
+    spec = next(s for s in LEVER_SPECS if s["id"] == "idx")
+    xs = [r["idx"] for r in d["rows"]]
+    assert xs[0] == spec["min"] and xs[-1] == spec["max"]
+    assert d["channel"] == "accounting"
+    # monótona: más indexación, más deuda, sin excepciones en la rejilla
+    deudas = [r["debt_2050"] for r in d["rows"]]
+    assert deudas == sorted(deudas)

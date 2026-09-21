@@ -42,7 +42,7 @@ def figures(housing, mc):
     for i, row in enumerate(rows):
         mean = row.get('mean', row.get('coef'))
         ax.errorbar(mean, 3-i, xerr=[[mean-row['ci_low']], [row['ci_high']-mean]], fmt='o', capsize=5, color='#087f8c')
-    ax.axvline(3, color='#b85622', ls='--', label='Calibración v16: 3 %')
+    ax.axvline(3, color='#b85622', ls='--', label='Valor calibrado: 3 %')
     ax.set_yticks(range(4), labels[::-1]); ax.set_xlabel('Media histórica del crecimiento anual (%) · intervalos 90 %')
     ax.grid(axis='x', alpha=.2); ax.legend(loc='lower right', fontsize=10)
     fig.savefig(output / 'housing-uncertainty.svg'); plt.close(fig)
@@ -53,6 +53,25 @@ def figures(housing, mc):
     ax.set_xlabel('Escala de las innovaciones (1 = calibración actual)')
     ax.set_ylabel('Anchura p5–p95 en 2050 (pp PIB)'); ax.grid(alpha=.2); ax.legend()
     fig.savefig(output / 'montecarlo-sensitivity.svg'); plt.close(fig)
+
+    # La curva entera y no dos puntos. La pendiente sube de 48 a 65 pp de
+    # deuda por punto de indexación de un extremo al otro, así que el coste de
+    # indexar se acelera; interpolar entre los extremos se equivoca en hasta
+    # 6,8 pp. Poco para un titular, bastante para una cifra que se cita.
+    pens = read('pension-indexation-sensitivity.json')
+    fig, ax = plt.subplots(figsize=(9, 3.7), layout='constrained')
+    xs = [r['idx'] for r in pens['rows']]
+    ys = [r['debt_2050'] for r in pens['rows']]
+    ax.plot(xs, ys, '-', color='#087f8c', lw=2.2)
+    base = pens['lever']['base']
+    y0 = next(r['debt_2050'] for r in pens['rows'] if abs(r['idx'] - base) < 1e-9)
+    ax.plot([base], [y0], 'o', color='#b85622', zorder=3)
+    ax.annotate(f'referencia: {y0:.0f} % PIB', (base, y0), textcoords='offset points',
+                xytext=(8, -14), fontsize=10, color='#b85622')
+    ax.set_xlabel('Indexación de pensiones y nóminas sobre la inflación (puntos/año)')
+    ax.set_ylabel('Deuda en 2050 (% PIB)')
+    ax.grid(alpha=.2)
+    fig.savefig(output / 'pension-indexation.svg'); plt.close(fig)
 
 
 def main():

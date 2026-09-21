@@ -162,7 +162,7 @@ El protocolo queda especificado y ejecutable; la anotación independiente es tra
 
 # Análogos: comparación descriptiva corregida
 
-**4.091 observaciones completas · 173 países · 1991–2020**
+**4.070 observaciones completas · 172 países · 1991–2020**
 
 - Consulta en el año seleccionado: deuda, saldo total, crecimiento real, paro e inflación.
 - Mahalanobis: covarianza y diferencias en las mismas coordenadas.

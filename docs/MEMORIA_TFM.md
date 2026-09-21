@@ -51,8 +51,9 @@ cumplimentarlos el autor conforme a la normativa de su titulación.
   - [6.4 Dependencia del estado: sin capacidad predictiva demostrada](#64-dependencia-del-estado-sin-capacidad-predictiva-demostrada)
   - [6.5 Incertidumbre Monte Carlo: los supuestos dominan](#65-incertidumbre-monte-carlo-los-supuestos-dominan)
   - [6.6 Incertidumbre paramétrica: qué aportan los dos parámetros estimados](#66-incertidumbre-paramétrica-qué-aportan-los-dos-parámetros-estimados)
-  - [6.7 Recuperación y generación](#67-recuperación-y-generación)
-  - [6.8 Coherencia de implementación](#68-coherencia-de-implementación)
+  - [6.7 Indexación de las pensiones: la palanca que más mueve la deuda](#67-indexación-de-las-pensiones-la-palanca-que-más-mueve-la-deuda)
+  - [6.8 Recuperación y generación](#68-recuperación-y-generación)
+  - [6.9 Coherencia de implementación](#69-coherencia-de-implementación)
 - [7. Discusión](#7-discusión)
 - [8. Limitaciones](#8-limitaciones)
 - [9. Conclusiones y líneas futuras](#9-conclusiones-y-líneas-futuras)
@@ -479,7 +480,26 @@ La banda nace cerrada en 2026, porque ese año está anclado en el dato observad
 
 Conviene decir qué no es esta banda. No es un intervalo de predicción: no incorpora el error del propio modelo, ni cambios estructurales, ni la incertidumbre de las palancas, que las fija quien usa la herramienta. Un precio observado fuera de la cinta no contradice al modelo. Mide una sola cosa, y por eso puede afirmarse: que los dos parámetros estimados no se conocen con exactitud y que esa ignorancia, propagada a veinticinco años, vale alrededor de una sexta parte del nivel proyectado. [Módulo](../engine/parametric.py), [pruebas](../tests/test_parametric.py).
 
-### 6.7 Recuperación y generación
+### 6.7 Indexación de las pensiones: la palanca que más mueve la deuda
+
+De las diez palancas del panel, la que gobierna la revalorización de pensiones y nóminas domina a todas las demás. Recorriendo su rango completo mueve la deuda de 2050 en 140,5 puntos de PIB; la productividad, recorriendo el suyo, mueve unos 17. Esa asimetría no es un artefacto: el gasto en pensiones es la partida comprometida de mayor tamaño del presupuesto, y una regla de revalorización actúa sobre ella todos los años y de forma acumulativa.
+
+| Indexación (puntos/año) | Pensiones 2050 (% PIB) | Deuda 2050 (% PIB) | Δ frente a la referencia |
+|---|---|---|---|
+| −1,5 | 15,70 | 146,2 | −77,7 |
+| −1,0 | 17,67 | 170,1 | −53,7 |
+| −0,5 | 19,87 | 195,9 | −27,9 |
+| 0,0 (referencia) | 22,33 | 223,8 | +0,0 |
+| +0,5 | 25,08 | 254,0 | +30,2 |
+| +1,0 | 28,16 | 286,6 | +62,8 |
+
+![Deuda en 2050 según la indexación de pensiones](deck/figures/pension-indexation.svg)
+
+La relación no es lineal. La pendiente pasa de 47,8 puntos de deuda por punto de indexación en el extremo inferior a 65,2 en el superior: indexar por encima de la inflación cuesta más caro cuanto más alto se parte, porque el gasto adicional de cada año se arrastra y se capitaliza al diferencial entre el tipo efectivo y el crecimiento nominal. La curvatura es moderada —interpolar linealmente entre los extremos se equivoca como mucho en 6,8 puntos, un 4,8 % del recorrido— pero suficiente para desaconsejar la interpolación cuando la cifra se va a citar. En el punto de referencia la pendiente local es de 58,0 puntos de deuda por punto de indexación.
+
+Conviene subrayar qué tipo de resultado es éste. No es una estimación ni una elasticidad medida sobre datos: es la aritmética del motor bajo un supuesto contable explícito, que un punto de PIB de gasto es un punto menos de saldo primario. No incorpora respuesta de política —ningún gobierno observa la senda y ajusta—, ni efectos de segunda ronda sobre la actividad o la recaudación, ni el efecto que una revalorización distinta tendría sobre el consumo de los hogares perceptores. Cada uno de esos canales ausentes empujaría el resultado en una dirección conocida, y su omisión está declarada en las limitaciones. [Artefacto](eval/pension-indexation-sensitivity.json), [método](../research/pension_sensitivity.py).
+
+### 6.8 Recuperación y generación
 
 | Métrica | Valor | Alcance real |
 |---|---|---|
@@ -495,7 +515,7 @@ Las 35 preguntas participaron en el ajuste de pesos y glosario: son conjunto de 
 
 En aislamiento e integridad, el artefacto histórico registra 156 búsquedas de aislamiento sobre un corpus de 474 documentos y 17.848 fragmentos, con 0 fugas observadas entre colecciones y los índices de embeddings y texto completo. Acredita la integridad del índice examinado, no seguridad universal. [Validador](../rag/validation.py).
 
-### 6.8 Coherencia de implementación
+### 6.9 Coherencia de implementación
 
 La comparación entre el motor de servidor y el de navegador cubre las 40 series en todos los años del horizonte, además de los ocho escenarios ilustrativos. Las anclas fijan el resultado esperado y cualquier divergencia detiene la construcción. Es una prueba de consistencia de implementación: no dice nada sobre la exactitud económica de las trayectorias.
 
