@@ -90,3 +90,16 @@ describe("los recuentos llevan separador de millares", () => {
     expect(nf(2050, 0)).toBe("2050");
   });
 });
+
+describe("la columna del primer año no se anuncia como dato", () => {
+  it("2026 es el primer año proyectado, no un observado", () => {
+    // El motor aplica las palancas ya en k=0: la línea base sale de 105,6
+    // (observado de 2025) y da 106,32 en 2026, y una palanca lo mueve otra
+    // vez. La cabecera decía «2026 · hoy», que invitaba a leerlo como dato,
+    // mientras la propia columna mostraba una Δ distinta de cero.
+    const encabezado = (y: number, y0: number) => `${y}${y === y0 ? " · inicio" : ""}`;
+    expect(encabezado(2026, 2026)).toBe("2026 · inicio");
+    expect(encabezado(2026, 2026)).not.toContain("hoy");
+    expect(encabezado(2050, 2026)).toBe("2050");
+  });
+});

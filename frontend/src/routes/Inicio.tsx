@@ -72,6 +72,11 @@ export default function Inicio() {
           quiere comprar, así que la tabla no dictamina por ti.
         </Caption>
         <Caption>
+          La proyección empieza en <b>2026</b>: esa columna no es un dato
+          observado, es el primer año calculado, y las palancas ya lo mueven.
+          El último valor observado es el de 2025.
+        </Caption>
+        <Caption>
           Las filas marcadas <b>sin senda propia</b> son constantes en los
           veinticinco años de la línea base: el motor no les da trayectoria,
           sólo las desplaza en bloque cuando una palanca las empuja. Se señala

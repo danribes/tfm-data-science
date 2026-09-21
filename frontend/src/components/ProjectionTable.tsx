@@ -50,9 +50,27 @@ export function ProjectionTable({ scn }: { scn: Scenario }) {
       <table className="projtable">
         <thead>
           <tr>
-            <th>Serie</th>
+            <th rowSpan={2}>Serie</th>
+            {/* 2026 es el PRIMER AÑO PROYECTADO, no un dato observado. El
+                motor aplica las palancas ya en k=0: la línea base da 106,32
+                partiendo del 105,6 observado de 2025, y una palanca lo mueve a
+                105,81. Decía «· hoy», que invitaba a leerlo como dato, y la
+                columna traía una Δ distinta de cero que lo desmentía. */}
             {TABLE_YEARS.map((y) => (
-              <th key={y} className="num" colSpan={2}>{y}{y === Y0 ? " · hoy" : ""}</th>
+              <th key={y} className={`num grp${y === Y0 ? " obs" : ""}`} colSpan={2}>
+                {y}{y === Y0 ? " · inicio" : ""}
+              </th>
+            ))}
+          </tr>
+          {/* Segunda fila: la cabecera decía «2030» sobre dos columnas y nada
+              indicaba que la segunda era la diferencia. Estaba explicado en
+              prosa debajo de la tabla, que es donde no se mira. */}
+          <tr className="sub">
+            {TABLE_YEARS.map((y) => (
+              <Fragment key={`s-${y}`}>
+                <th className={`num grp${y === Y0 ? " obs" : ""}`}>valor</th>
+                <th className={`num${y === Y0 ? " obs" : ""}`}>Δ base</th>
+              </Fragment>
             ))}
           </tr>
         </thead>
@@ -102,8 +120,10 @@ export function ProjectionTable({ scn }: { scn: Scenario }) {
                           recuentos— y ahí el separador de millares va siempre:
                           `nf` lo suprime entre 1000 y 9999 y la columna
                           mezclaba "1033" con "171.444". */}
-                      <td className="num">{f.dec === 0 ? eur(s[i]) : nf(s[i], f.dec)}</td>
-                      <td className={`num d ${tone(delta, k, UP_IS_BAD.has(k))}`}>
+                      <td className={`num grp${y === Y0 ? " obs" : ""}`}>
+                        {f.dec === 0 ? eur(s[i]) : nf(s[i], f.dec)}
+                      </td>
+                      <td className={`num d ${tone(delta, k, UP_IS_BAD.has(k))}${y === Y0 ? " obs" : ""}`}>
                         {f.dec === 0 ? sgEur(delta) : sg(delta, f.dec)}
                       </td>
                     </Fragment>

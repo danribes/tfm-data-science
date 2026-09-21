@@ -430,8 +430,29 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .projtable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .projtable th, .projtable td { padding: 7px 9px; border-bottom: 1px solid var(--grid); text-align: left; }
 .projtable thead th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em;
-  color: var(--muted); border-bottom: 2px solid var(--grid); }
+  color: var(--muted); border-bottom: 2px solid var(--grid); vertical-align: bottom; }
 .projtable tbody th { font-weight: 600; }
+
+/* Segunda fila de cabecera: nombra el par valor / diferencia. Sin ella, «2030»
+   cubría dos columnas y sólo la prosa de debajo decía qué era la segunda. */
+.projtable thead tr.sub th { text-transform: none; letter-spacing: 0; font-weight: 600;
+  font-size: 10.5px; padding-top: 0; padding-bottom: 5px; border-bottom: 2px solid var(--grid); }
+
+/* Separador entre años: ocho columnas numéricas seguidas se leen como una
+   mancha. Una línea fina delante de cada grupo basta; una rejilla completa
+   pesaría más que los datos. */
+.projtable .grp { border-left: 1px solid var(--grid); }
+
+/* El primer año de la proyección, destacado por ser el punto de partida — no
+   por ser un dato: 2026 ya está proyectado y las palancas lo mueven. El último
+   valor observado es el de 2025. */
+.projtable .obs { background: var(--code); }
+
+/* Filas de tres y cuatro líneas: sin bandas, seguir una serie de 2026 a 2050
+   obliga a usar el dedo. */
+.projtable tbody tr:nth-child(even) { background: color-mix(in srgb, var(--grid) 28%, transparent); }
+.projtable tbody tr:hover { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.projtable tbody tr:hover .obs { background: transparent; }
 .projtable tbody th small { display: block; font-weight: 400; color: var(--muted); font-size: 11.5px; }
 .projtable .num { text-align: right; font-variant-numeric: tabular-nums; }
 .projtable td.d { font-size: 12.5px; font-weight: 600; padding-left: 2px; }
