@@ -28,14 +28,20 @@ Tres decisiones de diseño que conviene no perder si la propuesta se acepta:
   · El año de lectura por defecto no es Y0. En el primer año no ha pasado nada
     todavía y todos los deltas salen 0,0, que es exactamente la primera
     impresión que hay que evitar.
+
+  · Una línea sola se lee como una certeza. Donde hay incertidumbre medible se
+    dibuja, y donde la hay pero no se ha medido se dice con palabras en vez de
+    dejar que la línea limpia hable por el modelo.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 from engine.levers import BASE_LEVERS, LEVER_SPECS, Levers
+from engine.parametric import parametric_band
 from engine.spain import Y0, baseline, run_scenario
 from explain.facts import HEADLINES, SERIES_META, SIDES, decompose
 
@@ -137,7 +143,7 @@ def collect(levers: Levers) -> dict:
         })
     contribs, _interaction, joint = decompose(levers, "b", 2050 - Y0) if moved else ([], 0.0, 0.0)
     return {"moved": moved, "rows": rows, "joint": joint,
-            "world": world(levers),
+            "world": world(levers), "band": parametric_band(levers, "precio"),
             "contrib": [{"name": c.lever_name, "delta": c.delta, "share": c.share}
                         for c in contribs],
             "path": {"years": list(range(Y0, 2051)), "base": base["b"], "scn": scn["b"]}}
@@ -207,19 +213,118 @@ def chart(path: dict, width: int = 720, height: int = 230, pad: int = 34) -> str
             f'{xlab}</svg>')
 
 
+def _ticks(lo: float, hi: float, target: int = 4) -> list[float]:
+    """Marcas redondas dentro del rango. El gráfico de deuda las lleva fijas
+    (120…280 %PIB); un precio en euros no admite esa lista escrita a mano."""
+    span = hi - lo
+    if span <= 0:
+        return []
+    raw = span / target
+    mag = 10 ** int(math.floor(math.log10(raw)))
+    # Se elige el paso redondo que deja el número de marcas más cerca del
+    # objetivo, no el primero que supera `raw`. Esa otra regla, que es la
+    # habitual, saltaba de 50.000 a 100.000 para un rango de 223.000 € y
+    # dejaba el gráfico con dos líneas de referencia.
+    cand = [m * mag for m in (0.5, 1, 2, 2.5, 5, 10, 20)]
+    step = min(cand, key=lambda st: (abs(span / st - target), st))
+    first = math.ceil(lo / step) * step
+    n = int(span / step) + 2
+    return [first + i * step for i in range(n) if first + i * step < hi]
+
+
+def band_chart(band, width: int = 720, height: int = 250, pad: int = 52) -> str:
+    """El precio con su banda paramétrica: dos cintas y la proyección puntual.
+
+    La cinta exterior es el 5–95, la interior el 25–75. La línea sigue siendo
+    la corrida con los valores puntuales, no la mediana de los sorteos: la
+    banda se añade alrededor de la proyección publicada, no la sustituye.
+    """
+    ys = band.years
+    p5, p95 = band.percentiles["p5"], band.percentiles["p95"]
+    p25, p75 = band.percentiles["p25"], band.percentiles["p75"]
+    lo, hi = min(p5) * 0.985, max(p95) * 1.015
+    x = lambda i: pad + i * (width - pad - 12) / (len(ys) - 1)              # noqa: E731
+    y = lambda v: height - pad + 18 - (v - lo) / (hi - lo) * (height - 2 * pad)  # noqa: E731
+    line = lambda vs: " ".join(("M" if i == 0 else "L") + f"{x(i):.1f} {y(v):.1f}"  # noqa: E731
+                               for i, v in enumerate(vs))
+    ribbon = lambda up, dn: (                                              # noqa: E731
+        " ".join(("M" if i == 0 else "L") + f"{x(i):.1f} {y(v):.1f}" for i, v in enumerate(up))
+        + " " + " ".join(f"L{x(i):.1f} {y(v):.1f}"
+                         for i, v in reversed(list(enumerate(dn)))) + " Z")
+    grid = "".join(
+        f'<line x1="{pad}" y1="{y(t):.1f}" x2="{width-12}" y2="{y(t):.1f}" stroke="var(--grid)"/>'
+        f'<text x="{pad-6}" y="{y(t)+4:.1f}" text-anchor="end" font-size="10" '
+        f'fill="var(--muted)">{nf(t/1000, 0)} k</text>' for t in _ticks(lo, hi))
+    xlab = "".join(
+        f'<text x="{x(i):.1f}" y="{height-12}" text-anchor="middle" font-size="10" '
+        f'fill="var(--muted)">{yr}</text>'
+        for i, yr in enumerate(ys) if yr in COLUMNS)
+    return (f'<svg viewBox="0 0 {width} {height}" width="100%" height="{height}">{grid}'
+            f'<path d="{ribbon(p95, p5)}" fill="var(--lab)" opacity="var(--band-o1)"/>'
+            f'<path d="{ribbon(p75, p25)}" fill="var(--lab)" opacity="var(--band-o2)"/>'
+            f'<path d="{line(band.point)}" fill="none" stroke="var(--lab)" stroke-width="2.4"/>'
+            f'{xlab}</svg>')
+
+
+def render_band(band) -> str:
+    """La banda, con lo que mide escrito al lado. Sin esa frase, una cinta
+    alrededor de una línea se lee como un intervalo de predicción, que es
+    justo lo que no es."""
+    lr, rev = band.params["IPV_LR"], band.params["IPV_REV"]
+    filas = ""
+    for yr in COLUMNS:
+        i = band.years.index(yr)
+        ancho = band.width(yr)
+        rel = ancho / band.point[i] * 100 if band.point[i] else 0.0
+        filas += (f'<tr><th scope="row">{yr}</th>'
+                  f'<td class="num">{nf(band.percentiles["p5"][i], 0)}</td>'
+                  f'<td class="num"><b>{nf(band.point[i], 0)}</b></td>'
+                  f'<td class="num">{nf(band.percentiles["p95"][i], 0)}</td>'
+                  f'<td class="num d">{nf(ancho, 0)}</td>'
+                  f'<td class="num d">{nf(rel, 1)} %</td></tr>')
+    return f"""{band_chart(band)}
+  <div class="foot"><span style="color:var(--lab)">——</span> proyección con los
+  valores puntuales · cinta interior 25–75 · cinta exterior 5–95 · precio medio
+  de la vivienda, euros</div>
+  <table style="margin-top:14px"><thead><tr><th>Año</th>
+    <th class="num">p5</th><th class="num">proyección</th><th class="num">p95</th>
+    <th class="num">ancho</th><th class="num">sobre el nivel</th></tr></thead>
+    <tbody>{filas}</tbody></table>
+  <div class="note" style="margin-top:12px"><strong>Qué mide esta banda y qué
+  no.</strong> Mide una sola cosa: que los dos parámetros del motor que vienen
+  de una estimación no se conocen exactamente. Se sortean
+  {nf(band.n_draws, 0)} veces de su distribución estimada —IPV_LR
+  {nf(lr["value"], 4)} (se {nf(lr["se"], 4)}), IPV_REV {nf(rev["value"], 4)}
+  (se {nf(rev["se"], 4)}), estimadas sobre {nf(lr["n"], 0)} observaciones
+  trimestrales de {lr["n_units"]} comunidades, 2007–2026— y cada
+  sorteo se mantiene fijo los 25 años, porque un parámetro es una incógnita
+  fija y no un choque anual. <b>No</b> es un intervalo de predicción: no
+  incluye los errores del propio modelo, ni los cambios estructurales, ni la
+  incertidumbre de las palancas, que las fija quien usa la herramienta. Un
+  precio fuera de esta cinta no contradice al modelo.</div>
+  <div class="note" style="margin-top:10px"><strong>Por qué sólo aquí.</strong>
+  De las ocho series de la tabla, la cadena de vivienda es la única que depende
+  de parámetros estimados. El resto sale de una identidad contable y de reglas
+  calibradas: no tienen error típico que sortear, y dibujarles una banda sería
+  inventarse una distribución que nadie ha estimado. El abanico de la deuda
+  existe, pero mide otra cosa —choques sobre tipos, crecimiento y saldo
+  primario— y no es comparable con ésta.</div>"""
+
+
 STYLE = """
 :root{--page:#f7f5f0;--surface:#fcfcfb;--card:#f9f9f7;--ink:#1a1a1a;--ink-2:#52514e;
 --muted:#898781;--grid:#e1e0d9;--accent:#2a78d6;--lab:#b0399a;--good:#006300;
 --div-neg:#e34948;--warn:#a86a00;--chip:#eef3fa;--chip-lab:#fbecf7;--chip-warn:#fdf3e2;
-color-scheme:light}
+--band-o1:.13;--band-o2:.20;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--page:#060606;
 --surface:#1a1a19;--card:#141413;--ink:#f4f4f1;--ink-2:#b9b8b2;--grid:#2a2a28;
 --chip:#16212e;--chip-lab:#2a1526;--chip-warn:#2e2415;--accent:#6aa9ec;--lab:#e082cd;
---good:#5fbf72;--div-neg:#ff6b6a;--warn:#e0a34a;color-scheme:dark}}
+--good:#5fbf72;--div-neg:#ff6b6a;--warn:#e0a34a;--band-o1:.24;--band-o2:.40;
+color-scheme:dark}}
 :root[data-theme=dark]{--page:#060606;--surface:#1a1a19;--card:#141413;--ink:#f4f4f1;
 --ink-2:#b9b8b2;--grid:#2a2a28;--chip:#16212e;--chip-lab:#2a1526;--chip-warn:#2e2415;
 --accent:#6aa9ec;--lab:#e082cd;--good:#5fbf72;--div-neg:#ff6b6a;--warn:#e0a34a;
-color-scheme:dark}
+--band-o1:.24;--band-o2:.40;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;padding:26px;background:var(--page);color:var(--ink);
 font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -401,7 +506,10 @@ cambio, salen del motor cada vez que se genera este archivo
   <div class="foot">— — base congelada · <span style="color:var(--lab)">——</span>
   escenario · Deuda %PIB</div></section>
 
-<section class="card"><h2>4 · El futuro, en números</h2>
+<section class="card"><h2>4 · Cuánto de esto es incertidumbre</h2>
+  {render_band(data["band"])}</section>
+
+<section class="card"><h2>5 · El futuro, en números</h2>
   <table><thead><tr><th>Serie</th>{heads}</tr></thead><tbody>{body}</tbody></table>
   <div class="acts"><button>Copiar tabla</button><button>Descargar CSV</button></div>
   <div class="key">
@@ -409,12 +517,12 @@ cambio, salen del motor cada vez que se genera este archivo
     <span><b class="dn">verde</b> mejora · <b class="up">rojo</b> empeora ·
     <b class="rel">azul</b> depende de quién pregunte</span></div></section>
 
-<section class="card"><h2>5 · Qué mueve la deuda en 2050</h2>
+<section class="card"><h2>6 · Qué mueve la deuda en 2050</h2>
   <table><tbody>{contrib}</tbody></table>
   <div class="foot" style="margin-top:8px">El motor vuelto a correr con una sola
   palanca cada vez. Total conjunto: {signed(data["joint"], 1)} pp.</div></section>
 
-<section class="card"><h2>6 · Cómo se ha calculado cada cifra</h2>
+<section class="card"><h2>7 · Cómo se ha calculado cada cifra</h2>
   <table class="layers"><tbody>{layers}</tbody></table>
   <div class="note" style="margin-top:12px"><strong>La respuesta corta:</strong>
   las cifras de la tabla salen de una identidad contable con reglas calibradas,
@@ -423,7 +531,7 @@ cambio, salen del motor cada vez que se genera este archivo
   superó a su referencia, el clasificador vive aparte y el modelo de lenguaje no
   calcula: redacta sobre hechos ya calculados.</div></section>
 
-<section class="card"><h2>7 · España entre los demás</h2>
+<section class="card"><h2>8 · España entre los demás</h2>
   {world}</section>
 
 <div class="foot">Proyección condicional, no recomendación de compra, venta o voto.</div>
@@ -458,6 +566,10 @@ def main() -> int:
     print(f"{args.out}  {args.out.stat().st_size / 1000:.1f} kB")
     print(f"  palancas: {', '.join(f'{k}={v}' for k, v in kwargs.items())}")
     print(f"  filas: {len(data['rows'])} · columnas: {', '.join(map(str, COLUMNS))}")
+    bd = data["band"]
+    print(f"  banda paramétrica · {bd.n_draws} sorteos · semilla {bd.seed} · "
+          f"ancho p5-p95 en 2050: {bd.width(2050):,.0f} EUR "
+          f"({bd.width(2050) / bd.point[-1] * 100:.1f} % del nivel)")
     flat = [r["label"] for r in data["rows"] if r["pinned"]]
     if flat:
         print(f"  sin senda propia (planas por construcción): {', '.join(flat)}")

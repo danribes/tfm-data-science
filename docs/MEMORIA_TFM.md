@@ -50,8 +50,9 @@ cumplimentarlos el autor conforme a la normativa de su titulación.
   - [6.3 Impago soberano: discriminación moderada, sin calibración](#63-impago-soberano-discriminación-moderada-sin-calibración)
   - [6.4 Dependencia del estado: sin capacidad predictiva demostrada](#64-dependencia-del-estado-sin-capacidad-predictiva-demostrada)
   - [6.5 Incertidumbre Monte Carlo: los supuestos dominan](#65-incertidumbre-monte-carlo-los-supuestos-dominan)
-  - [6.6 Recuperación y generación](#66-recuperación-y-generación)
-  - [6.7 Coherencia de implementación](#67-coherencia-de-implementación)
+  - [6.6 Incertidumbre paramétrica: qué aportan los dos parámetros estimados](#66-incertidumbre-paramétrica-qué-aportan-los-dos-parámetros-estimados)
+  - [6.7 Recuperación y generación](#67-recuperación-y-generación)
+  - [6.8 Coherencia de implementación](#68-coherencia-de-implementación)
 - [7. Discusión](#7-discusión)
 - [8. Limitaciones](#8-limitaciones)
 - [9. Conclusiones y líneas futuras](#9-conclusiones-y-líneas-futuras)
@@ -453,7 +454,24 @@ Manteniendo la escala de perturbación, la anchura se multiplica por seis al var
 
 ![Sensibilidad de la anchura de la banda a los supuestos](deck/figures/montecarlo-sensitivity.svg)
 
-### 6.6 Recuperación y generación
+### 6.6 Incertidumbre paramétrica: qué aportan los dos parámetros estimados
+
+Las bandas de la sección anterior no contienen incertidumbre paramétrica, y no pueden contenerla: ninguna de las constantes que entran en la identidad de deuda procede de una estimación. Son calibraciones, y sortearlas exigiría inventar una distribución que nadie ha estimado. Del motor completo sólo dos parámetros tienen error típico —$\mathrm{IPV\_LR}$ e $\mathrm{IPV\_REV}$, del panel trimestral de 19 comunidades— y ambos actúan sobre la cadena de vivienda. Ahí sí puede medirse.
+
+El procedimiento sortea los dos parámetros de su distribución estimada, 4.000 veces con semilla 42, y mantiene cada sorteo fijo durante los veinticinco años de la proyección. Esa permanencia no es un detalle de implementación: un parámetro es una incógnita fija, no una perturbación anual, y resortearlo cada periodo lo promediaría dentro de cada trayectoria. Medido contra la misma referencia, esa variante incorrecta produce en 2050 una banda cinco veces más estrecha, y sigue pareciendo perfectamente razonable en pantalla. $\mathrm{IPV\_REV}$ es una fracción de reversión anual acotada en $(0,1)$ y se trunca por rechazo, no recortando al borde, que apilaría masa justo en las colas que después se leen.
+
+| Año | p5 | Proyección puntual | p95 | Anchura | Sobre el nivel |
+|---|---|---|---|---|---|
+| 2026 | 171.444 € | 171.444 € | 171.444 € | 0 € | 0,0 % |
+| 2030 | 229.172 € | 232.967 € | 236.945 € | 7.773 € | 3,3 % |
+| 2040 | 291.222 € | 308.291 € | 328.421 € | 37.200 € | 12,1 % |
+| 2050 | 325.760 € | 353.640 € | 386.482 € | 60.722 € | 17,2 % |
+
+La banda nace cerrada en 2026, porque ese año está anclado en el dato observado, y se abre de forma monótona hasta un 17,2 % del nivel en 2050. La distribución del precio en 2050 es próxima a la normal con una leve cola derecha —asimetría 0,37, curtosis 3,53— y desviación típica de 18.626 €, coherente con una anchura p5–p95 de unos 3,3 desviaciones típicas. Con 4.000 sorteos la anchura es estable: su desviación típica entre 30 semillas es del 1,56 %, frente al 2,83 % con 1.000, la mejora en $1/\sqrt{n}$ que corresponde.
+
+Conviene decir qué no es esta banda. No es un intervalo de predicción: no incorpora el error del propio modelo, ni cambios estructurales, ni la incertidumbre de las palancas, que las fija quien usa la herramienta. Un precio observado fuera de la cinta no contradice al modelo. Mide una sola cosa, y por eso puede afirmarse: que los dos parámetros estimados no se conocen con exactitud y que esa ignorancia, propagada a veinticinco años, vale alrededor de una sexta parte del nivel proyectado. [Módulo](../engine/parametric.py), [pruebas](../tests/test_parametric.py).
+
+### 6.7 Recuperación y generación
 
 | Métrica | Valor | Alcance real |
 |---|---|---|
@@ -469,7 +487,7 @@ Las 35 preguntas participaron en el ajuste de pesos y glosario: son conjunto de 
 
 En aislamiento e integridad, el artefacto histórico registra 156 búsquedas de aislamiento sobre un corpus de 474 documentos y 17.848 fragmentos, con 0 fugas observadas entre colecciones y los índices de embeddings y texto completo. Acredita la integridad del índice examinado, no seguridad universal. [Validador](../rag/validation.py).
 
-### 6.7 Coherencia de implementación
+### 6.8 Coherencia de implementación
 
 La comparación entre el motor de servidor y el de navegador cubre las 40 series en todos los años del horizonte, además de los ocho escenarios ilustrativos. Las anclas fijan el resultado esperado y cualquier divergencia detiene la construcción. Es una prueba de consistencia de implementación: no dice nada sobre la exactitud económica de las trayectorias.
 
