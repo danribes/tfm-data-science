@@ -62,6 +62,10 @@ roto.
   hacer cuando no los muestre.
 - [Reproducción](docs/REPRODUCIBILITY.md): entorno, datos, comandos y pasos
   todavía ausentes para reconstruir el pipeline legado completo.
+- [Actualizar los datos](docs/ACTUALIZAR_DATOS.md): cómo se trae un corte de
+  datos nuevo, cómo se compara con el anterior y qué hay que recalcular. El
+  corte congelado es inmutable a propósito: promover uno nuevo es un acto
+  humano y revisado.
 - [Cambios metodológicos](docs/METHODOLOGY_CHANGES.md): correcciones del motor,
   significado de las métricas y revisión del contrato API.
 - [Verificación local](docs/VERIFICATION.md): resultados de pruebas, build y

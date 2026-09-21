@@ -150,11 +150,22 @@ Para instalar las dependencias opcionales de adquisición y figuras:
 .venv/bin/python -m pip install -r requirements-regenerate.txt
 ```
 
+El procedimiento completo —descargar, comparar, decidir, promover, recalcular
+y comprobar— está en **[ACTUALIZAR_DATOS.md](ACTUALIZAR_DATOS.md)**. Lo que
+sigue resume las herramientas sueltas.
+
 `python scripts/refresh_vintage.py` descarga las URL HTTP(S) registradas a
 `data/vintages/<fecha>/raw/`. Omite artefactos derivados y registros sin URL
 descargable, registra fallos y no toca `data/gold/`. No reconstruye los gold,
 no establece automáticamente un corte de observaciones y no recupera revisiones
 históricas ya sustituidas por el proveedor.
+
+`python scripts/diff_vintage.py <antes> <después>` compara dos vintages
+descargados y dice qué se ha movido en el origen. Devuelve 1 si hay algo que
+revisar. El vintage congelado no guarda el sha256 de sus descargas originales
+—16 de sus 18 filas lo tienen vacío— así que contra él no hay comparación
+posible; la herramienta lo declara «no comparable» en vez de fingir un «sin
+cambios».
 
 `python -m tools.fetch_wb_panel` puede adquirir un panel WDI nuevo.
 `python scripts/build_analog_panel.py` requiere red para fuentes no almacenadas

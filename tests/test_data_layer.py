@@ -568,3 +568,127 @@ def test_public_integrity_snapshot_is_independent_of_private_book_reports(tmp_pa
     assert integrity.snapshot() == before
     public.write_text('{"available": false}')
     assert integrity.snapshot() != before
+
+
+# ---- comparar dos vintages --------------------------------------------------
+
+def _vintage(tmp_path, nombre, filas):
+    """Un vintage de juguete con su manifiesto."""
+    import csv as _csv
+
+    d = tmp_path / nombre
+    d.mkdir(parents=True, exist_ok=True)
+    campos = ["source", "url", "acquired_at", "observation_cutoff", "built_at",
+              "bytes", "raw_file", "processed_file", "kind", "sha256", "status"]
+    with (d / "manifest.csv").open("w", newline="", encoding="utf-8") as fh:
+        w = _csv.DictWriter(fh, fieldnames=campos, lineterminator="\n")
+        w.writeheader()
+        for f in filas:
+            w.writerow({c: f.get(c, "") for c in campos})
+    return d
+
+
+def test_diff_detecta_una_fuente_que_ha_cambiado():
+    """La pregunta que nadie sabía responder: ¿se ha movido el origen?"""
+    import tempfile
+    from pathlib import Path
+
+    from scripts.diff_vintage import diff
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        a = _vintage(tmp, "v1", [
+            {"source": "eurostat", "url": "u1", "sha256": "aaa", "status": "ok"},
+            {"source": "imf", "url": "u2", "sha256": "bbb", "status": "ok"}])
+        b = _vintage(tmp, "v2", [
+            {"source": "eurostat", "url": "u1", "sha256": "ZZZ", "status": "ok"},
+            {"source": "imf", "url": "u2", "sha256": "bbb", "status": "ok"}])
+        d = diff(a, b)
+        assert [n for n, _, _ in d.changed] == ["eurostat"]
+        assert d.unchanged == 1
+        assert d.moved is True
+
+
+def test_diff_no_inventa_un_sin_cambios_cuando_falta_la_huella():
+    """El vintage congelado no guarda sha256 de las descargas originales. Un
+    «sin cambios» ahí sería falso, así que se declara no comparable."""
+    import tempfile
+    from pathlib import Path
+
+    from scripts.diff_vintage import diff
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        a = _vintage(tmp, "v1", [{"source": "eurostat", "url": "u1", "sha256": "", "status": "ok"}])
+        b = _vintage(tmp, "v2", [{"source": "eurostat", "url": "u1", "sha256": "abc", "status": "ok"}])
+        d = diff(a, b)
+        assert d.uncomparable == ["eurostat"]
+        assert d.unchanged == 0 and not d.changed
+
+
+def test_diff_señala_altas_bajas_y_fallos_de_red():
+    import tempfile
+    from pathlib import Path
+
+    from scripts.diff_vintage import diff
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        a = _vintage(tmp, "v1", [
+            {"source": "vieja", "url": "u1", "sha256": "a", "status": "ok"}])
+        b = _vintage(tmp, "v2", [
+            {"source": "nueva", "url": "u2", "sha256": "b", "status": "ok"},
+            {"source": "caida", "url": "u3", "status": "error: 404"}])
+        d = diff(a, b)
+        assert d.added == ["nueva"] and d.removed == ["vieja"]
+        assert [n for n, _ in d.failed] == ["caida"]
+        assert d.moved is True
+
+
+def test_diff_ignora_los_derivados():
+    """Los artefactos derivados no se descargan, así que no pueden cambiar en
+    el origen y no deben contarse como nada."""
+    import tempfile
+    from pathlib import Path
+
+    from scripts.diff_vintage import diff
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        filas = [{"source": "derivado", "url": "x", "kind": "derived",
+                  "status": "skipped: derived artifact or no downloadable HTTP(S) URL"}]
+        d = diff(_vintage(tmp, "v1", filas), _vintage(tmp, "v2", filas))
+        assert d.unchanged == 0 and not d.moved
+
+
+def test_el_runbook_no_cita_comandos_que_no_existen():
+    """`ACTUALIZAR_DATOS.md` es el procedimiento que se entrega al tribunal.
+
+    Un runbook que nombra un script inexistente es peor que no tenerlo: se
+    descubre delante de quien lo pregunta. Se comprueba cada ruta que aparece
+    en un bloque de comandos.
+    """
+    import re
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[1]
+    doc = (raiz / "docs/ACTUALIZAR_DATOS.md").read_text(encoding="utf-8")
+    rutas = set(re.findall(r"(?:python(?:\s+-m)?\s+)([\w./]+\.py)", doc))
+    rutas |= {m.replace(".", "/") + ".py"
+              for m in re.findall(r"python -m ([\w.]+)\b", doc) if "." in m}
+    assert rutas, "no se han encontrado comandos que comprobar"
+    faltan = [r for r in rutas if not (raiz / r).exists()]
+    assert not faltan, faltan
+
+
+def test_el_runbook_declara_las_limitaciones_que_de_verdad_hay():
+    """Las cifras que cita tienen que seguir siendo ciertas."""
+    import csv
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[1]
+    doc = (raiz / "docs/ACTUALIZAR_DATOS.md").read_text(encoding="utf-8")
+    filas = list(csv.DictReader((raiz / "data/gold/manifest.csv").open(encoding="utf-8")))
+    sin_sha = sum(1 for r in filas if not r.get("sha256"))
+    assert f"{sin_sha} de las 18" in doc or f"{sin_sha} de sus 18" in doc, sin_sha
+    assert "data/gold/` es inmutable" in doc
