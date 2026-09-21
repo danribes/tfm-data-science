@@ -40,8 +40,15 @@ cp "$ROOT/data/live/indicator_catalog.yaml" "$STAGE/data/live/"
 
 # Only the research artifacts read by the public endpoints. Do not glob this
 # directory: private RAG acquisition/probe reports may contain book passages.
+#
+# Los dos informes del RAG se añadieron tras comprobar uno por uno que no los
+# llevan: el de recuperación guarda títulos y métricas, y el de generación
+# guarda frases de las respuestas del modelo y sus rechazos. Sin ellos,
+# /rag/eval respondía «faltan artefactos de evaluación» en el despliegue
+# mientras los ficheros estaban en el repositorio desde el principio.
 mkdir -p "$STAGE/docs/eval"
-for report in t1-dl-global distress state_dependence regimes; do
+for report in t1-dl-global distress state_dependence regimes \
+              rag-eval-2026-08-09 rag-chat-eval; do
   cp "$ROOT/docs/eval/$report.json" "$STAGE/docs/eval/"
 done
 

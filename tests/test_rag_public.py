@@ -272,3 +272,47 @@ def test_the_token_holder_still_gets_the_configured_default(public_runtime, monk
     client = TestClient(api_main.app)
     body = client.get("/rag/collections", headers={"X-Rag-Token": "t0ken"}).json()
     assert body["default_collection"] == "libros"
+
+
+def test_the_deploy_ships_every_eval_artifact_the_api_reads():
+    """El despliegue tiene que llevar lo que la API va a abrir.
+
+    `/rag/eval` respondía «faltan artefactos de evaluación» en el Space
+    mientras los dos informes del RAG estaban en el repositorio desde el
+    principio: la lista blanca de assemble.sh no los incluía. El fallo era
+    invisible en local, donde los ficheros están siempre.
+
+    La lista blanca es deliberada —`docs/eval/` no se recorre con glob porque
+    los informes de adquisición pueden traer pasajes de los libros—, así que
+    esta prueba no propone globear: comprueba que lo que la API lee está
+    servido, y obliga a decidir explícitamente sobre cada artefacto nuevo.
+    """
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    api_src = (root / "api/main.py").read_text(encoding="utf-8")
+    needed = set(re.findall(r'"docs"\s*/\s*"eval"\s*/\s*"([^"]+)\.json"', api_src))
+    assert needed, "no se encontró ninguna referencia a docs/eval en api/main.py"
+
+    assemble = (root / "deploy/hf/assemble.sh").read_text(encoding="utf-8")
+    loop = re.search(r"for report in (.+?);\s*do", assemble, re.S)
+    assert loop, "no se encontró la lista blanca en assemble.sh"
+    shipped = set(loop.group(1).replace("\\\n", " ").split())
+
+    missing = needed - shipped
+    assert not missing, (
+        f"la API lee {sorted(missing)} pero assemble.sh no los copia; "
+        "añádelos a la lista blanca tras comprobar que no llevan pasajes")
+
+
+def test_every_shipped_eval_artifact_exists():
+    """Un nombre mal escrito en la lista blanca rompe el ensamblado entero."""
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    assemble = (root / "deploy/hf/assemble.sh").read_text(encoding="utf-8")
+    loop = re.search(r"for report in (.+?);\s*do", assemble, re.S)
+    for name in loop.group(1).replace("\\\n", " ").split():
+        assert (root / "docs/eval" / f"{name}.json").is_file(), name
