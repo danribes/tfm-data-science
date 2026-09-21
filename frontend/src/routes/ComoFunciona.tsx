@@ -189,9 +189,12 @@ export default function ComoFunciona() {
             base, lo que ves es la senda central del vintage, no un pronóstico.
           </li>
           <li>
-            <strong>Las constantes son calibraciones, no estimaciones.</strong>{" "}
-            Vienen de la literatura y de la calibración v16; no se han estimado
-            sobre estos datos. Un revisor puede discutirlas, y debería.
+            <strong>Casi todas las constantes son calibraciones, no
+            estimaciones.</strong>{" "}
+            Vienen de la literatura y de la práctica habitual; no se han medido
+            sobre este corte de datos. Las excepciones son los dos parámetros de
+            vivienda, estimados sobre un panel de 19 comunidades. Un revisor
+            puede discutir las calibraciones, y debería.
           </li>
           <li>
             <strong>No hay política monetaria endógena.</strong> Mueves el tipo a

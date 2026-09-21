@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { nf, sg } from "../lib/fmt";
 import { LEVER_SPECS, isMoved, type LeverId } from "../engine/levers";
-import { VINTAGE } from "../engine/vintage";
+import { VINTAGE, ENGINE_VERSION } from "../engine/vintage";
 import { HORIZON_YEARS, useScenarioStore } from "../state/scenarioStore";
 import { PresetBar } from "./PresetBar";
 
@@ -141,7 +141,7 @@ export function LeverRail({ hotIds = [], mobile = false, open = false, onClose }
         ↺ volver a base
       </button>
       <div className="src" style={{ whiteSpace: "normal" }}>
-        Motor v16 · constantes congeladas del vintage {VINTAGE} · el escenario te sigue entre páginas
+        Motor v{ENGINE_VERSION} · constantes congeladas del vintage {VINTAGE} · el escenario te sigue entre páginas
       </div>
     </aside>
   );

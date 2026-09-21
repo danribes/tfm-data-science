@@ -324,7 +324,7 @@ export const handlers = [
               ci_low: 4.54, ci_high: 5.40, significant: true },
           ] },
         { constant: "IPV_REV", label: "Reversión anual del IPV hacia su tendencia",
-          calibrated: 0.4, source: "gold_ccaa_trimestral.csv · AR(1); persistencia v16 0,60 = reversión 0,40",
+          calibrated: 0.4, source: "gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual sobre la desviación",
           compatible: false, verdict: "fuera de la banda (por encima)",
           name: "reversión (1 - phi)", coef: 0.2, se: 0.012,
           n: 1311, n_units: 19, ci_low: 0.18, ci_high: 0.23, significant: true,

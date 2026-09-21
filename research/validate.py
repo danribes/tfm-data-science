@@ -134,8 +134,8 @@ def compare_ipv_reversion() -> Comparison | None:
     return Comparison(
         constant="IPV_REV", label="Reversión anual del IPV hacia su tendencia",
         calibrated=1.0 - c.IPV_REV_V16, estimate=rev,
-        source=("gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual; "
-                "v16: persistencia 0,60 = reversión 0,40"),
+        source=("gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual "
+                "sobre la desviación, con efectos fijos por comunidad"),
     )
 
 

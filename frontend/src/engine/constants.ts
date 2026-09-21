@@ -30,97 +30,97 @@ export const CONSTANTS_META: ConstantMeta[] = [
     "name": "MULT",
     "value": 1.4,
     "unit": "x",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · fiscal multiplier, CORE Macro U3"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · fiscal multiplier, CORE Macro U3"
   },
   {
     "name": "RHO",
     "value": 0.62,
     "unit": "x",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · GDP-level persistence"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · GDP-level persistence"
   },
   {
     "name": "E_R",
     "value": 0.45,
     "unit": "pp GDP / pp rate",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6)"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo"
   },
   {
     "name": "E_EXT",
     "value": 0.25,
     "unit": "x",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · external-demand channel"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · external-demand channel"
   },
   {
     "name": "E_PM",
     "value": 0.012,
     "unit": "pp GDP / %",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · import-price channel"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · import-price channel"
   },
   {
     "name": "OKUN",
     "value": 0.48,
     "unit": "pp u / pp GDP",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · Spain Okun (generic engine uses 0.5)"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · Spain Okun (generic engine uses 0.5)"
   },
   {
     "name": "KAPPA",
     "value": 0.22,
     "unit": "pp pi / pp gap",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · Phillips slope"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · Phillips slope"
   },
   {
     "name": "GAMMA",
     "value": 0.045,
     "unit": "pp pi / %",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · pass-through, 2021-23 episode"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · pass-through, 2021-23 episode"
   },
   {
     "name": "THETA",
     "value": 0.55,
     "unit": "x",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · inflation inertia"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · inflation inertia"
   },
   {
     "name": "PHI",
     "value": 0.3,
     "unit": "pp wage / pp gap",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · wage-setting curve"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · wage-setting curve"
   },
   {
     "name": "A_Z",
     "value": 1.1,
     "unit": "pp u* / index",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · WS-PS shifter"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · WS-PS shifter"
   },
   {
     "name": "A_TAU",
     "value": 0.3,
     "unit": "pp u* / pp",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · WS-PS shifter"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · WS-PS shifter"
   },
   {
     "name": "A_LAM",
     "value": 0.45,
     "unit": "pp u* / pp",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · WS-PS shifter"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · WS-PS shifter"
   },
   {
     "name": "REFI",
     "value": 0.14,
     "unit": "share/yr",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · debt refinancing share 14 %/yr"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · debt refinancing share 14 %/yr"
   },
   {
     "name": "TERM",
     "value": 0.17,
     "unit": "pp",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · 10y term premium (3.42 − 2.80 − 0.45)"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · 10y term premium (3.42 − 2.80 − 0.45)"
   },
   {
     "name": "DIFF",
     "value": 1.4757,
     "unit": "pp",
-    "provenance": "build_v16.py bisection vs gold_cuota_teorica.csv €744.89 median at Euribor 2.80"
+    "provenance": "Calibrado por bisección contra gold_cuota_teorica.csv: cuota mediana de 744,89 € con el Euríbor en 2,80 %"
   },
   {
     "name": "IPV_LR",
@@ -132,31 +132,31 @@ export const CONSTANTS_META: ConstantMeta[] = [
     "name": "IPV_REV",
     "value": 0.2039,
     "unit": "x",
-    "provenance": "panel histórico congelado; incertidumbre dependiente del estimador: docs/eval/housing-robustness.json · tasa anual de reversión 1−phi; persistencia del motor = phi; v16 usaba persistencia 0.60 (reversión 0.40)"
+    "provenance": "panel histórico congelado; incertidumbre dependiente del estimador: docs/eval/housing-robustness.json · tasa anual de reversión 1−phi, donde phi es la persistencia estimada del crecimiento del IPV"
   },
   {
     "name": "E_IPV_R",
     "value": 2.6,
     "unit": "pp IPV / pp rate",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6)"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo"
   },
   {
     "name": "E_IPV_G",
     "value": 1.1,
     "unit": "pp IPV / pp growth",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6)"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo"
   },
   {
     "name": "RJUV",
     "value": 2.317,
     "unit": "x",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · youth/total unemployment ratio, 5y series"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · youth/total unemployment ratio, 5y series"
   },
   {
     "name": "PM_DECAY",
     "value": 0.45,
     "unit": "x",
-    "provenance": "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6) · import-price shock decay"
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · import-price shock decay"
   },
   {
     "name": "OMEGA",
@@ -180,7 +180,7 @@ export const CONSTANTS_META: ConstantMeta[] = [
     "name": "CAL_SALARIO_MES",
     "value": 1749.79,
     "unit": "EUR/mes",
-    "provenance": "kpis_perfiles.json salario_medio 24497 / 14 (build_v16 calib)"
+    "provenance": "Calibrado desde kpis_perfiles.json: salario medio anual 24.497 € repartido en 14 pagas"
   },
   {
     "name": "GENERIC_OKUN",

@@ -86,10 +86,13 @@ export default function Persona() {
 
   const estimated = (evidence.data?.comparisons ?? []).map((cmp) => ({
     name: cmp.constant,
+    label: cmp.label,
     value: cmp.coef,
     ci_low: cmp.ci_low,
     ci_high: cmp.ci_high,
-    calibrated_v16: cmp.calibrated,
+    n: cmp.n,
+    n_units: cmp.n_units,
+    source: cmp.source,
   }));
 
   /** Select a question and make sure it is answered about a year worth asking

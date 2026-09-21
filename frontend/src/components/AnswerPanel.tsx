@@ -4,7 +4,7 @@ import { useScenarioStore } from "../state/scenarioStore";
 import { seriesOf } from "../engine/derived";
 import type { Scenario } from "../engine/spain";
 import { YEARS } from "../engine/spain";
-import { nf } from "../lib/fmt";
+import { eur, nf } from "../lib/fmt";
 import { ProjectionChart } from "./ProjectionChart";
 import { SERIES_FORMAT } from "./KpiRow";
 import { RagCorpusNotice } from "./RagCorpusNotice";
@@ -99,7 +99,13 @@ export function AnswerPanel({
   k: number;
   year: number;
   onAsk: (id: string) => void;
-  estimated?: { name: string; value: number; ci_low: number; ci_high: number; calibrated_v16: number | null }[];
+  /** Los dos parámetros que el motor sí estima, con la muestra de la que
+   *  salen. `label` y `source` vienen de la API: escribirlos a mano aquí es
+   *  como la ficha acabó afirmando «panel de 20 CCAA» cuando son 19. */
+  estimated?: {
+    name: string; label?: string; value: number; ci_low: number; ci_high: number;
+    n?: number; n_units?: number; source?: string;
+  }[];
 }) {
   const prediction = usePrediction();
   const levers = useScenarioStore((s) => s.levers);
@@ -189,22 +195,34 @@ export function AnswerPanel({
         </Layer>
 
         {estimated && estimated.length > 0 && (
-          <Layer tag="datos" title="Qué parámetros vienen de los datos">
+          <Layer tag="datos" title="En qué se apoya esta cifra">
             <ul className="layer-list">
               {estimated.map((e) => (
                 <li key={e.name}>
-                  <code>{e.name}</code> = {nf(e.value, 2)}{" "}
-                  <span className="muted">[{nf(e.ci_low, 2)}, {nf(e.ci_high, 2)}]</span>
-                  {e.calibrated_v16 !== null && (
-                    <> — la calibración v16 usaba {nf(e.calibrated_v16, 2)}, fuera de esa banda.</>
+                  {e.label ?? e.name}: <b>{nf(e.value, 2)}</b>{" "}
+                  <span className="muted">
+                    (banda al 90 % [{nf(e.ci_low, 2)}, {nf(e.ci_high, 2)}])
+                  </span>
+                  {e.source && <div className="muted">{e.source}</div>}
+                  {e.n !== undefined && e.n_units !== undefined && (
+                    <div className="muted">
+                      {eur(e.n)} observaciones trimestrales de {e.n_units} comunidades
+                    </div>
                   )}
                 </li>
               ))}
             </ul>
             <p className="layer-note">
-              Estimado del panel de 20 CCAA. Los demás parámetros del motor
-              (Okun, Phillips, multiplicador) siguen calibrados: el corte de datos
-              congelado no permite identificarlos.
+              Son los dos únicos parámetros del motor estimados sobre datos, y
+              los dos actúan sobre la vivienda. La banda es la incertidumbre de
+              esa estimación: por eso el precio de la vivienda es la única serie
+              del panel que se publica con banda.
+            </p>
+            <p className="layer-note">
+              El resto de constantes —Okun, Phillips, el multiplicador fiscal—
+              están <b>calibradas</b>: valores tomados de la literatura, no
+              medidos sobre este corte de datos, que no permite identificarlos.
+              Son supuestos, y un revisor puede discutirlos.
             </p>
           </Layer>
         )}

@@ -119,7 +119,7 @@ describe("Evidencia — calibrado frente a estimado", () => {
   it("states that a calibration outside the band is a finding, not an error", async () => {
     ui();
     await waitFor(() => expect(screen.getByText(/no es un error/)).toBeInTheDocument());
-    expect(screen.getByText(/calibraciones originales de v16/)).toBeInTheDocument();
+    expect(screen.getByText(/pone\s+cada/)).toBeInTheDocument();
   });
 
   it("warns that the housing window contains the crash", async () => {

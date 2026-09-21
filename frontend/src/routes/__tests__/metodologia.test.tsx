@@ -14,7 +14,9 @@ describe("Metodología — provenance, parity, honesty", () => {
     await waitFor(() => expect(screen.getByText("MULT")).toBeInTheDocument());
     // 34 data rows + header
     expect(screen.getAllByRole("row")).toHaveLength(35);
-    expect(screen.getAllByText(/v16 calibration/).length).toBeGreaterThan(10);
+    // La procedencia dice que el valor está calibrado y no medido, sin
+    // nombrar una versión interna del motor que al lector no le dice nada.
+    expect(screen.getAllByText(/^Calibrado —/).length).toBeGreaterThan(10);
   });
 
   it("lists the 9 red lines with their sources", async () => {

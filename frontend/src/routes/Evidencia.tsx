@@ -57,10 +57,11 @@ export default function Evidencia() {
         <h2>Qué hace esta página</h2>
         <p>
           El motor combina calibraciones de la literatura con dos parámetros
-          de vivienda estimados sobre el vintage congelado. Esta página compara
-          las <strong>calibraciones originales de v16</strong> con las
-          estimaciones del panel y sus bandas al 90 %. El motor actual usa las
-          estimaciones de vivienda; los demás coeficientes siguen calibrados.
+          de vivienda estimados sobre el vintage congelado. Esta página pone
+          cada <strong>valor calibrado</strong> al lado de lo que dicen los
+          datos: la estimación del panel y su banda al 90 %. El motor usa la
+          estimación para la vivienda; los demás coeficientes siguen
+          calibrados porque este corte de datos no permite identificarlos.
           Su procedencia se detalla en <Link to="/metodologia">Datos y método</Link>.
         </p>
         <p>
@@ -72,8 +73,9 @@ export default function Evidencia() {
           Las bandas principales agrupan por región. Un análisis complementario
           conserva los choques nacionales mediante bloques temporales comunes
           de 4, 8 y 12 trimestres: sus intervalos para la media histórica se
-          amplían e incluyen el 3 % de v16. El rechazo depende del estimador;
-          esta media no identifica por sí sola una tendencia estructural.
+          amplían e incluyen el valor calibrado del 3 %. El rechazo depende del
+          estimador; esta media no identifica por sí sola una tendencia
+          estructural.
         </p>
       </section>
 
@@ -92,7 +94,7 @@ export default function Evidencia() {
               <table className="guide-t ev-t">
                 <thead>
                   <tr>
-                    <th>Constante</th><th>Calibración v16</th><th>Estimado</th>
+                    <th>Constante</th><th>Calibrado</th><th>Estimado</th>
                     <th>Banda 90 %</th><th>Muestra</th><th></th><th>Veredicto</th>
                   </tr>
                 </thead>
@@ -150,10 +152,10 @@ export default function Evidencia() {
             </div>
             <p className="caption">
               La barra clara es la banda al 90 %, el punto oscuro el valor
-              estimado y el marcador la calibración original v16. Su factor de
-              persistencia 0,60 equivale a una tasa de reversión 0,40. Está dibujada a
-              escala a propósito: en una tabla de cifras, quedarse fuera por poco
-              y quedarse fuera por el triple se leen igual.
+              estimado y el marcador el valor calibrado con el que se comparaba.
+              Está dibujada a escala a propósito: en una tabla de cifras,
+              quedarse fuera por poco y quedarse fuera por el triple se leen
+              igual.
             </p>
             <p className="caption">
               Las filas con ↳ son el mismo estimador sobre una ventana más

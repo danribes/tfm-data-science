@@ -193,7 +193,7 @@ BASE_LEVERS: dict[str, float] = {
     "z": 0.0, "ext": 1.8, "dem": 0.0, "idx": 0.0,
 }
 
-_V16 = "v16 calibration — calibrated default, not estimated (phase 3 contests may replace, AC-V6)"
+_V16 = ("Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo")
 _MC = "MC calibration fitted to gold_escenarios_deuda_mc.csv central envelopes (this repo, phase 1)"
 _EST = "panel histórico congelado; incertidumbre dependiente del estimador: docs/eval/housing-robustness.json"
 
@@ -213,9 +213,9 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "A_LAM", "value": A_LAM, "unit": "pp u* / pp", "provenance": _V16 + " · WS-PS shifter"},
     {"name": "REFI", "value": REFI, "unit": "share/yr", "provenance": _V16 + " · debt refinancing share 14 %/yr"},
     {"name": "TERM", "value": TERM, "unit": "pp", "provenance": _V16 + " · 10y term premium (3.42 − 2.80 − 0.45)"},
-    {"name": "DIFF", "value": DIFF, "unit": "pp", "provenance": "build_v16.py bisection vs gold_cuota_teorica.csv €744.89 median at Euribor 2.80"},
+    {"name": "DIFF", "value": DIFF, "unit": "pp", "provenance": "Calibrado por bisección contra gold_cuota_teorica.csv: cuota mediana de 744,89 € con el Euríbor en 2,80 %"},
     {"name": "IPV_LR", "value": IPV_LR, "unit": "% a/a", "provenance": _EST + " · crecimiento medio del IPV, 17 CCAA + Ceuta y Melilla; Nacional excluido; banda condicional a la muestra"},
-    {"name": "IPV_REV", "value": IPV_REV, "unit": "x", "provenance": _EST + " · tasa anual de reversión 1−phi; persistencia del motor = phi; v16 usaba persistencia 0.60 (reversión 0.40)"},
+    {"name": "IPV_REV", "value": IPV_REV, "unit": "x", "provenance": _EST + " · tasa anual de reversión 1−phi, donde phi es la persistencia estimada del crecimiento del IPV"},
     {"name": "E_IPV_R", "value": E_IPV_R, "unit": "pp IPV / pp rate", "provenance": _V16},
     {"name": "E_IPV_G", "value": E_IPV_G, "unit": "pp IPV / pp growth", "provenance": _V16},
     {"name": "RJUV", "value": RJUV, "unit": "x", "provenance": _V16 + " · youth/total unemployment ratio, 5y series"},
@@ -223,7 +223,7 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "OMEGA", "value": OMEGA, "unit": "x", "provenance": "lagged inflation-deviation weight: 1.0=default, 0.0=no lag around frozen inflation reference; not an ECB target model"},
     {"name": "ALPHA_SPREAD", "value": ALPHA_SPREAD, "unit": "pp bono / pp debt", "provenance": "endogenous spread: 0.0=off (default); 0.04=illustrative 4 bp per pp debt, not an estimate"},
     {"name": "B_CRIT", "value": B_CRIT, "unit": "% PIB", "provenance": "debt/GDP threshold above which spread feedback activates"},
-    {"name": "CAL_SALARIO_MES", "value": CAL_SALARIO_MES, "unit": "EUR/mes", "provenance": "kpis_perfiles.json salario_medio 24497 / 14 (build_v16 calib)"},
+    {"name": "CAL_SALARIO_MES", "value": CAL_SALARIO_MES, "unit": "EUR/mes", "provenance": "Calibrado desde kpis_perfiles.json: salario medio anual 24.497 € repartido en 14 pagas"},
     {"name": "GENERIC_OKUN", "value": OKUN_COEFFICIENT, "unit": "pp u / pp GDP", "provenance": "engine.generic.OKUN_COEFFICIENT (generic engine calibrated default, literature 0.3-0.5), NOT country-specific — distinct from Spain's 0.48"},
     {"name": "GENERIC_PHILLIPS", "value": PHILLIPS_SLOPE, "unit": "pp pi / pp gap", "provenance": "engine.generic.PHILLIPS_SLOPE (generic engine calibrated default, NOT country-specific — distinct from Spain's 0.22)"},
     {"name": "MC_RHO", "value": MC_RHO, "unit": "x", "provenance": _MC},
