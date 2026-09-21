@@ -24,11 +24,22 @@ const LAYERS: { id: string; name: string; body: string }[] = [
   },
   {
     id: "dl", name: "APRENDIZAJE PROFUNDO",
-    body: "Red neuronal entrenada en series de vivienda extranjeras. NO se usa "
-      + "en estas proyecciones: no superó su regla de desarrollo prerregistrada "
-      + "—MASE 0,4000 frente a 0,3953 de una tendencia simple, ganando en 5 de "
-      + "17 comunidades cuando la regla exigía 12—. El resultado negativo se "
-      + "conserva publicado en vez de retirarse.",
+    // Aquí había media respuesta: se presentaba la capa entera como «no se
+    // usa», cuando lo que no se usa es UNA de las dos redes. La otra está
+    // codificando cada consulta ahora mismo.
+    body: "Dos redes neuronales, y conviene no confundirlas. La que SÍ está en "
+      + "producción es el codificador multilingual-e5-large, un transformador "
+      + "de 24 capas que convierte cada pregunta en un vector de 1.024 "
+      + "dimensiones: es la mitad densa de la búsqueda documental, se ejecuta "
+      + "en cada consulta y es con ella medido el hit@8 publicado. Apagarla "
+      + "cambia los resultados —sólo 3 de 8 pasajes coinciden con la búsqueda "
+      + "por palabras—, así que no es decorativa. La que NO se usa es un "
+      + "perceptrón multicapa entrenado sobre series de vivienda extranjeras "
+      + "para proyectar el precio: no superó su regla de desarrollo "
+      + "prerregistrada —MASE 0,4000 frente a 0,3953 de una tendencia simple, "
+      + "ganando en 5 de 17 comunidades cuando la regla exigía 12— y el "
+      + "resultado negativo se conserva publicado en vez de retirarse. "
+      + "Ninguna de las dos interviene en las cifras de la tabla de arriba.",
   },
   {
     id: "ml", name: "CLASIFICADOR",
@@ -45,10 +56,12 @@ const LAYERS: { id: string; name: string; body: string }[] = [
   },
   {
     id: "llm", name: "RAG Y LENGUAJE",
-    body: "Recuperación documental sobre manuales y documentación propia, y un "
-      + "modelo de lenguaje que redacta. No calcula: redacta sobre hechos ya "
-      + "calculados por el motor, y las cifras que cita se comprueban contra "
-      + "él antes de mostrarse.",
+    body: "Recuperación documental sobre los manuales, y un modelo de lenguaje "
+      + "que redacta. La recuperación combina búsqueda por palabras (BM25) con "
+      + "búsqueda densa, y esta última es la red neuronal descrita arriba. El "
+      + "modelo de lenguaje no calcula: redacta sobre hechos ya calculados por "
+      + "el motor, y las cifras que cita se comprueban contra él antes de "
+      + "mostrarse.",
   },
 ];
 
@@ -70,9 +83,12 @@ export function HowComputed() {
         <strong>La respuesta corta:</strong> las cifras de la tabla salen de una
         identidad contable con reglas calibradas, no de un modelo aprendido. De
         los parámetros del motor sólo dos vienen de los datos, y afectan a la
-        cadena de vivienda. La red neuronal no se usa porque no superó a su
-        referencia, el clasificador vive aparte y el modelo de lenguaje no
-        calcula: redacta sobre hechos ya calculados.
+        cadena de vivienda. Hay aprendizaje profundo en la aplicación —el
+        codificador de la búsqueda documental es un transformador y se ejecuta
+        en cada consulta— pero no interviene en estos números: la red que se
+        entrenó para proyectar el precio no superó a su referencia y no se usa.
+        El clasificador vive aparte y el modelo de lenguaje no calcula: redacta
+        sobre hechos ya calculados.
       </div>
     </div>
   );
