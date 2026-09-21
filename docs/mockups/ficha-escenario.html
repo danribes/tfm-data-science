@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ficha del escenario · maqueta</title><style>
+:root{--page:#f7f5f0;--surface:#fcfcfb;--card:#f9f9f7;--ink:#1a1a1a;--ink-2:#52514e;
+--muted:#898781;--grid:#e1e0d9;--accent:#2a78d6;--lab:#b0399a;--good:#006300;
+--div-neg:#e34948;--warn:#a86a00;--chip:#eef3fa;--chip-lab:#fbecf7;--chip-warn:#fdf3e2;
+color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--page:#060606;
+--surface:#1a1a19;--card:#141413;--ink:#f4f4f1;--ink-2:#b9b8b2;--grid:#2a2a28;
+--chip:#16212e;--chip-lab:#2a1526;--chip-warn:#2e2415;--accent:#6aa9ec;--lab:#e082cd;
+--good:#5fbf72;--div-neg:#ff6b6a;--warn:#e0a34a;color-scheme:dark}}
+:root[data-theme=dark]{--page:#060606;--surface:#1a1a19;--card:#141413;--ink:#f4f4f1;
+--ink-2:#b9b8b2;--grid:#2a2a28;--chip:#16212e;--chip-lab:#2a1526;--chip-warn:#2e2415;
+--accent:#6aa9ec;--lab:#e082cd;--good:#5fbf72;--div-neg:#ff6b6a;--warn:#e0a34a;
+color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:26px;background:var(--page);color:var(--ink);
+font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-size:23px;margin:0}
+h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+margin:0 0 10px;font-weight:700}
+.card{background:var(--surface);border:1px solid var(--grid);border-radius:8px;padding:18px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.stamp{font-size:12px;color:var(--muted);border:1px solid var(--grid);border-radius:999px;
+padding:4px 11px;background:var(--card)}
+.pill{background:var(--chip-lab);color:var(--lab);border-radius:999px;padding:5px 12px;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--card);border:1px solid var(--grid);border-radius:8px;padding:12px 14px}
+.kpi .lab{font-size:12px;color:var(--muted)}
+.kpi .val{font-size:25px;font-weight:700;margin:3px 0}
+.kpi .u{font-size:13px;font-weight:400;color:var(--muted)}
+.kpi .dlt{font-size:12.5px;font-weight:600}
+.up{color:var(--div-neg)}.dn{color:var(--good)}.zero{color:var(--muted)}.rel{color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:7px 9px;border-bottom:1px solid var(--grid);text-align:left}
+thead th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+border-bottom:2px solid var(--grid)}
+tbody th{font-weight:600}
+tbody th small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+td.d{font-size:12.5px;font-weight:600;padding-left:2px}
+.tag{display:inline-block;font-size:10.5px;border-radius:4px;padding:1px 6px;
+margin-left:6px;font-weight:600}
+.tag.warn{background:var(--chip-warn);color:var(--warn)}
+.tag.rel{background:var(--chip);color:var(--accent)}
+.bar{width:120px}.bar span{display:block;height:8px;border-radius:4px;background:var(--lab)}
+.acts{display:flex;gap:8px;margin-top:12px}
+button{font:inherit;font-size:12.5px;padding:6px 13px;border:1px solid var(--grid);
+border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
+.foot{font-size:12px;color:var(--muted)}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
+.note{background:var(--chip-warn);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;
+padding:10px 14px;font-size:12.5px;color:var(--ink-2)}
+</style></head>
+<body><div class="wrap">
+
+<div class="head">
+  <div><h1>España en escenarios</h1>
+  <div class="foot">Proyección condicional sobre el vintage 2026-07-31 · motor 1.1.0</div></div>
+  <span class="stamp">año de lectura · <strong>2035</strong> · stocks a 2050</span>
+</div>
+
+<div class="note"><strong>Maqueta, no la aplicación.</strong> Propone cómo debería
+abrir el panel. Los botones no hacen nada y nada está conectado; las cifras, en
+cambio, salen del motor cada vez que se genera este archivo
+(<code>tools/build_scenario_mockup.py</code>).</div>
+
+<section class="card"><h2>1 · Qué has cambiado</h2>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="pill">Productividad 0,9 → 1,4 %/año</span>
+  <span class="foot">todo lo demás, en su valor observado</span></div></section>
+
+<section class="card"><h2>2 · Qué implica, de un vistazo</h2>
+  <div class="kpis"><div class="kpi"><div class="lab">Deuda pública · 2050</div><div class="val">206,9<span class="u"> %PIB</span></div><div class="dlt dn">−16,9 vs base</div></div><div class="kpi"><div class="lab">Paro · 2030</div><div class="val">9,9<span class="u"> %</span></div><div class="dlt dn">−0,2 vs base</div></div><div class="kpi"><div class="lab">IPCA · 2030</div><div class="val">3,0<span class="u"> %</span></div><div class="dlt zero">0,0 vs base</div></div><div class="kpi"><div class="lab">Saldo público · 2030</div><div class="val">-5,6<span class="u"> %PIB</span></div><div class="dlt dn">+0,1 vs base</div></div></div></section>
+
+<section class="card"><h2>3 · La trayectoria</h2>
+  <svg viewBox="0 0 720 230" width="100%" height="230"><line x1="34" y1="170.8" x2="708" y2="170.8" stroke="var(--grid)"/><text x="28" y="174.8" text-anchor="end" font-size="10" fill="var(--muted)">120</text><line x1="34" y1="121.0" x2="708" y2="121.0" stroke="var(--grid)"/><text x="28" y="125.0" text-anchor="end" font-size="10" fill="var(--muted)">160</text><line x1="34" y1="71.2" x2="708" y2="71.2" stroke="var(--grid)"/><text x="28" y="75.2" text-anchor="end" font-size="10" fill="var(--muted)">200</text><line x1="34.0" y1="22" x2="34.0" y2="196" stroke="var(--muted)" stroke-dasharray="3 3"/><text x="40.0" y="19" font-size="10.5" fill="var(--muted)">dato observado · proyección →</text><path d="M34.0 187.9 L62.1 186.5 L90.2 184.7 L118.2 182.4 L146.3 179.7 L174.4 176.5 L202.5 172.9 L230.6 168.8 L258.7 164.4 L286.8 159.5 L314.8 154.2 L342.9 148.5 L371.0 142.4 L399.1 135.9 L427.2 129.0 L455.2 121.6 L483.3 113.9 L511.4 105.8 L539.5 97.3 L567.6 88.6 L595.7 79.5 L623.8 70.3 L651.8 60.8 L679.9 51.2 L708.0 41.5" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 4"/><path d="M34.0 188.5 L62.1 187.8 L90.2 186.6 L118.2 184.9 L146.3 182.9 L174.4 180.3 L202.5 177.4 L230.6 174.0 L258.7 170.2 L286.8 166.0 L314.8 161.5 L342.9 156.6 L371.0 151.3 L399.1 145.6 L427.2 139.6 L455.2 133.1 L483.3 126.3 L511.4 119.1 L539.5 111.6 L567.6 103.9 L595.7 95.9 L623.8 87.8 L651.8 79.4 L679.9 71.1 L708.0 62.5" fill="none" stroke="var(--lab)" stroke-width="2.4"/><text x="34.0" y="218" text-anchor="middle" font-size="10" fill="var(--muted)">2026</text><text x="146.3" y="218" text-anchor="middle" font-size="10" fill="var(--muted)">2030</text><text x="427.2" y="218" text-anchor="middle" font-size="10" fill="var(--muted)">2040</text><text x="708.0" y="218" text-anchor="middle" font-size="10" fill="var(--muted)">2050</text></svg>
+  <div class="foot">— — base congelada · <span style="color:var(--lab)">——</span>
+  escenario · Deuda %PIB</div></section>
+
+<section class="card"><h2>4 · El futuro, en números</h2>
+  <table><thead><tr><th>Serie</th><th class="num" colspan="2">2026 · hoy</th><th class="num" colspan="2">2030</th><th class="num" colspan="2">2040</th><th class="num" colspan="2">2050</th></tr></thead><tbody><tr><th scope="row">Deuda pública<small>%PIB</small></th><td class="num">105,8</td><td class="num d dn">−0,5</td><td class="num">110,3</td><td class="num d dn">−2,5</td><td class="num">145,1</td><td class="num d dn">−8,5</td><td class="num">206,9</td><td class="num d dn">−16,9</td></tr><tr><th scope="row">Paro<span class="tag warn" title="El motor no le da senda propia: se queda en su valor observado y sólo se desplaza en bloque">sin senda propia · plana por construcción</span><small>%</small></th><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td><td class="num">9,9</td><td class="num d dn">−0,2</td></tr><tr><th scope="row">IPCA<span class="tag warn" title="El motor no le da senda propia: se queda en su valor observado y sólo se desplaza en bloque">sin senda propia · plana por construcción</span><small>%</small></th><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td><td class="num">3,0</td><td class="num d zero">0,0</td></tr><tr><th scope="row">Saldo público<small>%PIB</small></th><td class="num">-4,1</td><td class="num d dn">+0,0</td><td class="num">-5,6</td><td class="num d dn">+0,1</td><td class="num">-10,0</td><td class="num d dn">+0,3</td><td class="num">-14,2</td><td class="num d dn">+0,6</td></tr><tr><th scope="row">Precio vivienda<span class="tag rel" title="Subir es buena noticia para unos y mala para otros">signo según quién pregunte</span><small>€</small></th><td class="num">171.444</td><td class="num d zero">0</td><td class="num">237.751</td><td class="num d rel">+4.784</td><td class="num">331.859</td><td class="num d rel">+23.569</td><td class="num">401.839</td><td class="num d rel">+48.199</td></tr><tr><th scope="row">Cuota hipotecaria<small>€/mes</small></th><td class="num">745</td><td class="num d zero">0</td><td class="num">1.033</td><td class="num d up">+21</td><td class="num">1.442</td><td class="num d up">+102</td><td class="num">1.746</td><td class="num d up">+209</td></tr><tr><th scope="row">Salario medio<span class="tag rel" title="Subir es buena noticia para unos y mala para otros">signo según quién pregunte</span><small>€/año</small></th><td class="num">24.497</td><td class="num d zero">0</td><td class="num">29.101</td><td class="num d rel">+554</td><td class="num">44.763</td><td class="num d rel">+2.910</td><td class="num">68.853</td><td class="num d rel">+7.493</td></tr><tr><th scope="row">Esfuerzo vivienda<small>%</small></th><td class="num">42,6</td><td class="num d zero">0,0</td><td class="num">49,7</td><td class="num d up">+0,1</td><td class="num">45,1</td><td class="num d up">+0,3</td><td class="num">35,5</td><td class="num d up">+0,4</td></tr></tbody></table>
+  <div class="acts"><button>Copiar tabla</button><button>Descargar CSV</button></div>
+  <div class="key">
+    <span>Cada par: valor del escenario y Δ frente a la base.</span>
+    <span><b class="dn">verde</b> mejora · <b class="up">rojo</b> empeora ·
+    <b class="rel">azul</b> depende de quién pregunte</span></div></section>
+
+<section class="card"><h2>5 · Qué mueve la deuda en 2050</h2>
+  <table><tbody><tr><th scope="row">Productividad</th><td class="num">−16,9</td><td class="bar"><span style="width:100%"></span></td><td class="num">100 %</td></tr></tbody></table>
+  <div class="foot" style="margin-top:8px">El motor vuelto a correr con una sola
+  palanca cada vez. Total conjunto: −16,9 pp.</div></section>
+
+<div class="foot">Proyección condicional, no recomendación de compra, venta o voto.</div>
+</div></body></html>
