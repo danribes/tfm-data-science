@@ -7,6 +7,7 @@ import { PUBLIC_RAG_EXAMPLES, RagCorpusNotice } from "../components/RagCorpusNot
 import type { Authority, Passage, RagChatResponse } from "../api/types";
 import { useScenarioStore } from "../state/scenarioStore";
 import { eur } from "../lib/fmt";
+import { limpiarPasaje, marcarFragmento } from "../lib/passageText";
 
 /** How much weight a source carries, shown rather than assumed.
  *  A textbook and a YouTube transcript both produce text; only one of them is
@@ -28,7 +29,8 @@ function PassageCard({ p, index }: { p: Passage; index?: number }) {
         <span className="psg-cite">{p.cita}</span>
         <span className={`psg-auth ${p.authority}`}>{AUTHORITY_LABEL[p.authority]}</span>
       </div>
-      <p className={open ? "psg-text open" : "psg-text"}>{p.text}</p>
+      {/* Mismo arreglo del guion de final de renglón que en Consulta. */}
+      <p className={open ? "psg-text open" : "psg-text"}>{marcarFragmento(limpiarPasaje(p.text))}</p>
       <button type="button" className="psg-more" onClick={() => setOpen((v) => !v)}>
         {open ? "▾ menos" : "▸ ver el pasaje completo"}
       </button>

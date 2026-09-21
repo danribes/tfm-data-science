@@ -3,6 +3,7 @@ import { ragChatStream } from "../api/client";
 import { selectRagCollection, useRagCollections, useRagConnection } from "../api/hooks";
 import { RagConnectionSettings } from "../components/RagConnectionSettings";
 import { PUBLIC_RAG_EXAMPLES, RagCorpusNotice } from "../components/RagCorpusNotice";
+import { limpiarPasaje, marcarFragmento } from "../lib/passageText";
 import type { Passage, RagChatResponse } from "../api/types";
 
 type Failure = { status?: number; detail: string };
@@ -24,6 +25,29 @@ const EXAMPLES = [
   "¿Cómo afecta la política fiscal al crecimiento en una economía con deuda elevada?",
   "¿Qué son las expectativas racionales y en qué se diferencian de las adaptativas?",
 ];
+
+/** El cuerpo del pasaje, recortado y desplegable.
+ *
+ *  Estaba recortado a 3,8 em con `overflow: hidden` y sin ningún control para
+ *  abrirlo: se veían tres líneas de una frase empezada por la mitad y no había
+ *  manera de seguir leyendo. El recorte es correcto —son pasajes de mil
+ *  caracteres— pero necesitaba su botón.
+ */
+function PasajeTexto({ texto }: { texto: string }) {
+  const [abierto, setAbierto] = useState(false);
+  const limpio = marcarFragmento(limpiarPasaje(texto));
+  return (
+    <>
+      <p className={abierto ? "psg-text open" : "psg-text"}>{limpio}</p>
+      {limpio.length > 220 && (
+        <button type="button" className="psg-more"
+          onClick={() => setAbierto((v) => !v)}>
+          {abierto ? "mostrar menos" : "mostrar el pasaje completo"}
+        </button>
+      )}
+    </>
+  );
+}
 
 export default function Consulta() {
   const [question, setQuestion] = useState("");
@@ -190,13 +214,19 @@ export default function Consulta() {
                 <ol className="passages-list">
                   {passages.map((p, i) => (
                     <li key={i} className={`psg ${p.authority}`}>
-                      <span className="psg-cite">{p.cita}</span>
-                      <span className={`psg-auth ${p.authority}`}>
-                        {p.citable === false
-                          ? "documentación propia · no citable"
-                          : AUTHORITY_LABEL[p.authority] ?? p.authority}
-                      </span>
-                      <p className="psg-text">{p.text}</p>
+                      {/* La cita y la etiqueta necesitan el contenedor flexible:
+                          `.psg-auth` se separa con `margin-left: auto`, que sin
+                          él no hace nada y los dejaba pegados —«p. 193fuente
+                          académica»—. */}
+                      <div className="psg-head">
+                        <span className="psg-cite">{p.cita}</span>
+                        <span className={`psg-auth ${p.authority}`}>
+                          {p.citable === false
+                            ? "documentación propia · no citable"
+                            : AUTHORITY_LABEL[p.authority] ?? p.authority}
+                        </span>
+                      </div>
+                      <PasajeTexto texto={p.text} />
                     </li>
                   ))}
                 </ol>
