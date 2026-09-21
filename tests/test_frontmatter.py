@@ -43,17 +43,31 @@ def test_the_figures_the_memoria_references_exist():
         assert (MEMORIA.parent / target).is_file(), target
 
 
-def test_the_cover_leaves_the_institution_blank():
-    """No inventar la universidad ni el tutor.
-
-    Son datos de un registro oficial. Rellenarlos con algo plausible sería
-    falsificarlos, así que la portada deja el hueco y la memoria dice que el
-    autor debe completarlo.
+def test_the_cover_names_the_centre_and_tutor():
+    """Antes la portada dejaba el hueco a propósito: no inventar datos de un
+    registro oficial. Ya no hace falta, porque los ha dado el autor —Evolve
+    Academy, Julio Valero— y están en un solo sitio del generador para que la
+    cubierta y la declaración no puedan decir cosas distintas.
     """
+    from tools.build_frontmatter import CENTRE, TUTOR
+
     svg = (MEMORIA.parent / "figures/portada.svg").read_text(encoding="utf-8")
-    assert "Universidad:" in svg and "Tutor/a:" in svg
-    assert "____" in svg, "los campos deben quedar visiblemente vacíos"
+    assert f"Centro:" in svg and CENTRE in svg
+    assert f"Tutor:" in svg and TUTOR in svg
     assert "Daniel Ribes" in svg
+    assert "____" not in svg, "ya no quedan huecos por rellenar"
+
+
+def test_la_memoria_y_la_cubierta_no_se_contradicen():
+    """El mismo tutor y el mismo centro en los dos sitios."""
+    from tools.build_frontmatter import CENTRE, SIGNED_ON, TUTOR
+
+    memoria = MEMORIA.read_text(encoding="utf-8")
+    svg = (MEMORIA.parent / "figures/portada.svg").read_text(encoding="utf-8")
+    for dato in (CENTRE, TUTOR, SIGNED_ON):
+        assert dato in memoria, dato
+        assert dato in svg, dato
+    assert "Pendiente de firma" not in memoria
 
 
 def test_the_cover_carries_the_vintage_and_engine_version():
@@ -213,3 +227,57 @@ def test_the_readme_serves_the_dark_cover_to_dark_readers():
     assert "prefers-color-scheme: dark" in readme
     assert "docs/figures/portada-dark.svg" in readme
     assert "docs/figures/portada.svg" in readme
+
+
+# ---- cubierta: centro, tutor y declaración firmada --------------------------
+
+def test_la_cubierta_lleva_el_centro_el_tutor_y_la_firma():
+    from pathlib import Path
+
+    svg = (Path(__file__).resolve().parents[1] / "docs/figures/portada.svg").read_text("utf-8")
+    assert "Evolve Academy" in svg
+    assert "Julio Valero" in svg
+    assert "firmada el" in svg
+
+
+def test_no_queda_ningun_marcador_sin_renderizar():
+    """Dos líneas usaban `{p.blank}` dentro de una cadena que no era f-string,
+    así que el SVG publicado llevaba fill="{p.blank}" —un color inválido— y el
+    navegador pintaba negro. No falla nada: simplemente sale mal."""
+    from pathlib import Path
+
+    figuras = Path(__file__).resolve().parents[1] / "docs/figures"
+    for svg in figuras.glob("*.svg"):
+        texto = svg.read_text("utf-8")
+        assert "{p." not in texto, f"{svg.name}: marcador sin renderizar"
+        assert "{esc(" not in texto, svg.name
+
+
+def test_la_marca_del_centro_es_un_trazo_y_no_un_mapa_de_bits():
+    """Se copia el vector de evolve.es y no un PNG: la cubierta es un SVG, así
+    que la marca escala con la página y puede teñirse para el tema oscuro."""
+    from pathlib import Path
+
+    from tools.build_frontmatter import EVOLVE_MARK, evolve_logo
+
+    assert EVOLVE_MARK.startswith("M ") and EVOLVE_MARK.rstrip().endswith("Z")
+    claro = (Path(__file__).resolve().parents[1] / "docs/figures/portada.svg").read_text("utf-8")
+    assert EVOLVE_MARK in claro
+    # y se tiñe, en vez de arrastrar el #1a1a1a de origen
+    assert '#1a1a1a' not in evolve_logo(0, 0, 30, "#ffffff")
+
+
+def test_el_texto_de_la_cubierta_cabe_en_la_pagina():
+    """El ancho es 595 px. Una línea larga no desborda con error: se sale del
+    papel y sólo se ve mirando la imagen, que es como se encontró."""
+    import re
+    from pathlib import Path
+
+    svg = (Path(__file__).resolve().parents[1] / "docs/figures/portada.svg").read_text("utf-8")
+    for m in re.finditer(r'<text x="(\d+)"[^>]*font-size="([\d.]+)"[^>]*>(.*?)</text>', svg, re.S):
+        x, size = int(m.group(1)), float(m.group(2))
+        texto = re.sub(r"<[^>]+>", "", m.group(3))
+        # Arial ronda 0,52 em de ancho medio; se deja margen y se comprueba el
+        # desbordamiento grosero, que es el que se ve.
+        ancho = len(texto) * size * 0.52
+        assert x + ancho < 595 + 40, f"se sale: {texto[:60]!r}"

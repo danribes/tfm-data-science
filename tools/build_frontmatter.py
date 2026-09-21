@@ -205,9 +205,40 @@ CLAIMS = [
 ]
 
 
+#: La marca de Evolve, tal y como la sirve evolve.es: un SVG en línea de dos
+#: trazos sobre un lienzo de 18,539 x 23,242. Se copia el trazo y no un PNG
+#: porque la cubierta es ella misma un SVG: así la marca escala con la página
+#: y se puede teñir para la versión oscura, cosa que un mapa de bits no
+#: permite. El color original (#1a1a1a) se sustituye por el de cada tema.
+EVOLVE_MARK = (
+    "M 14.765 23.242 L 9.838 17.256 C 8.515 15.394 4.556 10.826 4.608 8.519 "
+    "C 4.193 5.815 7.188 1.982 8.526 0 L 14.761 8.519 C 17.971 12.826 18.77 "
+    "15.403 18.485 17.471 C 18.2 19.538 16.588 21.72 14.765 23.242 Z "
+    "M 0.739 19.936 L 3.075 23.242 L 5.093 20.065 C 5.515 19.392 5.732 18.611 "
+    "5.717 17.817 C 5.704 17.023 5.459 16.251 5.014 15.593 L 2.583 11.999 "
+    "L 0.545 15.546 C 0.157 16.22 -0.03 16.992 0.004 17.769 C 0.038 18.546 "
+    "0.293 19.298 0.739 19.936 Z"
+)
+EVOLVE_VB = (18.539, 23.242)
+
+#: Los datos de la titulación, en un solo sitio: la cubierta y la declaración
+#: tienen que decir lo mismo, y tenerlos repetidos es como se desincronizan.
+CENTRE = "Evolve Academy"
+TUTOR = "Julio Valero"
+SIGNED_ON = "21 de septiembre de 2026"
+
+
+def evolve_logo(x: float, y: float, height: float, colour: str) -> str:
+    """La marca a la altura pedida, conservando su proporción."""
+    k = height / EVOLVE_VB[1]
+    return (f'<g transform="translate({x},{y}) scale({k:.5f})">'
+            f'<path d="{EVOLVE_MARK}" fill="{colour}"/></g>')
+
+
 def portada_svg(p: Palette, title: str, subtitle: str, author: str,
-                programme: str, defence: str, vintage: str, engine: str) -> str:
-    """Cubierta A4. El campo de la universidad queda a completar a propósito."""
+                programme: str, defence: str, vintage: str, engine: str,
+                centre: str, tutor: str, signed_on: str) -> str:
+    """Cubierta A4 con la marca del centro, el tutor y la declaración firmada."""
     W, H = 595, 842
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
            f'width="{W}" height="{H}" font-family="Arial, Helvetica, sans-serif">',
@@ -219,6 +250,12 @@ def portada_svg(p: Palette, title: str, subtitle: str, author: str,
     out.append(f'<text x="44" y="52" font-size="12.5" fill="{p.onnavy}" '
                f'font-family="Georgia, serif" font-style="italic">'
                'b(t) = b(t−1)·(1+i)/(1+g) − sp</text>')
+
+    # La marca del centro, sobre la banda del título y teñida de blanco: es un
+    # trazo, no un mapa de bits, así que el tinte es legítimo.
+    out.append(evolve_logo(W - 96, 34, 30, "#ffffff"))
+    out.append(f'<text x="{W - 62}" y="{34 + 21}" font-size="15" font-weight="bold" '
+               f'fill="#ffffff" letter-spacing="0.4">evolve</text>')
 
     for k, line in enumerate(_wrap(title, 26)):
         out.append(f'<text x="44" y="{104 + k * 38}" font-size="33" font-weight="bold" '
@@ -274,20 +311,31 @@ def portada_svg(p: Palette, title: str, subtitle: str, author: str,
         out.append(f'<text x="90" y="{hy + 38 + k * 14}" font-size="11" '
                    f'fill="{p.ink}">{esc(line)}</text>')
 
-    # Pie: autoría y sello del corte. La universidad y el tutor van vacíos.
-    fy = H - 176
+    # Pie: autoría, centro, tutor y firma de la declaración.
+    #
+    # Sube 20 px respecto de antes porque la línea de la firma no cabía: se
+    # dibujaba en y=800 y la banda del pie empieza en 790, así que quedaba
+    # pintada por debajo. En un SVG no hay error, simplemente no se ve, y sólo
+    # aparece al mirar la imagen.
+    fy = H - 196
     out.append(f'<line x1="44" y1="{fy}" x2="{W - 44}" y2="{fy}" stroke="{p.rule}" stroke-width="1"/>')
     out.append(f'<text x="44" y="{fy + 26}" font-size="16" font-weight="bold" '
                f'fill="{p.navy}">{esc(author)}</text>')
     out.append(f'<text x="44" y="{fy + 46}" font-size="12.5" fill="{p.ink}">{esc(programme)}</text>')
+    # Las dos líneas siguientes llevaban `{p.blank}` dentro de una cadena que no
+    # era f-string, así que el SVG publicado decía literalmente
+    # fill="{p.blank}" —un color inválido— y el navegador pintaba negro. Se ve
+    # al mirar el fichero, no al leer el código.
     out.append(f'<text x="44" y="{fy + 70}" font-size="12.5" fill="{p.grey}">'
-               '<tspan font-weight="bold">Universidad:</tspan> '
-               '<tspan fill="{p.blank}">_______________________________________</tspan></text>')
+               f'<tspan font-weight="bold">Centro:</tspan> {esc(centre)}</text>')
     out.append(f'<text x="44" y="{fy + 90}" font-size="12.5" fill="{p.grey}">'
-               '<tspan font-weight="bold">Tutor/a:</tspan> '
-               '<tspan fill="{p.blank}">___________________________________________</tspan></text>')
-    out.append(f'<text x="44" y="{fy + 116}" font-size="12.5" fill="{p.ink}">'
+               f'<tspan font-weight="bold">Tutor:</tspan> {esc(tutor)}</text>')
+    out.append(f'<text x="44" y="{fy + 110}" font-size="12.5" fill="{p.ink}">'
                f'<tspan font-weight="bold">Defensa:</tspan> {esc(defence)}</text>')
+    # La declaración de uso de IA, firmada en la propia cubierta.
+    out.append(f'<text x="44" y="{fy + 132}" font-size="11" fill="{p.grey}">'
+               'Declaración de uso de herramientas de IA: firmada el '
+               f'{esc(signed_on)}</text>')
 
     out.append(f'<rect x="0" y="{H - 52}" width="{W}" height="52" fill="{p.paper}"/>')
     out.append(f'<rect x="0" y="{H - 52}" width="{W}" height="3" fill="{p.teal}"/>')
@@ -334,7 +382,8 @@ def main() -> int:
         (FIGURES / f"portada{suffix}.svg").write_text(
             portada_svg(pal, main_title.strip(), subtitle.strip(),
                         "Daniel Ribes", "Máster en Inteligencia Artificial y Data Science",
-                        "28 de septiembre de 2026", "2026-07-31", "1.1.0"),
+                        "28 de septiembre de 2026", "2026-07-31", "1.1.0",
+                        CENTRE, TUTOR, SIGNED_ON),
             encoding="utf-8")
 
     if BEGIN in text and END in text:

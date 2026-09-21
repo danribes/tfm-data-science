@@ -5,9 +5,9 @@
 **Estado documental:** 20 de septiembre de 2026, motor 1.1.0, corte de datos `2026-07-31`.
 Los resultados citados proceden de los artefactos indicados; las evaluaciones
 pendientes se distinguen explícitamente de las realizadas. La portada, el índice
-y esta sección preliminar se generan con `tools/build_frontmatter.py`; los
-campos de universidad y tutor/a están deliberadamente vacíos y debe
-cumplimentarlos el autor conforme a la normativa de su titulación.
+y esta sección preliminar se generan con `tools/build_frontmatter.py`, que toma
+de un único sitio el centro, el tutor y la fecha de firma para que la cubierta y
+la declaración no puedan contradecirse.
 
 ## Índice
 
@@ -136,9 +136,12 @@ citan declarando la ausencia de identificador persistente.
 contenido, de las decisiones metodológicas y de los errores que puedan
 subsistir. El uso de estas herramientas no delega ninguna de las dos.
 
-> **Pendiente de firma del autor.** Esta declaración debe revisarse, ajustarse a
-> la fórmula que exija la titulación y firmarse. Su contenido refleja el uso
-> real observado en el historial del repositorio y no debe suavizarse.
+**Firma.** Daniel Ribes, 21 de septiembre de 2026. Máster en Inteligencia
+Artificial y Data Science, Evolve Academy. Tutor: Julio Valero.
+
+> Esta declaración se firma con el contenido que aquí figura, que refleja el uso
+> real observado en el historial del repositorio. Si la titulación exige una
+> fórmula distinta, debe sustituirse el texto sin suavizar lo que describe.
 
 ## Resumen
 
