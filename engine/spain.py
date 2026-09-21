@@ -168,8 +168,14 @@ def run_scenario(
             wr_idx *= 1 + wreal / 100
 
         # housing
+        # El choque de tipos decae, como el de precios de importación en la
+        # curva de Phillips de más arriba. Permanente sobre la tasa, el mismo
+        # coeficiente hundía el precio sin límite: con el Euríbor dos puntos
+        # arriba, el esfuerzo hipotecario de 2035 BAJABA del 49,1 % al 38,9 %,
+        # es decir, subir los tipos hacía la vivienda más asequible.
         ipv = (_ipv_lr + (V0["ipv"] - _ipv_lr) * (1.0 - _ipv_rev) ** k
-               - c.E_IPV_R * (L.r - B["r"]) + c.E_IPV_G * (g - V0["g"]))
+               - c.E_IPV_R * (L.r - B["r"]) * c.E_IPV_R_DECAY ** k
+               + c.E_IPV_G * (g - V0["g"]))
         if k > 0:
             precio *= 1 + ipv / 100
         cuota = french(precio * 0.8, L.r + c.DIFF, 300)

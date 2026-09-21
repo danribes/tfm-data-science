@@ -335,6 +335,12 @@ donde los tipos se expresan en tanto por uno y el saldo primario en puntos de PI
 
 Los intereses sobre el PIB corriente son $b_{t-1}i_t/(1+g_t)$, y el saldo total resta estos intereses al saldo primario. Una versión anterior omitía el denominador al calcular intereses y saldo total, aunque lo aplicaba correctamente en la identidad de deuda; corregirlo sitúa los intereses base de 2026 en 2,73967 % del PIB y el saldo total en −4,08967 %, sin alterar la senda de deuda. Esta misma base contable se usa ahora en ambos motores.
 
+El tipo de interés actúa sobre el precio de la vivienda con un impulso que se desvanece,
+
+$$h_k = \mu + (h_0-\mu)(1-\kappa)^k - \varepsilon_r\,(r - r_0)\,\delta^k + \varepsilon_g\,(g_k - g_0),$$
+
+donde $\delta$ es el mismo factor de decaimiento que el motor aplica al choque de precios de importación en la curva de Phillips. El efecto sobre el **nivel** del precio es permanente —el producto acumulado no se deshace— pero el impulso sobre la **tasa** se agota. Una versión anterior lo aplicaba sin decaimiento, restando $\varepsilon_r = 2{,}6$ puntos al crecimiento anual por cada punto de tipo todos los años: con el Euríbor dos puntos por encima de su referencia el precio de 2035 caía un 37 %, la cuota bajaba con él y el esfuerzo hipotecario pasaba del 49,1 % al 38,9 %. Es decir, subir los tipos abarataba la hipoteca. Con el decaimiento el esfuerzo sube al 59,0 %, que es la dirección que corresponde: el encarecimiento del crédito domina al enfriamiento del precio. $\varepsilon_r$ no está identificado por el corte de datos —el Euríbor es nacional y el panel es regional, de modo que su efecto no se separa del efecto temporal común— y sigue siendo por tanto una calibración discutible.
+
 El gasto en pensiones entra en el saldo primario por la desviación, no por el nivel. El escenario central ya incorpora una senda de gasto bajo una indexación supuesta, y la presión demográfica entra por su propio término, de modo que restar el nivel completo contabilizaría dos veces la misma partida. Lo que se resta del saldo es la diferencia entre el gasto que implica la indexación elegida y el que implicaría la indexación de referencia,
 
 $$pb_t = pb^{\text{central}}_t + sp - \delta_t\,\text{dem} - \bigl(P_t(\iota) - P_t(\iota_0)\bigr),$$

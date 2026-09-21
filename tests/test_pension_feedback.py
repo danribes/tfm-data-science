@@ -18,7 +18,7 @@ import pytest
 from engine.constants import BASE_LEVERS
 from engine.levers import Levers, PRESETS, preset_levers
 from engine.montecarlo import mc_input_paths, run_montecarlo
-from engine.spain import run_scenario
+from engine.spain import Y0, run_scenario
 
 
 def test_la_indexacion_mueve_la_deuda():
@@ -147,3 +147,58 @@ def test_el_artefacto_de_sensibilidad_cubre_todo_el_rango():
     # monótona: más indexación, más deuda, sin excepciones en la rejilla
     deudas = [r["debt_2050"] for r in d["rows"]]
     assert deudas == sorted(deudas)
+
+
+# ---- el canal del tipo sobre la vivienda ------------------------------------
+
+def test_subir_el_euribor_encarece_la_hipoteca():
+    """El fallo reportado, en una línea.
+
+    El esfuerzo hipotecario es cuota/salario. Subir el tipo encarece la cuota,
+    pero también abarata la vivienda, así que el signo neto depende de cuánto
+    pese cada canal. Estaba desequilibrado: el choque de tipos restaba 2,6
+    puntos al CRECIMIENTO anual del precio todos los años y sin decaer, de modo
+    que el precio se hundía y la cuota bajaba con él.
+    """
+    k = 2035 - Y0
+    base = run_scenario(Levers())["esf"][k]
+    for r in (3.8, 4.8, 6.0):
+        assert run_scenario(Levers(r=r))["esf"][k] > base, r
+
+
+def test_el_esfuerzo_crece_de_forma_monotona_con_el_tipo():
+    k = 2035 - Y0
+    esf = [run_scenario(Levers(r=r))["esf"][k] for r in (2.8, 3.8, 4.8, 6.0)]
+    assert esf == sorted(esf)
+
+
+def test_la_cuota_sube_aunque_el_precio_baje():
+    """Los dos canales siguen vivos y en la dirección correcta: el tipo sube,
+    el precio baja algo, y la cuota sube porque el tipo pesa más."""
+    k = 2035 - Y0
+    base, caro = run_scenario(Levers()), run_scenario(Levers(r=4.8))
+    assert caro["precio"][k] < base["precio"][k]      # el tipo sigue enfriando el precio
+    assert caro["cuota"][k] > base["cuota"][k]        # pero no hasta abaratar la hipoteca
+
+
+def test_el_choque_de_tipos_decae_como_el_de_importaciones():
+    """Mismo idioma para el mismo problema, y con el mismo valor."""
+    from engine import constants as c
+
+    assert c.E_IPV_R_DECAY == c.PM_DECAY
+    assert 0 < c.E_IPV_R_DECAY < 1
+
+
+def test_el_efecto_sobre_el_nivel_del_precio_sigue_siendo_permanente():
+    """Lo que decae es el impulso sobre la tasa, no el producto acumulado: una
+    subida de tipos deja el precio permanentemente por debajo."""
+    base, caro = run_scenario(Levers()), run_scenario(Levers(r=4.8))
+    assert caro["precio"][-1] < base["precio"][-1]
+
+
+def test_la_linea_base_no_se_mueve():
+    """El decaimiento multiplica una diferencia que en la base es cero."""
+    a = run_scenario(Levers())
+    b = run_scenario(Levers(r=BASE_LEVERS["r"]))
+    for key in a:
+        assert a[key] == b[key], key

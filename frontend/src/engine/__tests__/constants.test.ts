@@ -29,8 +29,10 @@ describe("generated constants match the Python engine and the committed vintage"
     expect(C.PM_DECAY).toBe(0.45);
     expect(C.CAL_SALARIO_MES).toBe(1749.79);
   });
-  it("34 provenance rows for Metodología", () => {
-    expect(C.CONSTANTS_META).toHaveLength(34);
+  it("35 provenance rows for Metodología", () => {
+    // 35 desde que el choque de tipos sobre la vivienda decae: su factor
+    // es una calibración y se publica como tal.
+    expect(C.CONSTANTS_META).toHaveLength(35);
     expect(C.CONSTANTS_META[0]).toMatchObject({ name: "MULT", value: 1.4, unit: "x" });
     expect(C.CONSTANTS_META.map((r) => r.name)).toContain("MC_SIG_R");
   });

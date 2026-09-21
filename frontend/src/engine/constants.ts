@@ -19,6 +19,7 @@ export const DIFF = 1.4757;
 export const IPV_LR = 1.2151;
 export const IPV_REV = 0.2039;
 export const E_IPV_R = 2.6;
+export const E_IPV_R_DECAY = 0.45;
 export const E_IPV_G = 1.1;
 export const RJUV = 2.317;
 export const PM_DECAY = 0.45;
@@ -157,6 +158,12 @@ export const CONSTANTS_META: ConstantMeta[] = [
     "value": 0.45,
     "unit": "x",
     "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · import-price shock decay"
+  },
+  {
+    "name": "E_IPV_R_DECAY",
+    "value": 0.45,
+    "unit": "x",
+    "provenance": "Calibrado — decaimiento geométrico del choque de tipos sobre el crecimiento del precio de la vivienda, con el mismo valor que el de precios de importación. Sin él, el efecto sobre la tasa sería permanente y una subida del Euríbor abarataría la hipoteca"
   },
   {
     "name": "OMEGA",

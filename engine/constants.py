@@ -52,6 +52,14 @@ E_IPV_R = 2.6    # IPV response to the rate lever
 E_IPV_G = 1.1    # IPV response to the growth deviation
 RJUV = 2.317     # youth/total unemployment ratio (stable in the 5y series)
 PM_DECAY = 0.45  # geometric decay of the import-price Phillips term (extract L116)
+# Same idiom for the rate shock on house-price growth, and for the same reason.
+# Sin decaimiento, `E_IPV_R` restaba 2,6 puntos al CRECIMIENTO anual del precio
+# por cada punto de Euríbor TODOS los años: con el tipo dos puntos por encima
+# de su base, el precio de 2035 caía un 37 % y la cuota bajaba con él, de modo
+# que subir el Euríbor abarataba la hipoteca. El efecto sobre el NIVEL del
+# precio sigue siendo permanente —el producto acumulado no se deshace—; lo que
+# se desvanece es el impulso sobre la tasa.
+E_IPV_R_DECAY = 0.45
 
 # ---- Expectations regime (see engine/spain.py run_scenario) ----
 # OMEGA: adaptive-expectations weight in the hybrid Phillips curve.
@@ -220,6 +228,11 @@ CONSTANTS_TABLE: list[dict] = [
     {"name": "E_IPV_G", "value": E_IPV_G, "unit": "pp IPV / pp growth", "provenance": _V16},
     {"name": "RJUV", "value": RJUV, "unit": "x", "provenance": _V16 + " · youth/total unemployment ratio, 5y series"},
     {"name": "PM_DECAY", "value": PM_DECAY, "unit": "x", "provenance": _V16 + " · import-price shock decay"},
+    {"name": "E_IPV_R_DECAY", "value": E_IPV_R_DECAY, "unit": "x",
+     "provenance": "Calibrado — decaimiento geométrico del choque de tipos sobre el "
+                   "crecimiento del precio de la vivienda, con el mismo valor que el "
+                   "de precios de importación. Sin él, el efecto sobre la tasa sería "
+                   "permanente y una subida del Euríbor abarataría la hipoteca"},
     {"name": "OMEGA", "value": OMEGA, "unit": "x", "provenance": "lagged inflation-deviation weight: 1.0=default, 0.0=no lag around frozen inflation reference; not an ECB target model"},
     {"name": "ALPHA_SPREAD", "value": ALPHA_SPREAD, "unit": "pp bono / pp debt", "provenance": "endogenous spread: 0.0=off (default); 0.04=illustrative 4 bp per pp debt, not an estimate"},
     {"name": "B_CRIT", "value": B_CRIT, "unit": "% PIB", "provenance": "debt/GDP threshold above which spread feedback activates"},

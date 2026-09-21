@@ -277,10 +277,19 @@ BASE_PINS = [
 ]
 
 # One pinned moved-lever check per persona (same provenance).
+#
+# El ancla de `esf` con el tipo movido diverge a propósito de la semántica v16
+# y se ha actualizado: 35,7009 -> 54,3044. En v16 el choque de tipos restaba
+# 2,6 puntos al CRECIMIENTO anual del precio todos los años y sin decaer, de
+# modo que el precio se hundía, la cuota bajaba con él y subir el Euríbor
+# abarataba la hipoteca. Ahora el choque decae como el de precios de
+# importación, así que el esfuerzo sube con el tipo, que es lo que debe hacer.
+# Ninguna de las anclas de BASE_PINS se mueve: el cambio sólo toca el canal del
+# tipo, y que sólo cambie ésta es la prueba de ello.
 MOVED_PINS = [
     ("01", {"prima": 150.0}, "bono", 0, 4.47),
     ("02", {"r": 4.8}, "bls", 9, 35.4993),
-    ("03", {"r": 4.8}, "esf", 9, 35.7009),
+    ("03", {"r": 4.8}, "esf", 9, 54.3044),
     ("04", {"ext": 3.0}, "lvl", 9, 0.4165),
     ("05", {"sp": 1.0}, "d1", 9, 10.66),
     ("06", {"sp": 1.0}, "b", 24, 210.3118),

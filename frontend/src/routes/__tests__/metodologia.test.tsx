@@ -9,11 +9,11 @@ const ui = () => render(<QueryClientProvider client={queryClient}><Metodologia /
 describe("Metodología — provenance, parity, honesty", () => {
   beforeEach(() => queryClient.clear());
 
-  it("renders the 34 constants with provenance", async () => {
+  it("renders the 35 constants with provenance", async () => {
     ui();
     await waitFor(() => expect(screen.getByText("MULT")).toBeInTheDocument());
-    // 34 data rows + header
-    expect(screen.getAllByRole("row")).toHaveLength(35);
+    // 35 data rows + header
+    expect(screen.getAllByRole("row")).toHaveLength(36);
     // La procedencia dice que el valor está calibrado y no medido, sin
     // nombrar una versión interna del motor que al lector no le dice nada.
     expect(screen.getAllByText(/^Calibrado —/).length).toBeGreaterThan(10);

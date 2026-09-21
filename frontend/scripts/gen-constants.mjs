@@ -27,7 +27,7 @@ const SOURCE = "engine/constants.py";
 const CHAIN_NAMES = [
   "MULT", "RHO", "E_R", "E_EXT", "E_PM", "OKUN", "KAPPA", "GAMMA", "THETA",
   "PHI", "A_Z", "A_TAU", "A_LAM", "REFI", "TERM", "DIFF", "IPV_LR", "IPV_REV",
-  "E_IPV_R", "E_IPV_G", "RJUV", "PM_DECAY", "CAL_SALARIO_MES",
+  "E_IPV_R", "E_IPV_R_DECAY", "E_IPV_G", "RJUV", "PM_DECAY", "CAL_SALARIO_MES",
 ];
 const byName = Object.fromEntries(constants.constants.map((c) => [c.name, c]));
 for (const n of CHAIN_NAMES) {

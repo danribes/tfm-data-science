@@ -98,9 +98,15 @@ export function runScenario(L: Levers): Scenario {
     }
 
     // IPV_REV removes this fraction of the growth gap each year; 1 - REV persists.
+    //
+    // El choque de tipos decae, igual que el de precios de importación. Sin
+    // decaimiento restaba 2,6 puntos al crecimiento anual del precio por cada
+    // punto de Euríbor todos los años, así que subir el tipo abarataba la
+    // hipoteca: el esfuerzo de 2035 bajaba del 49,1 % al 38,9 %.
     const ipv =
       C.IPV_LR + (V0.ipv - C.IPV_LR) * Math.pow(1 - C.IPV_REV, k) -
-      C.E_IPV_R * (L.r - B.r) + C.E_IPV_G * (g - V0.g);
+      C.E_IPV_R * (L.r - B.r) * Math.pow(C.E_IPV_R_DECAY, k) +
+      C.E_IPV_G * (g - V0.g);
     if (k > 0) precio *= 1 + ipv / 100;
     const cuota = french(precio * 0.8, L.r + C.DIFF, 300);
     const salmes = V0.salmes * salIdx;
