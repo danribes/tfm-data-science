@@ -51,8 +51,13 @@ def test_fresh_assembly_contains_only_public_corpus_and_allowlisted_reports(tmp_
     result = assemble(stage)
 
     assert result.returncode == 0, result.stderr
+    # Igualdad exacta a propósito: es la red que atraparía a quien recorra
+    # docs/eval con glob y acabe publicando pasajes de los libros. Los dos
+    # informes del RAG se añadieron tras comprobar que sólo llevan títulos,
+    # métricas y frases de las respuestas del propio modelo.
     assert {p.name for p in (stage / "docs/eval").iterdir()} == {
         "t1-dl-global.json", "distress.json", "state_dependence.json", "regimes.json",
+        "rag-eval-2026-08-09.json", "rag-chat-eval.json",
     }
     assert {p.name for p in (stage / "data/rag").iterdir()} == {"public.db"}
     with sqlite3.connect(stage / "data/rag/public.db") as con:
