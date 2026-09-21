@@ -15,6 +15,9 @@ export interface Levers {
 export type LeverId = keyof Levers;
 
 export interface LeverSpec {
+  /** Una línea en castellano llano, para quien no sabe qué es un saldo
+   *  primario. Se muestra bajo el nombre en el panel de palancas. */
+  plain: string;
   id: LeverId;
   sym: string;
   nm: string;
@@ -28,16 +31,16 @@ export interface LeverSpec {
 
 // v16 `const LEVERS` — Spanish copy verbatim (engine/levers.py LEVER_SPECS)
 export const LEVER_SPECS: LeverSpec[] = [
-  { id: "r", sym: "r", nm: "Tipo de interés · Euríbor 12m", unit: "%", min: 0.0, max: 6.0, step: 0.05, dec: 2, src: "ecb_euribor12m.csv · 2026-06" },
-  { id: "prima", sym: "σ", nm: "Prima de riesgo · spread ES–DE", unit: "pb", min: 0.0, max: 400.0, step: 5.0, dec: 0, src: "ecb_bono10y_{es,de}.csv · 2026-06" },
-  { id: "sp", sym: "sp", nm: "Saldo primario · Δ vs central", unit: "pp PIB", min: -4.0, max: 4.0, step: 0.1, dec: 1, src: "gold_escenarios_deuda.csv (central)" },
-  { id: "lam", sym: "λ", nm: "Productividad", unit: "%/año", min: -0.5, max: 2.5, step: 0.1, dec: 1, src: "PWT + INE · desplaza la PS" },
-  { id: "pm", sym: "pᵐ", nm: "Precio importaciones/energía", unit: "% a/a", min: -50.0, max: 100.0, step: 5.0, dec: 0, src: "WEO commodity prices" },
-  { id: "tau", sym: "τ", nm: "Presión fiscal · cuña laboral", unit: "pp", min: -5.0, max: 5.0, step: 0.25, dec: 2, src: "Eurostat GFS · desplaza la WS" },
-  { id: "z", sym: "z", nm: "Instituciones laborales", unit: "índice", min: -2.0, max: 2.0, step: 0.1, dec: 1, src: "OECD/Eurostat · desplaza la WS" },
-  { id: "ext", sym: "Y*", nm: "Demanda externa", unit: "% a/a", min: -4.0, max: 6.0, step: 0.1, dec: 1, src: "WEO · canal exterior (U7)" },
-  { id: "dem", sym: "β₆₅", nm: "Presión demográfica", unit: "×", min: -1.0, max: 1.0, step: 0.05, dec: 2, src: "gold_projections.csv · variante" },
-  { id: "idx", sym: "ι", nm: "Indexación pensiones/nóminas", unit: "IPC+pp", min: -1.5, max: 1.0, step: 0.1, dec: 1, src: "regla de revalorización · palanca" },
+  { id: "r", sym: "r", nm: "Tipo de interés · Euríbor 12m", unit: "%", min: 0.0, max: 6.0, step: 0.05, dec: 2, plain: "Lo que cuesta pedir dinero prestado en Europa. Si sube, se encarecen las hipotecas y también la deuda del Estado.", src: "ecb_euribor12m.csv · 2026-06" },
+  { id: "prima", sym: "σ", nm: "Prima de riesgo · spread ES–DE", unit: "pb", min: 0.0, max: 400.0, step: 5.0, dec: 0, plain: "El sobrecoste que paga España frente a Alemania por pedir prestado. Mide la desconfianza de quien presta.", src: "ecb_bono10y_{es,de}.csv · 2026-06" },
+  { id: "sp", sym: "sp", nm: "Saldo primario · Δ vs central", unit: "pp PIB", min: -4.0, max: 4.0, step: 0.1, dec: 1, plain: "Lo que el Estado ingresa menos lo que gasta, sin contar los intereses de la deuda. Positivo es superávit; negativo, déficit.", src: "gold_escenarios_deuda.csv (central)" },
+  { id: "lam", sym: "λ", nm: "Productividad", unit: "%/año", min: -0.5, max: 2.5, step: 0.1, dec: 1, plain: "Cuánto se produce por hora trabajada. Es lo que permite subir sueldos sin que suban los precios.", src: "PWT + INE · desplaza la PS" },
+  { id: "pm", sym: "pᵐ", nm: "Precio importaciones/energía", unit: "% a/a", min: -50.0, max: 100.0, step: 5.0, dec: 0, plain: "Lo que cuesta lo que compramos fuera, sobre todo energía. Si se encarece, acaba en los precios de aquí.", src: "WEO commodity prices" },
+  { id: "tau", sym: "τ", nm: "Presión fiscal · cuña laboral", unit: "pp", min: -5.0, max: 5.0, step: 0.25, dec: 2, plain: "La diferencia entre lo que le cuesta un empleado a la empresa y lo que él cobra: impuestos y cotizaciones.", src: "Eurostat GFS · desplaza la WS" },
+  { id: "z", sym: "z", nm: "Instituciones laborales", unit: "índice", min: -2.0, max: 2.0, step: 0.1, dec: 1, plain: "Cuánto protege y negocia el empleo el marco laboral: convenios, indemnizaciones, salario mínimo.", src: "OECD/Eurostat · desplaza la WS" },
+  { id: "ext", sym: "Y*", nm: "Demanda externa", unit: "% a/a", min: -4.0, max: 6.0, step: 0.1, dec: 1, plain: "Cuánto crecen los países que nos compran. Si a ellos les va bien, aquí se exporta más.", src: "WEO · canal exterior (U7)" },
+  { id: "dem", sym: "β₆₅", nm: "Presión demográfica", unit: "×", min: -1.0, max: 1.0, step: 0.05, dec: 2, plain: "Cuántas personas mayores hay por cada persona en edad de trabajar.", src: "gold_projections.csv · variante" },
+  { id: "idx", sym: "ι", nm: "Indexación pensiones/nóminas", unit: "IPC+pp", min: -1.5, max: 1.0, step: 0.1, dec: 1, plain: "Cuánto suben las pensiones y las nóminas cada año por encima o por debajo de la inflación.", src: "regla de revalorización · palanca" },
 ];
 
 // v16 `const PRESETS` verbatim; r offsets resolved against BASE (S1/S7: BASE.r + 2 = 4.8)

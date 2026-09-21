@@ -111,6 +111,10 @@ export function LeverRail({ hotIds = [], mobile = false, open = false, onClose }
                 {nf(levers[s.id], s.dec)} {s.unit}
               </span>
             </div>
+            {/* Qué es esto, en una línea y sin jerga. Va antes del control y
+                no después: quien no sabe qué es un saldo primario necesita
+                leerlo antes de moverlo, no mientras lo mueve. */}
+            <div className="plain">{s.plain}</div>
             <input
               type="range"
               aria-label={s.nm}

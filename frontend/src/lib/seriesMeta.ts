@@ -27,15 +27,23 @@ export const SIDES: Record<string, [string, string]> = {
 
 export const PANEL_DEPENDENT = new Set(["ipv", "precio", "cuota", "esf", "hip", "sobre"]);
 
-export const TABLE_ROWS: { k: SeriesKey; lab: string }[] = [
-  { k: "b", lab: "Deuda pública" },
-  { k: "u", lab: "Paro" },
-  { k: "pi", lab: "IPCA" },
-  { k: "saldo", lab: "Saldo público" },
-  { k: "precio", lab: "Precio vivienda" },
-  { k: "cuota", lab: "Cuota hipotecaria" },
-  { k: "salario", lab: "Salario medio" },
-  { k: "esf", lab: "Esfuerzo vivienda" },
+export const TABLE_ROWS: { k: SeriesKey; lab: string; plain: string }[] = [
+  { k: "b", lab: "Deuda pública",
+    plain: "Todo lo que debe el Estado, comparado con lo que produce el país en un año." },
+  { k: "u", lab: "Paro",
+    plain: "De cada cien personas que quieren trabajar, cuántas no encuentran empleo." },
+  { k: "pi", lab: "IPCA",
+    plain: "La inflación: cuánto suben los precios en un año. Se mide igual en toda la eurozona para poder comparar." },
+  { k: "saldo", lab: "Saldo público",
+    plain: "Lo que ingresa el Estado menos lo que gasta, intereses incluidos. En negativo es déficit." },
+  { k: "precio", lab: "Precio vivienda",
+    plain: "Lo que cuesta comprar una vivienda media." },
+  { k: "cuota", lab: "Cuota hipotecaria",
+    plain: "Lo que se paga cada mes por una hipoteca media a 25 años." },
+  { k: "salario", lab: "Salario medio",
+    plain: "Lo que cobra al año, de media, una persona asalariada." },
+  { k: "esf", lab: "Esfuerzo vivienda",
+    plain: "Qué parte del sueldo se va en pagar la hipoteca." },
 ];
 
 /** Los años de la tabla. El primero es el dato observado y se marca como tal:

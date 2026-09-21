@@ -57,7 +57,7 @@ export function ProjectionTable({ scn }: { scn: Scenario }) {
           </tr>
         </thead>
         <tbody>
-          {TABLE_ROWS.map(({ k, lab }) => {
+          {TABLE_ROWS.map(({ k, lab, plain }) => {
             const f = SERIES_FORMAT[k] ?? { dec: 1, unit: "" };
             const b = base[k], s = scn[k];
             if (!b || !s) return null;
@@ -77,6 +77,11 @@ export function ProjectionTable({ scn }: { scn: Scenario }) {
                       signo según quién pregunte
                     </span>
                   )}
+                  {/* Qué mide la fila, sin jerga, en su propia línea y después
+                      de las etiquetas: éstas matizan el nombre y deben quedar
+                      junto a él. Un lector que no sabe qué es un saldo primario
+                      no puede juzgar si +0,6 es mucho. */}
+                  <span className="plain">{plain}</span>
                   <small>
                     {f.unit}
                     {" · "}

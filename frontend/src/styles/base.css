@@ -77,7 +77,12 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .lev { border-radius: var(--rad-chip); padding: 6px 10px 8px; }
 .lev.hot { background: var(--chip-lab); }
 .lev .l1 { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
-.lev .nm { font-size: 14.5px; font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* El nombre se parte en dos líneas antes que cortarse. Con `nowrap` y
+   ellipsis, «Saldo primario · Δ vs central» se leía «Saldo primario · Δ vs
+   ce…» y «Precio importaciones/energía» perdía la mitad: se ocultaba justo
+   la parte que distingue una palanca de otra. */
+.lev .nm { font-size: 14.5px; font-weight: 700; flex: 1; min-width: 0;
+  white-space: normal; overflow-wrap: break-word; }
 .lev .sym { font-size: 12.5px; font-weight: 800; color: var(--lab); font-style: italic; }
 .lev .vv { font-size: 15px; font-weight: 800; color: var(--ink); white-space: nowrap; }
 .lev .vv.moved { color: var(--lab); }
@@ -461,3 +466,10 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
   .how-table th, .how-table td { display: block; border-bottom: none; padding-bottom: 2px; }
   .how-table td { border-bottom: 1px solid var(--grid); padding-bottom: 10px; }
 }
+
+/* Una línea en castellano llano bajo cada palanca y cada indicador.
+   El panel ya decía de qué fichero sale el dato (.src) pero no qué es el
+   dato, que es justo lo que separa a un lector de un economista. */
+.lev .plain { font-size: 12px; line-height: 1.35; color: var(--ink-2); margin: 2px 0 6px; }
+.projtable tbody th .plain { display: block; font-weight: 400; font-size: 11.5px;
+  line-height: 1.35; color: var(--ink-2); margin-top: 2px; max-width: 30ch; }
