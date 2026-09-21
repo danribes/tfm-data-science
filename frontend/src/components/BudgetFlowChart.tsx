@@ -114,6 +114,20 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
         </div>
       </div>
 
+      {/* Fuera de la fila de cabecera: dentro era un `span` en línea y se
+          superponía al subtítulo. Las partidas están congeladas en su valor
+          observado y las pensiones no, así que a partir de 2035 suman más que
+          el gasto total, que también está congelado. Callarlo sería peor. */}
+      {budget.exceso > 0.005 && (
+        <div className="banner" style={{ fontSize: 12.5, fontWeight: 400, marginBottom: 14 }}>
+          Las partidas suman {nf(budget.identificado, 1)} % del PIB,{" "}
+          {nf(budget.exceso, 1)} más que el gasto total del escenario. Seis de las siete
+          están congeladas en su valor observado y sólo las pensiones evolucionan, así que la
+          composición deja de cuadrar a partir de 2035. Cada partida es correcta; su suma no
+          es un presupuesto.
+        </div>
+      )}
+
       <div style={{ position: "relative", width: "100%", overflowX: "auto" }}>
         <svg role="img" aria-label={`Esquema presupuestario ilustrativo de ${selectedYear}`} viewBox="0 0 920 520" style={{ width: "100%", height: "auto", minWidth: 700, overflow: "visible" }}>
           <defs>
