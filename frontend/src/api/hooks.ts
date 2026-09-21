@@ -97,6 +97,23 @@ export function useMonteCarlo(levers: Levers, enabled: boolean) {
   });
 }
 
+/** La banda paramétrica de la vivienda.
+ *
+ *  Cuesta 4.000 corridas del motor, así que va al servidor y no al motor de
+ *  TypeScript del navegador, y se depura igual que el Monte Carlo.
+ */
+export function useParametric(levers: Levers, series = "precio", enabled = true) {
+  const debouncedLevers = useDebounced(levers, 400);
+  return useQuery({
+    queryKey: ["parametric", series, debouncedLevers],
+    queryFn: ({ signal }) =>
+      api.parametric({ levers: debouncedLevers, series, horizon: 2050 }, signal),
+    enabled,
+    staleTime: Infinity,
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useSensitivity(levers?: Levers) {
   const debouncedLevers = useDebounced(levers, 400);
   return useQuery({

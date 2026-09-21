@@ -43,6 +43,12 @@ from engine.spain import Y0, run_scenario
 #: típico. Cualquier otro es calibración y no tiene distribución que sortear.
 ESTIMATED = ("IPV_LR", "IPV_REV")
 
+#: Las series que de verdad dependen de los parámetros estimados. Verificado
+#: sustituyendo IPV_LR/IPV_REV por sus valores heredados de v16 y comparando
+#: las 40 series del motor: sólo estas seis se mueven. Pedir una banda para
+#: cualquier otra sería dibujar incertidumbre paramétrica donde no la hay.
+PANEL_SERIES = frozenset({"ipv", "precio", "cuota", "esf", "hip", "sobre"})
+
 PCT_LEVELS = (5, 25, 50, 75, 95)
 
 #: Los mismos 4.000 sorteos que el abanico de deuda, y por la misma razón: con

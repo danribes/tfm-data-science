@@ -347,6 +347,39 @@ export interface MonteCarloResponse extends ApiMeta {
   paths: number[][];
 }
 
+/** Incertidumbre paramétrica: sólo la cadena de vivienda.
+ *
+ *  Son los dos únicos parámetros del motor que vienen de una estimación. El
+ *  resto de constantes son calibración y no tienen distribución que sortear,
+ *  así que pedir otra serie devuelve 422 en vez de una banda inventada.
+ */
+export interface ParametricRequest {
+  levers?: Partial<Levers>;
+  series?: string;
+  horizon?: number;
+}
+export interface EstimatedParam {
+  value: number;
+  se: number;
+  ci_low: number;
+  ci_high: number;
+  n: number;
+  n_units: number;
+}
+export interface ParametricResponse extends ApiMeta {
+  /** No es un intervalo de predicción, y la respuesta lo dice. */
+  uncertainty_kind?: "parametric_only";
+  empirical_coverage_validated?: boolean;
+  series: string;
+  years: number[];
+  /** La proyección con los valores puntuales: el centro sigue siendo ésta. */
+  point: number[];
+  percentiles: Record<PercentileKey, number[]>;
+  n_draws: number;
+  seed: number;
+  params: Record<string, EstimatedParam>;
+}
+
 // ---- Análogos históricos ----
 
 export interface AnalogOutcomePoint {

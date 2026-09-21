@@ -412,3 +412,52 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .coloquial { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: flex; flex-direction: column; gap: 4px; }
 .coloquial-lab { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
 .coloquial p { margin: 0; font-size: 15.5px; line-height: 1.65; color: var(--ink-2); }
+
+/* ---- Ficha del escenario: resumen de palancas, tabla y procedencia ------- */
+/* La página abría con el gráfico de trayectorias y no tenía tabla: un gráfico
+   contesta «hacia dónde» y una tabla contesta «cuánto», que es la pregunta de
+   quien va a citar una cifra. */
+
+.lever-summary { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.lever-pill { background: var(--chip-lab); color: var(--lab); border-radius: var(--rad-pill);
+  padding: 5px 12px; font-weight: 600; font-size: 13px; }
+
+.projtable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.projtable th, .projtable td { padding: 7px 9px; border-bottom: 1px solid var(--grid); text-align: left; }
+.projtable thead th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); border-bottom: 2px solid var(--grid); }
+.projtable tbody th { font-weight: 600; }
+.projtable tbody th small { display: block; font-weight: 400; color: var(--muted); font-size: 11.5px; }
+.projtable .num { text-align: right; font-variant-numeric: tabular-nums; }
+.projtable td.d { font-size: 12.5px; font-weight: 600; padding-left: 2px; }
+.projtable .bad { color: var(--div-neg); }
+.projtable .good { color: var(--good); }
+.projtable .zero { color: var(--muted); }
+/* Azul y sin veredicto: un precio que sube es buena noticia para quien ya
+   tiene piso y mala para quien quiere comprarlo, así que pintarlo de rojo o
+   de verde es tomar partido por un lector. */
+.projtable .rel { color: var(--accent); }
+
+.tag { display: inline-block; font-size: 10.5px; border-radius: 4px; padding: 1px 6px;
+  margin-left: 6px; font-weight: 600; vertical-align: middle; }
+.tag.warn { background: var(--chip-warn); color: var(--warn); }
+.tag.rel { background: var(--chip); color: var(--accent); }
+.tag.prov { background: var(--chip); color: var(--accent); font-weight: 700; letter-spacing: .03em; margin-left: 0; }
+.tag.prov.motor { background: var(--code); color: var(--ink-2); }
+.tag.prov.dl, .tag.prov.ml { background: var(--chip-warn); color: var(--warn); }
+.tag.prov.knn { background: var(--chip-lab); color: var(--lab); }
+.tag.prov.llm { background: var(--code); color: var(--ink-2); }
+
+/* La tabla de capas lleva prosa, no cifras: alineada a la izquierda y con la
+   etiqueta de capa en una columna fija para que se lean en vertical. */
+.how-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0 12px; }
+.how-table th, .how-table td { padding: 8px 9px; border-bottom: 1px solid var(--grid);
+  text-align: left; vertical-align: top; }
+.how-table th { width: 190px; }
+.how-table td { color: var(--ink-2); }
+
+@media (max-width: 640px) {
+  .how-table th { width: auto; }
+  .how-table th, .how-table td { display: block; border-bottom: none; padding-bottom: 2px; }
+  .how-table td { border-bottom: 1px solid var(--grid); padding-bottom: 10px; }
+}

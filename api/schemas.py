@@ -181,6 +181,35 @@ class MonteCarloResponse(ApiMeta):
     paths: list[list[float]] = Field(default_factory=list)
 
 
+class ParametricRequest(BaseModel):
+    levers: LeverValues = Field(default_factory=LeverValues)
+    series: str = "precio"
+    horizon: int = Field(2050, ge=2026, le=2050)
+
+
+class ParametricResponse(ApiMeta):
+    """La banda que sale de no dar por exactos los dos parámetros estimados.
+
+    `uncertainty_kind` no es decorativo: esto NO es un intervalo de predicción
+    y la respuesta tiene que decirlo, porque una cinta alrededor de una línea
+    se lee como si lo fuera.
+    """
+    uncertainty_kind: str = "parametric_only"
+    empirical_coverage_validated: bool = False
+    series: str
+    years: list[int]
+    #: La proyección con los valores puntuales. Sigue siendo el centro: la
+    #: banda se añade alrededor de lo publicado, no lo sustituye por la
+    #: mediana de los sorteos.
+    point: list[float]
+    percentiles: dict[str, list[float]]
+    n_draws: int
+    seed: int
+    #: Los parámetros sorteados, con su error típico, para poder citarlos al
+    #: lado de la banda en vez de pedir que se confíe en ella.
+    params: dict[str, dict[str, float]]
+
+
 class CountryOut(BaseModel):
     iso3: str
     iso2: str

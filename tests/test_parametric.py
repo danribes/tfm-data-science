@@ -164,3 +164,57 @@ def test_la_tabla_de_la_memoria_coincide_con_el_motor():
         assert num(ancho) == pytest.approx(b.width(int(anio)), abs=1.0), anio
         esperado = b.width(int(anio)) / b.point[i] * 100
         assert float(rel.replace(",", ".")) == pytest.approx(esperado, abs=0.05), anio
+
+
+# --- el endpoint -------------------------------------------------------------
+
+def test_el_endpoint_devuelve_la_banda():
+    from fastapi.testclient import TestClient
+    from api.main import app
+
+    r = TestClient(app).post("/scenario/parametric",
+                             json={"series": "precio", "horizon": 2050})
+    assert r.status_code == 200, r.text
+    d = r.json()
+    assert d["uncertainty_kind"] == "parametric_only"
+    assert d["empirical_coverage_validated"] is False
+    assert len(d["years"]) == len(d["point"]) == len(d["percentiles"]["p50"])
+    assert d["params"]["IPV_LR"]["se"] > 0
+    i = d["years"].index(2050)
+    assert d["percentiles"]["p5"][i] < d["point"][i] < d["percentiles"]["p95"][i]
+
+
+def test_el_endpoint_rechaza_una_serie_sin_parametros_estimados():
+    """La deuda no tiene error típico que sortear. Devolver una banda para
+    ella sería dibujar incertidumbre paramétrica donde no la hay."""
+    from fastapi.testclient import TestClient
+    from api.main import app
+
+    r = TestClient(app).post("/scenario/parametric", json={"series": "b"})
+    assert r.status_code == 422
+    assert "calibración" in r.json()["detail"]
+
+
+def test_el_horizonte_recorta_la_banda():
+    from fastapi.testclient import TestClient
+    from api.main import app
+
+    d = TestClient(app).post("/scenario/parametric",
+                             json={"series": "precio", "horizon": 2040}).json()
+    assert d["years"][-1] == 2040
+
+
+def test_panel_series_son_las_que_de_verdad_dependen_de_los_estimados():
+    """La lista no se mantiene a mano: se comprueba contra el motor.
+
+    Se sustituyen los dos parámetros por sus valores heredados de v16 y se
+    comparan las 40 series. Las que cambian son, por definición, las que
+    dependen de la estimación.
+    """
+    from engine import constants as c
+    from engine.parametric import PANEL_SERIES
+
+    a = run_scenario(Levers())
+    b = run_scenario(Levers(), ipv_lr=c.IPV_LR_V16, ipv_rev=1.0 - c.IPV_REV_V16)
+    movidas = {k for k in a if any(abs(x - y) > 1e-9 for x, y in zip(a[k], b[k]))}
+    assert movidas == set(PANEL_SERIES)

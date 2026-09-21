@@ -14,6 +14,9 @@ import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenari
 import { SHIPPED_IDS } from "../personas/registry";
 import { RegimeChart } from "../components/RegimeChart";
 import { DistressGauge } from "../components/DistressGauge";
+import { LeverSummary, ProjectionTable } from "../components/ProjectionTable";
+import { ParametricBand } from "../components/ParametricBand";
+import { HowComputed } from "../components/HowComputed";
 
 const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean }[] = [
   { k: "b", lab: "Deuda", at2050: true },
@@ -45,6 +48,38 @@ export default function Inicio() {
           <span className="meta">cobertura no disponible</span>
         ) : null}
       </div>
+
+      {/* La ficha abre la página.
+          Antes se abría con el gráfico de 4.000 trayectorias, que es la parte
+          más técnica de todo el panel, y no había ninguna tabla: sólo
+          gráficos y fichas de titular. Quien llega con palancas movidas desde
+          un enlace tampoco tenía forma de saber qué escenario miraba. */}
+      <div className="card">
+        <h4>Qué has cambiado <small>el escenario que estás mirando</small></h4>
+        <LeverSummary levers={levers} />
+      </div>
+
+      <div className="card">
+        <h4>El futuro, en números <small>escenario y diferencia frente a la base</small></h4>
+        <ProjectionTable scn={scn} />
+        <Caption>
+          Cada par de columnas es el valor del escenario y su diferencia frente
+          a la línea base. <b className="good">Verde</b> mejora,{" "}
+          <b className="bad">rojo</b> empeora, y <b className="rel">azul</b> son
+          las series cuyo signo depende de quién pregunte: un precio de vivienda
+          que sube es buena noticia para quien ya tiene piso y mala para quien
+          quiere comprar, así que la tabla no dictamina por ti.
+        </Caption>
+        <Caption>
+          Las filas marcadas <b>sin senda propia</b> son constantes en los
+          veinticinco años de la línea base: el motor no les da trayectoria,
+          sólo las desplaza en bloque cuando una palanca las empuja. Se señala
+          porque ver esa recta sin explicación es lo que hace pensar que la
+          herramienta está rota.
+        </Caption>
+      </div>
+
+      <ParametricBand />
 
       <div className="card">
         <h4>
@@ -137,6 +172,8 @@ export default function Inicio() {
           en el coste, pero también que, una vez dentro, tarde años en salir.
         </Caption>
       </div>
+
+      <HowComputed />
 
       <RegimeChart />
 

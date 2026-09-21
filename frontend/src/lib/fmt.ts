@@ -28,3 +28,15 @@ export function eur(v: number): string {
     .format(v)
     .replace("-", "−");
 }
+
+/** Delta con signo para magnitudes grandes (€, recuentos).
+ *
+ *  `sg` delega en `nf`, que usa el agrupamiento "auto" de CLDR: para es-ES eso
+ *  suprime el separador de millares entre 1000 y 9999. En una columna donde
+ *  conviven +4.784 y +23.569 el resultado era que el primero salía "+4784" y
+ *  el segundo "+23.569", como si fueran unidades distintas. `eur` ya forzaba
+ *  el agrupamiento para los niveles; esto hace lo mismo con las diferencias.
+ */
+export function sgEur(v: number): string {
+  return (v >= 0 ? "+" : "−") + eur(Math.abs(v));
+}

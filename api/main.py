@@ -19,6 +19,7 @@ from api.schemas import (ComparisonOut, ConstantsResponse, ConstantOut,
                           GenericScenarioRequest, GenericScenarioResponse,
                           HealthResponse, IndicatorOut, MonteCarloRequest,
                           MonteCarloResponse, PanelResponse, PersonaCard,
+                          ParametricRequest, ParametricResponse,
                           PersonaDependentsOut, PersonasResponse,
                           PassageOut, PresetOut, PresetsResponse,
                           RagChatRequest, RagChatResponse, RagCollectionOut,
@@ -209,6 +210,31 @@ def scenario_montecarlo(req: MonteCarloRequest) -> MonteCarloResponse:
         seed=mc.seed,
         paths=[p[:n] for p in mc.paths],
     )
+
+
+@app.post("/scenario/parametric", response_model=ParametricResponse)
+def scenario_parametric(req: ParametricRequest) -> ParametricResponse:
+    """Incertidumbre paramétrica de la cadena de vivienda.
+
+    Sólo la vivienda: son los dos únicos parámetros del motor que vienen de una
+    estimación. El resto son calibraciones y no tienen distribución que
+    sortear, así que pedir aquí otra serie devuelve 422 en vez de una banda
+    inventada.
+    """
+    from engine.parametric import PANEL_SERIES, parametric_band
+
+    if req.series not in PANEL_SERIES:
+        raise HTTPException(
+            status_code=422,
+            detail=(f"sin incertidumbre paramétrica para {req.series!r}: sólo "
+                    f"{', '.join(sorted(PANEL_SERIES))} dependen de parámetros "
+                    "estimados; el resto del motor es calibración"))
+    band = parametric_band(Levers(**req.levers.model_dump()), req.series,
+                           last_year=req.horizon)
+    return ParametricResponse(
+        series=band.series, years=band.years, point=band.point,
+        percentiles=band.percentiles, n_draws=band.n_draws, seed=band.seed,
+        params=band.params)
 
 
 @app.post("/scenario/analog", response_model=AnalogResponse)

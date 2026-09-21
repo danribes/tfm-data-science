@@ -1,6 +1,8 @@
 import type {
   ConstantsResponse, DemographyResponse, DistressResponse, EvidenceResponse, ExplainRequest, ExplainResponse, HealthResponse,
   MonteCarloRequest, MonteCarloResponse,
+  ParametricRequest,
+  ParametricResponse,
   Passage,
   PersonasResponse, PredictionResponse, PresetsResponse,
   AskRequest, AskResponse,
@@ -183,6 +185,8 @@ export const api = {
     request<ScenarioResponse>("/scenario", { method: "POST", body: JSON.stringify(body), signal }),
   montecarlo: (body: MonteCarloRequest, signal?: AbortSignal) =>
     request<MonteCarloResponse>("/scenario/montecarlo", { method: "POST", body: JSON.stringify(body), signal }),
+  parametric: (body: ParametricRequest, signal?: AbortSignal) =>
+    request<ParametricResponse>("/scenario/parametric", { method: "POST", body: JSON.stringify(body), signal }),
   sensitivity: (body?: ScenarioRequest, signal?: AbortSignal) =>
     request<SensitivityResponse>("/scenario/sensitivity", {
       method: body ? "POST" : "GET",
