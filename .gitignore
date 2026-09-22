@@ -39,3 +39,7 @@ docs/deck/media/_archive/
 # tiene sus cifras comprobadas contra el motor. Versionar los dos invita a que
 # digan cosas distintas.
 docs/PRESENTACION_10MIN.docx
+
+# La presentación del front-end se regenera desde las capturas del sitio
+# desplegado con tools/build_deck_frontend.py.
+docs/Presentacion_frontend.pptx
