@@ -202,3 +202,47 @@ def test_la_linea_base_no_se_mueve():
     b = run_scenario(Levers(r=BASE_LEVERS["r"]))
     for key in a:
         assert a[key] == b[key], key
+
+
+def test_las_cifras_del_guion_de_presentacion_son_las_del_motor():
+    """El guion se dice en voz alta ante un tribunal.
+
+    Una cifra obsoleta ahí se descubre en el peor momento posible: proyectada
+    al lado de la pantalla que la desmiente. Se recalculan las que cita.
+    """
+    from pathlib import Path
+
+    doc = (Path(__file__).resolve().parents[1]
+           / "docs/PRESENTACION_10MIN.md").read_text(encoding="utf-8")
+    base = run_scenario(Levers())
+    k35, k50 = 2035 - Y0, 2050 - Y0
+
+    esperadas = {
+        f"{base['b'][k50]:.1f}".replace(".", ","): "deuda base 2050",
+        f"{run_scenario(Levers(idx=1.0))['b'][k50]:.1f}".replace(".", ","): "deuda con idx +1",
+        f"{base['esf'][k35]:.1f}".replace(".", ","): "esfuerzo base 2035",
+        f"{run_scenario(Levers(r=4.8))['esf'][k35]:.1f}".replace(".", ","): "esfuerzo con r=4,8",
+    }
+    for cifra, que in esperadas.items():
+        assert cifra in doc, f"{que}: {cifra} no aparece en el guion"
+
+
+def test_el_guion_no_promete_lo_que_el_trabajo_no_acredita():
+    """El cierre de la presentación es el resultado negativo. Si alguien lo
+    suaviza, esta prueba lo dice."""
+    from pathlib import Path
+
+    import re
+
+    crudo = (Path(__file__).resolve().parents[1]
+             / "docs/PRESENTACION_10MIN.md").read_text(encoding="utf-8")
+    # El guion va en prosa ajustada a 80 columnas, así que una frase puede
+    # partirse en cualquier punto. Se normalizan los espacios antes de buscar.
+    doc = re.sub(r"\s+", " ", crudo)
+    assert "0,4000" in doc and "0,3953" in doc
+    assert "5 de 17 comunidades" in doc
+    assert "No es un intervalo de predicción" in doc
+    # El descargo va como «lo que este número NO es: una predicción…», que es
+    # más fuerte que la frase suelta que buscaba antes esta prueba.
+    assert "una predicción de la deuda española" in doc
+    assert "Proyección condicional" in doc

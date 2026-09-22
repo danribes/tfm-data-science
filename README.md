@@ -62,6 +62,8 @@ roto.
   hacer cuando no los muestre.
 - [Reproducción](docs/REPRODUCIBILITY.md): entorno, datos, comandos y pasos
   todavía ausentes para reconstruir el pipeline legado completo.
+- [Guion de presentación](docs/PRESENTACION_10MIN.md): diez minutos hablados,
+  cómo funciona y dos ejemplos con sus cifras y sus límites.
 - [Actualizar los datos](docs/ACTUALIZAR_DATOS.md): cómo se trae un corte de
   datos nuevo, cómo se compara con el anterior y qué hay que recalcular. El
   corte congelado es inmutable a propósito: promover uno nuevo es un acto

@@ -1,5 +1,9 @@
 # Guion de demostración — defensa del 28 de septiembre de 2026
 
+> Seis minutos, centrado en operar la aplicación. Para la presentación de
+> diez minutos con dos ejemplos hablados, ver
+> [PRESENTACION_10MIN.md](PRESENTACION_10MIN.md).
+
 Seis minutos de aplicación en directo, con lo que debe aparecer en pantalla en
 cada paso y qué hacer cuando no aparezca. Los números están calculados con el
 motor 1.1.0 sobre el vintage 2026-07-31; si la pantalla dice otra cosa, la
@@ -118,9 +122,11 @@ adaptativas?»**.
 > «El modelo escribe; no calcula. Las cifras vienen del motor y pasan por un
 > inventario numérico antes de mostrarse; el texto sólo las envuelve.»
 
-**Aviso honesto que conviene dar sin que lo pregunten:** el índice desplegado
-recupera por BM25, no con la fusión híbrida con la que se midió el hit@8 del
-informe. Es un recuperador distinto y está documentado como tal.
+**Aviso honesto que conviene dar sin que lo pregunten:** el `hit@8` del informe
+se midió sobre 35 preguntas que participaron en el ajuste, así que es una cota
+superior de desarrollo, no una medida independiente. El despliegue sí resuelve
+hoy con la fusión híbrida: cada respuesta publica el recuperador que de verdad
+la resolvió.
 
 ### 6 · Cierre (30 s)
 
