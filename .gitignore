@@ -34,3 +34,8 @@ docs/deck/media/_archive/
 # conserva: este repositorio es público y un secreto en su historial queda
 # quemado aunque un commit posterior lo borre.
 *.secreto.md
+
+# El guion en Word se regenera desde el Markdown, que es la fuente y el que
+# tiene sus cifras comprobadas contra el motor. Versionar los dos invita a que
+# digan cosas distintas.
+docs/PRESENTACION_10MIN.docx
