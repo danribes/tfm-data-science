@@ -53,6 +53,16 @@ SLIDES: list[tuple[str | None, str, str, str]] = [
      "La cuota sube de 1.213 a 1.409 € y el esfuerzo hipotecario de 49,1 % a 59,0 %, "
      "aunque el precio baje.",
      "El coeficiente del tipo sobre la vivienda no está identificado por este corte de datos."),
+    ("11-comprador.png", "El mismo ejemplo, preguntado por quien lo vive",
+     "El comprador pulsa «¿Y si el Euríbor sube al 4,8 %?» y la pregunta aplica "
+     "su propio supuesto: 59,0 % de esfuerzo en 2035 frente al 49,1 % de la base.",
+     "Misma aritmética que la diapositiva anterior. Quien pregunta no tiene que "
+     "saber qué palanca mover."),
+    ("12-jubilado.png", "Y una pregunta que no supone nada",
+     "«¿Cuánto costará pagar las pensiones?» — 16,49 %PIB en 2035 y 22,3 en 2050, "
+     "con la dependencia 65+ subiendo de 32,6 a 59,0 por cada cien.",
+     "Sin ninguna palanca movida la base y el escenario coinciden, así que sólo se "
+     "ve una línea: esto es demografía, no una decisión de política."),
     ("03-banda.png", "La única serie con banda de incertidumbre",
      "Mide cuánto se mueve la proyección si los dos parámetros estimados no se dan "
      "por exactos: un 17 % del nivel en 2050.",

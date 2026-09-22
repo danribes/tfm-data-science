@@ -40,6 +40,18 @@ export interface PersonaQuestion {
    *  question text; without it, the most natural phrasing of the question the
    *  set does answer gets refused. */
   synonyms?: string[];
+  /** El supuesto que la pregunta enuncia, cuando enuncia uno concreto.
+   *
+   *  «¿Y si el Euríbor sube al 4,8 %?» nombra un valor y la aplicación
+   *  respondía con el Euríbor en su base: el titular decía 49,1 % —el caso
+   *  base— debajo de una pregunta sobre una subida. Una pregunta que no
+   *  aplica su propia premisa no es un escenario, es un titular.
+   *
+   *  Sólo lo llevan las preguntas que citan una cifra. Las cualitativas
+   *  —«¿y si se dispara la prima?»— no traen supuesto porque elegir el valor
+   *  por el lector seria inventarle la premisa.
+   */
+  apply?: Partial<Levers>;
   /** Questions to offer next — ids in the same set. */
   followUps: string[];
 }
@@ -94,6 +106,7 @@ export const Q03: PersonaQuestion[] = [
       "El tipo entra dos veces y en sentidos opuestos: encarece la cuota y " +
       "abarata el precio (E_IPV_R). El efecto neto sobre el esfuerzo es la suma.",
     levers: ["r"],
+    apply: { r: 4.8 },
     concept: "transmisión de la política monetaria a la vivienda",
     synonyms: ["euribor", "subida de tipos", "bce"],
     followUps: ["esfuerzo", "cuota", "precio"],

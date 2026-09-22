@@ -58,3 +58,35 @@ export function tone(delta: number, key: string, upIsBad: boolean): string {
   if (key in SIDES) return "rel";
   return (delta > 0) === upIsBad ? "bad" : "good";
 }
+
+/** Nombre legible de cada serie.
+ *
+ *  Existía repartido: el motor lo lleva persona a persona en `outs[].lab`, la
+ *  tabla en `TABLE_ROWS`, el esquema presupuestario en `fiscalFlows`. Lo que
+ *  no había era un sitio donde buscarlo por clave, así que el panel de
+ *  respuesta escribía el identificador crudo en su encabezado: «Para leerlo
+ *  bien · dep», «· p51», «· nomreal».
+ *
+ *  Las ocho filas de la tabla se toman de `TABLE_ROWS` en vez de repetirse,
+ *  para que no puedan decir cosas distintas en dos sitios de la misma página.
+ */
+export const SERIES_LABEL: Record<string, string> = {
+  // partidas de gasto — mismo texto que el esquema presupuestario
+  pens: "Pensiones", d1: "Salarios públicos", p2: "Consumo intermedio",
+  edu: "Educación", p51: "Inversión pública", d3: "Subvenciones",
+  int: "Intereses", gtot: "Gasto total AAPP",
+  // el resto, con la redacción que ya usa el motor
+  g: "PIB real", dep: "Dependencia 65+", arop: "AROP infantil (<16)",
+  auton: "Autoempleo", bono: "Bono 10A España", spread: "Spread ES–DE",
+  r: "Euríbor 12m", temp: "Temporalidad", ujuv: "Paro juvenil <25",
+  wrealIdx: "Salario real acumulado", nomreal: "Poder de compra de la nómina",
+  ipv: "Precio vivienda a/a", ipvreal: "Precio vivienda real a/a",
+  sobre: "Sobrecarga vivienda", hip: "Nueva producción hipotecaria",
+  bls: "BLS endurecimiento", vida: "Esperanza de vida",
+  salmes: "Salario mensual", pb: "Saldo primario",
+  ...Object.fromEntries(TABLE_ROWS.map((r) => [r.k, r.lab])),
+};
+
+/** El nombre si se conoce; si no, la clave, que es lo que había antes y al
+ *  menos no miente sobre qué serie se está pintando. */
+export const seriesLabel = (k: string): string => SERIES_LABEL[k] ?? k;

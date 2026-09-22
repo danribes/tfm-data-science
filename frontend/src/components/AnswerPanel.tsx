@@ -8,6 +8,7 @@ import { eur, nf } from "../lib/fmt";
 import { ProjectionChart } from "./ProjectionChart";
 import { SERIES_FORMAT } from "./KpiRow";
 import { RagCorpusNotice } from "./RagCorpusNotice";
+import { seriesLabel } from "../lib/seriesMeta";
 import type { PersonaQuestion } from "../personas/questions";
 
 function fmt(key: string, v: number): string {
@@ -146,7 +147,7 @@ export function AnswerPanel({
         </div>
         {q.companion && (
           <div className="card">
-            <h4>Para leerlo bien <small>{q.companion}</small></h4>
+            <h4>Para leerlo bien <small>{seriesLabel(q.companion)}</small></h4>
             <ProjectionChart
               years={YEARS}
               baseline={seriesOf(base, q.companion)}

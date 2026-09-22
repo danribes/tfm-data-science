@@ -106,6 +106,15 @@ export default function Persona() {
    *  broken feature. The first question moves the horizon off Y0; a horizon the
    *  reader chose themselves is never overridden. */
   const ask = (qid: string) => {
+    // Si la pregunta enuncia un supuesto concreto, se aplica: «¿y si el
+    // Euríbor sube al 4,8 %?» dejaba la palanca en 2,80 y contestaba con el
+    // caso base, es decir, respondía a otra pregunta.
+    const q = questions.find((x) => x.id === qid);
+    if (q?.apply) {
+      for (const [id, valor] of Object.entries(q.apply)) {
+        setLever(id as never, valor as number);
+      }
+    }
     if (horizon === Y0) setHorizon(ANSWER_YEAR);
     setAskedId(qid);
     setAdHoc(null);

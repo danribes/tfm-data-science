@@ -4,6 +4,7 @@ import { SHIPPED_IDS } from "../registry";
 import { ALL_SERIES_KEYS } from "../../engine/derived";
 import { LEVER_SPECS } from "../../engine/levers";
 import { SERIES_FORMAT } from "../../components/KpiRow";
+import { seriesLabel, TABLE_ROWS } from "../../lib/seriesMeta";
 
 const LEVER_IDS = new Set(LEVER_SPECS.map((s) => s.id));
 
@@ -111,6 +112,62 @@ describe("matchQuestion — real phrasings readers use", () => {
   it("still refuses what the profile cannot answer", () => {
     for (const q of ["cuando bajara el paro", "cuanto costara una vivienda"]) {
       expect(matchQuestion(q, q01), q).toBeNull();
+    }
+  });
+});
+
+describe("una pregunta que enuncia un supuesto lo aplica", () => {
+  // PERSONA_QUESTIONS va indexado por perfil; aquí interesan todas juntas.
+  const TODAS = Object.values(PERSONA_QUESTIONS).flat();
+
+  it("«¿Y si el Euríbor sube al 4,8 %?» trae ese 4,8", () => {
+    // Sin esto, la aplicación dejaba la palanca en 2,80 y contestaba con el
+    // caso base: el titular decía 49,1 % debajo de una pregunta sobre una
+    // subida de tipos. Una pregunta que no aplica su propia premisa no es un
+    // escenario, es un titular.
+    const q = TODAS.find((x) => x.id === "euribor")!;
+    expect(q.apply).toEqual({ r: 4.8 });
+    expect(q.text).toContain("4,8");
+  });
+
+  it("el valor aplicado coincide con el que cita el enunciado", () => {
+    for (const q of TODAS) {
+      if (!q.apply) continue;
+      for (const valor of Object.values(q.apply)) {
+        const escrito = String(valor).replace(".", ",");
+        expect(q.text, q.id).toContain(escrito);
+      }
+    }
+  });
+
+  it("las preguntas cualitativas no inventan una premisa", () => {
+    // «¿Y si se dispara la prima?» no cita cifra: elegirla por el lector sería
+    // inventarle el supuesto. Se quedan sin `apply` a propósito.
+    for (const id of ["prima-riesgo", "demanda-externa", "salarios"]) {
+      const q = TODAS.find((x) => x.id === id);
+      if (q) expect(q.apply, id).toBeUndefined();
+    }
+  });
+});
+
+describe("toda serie que se pinta tiene nombre legible", () => {
+  const TODAS_S = Object.values(PERSONA_QUESTIONS).flat();
+
+  // El encabezado del panel de respuesta escribe el nombre de la serie
+  // acompañante. Sin entrada en SERIES_LABEL escribía la clave: «· dep».
+  it("ninguna clave de pregunta cae al identificador crudo", () => {
+    const sin: string[] = [];
+    for (const q of TODAS_S) {
+      for (const k of [q.series, q.companion]) {
+        if (k && seriesLabel(k) === k) sin.push(`${q.id}:${k}`);
+      }
+    }
+    expect(sin).toEqual([]);
+  });
+
+  it("la tabla y el panel llaman igual a las mismas ocho series", () => {
+    for (const fila of TABLE_ROWS) {
+      expect(seriesLabel(fila.k)).toBe(fila.lab);
     }
   });
 });
