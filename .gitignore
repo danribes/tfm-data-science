@@ -35,10 +35,10 @@ docs/deck/media/_archive/
 # quemado aunque un commit posterior lo borre.
 *.secreto.md
 
-# El guion en Word se regenera desde el Markdown, que es la fuente y el que
-# tiene sus cifras comprobadas contra el motor. Versionar los dos invita a que
-# digan cosas distintas.
-docs/PRESENTACION_10MIN.docx
+# Los .docx se regeneran desde el Markdown con tools/md_a_docx.py. El Markdown
+# es la fuente, es el que se revisa y es el que tiene sus cifras comprobadas
+# contra el motor. Versionar los dos invita a que digan cosas distintas.
+docs/*.docx
 
 # La presentación del front-end se regenera desde las capturas del sitio
 # desplegado con tools/build_deck_frontend.py.
