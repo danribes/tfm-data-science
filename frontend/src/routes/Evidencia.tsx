@@ -232,11 +232,13 @@ export default function Evidencia() {
               </p>
               <p>
                 Esto toca directamente a la palanca <code>sp</code>. El panel te
-                deja mover el saldo primario {sg(4, 0)} puntos de PIB y
-                mantenerlo veinticinco años; la historia dice que los saldos se
-                mueven despacio y vuelven. La aritmética del escenario es
-                correcta — la pregunta que abre este número es si el supuesto de
-                comportamiento lo es.
+                deja fijar un ajuste del saldo primario de {sg(4, 0)} puntos de
+                PIB y mantenerlo veinticinco años (el saldo que resulta queda
+                algo por debajo del ajuste, porque el ajuste frena la economía y
+                las pensiones pasan a pesar más en el PIB); la historia dice que
+                los saldos se mueven despacio y vuelven. La aritmética del
+                escenario es correcta — la pregunta que abre este número es si
+                el supuesto de comportamiento lo es.
               </p>
             </section>
           )}

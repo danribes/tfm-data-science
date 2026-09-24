@@ -415,11 +415,11 @@ export const Q05: PersonaQuestion[] = [
       "La masa salarial pública en % del PIB se mueve con la consolidación " +
       "fiscal y con el denominador: crecer más rebaja la ratio sin tocar la nómina.",
     plain:
-      "Sólo lo mueve el saldo primario: por cada punto que mejora (menos " +
-      "déficit), el motor quita 0,24 puntos de PIB a los salarios públicos, y al " +
-      "revés si empeora. La productividad no lo cambia: la cifra no se recalcula " +
-      "aunque la economía crezca más. Es un reparto fijo del ajuste, que no " +
-      "distingue plantilla de sueldos.",
+      "Sólo lo mueve la palanca del saldo primario: por cada punto de ajuste " +
+      "que marques (menos déficit), el motor quita 0,24 puntos de PIB a los " +
+      "salarios públicos, y al revés si la bajas. Si el saldo mejora por otra " +
+      "vía, como más productividad, la cifra no cambia. Es un reparto fijo del " +
+      "ajuste, que no distingue plantilla de sueldos.",
     levers: ["sp", "lam"],
     concept: "consolidación fiscal y gasto en personal",
     synonyms: ["recortes", "plantilla", "empleo publico", "masa salarial"],
@@ -434,11 +434,11 @@ export const Q05: PersonaQuestion[] = [
       "Saldo primario menos intereses. Es lo que queda después de pagar la " +
       "deuda heredada, y la parte que el presupuesto no elige.",
     plain:
-      "Lo mueven dos piezas: el saldo primario, que se decide en el presupuesto, " +
-      "y los intereses de la deuda heredada, que nadie elige. Subir el saldo " +
-      "primario lo mejora. Lo empeoran el envejecimiento, que añade gasto, y un " +
-      "Euríbor más alto, que encarece la deuda poco a poco: cada año sólo se " +
-      "renueva una séptima parte.",
+      "Lo mueven dos piezas: el saldo primario y los intereses de la deuda " +
+      "heredada, que nadie elige. Lo mejoran subir el saldo primario y más " +
+      "productividad: si la economía crece más, las pensiones pesan menos. Lo " +
+      "empeoran el envejecimiento, que añade gasto, y un Euríbor más alto, que " +
+      "encarece la deuda poco a poco: cada año sólo se renueva una séptima parte.",
     levers: ["sp", "r", "dem"],
     concept: "saldo público y espacio fiscal",
     synonyms: ["deficit", "superavit", "cuentas publicas", "presupuesto"],

@@ -71,13 +71,22 @@ export function runScenario(L: Levers): Scenario {
     //
     // Estaban al final del bucle, cuando `b` ya estaba guardada, así que la
     // indexación movía el gasto mostrado y la deuda no se enteraba. Se compara
-    // contra el mismo escenario con idx en su base, no contra cero: gc.pb ya
-    // lleva el gasto que el escenario central suponía y la presión demográfica
-    // entra aparte por L.dem, así que restar el nivel entero contaría dos
-    // veces. Con idx en base el ajuste es exactamente cero.
+    // contra la pensión con idx en su base y con los precios y el crecimiento
+    // del escenario BASE, no contra cero: gc.pb ya lleva el gasto que el
+    // escenario central suponía y la presión demográfica entra aparte por
+    // L.dem, así que restar el nivel entero contaría dos veces. El ajuste es
+    // cero sólo con idx en base y precios y crecimiento de la base: la línea
+    // base y S0, S5 y S6 no se mueven; los presets que tocan el crecimiento, sí.
     if (k > 0) {
       pensFac *= (1 + (pi + L.idx) / 100) / (1 + gnom / 100);
-      pensFacIdx0 *= (1 + (pi + B.idx) / 100) / (1 + gnom / 100);
+      // The reference uses the BASE scenario's prices and growth, not this
+      // one's. Measured against its own, faster growth shrank the reference
+      // as much as it shrank pensions, the difference was zero, and a pension
+      // bill productivity cut from 22 % to 18 % of GDP never reached the
+      // deficit: implied revenue fell instead. Same line as engine/spain.py.
+      // With the levers at base, inflation is V0.pi and nominal growth the
+      // central path every year, so those two are the reference directly.
+      pensFacIdx0 *= (1 + (V0.pi + B.idx) / 100) / (1 + gc.g_nominal / 100);
       nomIdx *= 1 + L.idx / 100;
     }
     const depIdx = 1 + (OLDDEP[y] / OLDDEP[Y0] - 1) * (1 + L.dem);

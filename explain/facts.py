@@ -68,6 +68,9 @@ MECHANISM: dict[str, list[dict]] = {
          "note": "pp de PIB por cada pp de tipo"},
         {"step": "precio de la vivienda",
          "const": "E_IPV_R", "value": c.E_IPV_R, "note": "respuesta del IPV al tipo"},
+        {"step": "peso de las pensiones en el PIB (saldo primario)",
+         "const": "—", "value": None,
+         "note": "un tipo más alto frena el crecimiento y las pensiones pesan algo más en el PIB; el efecto es pequeño"},
     ],
     "prima": [
         {"step": "cupón exigido al bono a 10 años",
@@ -80,12 +83,18 @@ MECHANISM: dict[str, list[dict]] = {
          "const": "—", "value": None, "note": "b(t+1) = b(t)·(1+r−g) − sp"},
         {"step": "demanda agregada (multiplicador fiscal)",
          "const": "MULT", "value": c.MULT, "note": "multiplicador fiscal CORE U3"},
+        {"step": "peso de las pensiones en el PIB (saldo primario)",
+         "const": "—", "value": None,
+         "note": "consolidar frena el crecimiento: las pensiones pesan más en el PIB y el saldo primario devuelve parte del ajuste"},
     ],
     "lam": [
         {"step": "desplaza la curva PS (paro estructural)",
          "const": "A_LAM", "value": c.A_LAM, "note": "productividad sobre u*"},
         {"step": "crecimiento potencial",
          "const": "MULT", "value": c.MULT, "note": "vía nivel de PIB"},
+        {"step": "peso de las pensiones en el PIB (saldo primario)",
+         "const": "—", "value": None,
+         "note": "las pensiones siguen al IPC y no al PIB: crecer más que la base las abarata en proporción al PIB y el ahorro llega al saldo primario; crecer menos, al revés"},
     ],
     "pm": [
         {"step": "inflación importada (pass-through a HICP)",
@@ -106,6 +115,9 @@ MECHANISM: dict[str, list[dict]] = {
     "ext": [
         {"step": "canal exterior sobre el nivel de PIB",
          "const": "E_EXT", "value": c.E_EXT, "note": "peso de la demanda externa"},
+        {"step": "peso de las pensiones en el PIB (saldo primario)",
+         "const": "—", "value": None,
+         "note": "más demanda externa, más crecimiento: las pensiones pesan menos en el PIB y mejora el saldo primario; menos, al revés"},
     ],
     "dem": [
         {"step": "tasa de dependencia y gasto en pensiones",

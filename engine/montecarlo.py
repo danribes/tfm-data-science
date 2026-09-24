@@ -89,7 +89,13 @@ def mc_input_paths(levers: Levers) -> tuple[list[int], np.ndarray, np.ndarray, n
         pi = V0["pi"] + pi_dev
         if k > 0:
             pens_fac *= (1 + (pi + L.idx) / 100) / (1 + gnom_k / 100)
-            pens_fac_idx0 *= (1 + (pi + B["idx"]) / 100) / (1 + gnom_k / 100)
+            # Measured against the BASE scenario's prices and growth, as in
+            # engine/spain.py — V0["pi"] and the central path c_g — so a pension
+            # saving or cost the levers cause through growth reaches the primary
+            # balance. The random shocks are added to the debt path later
+            # (run_montecarlo) and never reach this, so a base-lever fan is
+            # unchanged.
+            pens_fac_idx0 *= (1 + (V0["pi"] + B["idx"]) / 100) / (1 + c_g / 100)
         dep_idx = 1 + (olddep[y] / dep0 - 1) * (1 + L.dem)
         pens_gap = V0["pens"] * dep_idx * (pens_fac - pens_fac_idx0)
 

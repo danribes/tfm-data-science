@@ -187,13 +187,13 @@ La semejanza histórica no predice la trayectoria española.
 | Preset | Deuda (% PIB) | Paro (%) | Cuota/salario (%) |
 |---|---:|---:|---:|
 | S0 | 223.8 | 10.1 | 35.1 |
-| S1 | 306.9 | 10.7 | 13.5 |
-| S2 | 221.8 | 10.5 | 35.0 |
-| S3 | 210.3 | 10.8 | 39.0 |
-| S4 | 206.9 | 9.9 | 35.5 |
+| S1 | 310.8 | 10.7 | 45.1 |
+| S2 | 224.0 | 10.5 | 35.0 |
+| S3 | 213.9 | 10.8 | 39.0 |
+| S4 | 180.1 | 9.9 | 35.5 |
 | S5 | 223.8 | 8.5 | 35.1 |
 | S6 | 282.0 | 10.1 | 35.1 |
-| S7 | 349.8 | 11.1 | 13.5 |
+| S7 | 357.0 | 11.1 | 45.0 |
 
 Cálculos locales del motor **1.1.0**. Son implicaciones de supuestos mantenidos; no resultados observados ni previsiones.
 

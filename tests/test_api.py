@@ -99,11 +99,14 @@ def test_scenario_s7_adverse_crosses_redlines():
     s7 = {"levers": {"r": 4.8, "pm": 50.0, "prima": 150.0}, "horizon": 2050}
     body = client.post("/scenario", json=s7).json()
     statuses = {rl["id"]: rl["status"] for rl in body["redlines"]}
-    assert statuses["deuda_120"] == "crossed"           # b 2050 = 349.80
-    assert statuses["deficit_suelo_2009"] == "crossed"  # saldo 2050 = -28.79
+    assert statuses["deuda_120"] == "crossed"           # b 2050 = 357.03
+    assert statuses["deficit_suelo_2009"] == "crossed"  # saldo 2050 = -28.91
     assert statuses["bono_rescate"] == "near"           # bono 6.47 vs 7.0
     k = 2050 - 2026
-    assert abs(body["scenario"]["b"][k] - 349.7973) < 1e-3
+    # 349.80 before the pension correction took the base scenario's growth as
+    # its reference: the slower growth of S7 now raises pensions as a share of
+    # GDP and that reaches the deficit.
+    assert abs(body["scenario"]["b"][k] - 357.0265) < 1e-3
 
 
 def test_scenario_lever_out_of_range_422():

@@ -106,10 +106,13 @@ PLAIN_LEVER: dict[str, str] = {
     "prima": ("se suma al interés del bono a 10 años y, a medida que el Estado "
               "renueva su deuda, a lo que paga en intereses"),
     "sp": ("resta o suma directamente a la deuda, y además frena o empuja la "
-           "economía a través del gasto y los impuestos"),
+           "economía a través del gasto y los impuestos; con menos actividad las "
+           "pensiones pesan más en el PIB, así que parte del ajuste se pierde por ahí"),
     "lam": ("cambia cuánto puede crecer la economía y el paro que tiene de fondo: "
             "con más productividad, los sueldos pueden subir sin que suban los "
-            "precios"),
+            "precios; y como las pensiones suben con los precios y no con la "
+            "economía, pesan menos si la economía crece más, lo que mejora el "
+            "saldo del Estado (con menos productividad, al revés)"),
     "pm": ("pasa a la inflación durante unos años, cada vez menos, y resta "
            "actividad"),
     "tau": ("son los impuestos y cotizaciones que separan lo que paga la empresa "
@@ -118,7 +121,8 @@ PLAIN_LEVER: dict[str, str] = {
     "z": ("son los convenios, las indemnizaciones y el salario mínimo; cambian el "
           "paro que la economía tiene de fondo, y en el modelo son lo que más "
           "lo mueve"),
-    "ext": "se traslada a la actividad de aquí a través de las exportaciones",
+    "ext": ("se traslada a la actividad de aquí a través de las exportaciones; y "
+            "si la economía crece más, las pensiones pesan menos en el PIB"),
     "dem": ("cambia cuántos mayores hay por cada persona en edad de trabajar, y con "
             "ello el gasto en pensiones"),
     "idx": ("cambia cuánto suben cada año pensiones y nóminas públicas respecto a "

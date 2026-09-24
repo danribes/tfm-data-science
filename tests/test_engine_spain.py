@@ -292,7 +292,10 @@ MOVED_PINS = [
     ("03", {"r": 4.8}, "esf", 9, 54.3044),
     ("04", {"ext": 3.0}, "lvl", 9, 0.4165),
     ("05", {"sp": 1.0}, "d1", 9, 10.66),
-    ("06", {"sp": 1.0}, "b", 24, 210.3118),
+    # 210.3118 before the pension correction used the base scenario's growth:
+    # consolidating slows growth, pensions weigh more in GDP, the deficit
+    # takes part of the adjustment back.
+    ("06", {"sp": 1.0}, "b", 24, 213.8973),
     ("07", {"sp": 1.0}, "p51", 9, 2.855),
     ("08", {"sp": 1.0}, "arop", 9, 29.7665),
     ("09", {"idx": -0.5}, "nomreal", 9, 95.589),

@@ -142,15 +142,28 @@ def run_scenario(
         # por el término exógeno de presión demográfica, calibrado a una
         # indexación fija que la palanca no actualizaba.
         #
-        # Se compara contra el mismo escenario con idx en su base, no contra
-        # cero: `gc["pb"]` ya lleva dentro el gasto en pensiones que el
-        # escenario central suponía, y la presión demográfica ya entra aparte
-        # por `L.dem`. Restar el nivel entero contaría dos veces; restar la
-        # desviación no. Con idx en base el ajuste es exactamente cero, así que
-        # la línea base y los ocho presets no se mueven.
+        # Se compara contra una senda de referencia, no contra cero: la misma
+        # pensión con idx en su base y con los precios y el crecimiento del
+        # escenario BASE, no los de este. `gc["pb"]` ya lleva dentro el gasto
+        # en pensiones que el escenario central suponía, y la presión
+        # demográfica entra aparte por `L.dem`: restar el nivel entero contaría
+        # dos veces; restar la desviación no. El ajuste es cero sólo con idx en
+        # base y precios y crecimiento de la base: la línea base y S0, S5 y S6
+        # no se mueven; los presets que tocan el crecimiento, sí.
         if k > 0:
             pens_fac *= (1 + (pi + L.idx) / 100) / (1 + gnom / 100)
-            pens_fac_idx0 *= (1 + (pi + B["idx"]) / 100) / (1 + gnom / 100)
+            # The reference uses the BASE scenario's prices and growth, not
+            # this one's. Measured against its own, faster growth shrank the
+            # reference exactly as much as it shrank pensions, the difference
+            # was zero, and a pension bill that productivity cut from 22 % to
+            # 18 % of GDP never reached the deficit: implied revenue fell
+            # instead, from 44 % to 40 %. Now any pension saving or cost that
+            # growth or inflation cause goes to the primary balance.
+            # With the levers at base, inflation is V0["pi"] and nominal growth
+            # the central path every year, whatever the calibration overrides
+            # (tests/test_pension_feedback.py pins it), so those two are the
+            # reference directly.
+            pens_fac_idx0 *= (1 + (V0["pi"] + B["idx"]) / 100) / (1 + gc["g_nominal"] / 100)
             nom_idx *= 1 + L.idx / 100
         dep_idx = 1 + (olddep[y] / olddep[Y0] - 1) * (1 + L.dem)
         dep = olddep[Y0] * dep_idx

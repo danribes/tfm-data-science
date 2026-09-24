@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import pytest
 
+from engine import constants as c
 from engine.constants import BASE_LEVERS
 from engine.levers import Levers, PRESETS, preset_levers
 from engine.montecarlo import mc_input_paths, run_montecarlo
@@ -44,13 +45,52 @@ def test_es_monotona_en_la_palanca():
     assert deudas == sorted(deudas)
 
 
-@pytest.mark.parametrize("preset", [p["id"] for p in PRESETS])
-def test_los_presets_no_se_mueven(preset):
-    """Ninguno mueve `idx`, así que el ajuste es cero y sus cifras publicadas
-    siguen siendo las mismas. Si alguna vez un preset moviera la indexación,
-    esta prueba avisaría de que hay figuras que revisar."""
-    levers = preset_levers(preset)
-    assert levers.idx == BASE_LEVERS["idx"]
+def _pens_correction(levers):
+    """What pens_gap took from the primary balance, year by year."""
+    central = c.load_central()
+    r = run_scenario(levers)
+    return [r["pb"][k] - (central[2026 + k]["pb"] + levers.sp
+                          - central[2026 + k]["presion_demog"] * levers.dem)
+            for k in range(len(r["pb"]))]
+
+
+@pytest.mark.parametrize("preset", ["S0", "S5", "S6"])
+def test_los_presets_que_no_tocan_el_crecimiento_no_llevan_correccion(preset):
+    """La corrección de pensiones se mide contra los precios y el crecimiento
+    de la BASE. S0, S5 (instituciones y cuña) y S6 (demografía) no los mueven,
+    así que para ellos es exactamente cero y sus cifras publicadas no cambian.
+    S1-S4 y S7 sí tocan el crecimiento o la inflación y llevan su efecto."""
+    assert all(abs(x) < 1e-12 for x in _pens_correction(preset_levers(preset)))
+
+
+@pytest.mark.parametrize("preset", ["S1", "S2", "S3", "S4", "S7"])
+def test_los_presets_que_tocan_el_crecimiento_si_la_llevan(preset):
+    assert max(abs(x) for x in _pens_correction(preset_levers(preset))) > 0.05
+
+
+@pytest.mark.parametrize("kw", [{}, {"omega": 0.0}, {"omega": 0.5},
+                                {"alpha_spread": 0.04, "b_crit": 90.0},
+                                {"ipv_lr": 3.0, "ipv_rev": 0.4}])
+def test_la_referencia_es_la_base_bajo_cualquier_calibracion(kw):
+    """La referencia lee V0["pi"] y el g_nominal central directamente. Eso sólo
+    es correcto si la base produce exactamente esos dos, con cualquier ajuste
+    de calibración: aquí se comprueba."""
+    central = c.load_central()
+    base = run_scenario(Levers(), **kw)
+    assert all(p == pytest.approx(c.V0["pi"], abs=1e-12) for p in base["pi"])
+    assert all(g == pytest.approx(central[2026 + k]["g_nominal"], abs=1e-12)
+               for k, g in enumerate(base["gnom"]))
+
+
+def test_la_productividad_mejora_el_saldo_y_no_toca_los_ingresos():
+    """Antes el ahorro en pensiones de crecer más no llegaba al saldo y los
+    ingresos implícitos caían del 44 % al 40 % del PIB. Ahora llega al saldo
+    primario y los ingresos, en % del PIB, se quedan como en la base."""
+    base, up = run_scenario(Levers()), run_scenario(Levers(lam=BASE_LEVERS["lam"] + 1))
+    assert up["pb"][-1] > base["pb"][-1] + 4
+    assert up["b"][-1] < base["b"][-1] - 40
+    rev = lambda r: r["gtot"][-1] + r["saldo"][-1]
+    assert rev(up) == pytest.approx(rev(base), abs=1e-9)
 
 
 def test_con_la_indexacion_en_su_base_el_ajuste_es_exactamente_cero():

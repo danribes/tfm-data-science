@@ -55,7 +55,7 @@ Aplicar **S1 · tipos +200 pb** (Euríbor 2,80 → 4,80 %).
 | | deuda 2050 (%PIB) |
 |---|---|
 | S0 base | **223,8** |
-| S1 tipos +200 pb | **306,9** |
+| S1 tipos +200 pb | **310,8** |
 
 Abrir la descomposición y enseñar que la subida se atribuye a la palanca
 movida, con el residuo de interacción declarado aparte.
