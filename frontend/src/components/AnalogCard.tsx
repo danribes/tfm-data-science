@@ -4,6 +4,18 @@ import { ProjectionChart } from "./ProjectionChart";
 import { AnalogDiffRow } from "./AnalogDiffRow";
 import { LEVER_SPECS } from "../engine/levers";
 
+/** How close a match really is. The scale comes from the panel itself: the
+ *  distance from each country-year to its nearest neighbour in another
+ *  country is 0,22 at the median, 0,57 at p90 and 2,5 at p99
+ *  (tests/test_analog.py recomputes it). A top match past 2,5 is not a
+ *  country that resembles the scenario: it is the least different of none. */
+export const CLOSE_MAX = 0.6;
+export const MODERATE_MAX = 2.5;
+
+export function closeness(distance: number): "cercano" | "moderado" | "lejano" {
+  return distance <= CLOSE_MAX ? "cercano" : distance <= MODERATE_MAX ? "moderado" : "lejano";
+}
+
 function fmt(v: number | null | undefined, dec = 1): string {
   return v == null ? "—" : v.toFixed(dec).replace(".", ",");
 }
@@ -59,8 +71,20 @@ export function AnalogCard({ matches }: { matches: AnalogMatch[] }) {
               : "—"}
           </span>
         </div>
-        <span className="meta">Similitud descriptiva</span>
+        <span className={closeness(m.distance) === "lejano" ? "meta st cross" : "meta"}>
+          parecido {closeness(m.distance)}
+        </span>
       </div>
+      {closeness(m.distance) === "lejano" && (
+        <p className="danger-note" role="note" style={{ marginTop: 8 }}>
+          <span aria-hidden="true">⚠</span>{" "}
+          Ningún país del registro histórico se parece de verdad a este escenario: con
+          una distancia de {m.distance.toFixed(2).replace(".", ",")}, {m.country_name} en{" "}
+          {m.match_year} es sólo el menos distinto. Entre los países, lo normal es tener un
+          vecino a menos de {CLOSE_MAX.toString().replace(".", ",")}. Tómalo como un caso
+          extremo de referencia, no como un espejo.
+        </p>
+      )}
 
       {/* Snapshot KPIs */}
       <div style={{ display: "flex", gap: 16, marginTop: 10, flexWrap: "wrap" }}>

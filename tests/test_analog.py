@@ -86,3 +86,44 @@ def test_missing_macro_rows_cannot_appear_as_average_neighbors(monkeypatch):
     missing['gdp_growth'] = np.nan
     monkeypatch.setattr(module, 'ANALOG_PANEL', pd.concat([ANALOG_PANEL, pd.DataFrame([missing])], ignore_index=True))
     assert all(m['iso3'] != 'ZZZ' for m in find_analogs(Levers()))
+
+
+def test_every_searchable_country_has_a_spanish_name():
+    """The card printed the ISO code when a country had no name: «LBR · 2004»
+    instead of Liberia. Every code the search can return now has one."""
+    from engine import analog
+    codes = set(analog.ANALOG_PANEL.iso3)
+    assert sorted(c for c in codes if c not in analog._NAMES) == []
+    assert analog._NAMES["LBR"] == "Liberia"
+
+
+def test_no_regional_aggregate_is_searchable():
+    """WEO regions with three-letter codes (the …Q family, EDE, MAE, OAE) are
+    not countries. GNQ and IRQ end in Q too and are."""
+    from engine import analog
+    codes = set(analog.ANALOG_PANEL.iso3)
+    assert not codes & analog.AGGREGATES
+    assert {"GNQ", "IRQ"} <= codes
+
+
+def test_closeness_cutoffs_match_the_panel():
+    """The card calls a match close up to 0,6 and distant past 2,5
+    (frontend/src/components/AnalogCard.tsx). Those come from the panel: the
+    distance from a country-year to its nearest neighbour in another country
+    is under 0,6 for 90 % of them, and 2,5 is about the 99th percentile."""
+    import numpy as np
+    from engine import analog as a
+    p = a.ANALOG_PANEL[(a.ANALOG_PANEL.iso3 != "ESP") & (a.ANALOG_PANEL.year <= 2020)]
+    p = p.dropna(subset=a.QUERY_FEATURES)
+    z = np.array([[a._normalize(v, f) for f, v in zip(a.QUERY_FEATURES, row)]
+                  for row in p[a.QUERY_FEATURES].to_numpy()])
+    iso = p.iso3.to_numpy()
+    rng = np.random.default_rng(0)
+    nn = []
+    for i in rng.choice(len(z), size=600, replace=False):
+        diff = z - z[i]
+        d = np.sqrt(np.maximum(0.0, np.einsum("ij,jk,ik->i", diff, a._COV_INV, diff)))
+        nn.append(d[iso != iso[i]].min())
+    p90, p99 = np.percentile(nn, [90, 99])
+    assert p90 <= 0.6
+    assert 1.8 <= p99 <= 3.2

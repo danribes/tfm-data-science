@@ -25,7 +25,14 @@ _SERIES_TO_PANEL = {
 #: Codigos de tres letras que no son paises. El panel de origen (WEO) mezcla
 #: paises y agrupaciones regionales; las de nombre largo ya las quita el filtro
 #: de tres letras, esta no.
-AGGREGATES: frozenset[str] = frozenset({"SSA"})
+AGGREGATES: frozenset[str] = frozenset({
+    "SSA",
+    # Las agrupaciones regionales del WEO con codigo de tres letras en Q, y
+    # EDE, MAE y OAE. Se colaban como «paises» en la busqueda de analogos.
+    "AFQ", "APQ", "AZQ", "CAQ", "CBQ", "CMQ", "EAQ", "EEQ", "EUQ", "MEQ",
+    "NAQ", "NMQ", "PIQ", "SAQ", "SEQ", "SMQ", "SSQ", "WEQ", "WHQ",
+    "EDE", "MAE", "OAE",
+})
 
 _NAMES: dict[str, str] = {
     "AUT": "Austria", "BEL": "Bélgica", "CHE": "Suiza",
@@ -56,6 +63,41 @@ _NAMES: dict[str, str] = {
     "SGP": "Singapur", "CHN": "China", "IND": "India", "CHL": "Chile",
     "URY": "Uruguay", "CRI": "Costa Rica", "PAN": "Panamá",
     "DOM": "República Dominicana", "TUN": "Túnez", "JOR": "Jordania",
+    # El resto de paises del panel, con su nombre ISO 3166 en castellano
+    # (pycountry, traduccion es, retocada donde la forma oficial no es la
+    # usual) y los dos codigos del FMI que no son ISO: UVK y WBG. Sin esto, la
+    # ficha de analogos ensenaba el codigo: «LBR · 2004» en vez de Liberia.
+    "ABW": "Aruba", "AFG": "Afganistán", "AGO": "Angola", "AND": "Andorra",
+    "ARE": "Emiratos Árabes Unidos", "ARM": "Armenia", "ATG": "Antigua y Barbuda",
+    "AZE": "Azerbaiyán", "BDI": "Burundi", "BEN": "Benín", "BFA": "Burkina Faso",
+    "BGD": "Bangladés", "BHR": "Baréin", "BHS": "Bahamas", "BLR": "Bielorrusia",
+    "BLZ": "Belice", "BOL": "Bolivia", "BRN": "Brunéi", "BTN": "Bután",
+    "BWA": "Botsuana", "CAF": "República Centroafricana", "CIV": "Costa de Marfil",
+    "CMR": "Camerún", "COD": "República Democrática del Congo", "COG": "Congo",
+    "COM": "Comoras", "CPV": "Cabo Verde", "DJI": "Yibuti", "DMA": "Dominica",
+    "DZA": "Argelia", "ECU": "Ecuador", "ERI": "Eritrea", "ETH": "Etiopía",
+    "FJI": "Fiyi", "FSM": "Micronesia", "GAB": "Gabón", "GEO": "Georgia",
+    "GHA": "Ghana", "GIN": "Guinea", "GMB": "Gambia", "GRD": "Granada",
+    "GTM": "Guatemala", "GUY": "Guyana", "HKG": "Hong Kong", "HND": "Honduras",
+    "HTI": "Haití", "IRN": "Irán", "KAZ": "Kazajistán", "KEN": "Kenia",
+    "KGZ": "Kirguistán", "KHM": "Camboya", "KIR": "Kiribati", "KNA": "San Cristóbal y Nieves",
+    "KWT": "Kuwait", "LAO": "Laos", "LBR": "Liberia", "LCA": "Santa Lucía",
+    "LIE": "Liechtenstein", "LSO": "Lesoto", "MAC": "Macao", "MDA": "Moldavia",
+    "MDG": "Madagascar", "MDV": "Maldivas", "MHL": "Islas Marshall", "MKD": "Macedonia del Norte",
+    "MLI": "Malí", "MMR": "Birmania", "MNG": "Mongolia", "MOZ": "Mozambique",
+    "MRT": "Mauritania", "MUS": "Mauricio", "MWI": "Malaui", "MYS": "Malasia",
+    "NAM": "Namibia", "NER": "Níger", "NIC": "Nicaragua", "NPL": "Nepal",
+    "NRU": "Nauru", "OMN": "Omán", "PAK": "Pakistán", "PHL": "Filipinas",
+    "PLW": "Palaos", "PNG": "Papúa Nueva Guinea", "PRI": "Puerto Rico",
+    "PRY": "Paraguay", "QAT": "Catar", "RWA": "Ruanda", "SAU": "Arabia Saudí",
+    "SDN": "Sudán", "SEN": "Senegal", "SLB": "Islas Salomón", "SLE": "Sierra Leona",
+    "SLV": "El Salvador", "SMR": "San Marino", "SSD": "Sudán del Sur", "SUR": "Surinam",
+    "SWZ": "Esuatini", "SYC": "Seychelles", "SYR": "Siria", "TCD": "Chad",
+    "TGO": "Togo", "TJK": "Tayikistán", "TKM": "Turkmenistán", "TLS": "Timor Oriental",
+    "TON": "Tonga", "TTO": "Trinidad y Tobago", "TUV": "Tuvalu", "TWN": "Taiwán",
+    "TZA": "Tanzania", "UGA": "Uganda", "UVK": "Kosovo", "UZB": "Uzbekistán",
+    "VCT": "San Vicente y las Granadinas", "VEN": "Venezuela", "VNM": "Vietnam",
+    "VUT": "Vanuatu", "WBG": "Cisjordania y Gaza", "WSM": "Samoa", "ZWE": "Zimbabue",
 }
 
 

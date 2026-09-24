@@ -55,6 +55,9 @@ export function AnalogPanel({
               <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>
                 Busca los 3 episodios históricos más similares al escenario activo y muestra
                 su evolución posterior. La semejanza histórica no predice la trayectoria de España.
+                La distancia dice cuánto se parecen: hasta 0,6 es un parecido cercano, como el
+                de la mayoría de países entre sí; por encima de 2,5, ningún país se parece de
+                verdad y el primero de la lista es sólo el menos distinto.
               </p>
               <button
                 aria-label="Buscar análogo histórico"
