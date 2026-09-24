@@ -79,3 +79,49 @@ describe("AnswerPanel · qué cifra es la de cabecera", () => {
     expect(screen.queryByText(/−1,9 % frente/)).not.toBeInTheDocument();
   });
 });
+
+describe("AnswerPanel · y con un poco de sorna", () => {
+  function panel(persona: string | undefined, shift: number) {
+    const q = Q10.find((x) => x.series === "ujuv")!;
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const base = baseline();
+    const scn = { ...base, ujuv: base.ujuv.map((v) => v + shift) };
+    return render(
+      <QueryClientProvider client={client}>
+        <AnswerPanel q={q} all={Q10} scn={scn} base={base} k={24} year={2050} onAsk={() => {}} persona={persona} />
+      </QueryClientProvider>,
+    );
+  }
+
+  it("tells the young reader, ironically, what a worse youth rate means for them", () => {
+    panel("10", +2);
+    expect(screen.getByText("Y con un poco de sorna")).toBeInTheDocument();
+    expect(screen.getByText(/la habitación de tu infancia seguirá siendo tuya/)).toBeInTheDocument();
+    expect(screen.getByText(/no se lo reclames al simulador/)).toBeInTheDocument();
+  });
+
+  it("and a better one", () => {
+    panel("10", -2);
+    expect(screen.getByText(/igual hasta te independizas/)).toBeInTheDocument();
+  });
+
+  it("stays quiet without a persona", () => {
+    panel(undefined, +2);
+    expect(screen.queryByText("Y con un poco de sorna")).not.toBeInTheDocument();
+  });
+});
+
+describe("AnswerPanel · cómo se calcula, en llano", () => {
+  it("leads with the plain mechanism and folds the engine shorthand away", async () => {
+    const q = Q03.find((x) => x.series === "precio")!;
+    const { container } = ui(q, Q03);
+    await userEvent.click(screen.getByRole("button", { name: /Cómo se calcula este número/ }));
+    const body = container.querySelector(".layer.open .layer-body")!;
+    expect(body.firstElementChild!.textContent).toBe(q.plain);
+    const details = body.querySelector("details.tech-details")!;
+    expect(details.textContent).toContain("IPV_LR");
+    // The shorthand is nowhere outside the technical note.
+    const outside = [...body.children].filter((el) => !el.contains(details)).map((el) => el.textContent).join(" ");
+    expect(outside).not.toContain("IPV_LR");
+  });
+});

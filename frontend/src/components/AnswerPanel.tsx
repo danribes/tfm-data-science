@@ -8,8 +8,10 @@ import { eur, nf, sgUnit } from "../lib/fmt";
 import { ProjectionChart } from "./ProjectionChart";
 import { SERIES_FORMAT } from "./KpiRow";
 import { RagCorpusNotice } from "./RagCorpusNotice";
+import { MechanismText } from "./MechanismText";
 import { seriesLabel, seriesPlain } from "../lib/seriesMeta";
 import type { PersonaQuestion } from "../personas/questions";
+import { sorna } from "../personas/sorna";
 
 /** The only series the deep-learning backtest was run on. The layer shows
  *  under every question, but under any other one it says first that this
@@ -114,7 +116,7 @@ function CorpusLayer({ concept }: { concept: string }) {
 }
 
 export function AnswerPanel({
-  q, all, scn, base, k, year, onAsk, estimated,
+  q, all, scn, base, k, year, onAsk, estimated, persona,
 }: {
   q: PersonaQuestion;
   all: PersonaQuestion[];
@@ -123,6 +125,8 @@ export function AnswerPanel({
   k: number;
   year: number;
   onAsk: (id: string) => void;
+  /** Quién pregunta: elige el comentario con sorna. Sin él, no hay comentario. */
+  persona?: string;
   /** Los dos parámetros que el motor sí estima, con la muestra de la que
    *  salen. `label` y `source` vienen de la API: escribirlos a mano aquí es
    *  como la ficha acabó afirmando «panel de 20 CCAA» cuando son 19. */
@@ -140,6 +144,7 @@ export function AnswerPanel({
   const value = seriesOf(scn, q.series)[k];
   const baseValue = seriesOf(base, q.series)[k];
   const delta = value - baseValue;
+  const ironia = sorna(persona, q.series, delta, SERIES_FORMAT[q.series]?.dec ?? 1, year);
 
   return (
     <div className="answer">
@@ -192,11 +197,15 @@ export function AnswerPanel({
 
       <div className="layers">
         <Layer tag="motor" title="Cómo se calcula este número">
-          {q.mechanism && <p>{q.mechanism}</p>}
-          {explain.isSuccess && (
+          {/* The plain version first; the original shorthand (TERM, IPV_LR,
+              Okun…) is kept for a reviewer and folds into «Detalle técnico». */}
+          {q.plain && <p>{q.plain}</p>}
+          {explain.isSuccess ? (
             <>
-              <p>{explain.data.mecanismo}</p>
-              {explain.data.contributions.length > 0 && (
+              <MechanismText text={explain.data.mecanismo} technical={q.mechanism || undefined} />
+              {/* The deterministic text already carries the breakdown, in the
+                  same words; the list is for model-written text, which may not. */}
+              {explain.data.source === "llm" && explain.data.contributions.length > 0 && (
                 <>
                   <p className="layer-note">
                     De cuánto responde cada palanca en el movimiento de este año:
@@ -219,6 +228,8 @@ export function AnswerPanel({
                   : "Texto generado con plantillas deterministas sobre las cifras del motor."}
               </p>
             </>
+          ) : (
+            q.mechanism && <MechanismText text="" technical={q.mechanism} />
           )}
           <p className="layer-note">
             Es un escenario condicionado a las palancas, no una predicción: el
@@ -380,6 +391,17 @@ export function AnswerPanel({
         <div className="coloquial">
           <span className="coloquial-lab">Y en corto</span>
           <p>{explain.data.coloquial}</p>
+        </div>
+      )}
+
+      {ironia && (
+        <div className="coloquial sorna">
+          <span className="coloquial-lab">Y con un poco de sorna</span>
+          <p>{ironia}</p>
+          <p className="layer-note">
+            Ironía sobre un escenario condicional: si nada de esto pasa, no se lo
+            reclames al simulador.
+          </p>
         </div>
       )}
 

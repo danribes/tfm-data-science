@@ -94,50 +94,115 @@ def _resumen(f: ExplanationFacts) -> str:
     return " ".join(parts)
 
 
+#: What each lever does inside the engine, in words a reader without economics
+#: can follow. The same chains as facts.MECHANISM — whose constants go to the
+#: technical line at the end instead of sitting inside every sentence — and
+#: checked against engine/spain.py: a higher Euríbor lowers house-price growth
+#: with a fading effect and raises the mortgage payment (r + DIFF).
+PLAIN_LEVER: dict[str, str] = {
+    "r": ("cambia lo que paga el Estado al renovar su deuda, el interés del bono "
+          "a 10 años, la inversión y el consumo, la cuota de la hipoteca y, los "
+          "primeros años, cuánto sube el precio de la vivienda"),
+    "prima": ("se suma al interés del bono a 10 años y, a medida que el Estado "
+              "renueva su deuda, a lo que paga en intereses"),
+    "sp": ("resta o suma directamente a la deuda, y además frena o empuja la "
+           "economía a través del gasto y los impuestos"),
+    "lam": ("cambia cuánto puede crecer la economía y el paro que tiene de fondo: "
+            "con más productividad, los sueldos pueden subir sin que suban los "
+            "precios"),
+    "pm": ("pasa a la inflación durante unos años, cada vez menos, y resta "
+           "actividad"),
+    "tau": ("son los impuestos y cotizaciones que separan lo que paga la empresa "
+            "de lo que cobra el trabajador, y cambian el paro que la economía "
+            "tiene de fondo"),
+    "z": ("son los convenios, las indemnizaciones y el salario mínimo; cambian el "
+          "paro que la economía tiene de fondo, y en el modelo son lo que más "
+          "lo mueve"),
+    "ext": "se traslada a la actividad de aquí a través de las exportaciones",
+    "dem": ("cambia cuántos mayores hay por cada persona en edad de trabajar, y con "
+            "ello el gasto en pensiones"),
+    "idx": ("cambia cuánto suben cada año pensiones y nóminas públicas respecto a "
+            "la inflación: su poder de compra y lo que le cuestan al Estado"),
+}
+
+
+def _y(names: list[str]) -> str:
+    """«A», «A y B», «A, B y C»."""
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " y " + names[-1]
+
+
 def _mecanismo(f: ExplanationFacts) -> str:
     if not f.moved:
         return ("Sin palancas movidas no hay mecanismo que trazar: las series "
                 "son las del vintage congelado.")
 
-    lines: list[str] = []
-    for m in f.moved:
-        steps = f.mechanism.get(m.id, [])
-        if not steps:
-            continue
-        chain = "; ".join(
-            s["step"] + (f" ({s['const']} = {nf(s['value'], 2)})"
-                         if s.get("value") is not None else "")
-            for s in steps)
-        lines.append(f"{m.symbol} · {m.name} → {chain}.")
+    hd = next((o for o in f.outcomes if o.key == f.headline_key), None)
+    what = hd.label.lower() if hd else "la serie"
+    # Every figure in the decomposition is a change, so all of it is in the
+    # change's unit: «−43,7 puntos de PIB», not «−43,7 %PIB».
+    unit = _delta_unit(hd.unit) if hd else ""
 
+    # A lever that does not reach this figure is named once, not explained:
+    # six paragraphs about levers that move it by +0,0 is how the one that
+    # matters got lost.
+    by_id = {m.id: m for m in f.moved}
     if f.contributions:
-        hd = next((o for o in f.outcomes if o.key == f.headline_key), None)
-        what = hd.label.lower() if hd else "la serie"
-        # Every figure in the decomposition is a change, so all of it is in the
-        # change's unit: «−43,7 puntos de PIB», not «−43,7 %PIB».
-        unit = _delta_unit(hd.unit) if hd else ""
+        ranked = sorted(f.contributions, key=lambda ct: abs(ct.delta), reverse=True)
+        movers = [ct for ct in ranked if abs(ct.delta) >= 0.05]
+        idle = [ct.lever_name for ct in ranked if abs(ct.delta) < 0.05]
+        explained = [by_id[ct.lever_id] for ct in movers if ct.lever_id in by_id]
+    else:
+        movers, idle, explained = [], [], list(f.moved)
+
+    lines: list[str] = []
+    described = [m for m in explained if m.id in PLAIN_LEVER]
+    if described:
+        lines.append("Qué hace en el modelo cada palanca que mueve esta cifra:")
+        for m in described:
+            lines.append(f"  · {m.name}: {PLAIN_LEVER[m.id]}.")
+
+    if f.contributions and not movers:
+        lines.append(f"Ninguna de las palancas que has movido cambia {what} en "
+                     f"{f.headline_year}: {_y(idle)}.")
+    elif f.contributions:
         lines.append(
-            f"Descomposición del movimiento de {what} en {f.headline_year} "
-            f"({_signed(f.joint_delta, 1)}{_sp(unit)} en total), volviendo a correr el "
-            "motor con una sola palanca cada vez:")
-        for ct in f.contributions:
+            f"Cuánto pesa cada una en el cambio de {what} en {f.headline_year} "
+            f"({_signed(f.joint_delta, 1)}{_sp(unit)} en total). Para saberlo, el "
+            "modelo se vuelve a calcular moviendo una sola palanca cada vez:")
+        for ct in movers:
             lines.append(
-                f"  · {ct.lever_name}: {_signed(ct.delta, 1)}{_sp(unit)} por sí sola "
-                f"({nf(ct.share * 100, 0)} % del movimiento bruto).")
+                f"  · {ct.lever_name}: {_signed(ct.delta, 1)}{_sp(unit)} "
+                f"({nf(ct.share * 100, 0)} % del cambio).")
+        if idle:
+            lines.append(f"  · No mueven esta cifra, o casi nada: {_y(idle)}.")
         if abs(f.interaction) > 0.05:
             lines.append(
                 f"  · Interacción entre palancas: {_signed(f.interaction, 1)}{_sp(unit)}. "
-                "El motor no es lineal, así que las palancas por separado no suman "
-                "el efecto conjunto — esta diferencia es real, no un error de "
+                "El modelo no es lineal, así que las palancas por separado no suman "
+                "el efecto conjunto: esta diferencia es real, no un error de "
                 "redondeo.")
 
     # Only where it is the mechanism. Under «¿qué parte de mi sueldo se irá en
     # la hipoteca?» the debt identity is true and irrelevant, and a paragraph
     # of irrelevant truth is how an explanation stops being read.
-    if f.headline_key in {"b", "int", "saldo", "pb", "ief", "bono", "spread"}:
-        lines.append("La identidad que cierra el círculo es b(t+1) = b(t)·(1+r−g) − sp: "
-                     "la deuda crece con el tipo, baja con el crecimiento y con el "
-                     "superávit primario.")
+    debt = f.headline_key in {"b", "int", "saldo", "pb", "ief", "bono", "spread"}
+    if debt:
+        lines.append("La cuenta de la deuda: la de este año es la del anterior, más "
+                     "los intereses, menos el efecto de que la economía crezca, "
+                     "menos el superávit (o más el déficit) sin contar intereses.")
+
+    # The constants stay — a reviewer checks them — but on one line of their
+    # own, labelled, which the page folds into «Detalle técnico».
+    consts: dict[str, float] = {}
+    for m in explained:
+        for s in f.mechanism.get(m.id, []):
+            if s.get("value") is not None:
+                consts.setdefault(s["const"], s["value"])
+    tech = [f"{k} = {nf(v, 2)}" for k, v in consts.items()]
+    if debt:
+        tech.append("b(t+1) = b(t)·(1+r−g) − sp")
+    if tech:
+        lines.append("Detalle técnico: " + " · ".join(tech) + ".")
     return "\n".join(lines)
 
 

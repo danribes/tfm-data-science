@@ -176,6 +176,7 @@ export default function Persona() {
             text,
             series: res.series as AnySeriesKey,
             mechanism: "",
+            plain: "",
             levers: Object.keys(res.levers ?? {}) as PersonaQuestion["levers"],
             followUps: [],
           });
@@ -249,6 +250,7 @@ export default function Persona() {
           year={year}
           estimated={estimated}
           onAsk={ask}
+          persona={id}
         />
       )}
 

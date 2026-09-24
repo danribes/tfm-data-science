@@ -290,7 +290,7 @@ def test_fallback_decomposition_uses_the_headline_unit():
     mech = fallback_narration(facts)["mecanismo"]
     if facts.contributions:
         esf = next(o for o in facts.outcomes if o.key == "esf")
-        assert f"Descomposición del movimiento de {esf.label.lower()}" in mech
+        assert f"en el cambio de {esf.label.lower()}" in mech
 
 
 def test_fallback_states_the_change_in_the_series_own_unit():
@@ -490,3 +490,28 @@ def test_series_metadata_matches_the_engine():
         assert key in SERIES_KEYS, key
         assert meta["label"].strip() and meta["label"][0].isupper(), key
         assert isinstance(meta["dec"], int) and isinstance(meta["up_is_bad"], bool), key
+
+
+def test_mecanismo_explains_in_plain_words_and_folds_the_constants():
+    """«r · Tipo de interés → coste de refinanciación (REFI = 0,14); …» for all
+    six moved levers, including the ones that move temporalidad by +0,0, was
+    unreadable. The plain text explains only the levers that move the figure,
+    names the rest once, and keeps the constants on one «Detalle técnico» line."""
+    levers = Levers(r=BASE_LEVERS["r"] - 2.65, prima=105.0, idx=-0.8, z=-1.6, tau=-1.0)
+    mech = fallback_narration(build_facts(levers, 2050, headline="temp"))["mecanismo"]
+    lines = mech.splitlines()
+    tech = [ln for ln in lines if ln.startswith("Detalle técnico:")]
+    assert len(tech) == 1 and "A_Z = 1,10" in tech[0]
+    body = "\n".join(ln for ln in lines if not ln.startswith("Detalle técnico:"))
+    for jargon in ("REFI", "TERM", "E_R", "curva WS", "curva PS", "→", "(1+r−g)"):
+        assert jargon not in body, jargon
+    assert "convenios, las indemnizaciones y el salario mínimo" in body
+    assert "No mueven esta cifra, o casi nada:" in body
+    assert "Prima de riesgo" in body.split("No mueven esta cifra")[1]
+
+
+def test_mecanismo_says_so_when_no_moved_lever_reaches_the_figure():
+    levers = Levers(r=BASE_LEVERS["r"] - 0.85, prima=105.0, idx=-0.8)
+    mech = fallback_narration(build_facts(levers, 2050, headline="d1"))["mecanismo"]
+    assert mech.startswith("Ninguna de las palancas que has movido cambia salarios públicos")
+    assert "Cuánto pesa" not in mech

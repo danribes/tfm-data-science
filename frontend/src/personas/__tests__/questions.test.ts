@@ -44,6 +44,13 @@ describe("persona question sets", () => {
         expect(f, `${pid}/${q.id}: follows itself`).not.toBe(q.id);
       }
       expect(q.mechanism.length, `${pid}/${q.id}: mechanism too short`).toBeGreaterThan(40);
+      // The plain version is what a reader sees first under «Cómo se calcula»:
+      // the engine's shorthand (TERM, IPV_LR, Okun, WS/PS…) belongs in the
+      // technical note, not here.
+      expect(q.plain.length, `${pid}/${q.id}: plain too short`).toBeGreaterThan(60);
+      expect(q.plain.length, `${pid}/${q.id}: plain too long`).toBeLessThan(360);
+      expect(q.plain, `${pid}/${q.id}: jargon in plain`).not.toMatch(
+        /\b(TERM|IPV_LR|IPV_REV|B_CRIT|PHI|REFI|E_R|NAIRU|Okun|Phillips|WS|PS|P51G?|numerador|denominador)\b|[λβσιτ]|\(1\+/);
       expect(q.text.endsWith("?"), `${pid}/${q.id}: not a question`).toBe(true);
     }
   });

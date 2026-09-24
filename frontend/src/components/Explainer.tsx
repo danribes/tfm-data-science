@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useExplain } from "../api/hooks";
 import { useScenarioStore } from "../state/scenarioStore";
 import { ContributionChart } from "./ContributionChart";
+import { MechanismText } from "./MechanismText";
 
 /** The persistent explanation panel.
  *
@@ -74,7 +75,7 @@ export function Explainer() {
           >
             {openMech ? "▾" : "▸"} ver el mecanismo
           </button>
-          {openMech && <pre className="mech-body">{d.mecanismo}</pre>}
+          {openMech && <div className="mech-body"><MechanismText text={d.mecanismo} /></div>}
         </div>
       )}
 
