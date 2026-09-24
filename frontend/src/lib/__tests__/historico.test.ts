@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { GTOT_RECORD, recordCrossing } from "../historico";
+import { GTOT_RECORD, INT_RECORD, recordCrossing } from "../historico";
 import { baseline, runScenario, YEARS } from "../../engine/spain";
 import { BASE_LEVERS } from "../../engine/vintage";
 
@@ -34,6 +34,13 @@ describe("GTOT_RECORD — el récord del gasto público", () => {
     const pts: [string, number][] = gold.series.gasto_total_pib_hist.puntos;
     const [year, value] = pts.reduce((m, p) => (p[1] > m[1] ? p : m));
     expect({ value, year: Math.round(Number(year)) }).toEqual(GTOT_RECORD);
+  });
+
+  it("the interest record matches the frozen vintage too", () => {
+    const gold = JSON.parse(readFileSync(resolve(__dirname, "../../../../data/gold/kpis_perfiles.json"), "utf8"));
+    const pts: [string, number][] = gold.series.intereses_deuda_hist.puntos;
+    const [year, value] = pts.reduce((m, p) => (p[1] > m[1] ? p : m));
+    expect({ value, year: Math.round(Number(year)) }).toEqual(INT_RECORD);
   });
 
   it("the base scenario passes it in 2038, and cutting the deficit delays it", () => {

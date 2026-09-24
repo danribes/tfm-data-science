@@ -14,6 +14,7 @@ import { isFresh, kIndex, useScenario, useScenarioStore } from "../state/scenari
 import { SHIPPED_IDS } from "../personas/registry";
 import { RegimeChart } from "../components/RegimeChart";
 import { DistressGauge } from "../components/DistressGauge";
+import { DebtAlarms } from "../components/DebtAlarms";
 import { Portada } from "../components/Portada";
 import { SpainAmongOthers } from "../components/SpainAmongOthers";
 import { LeverSummary, ProjectionTable } from "../components/ProjectionTable";
@@ -274,6 +275,10 @@ export default function Inicio() {
           está por encima de ese umbral hoy, no que este escenario la haya roto.
         </Caption>
       </div>
+
+      {/* What the app does and does not judge about paying the debt, and the
+          year each alarm goes off in this scenario. */}
+      {redlines.isSuccess && <DebtAlarms scn={scn} defs={redlines.data.redlines} />}
 
       {/* The probabilistic complement of the 7 % threshold, right after the
           thresholds themselves so the two readings sit together. */}

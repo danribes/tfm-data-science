@@ -40,7 +40,9 @@ describe("Inicio — headline figures + global semaphore + persona cards", () =>
   it("renders the 9 global red lines with computed statuses (deuda_105 crossed at base 2026)", async () => {
     ui();
     await waitFor(() => expect(document.querySelectorAll(".rl-item")).toHaveLength(9));
-    const deuda105 = screen.getByText("Deuda > 105 % PIB").closest(".rl-item")!;
+    // Scoped to the traffic light: the alarms table below names the same line.
+    const deuda105 = [...document.querySelectorAll(".rl-item")]
+      .find((el) => el.textContent?.includes("Deuda > 105 % PIB"))!;
     expect(deuda105.querySelector(".st")!.className).toContain("cross");
   });
 

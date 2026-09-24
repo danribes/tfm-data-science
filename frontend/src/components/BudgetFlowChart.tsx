@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import type { Levers } from "../engine/levers";
-import { runScenario } from "../engine/spain";
+import { runScenario, YEARS } from "../engine/spain";
 import { nf } from "../lib/fmt";
 import { budgetFlows } from "./fiscalFlows";
 import { HowToRead } from "./HowToRead";
-import { GTOT_RECORD } from "../lib/historico";
+import { GTOT_RECORD, recordCrossing } from "../lib/historico";
 
 interface FlowLink {
   id: string;
@@ -93,6 +93,8 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
   // spending nodes (not a surplus) until their running total reaches the
   // record, and interpolate inside that node. Everything below it is spending
   // Spain has never had.
+  // The first year this scenario's spending passes the record, for the note.
+  const recordYear = recordCrossing(YEARS, scn.gtot);
   let recordY: number | null = null;
   let spendEnd = TOP_Y;
   if (spending > GTOT_RECORD.value) {
@@ -172,12 +174,21 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
         </p>
       )}
 
+      {/* Before the record is passed, say when it would be: the warning and
+          the red zone only appear in years where spending is above it. */}
+      {recordY === null && recordYear !== null && recordYear > selectedYear && (
+        <p className="muted" style={{ fontSize: 13, margin: "0 0 12px" }}>
+          En {selectedYear} el gasto público, {nf(spending, 1)} % del PIB, todavía no llega
+          a su récord de {GTOT_RECORD.year} ({nf(GTOT_RECORD.value, 1)} %). Con tus palancas lo
+          pasaría en {recordYear}: elige ese año o uno posterior para ver la zona roja.
+        </p>
+      )}
       {recordY !== null && (
         <p className="danger-note" role="note">
           <span aria-hidden="true">⚠</span>{" "}
           En {selectedYear} el gasto público llegaría al {nf(spending, 1)} % del PIB, por
           encima de su récord: el {nf(GTOT_RECORD.value, 1)} % de {GTOT_RECORD.year}, en plena
-          pandemia. La zona roja de la derecha es el gasto que pasa de ese récord, empujado por
+          pandemia{recordYear !== null && recordYear < selectedYear ? `, y lo pasa desde ${recordYear}` : ""}. La zona roja de la derecha es el gasto que pasa de ese récord, empujado por
           las pensiones y los intereses de la deuda. Cada punto de más habría que pagarlo con
           impuestos o con más deuda.
         </p>

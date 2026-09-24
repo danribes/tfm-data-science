@@ -562,3 +562,8 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 /* --- the spaghetti's danger zone, said in words under the chart --- */
 .danger-note { margin: 6px 0 4px; padding: 8px 12px; border-left: 3px solid var(--st-crossed); background: color-mix(in srgb, var(--st-crossed) 9%, transparent); color: var(--ink); font-size: 14.5px; line-height: 1.55; border-radius: var(--rad-chip); }
 .danger-note > span { color: var(--st-crossed); font-weight: 800; }
+
+/* --- «¿Cuándo es demasiada deuda?»: when each alarm goes off --- */
+.alarm-t td { vertical-align: top; }
+.alarm-t td.bad { color: var(--st-crossed); font-weight: 700; white-space: nowrap; }
+.alarm-t td.ok { color: var(--good); font-weight: 700; white-space: nowrap; }

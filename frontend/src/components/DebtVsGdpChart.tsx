@@ -167,8 +167,8 @@ export function SnowballStrip({ scn, k }: { scn: Scenario; k: number }) {
             title={`Zona de rescate: ${nf(RESCUE_YIELD, 0)} %`}
           />
         </span>
-        <span className={bono >= RESCUE_YIELD ? "snow-val bad" : "snow-val"}>
-          {nf(bono, 2)} %
+        <span className={bono > RESCUE_YIELD ? "snow-val bad" : "snow-val"}>
+          {nf(bono, 2)} %{bono > RESCUE_YIELD && " ⚠ zona de rescate"}
         </span>
       </div>
       <div className="snow-row">
