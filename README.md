@@ -336,6 +336,85 @@ reescribe.
 El mismo cálculo existe en Python y en TypeScript, fijado a anclas numéricas
 compartidas, para que el navegador y el servidor no puedan divergir en silencio.
 
+#### Cómo evoluciona cada cifra, año a año
+
+El motor recorre los años de 2026 a 2050 en un solo paso por año. Parte del
+corte congelado del 31 de julio de 2026 (los valores observados, `V0`) y de la
+senda central de deuda heredada (`gold_escenarios_deuda.csv`), y cada año
+calcula lo siguiente. El orden respeta las dependencias; en el código el
+crecimiento real sale justo después del paro y la inflación, y el gasto total
+se calcula al final del año, con las series satélite. El subíndice ₀ indica el
+valor base de cada palanca y, en `pens₀` e `ipv₀`, el valor observado de `V0`
+(13,23 % del PIB y 12,8 % anual).
+
+1. **Actividad.** Las palancas de demanda forman un choque,
+   `choque = −(sp − sp₀) − E_R·(r − r₀) + E_EXT·(ext − ext₀) − E_PM·(pm − pm₀)`
+   (saldo discrecional, Euríbor, demanda exterior y precio de importación).
+   El nivel del PIB se aparta de la base con persistencia,
+   `nivel_t = RHO·nivel_{t−1} + (1 − RHO)·MULT·choque`, y el crecimiento real es
+   el observado más el cambio de ese nivel más la productividad,
+   `g = 2,7 + (nivel_t − nivel_{t−1}) + (λ − λ₀)`.
+   RHO 0,62; MULT 1,4; E_R 0,45; E_EXT 0,25; E_PM 0,012.
+2. **Paro.** Ley de Okun sobre ese nivel, más los desplazamientos del paro de
+   fondo: `u = 10,1 + A_Z·z + A_TAU·τ − A_LAM·(λ − λ₀) − OKUN·nivel`
+   (`z` instituciones laborales, `τ` cuña fiscal, `λ` productividad).
+   OKUN 0,48; A_Z 1,1; A_TAU 0,3; A_LAM 0,45.
+3. **Inflación.** Curva de Phillips adaptativa alrededor del 3 % observado: es
+   la forma híbrida de la memoria con el peso adaptativo en 1 (`OMEGA`), así que
+   sólo mira hacia atrás; ninguna ruta de la aplicación cambia ese peso.
+   `π_desv,t = THETA·π_desv,t−1 + KAPPA·OKUN·nivel + GAMMA·(pm − pm₀)·PM_DECAY^k`,
+   donde `k` es el año de proyección. El crecimiento nominal es
+   `gnom = g_nominal_central + (g − 2,7) + π_desv`.
+   THETA 0,55; KAPPA 0,22; GAMMA 0,045; PM_DECAY 0,45.
+4. **Bono y tipo medio de la deuda.** `bono = r + TERM + prima/100` (TERM 0,17).
+   Es constante en todo el horizonte: la realimentación de la prima con la
+   deuda (`ALPHA_SPREAD`, por encima de `B_CRIT`) existe en el motor de Python,
+   pero vale 0 y ninguna ruta de la aplicación la activa. El tipo medio que
+   paga el Estado recoge el cambio del bono al ritmo de refinanciación:
+   `di_t = di_{t−1} + REFI·((bono − 3,42) − di_{t−1})` e
+   `ief = r_efectivo_central + di` (REFI 0,14: cada año se renueva en torno al
+   14 % de la deuda).
+5. **Pensiones.** `pens = pens₀·dep_idx·F`, donde `F` acumula cada año
+   `(1 + (π + ι)/100)/(1 + gnom/100)` —la revalorización frente al crecimiento
+   del PIB— y `dep_idx` sigue la proyección de dependencia de Eurostat,
+   agrandada o reducida por la palanca demográfica. Al saldo llega la
+   diferencia `pens − pens₀·dep_idx·F_ref`, con `F_ref` calculado con la
+   indexación de referencia y con la inflación y el crecimiento de la base:
+   así llegan al déficit tanto la palanca de indexación como lo que el
+   crecimiento o los precios cambian el peso de las pensiones en el PIB.
+6. **Saldo y deuda.** `pb = pb_central + sp − presión_demográfica·dem − corrección_de_pensiones`;
+   `b_t = b_{t−1}·(1 + ief/100)/(1 + gnom/100) − pb`;
+   intereses `= b_{t−1}·ief/100/(1 + gnom/100)`; saldo total `= pb − intereses`.
+7. **Gasto total.** `gtot = 45,4 − sp + (pens − pens₀) + (intereses − intereses_base_2026)`:
+   crece con las dos partidas que evolucionan. Las otras cinco —salarios
+   públicos, consumo intermedio, educación, inversión y subvenciones— sólo se
+   mueven con la palanca `sp`, con pesos fijos (0,240; 0,125; 0,090; 0,145;
+   0,031). Los ingresos del esquema presupuestario no se modelan: son el
+   residuo `gtot + saldo`.
+8. **Salarios.** `w_nom = π + λ + PHI·OKUN·nivel` (PHI 0,3); el salario real es
+   `w_nom − π`. El índice de salario nominal acumula `w_nom` y el de salario
+   real (`wrealIdx`, «salario real acumulado») acumula `w_nom − π`, ambos con
+   base 100 en 2026. El «poder de compra de la nómina» (`nomreal`) es otra
+   serie: sólo acumula la palanca de indexación. El salario de partida es el medio del INE (EAES 2024, 24.497 € al año).
+9. **Vivienda.** La subida anual del precio vuelve a su media con la reversión
+   estimada, menos un choque de tipos que se apaga, más el efecto del
+   crecimiento:
+   `ipv = IPV_LR + (ipv₀ − IPV_LR)·(1 − IPV_REV)^k − E_IPV_R·(r − r₀)·E_IPV_R_DECAY^k + E_IPV_G·(g − 2,7)`.
+   IPV_LR 1,2151 e IPV_REV 0,2039 están estimados (apartado 2); E_IPV_R 2,6,
+   E_IPV_R_DECAY 0,45 y E_IPV_G 1,1 son calibraciones. La cuota es la de un
+   préstamo francés a 25 años por el 80 % del precio, al Euríbor más un
+   diferencial fijo de 1,4757 puntos; el esfuerzo es la cuota entre el salario
+   mensual (el anual en 14 pagas).
+10. **Series satélite.** Reglas sencillas con coeficientes fijos sobre las
+    anteriores: paro juvenil = 2,317 × paro; temporalidad, autoempleo, pobreza
+    infantil, sobrecarga por vivienda, nueva producción hipotecaria y
+    endurecimiento del crédito, declaradas en `engine/spain.py`.
+
+Todo es determinista: las mismas palancas dan siempre las mismas cifras. Para
+saber qué palanca mueve cada cifra, el motor se vuelve a correr con cada
+palanca sola; lo que las palancas por separado no suman es la interacción, que
+se publica en vez de repartirse.
+
 ### 2. Estimación en panel — qué dicen los datos sobre los parámetros
 
 De los ocho parámetros que el corte congelado podría informar, **dos se
@@ -397,6 +476,25 @@ colecciones con derechos de autor no forman parte de él.
 El despliegue actual va más allá, por decisión explícita del autor: sirve
 también los manuales, y sin credencial. Se describe en «Corpus completo,
 servido abierto», junto con la línea que lo cierra otra vez.
+
+### Métodos aplicados, de un vistazo
+
+| Componente | Método | Estimado o calibrado | Dónde |
+|---|---|---|---|
+| Motor semiestructural | Choque de demanda con persistencia, ley de Okun, curva de Phillips con inercia adaptativa, fijación de salarios, identidad de la deuda con refinanciación gradual, canal de pensiones | Calibrado, salvo `IPV_LR` e `IPV_REV` | `engine/spain.py`, `frontend/src/engine/spain.ts` |
+| Parámetros de vivienda | Media agrupada del crecimiento interanual (errores agrupados por comunidad) y AR(1) de la desviación con efectos fijos por comunidad; 17 CCAA más Ceuta y Melilla, 2007–2026 | Estimado, con intervalo al 90 % | `research/validate.py` (estimadores en `research/estimate.py`, panel en `research/panel.py`; congelados en `data/gold/estimated_params.json`) |
+| Persistencia del saldo | AR(1) con efectos fijos por país del saldo aproximado (ingresos menos gastos), panel de 18 países desde 1960; contraste de la palanca `sp`, no entra en el motor | Estimado | `research/validate.py` (`fiscal_persistence`), página Evidencia |
+| Qué palanca mueve cada cifra | Una corrida del motor por palanca, más el residuo de interacción | — | `explain/facts.py` |
+| Sensibilidad | Derivada numérica centrada, y esa derivada por el recorrido de cada palanca para poder comparar | — | `engine/spain.py` (`sensitivity_matrix`) |
+| Abanico de deuda | Monte Carlo: 4.000 trayectorias hasta 2070, choques AR(1) sobre tipo, crecimiento y saldo (ρ 0,96), freno fiscal asimétrico, semilla 42 | Calibrado para reproducir el abanico heredado dentro de ±2 pp | `engine/montecarlo.py` |
+| Banda del precio de la vivienda | 4.000 sorteos normales e independientes de `IPV_LR` e `IPV_REV`, con la media y el error estándar estimados (`IPV_REV` truncado a (0, 1)), semilla 42 | Estimado | `engine/parametric.py` |
+| Alarmas y líneas rojas | Umbrales con fuente declarada: casi todos, episodios reales (rescates con el bono al 7 %, récords de España) o una regla (Maastricht, definición de Eurostat); el 105 % de deuda viene de una cita de comentarista. Se evalúan año a año; «cerca» es estar a menos de un 10 % del umbral | Fuente declarada por umbral | `engine/redlines.py`, `frontend/src/components/DebtAlarms.tsx` |
+| Análogos históricos | Vecinos más próximos por distancia de Mahalanobis en coordenadas normalizadas, cinco variables; el parecido se califica con la escala del propio panel | Descriptivo | `engine/analog.py`, `frontend/src/components/AnalogCard.tsx` |
+| Riesgo de impago | Clasificador de gradient boosting (`HistGradientBoostingClassifier`) que anticipa el primer año de impago, con validación agrupada por país (BoC–BoE y Banco Mundial) | Exploratorio | `research/distress.py` |
+| Gemelo empírico | Proyección local con `GradientBoostingRegressor` y SHAP por régimen de deuda | Exploratorio | `research/state_dependence.py` |
+| Aprendizaje profundo | MLP global (16 trimestres → 8), 1.760 series extranjeras; backtest con orígenes móviles contra la deriva | Pierde; no entra en el motor | `research/dl_global.py` |
+| Recuperación con citas | BM25 y `multilingual-e5-large` con fusión de rangos ponderada (RRF) en modo híbrido; el modo público `public_lexical` usa sólo BM25 | — | `rag/` |
+| Redacción | Plantillas deterministas; un LLM opcional cuyas cifras se comprueban contra los hechos | — | `explain/` |
 
 ## Cómo se construyó
 

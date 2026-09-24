@@ -101,10 +101,11 @@ def run_scenario(
     int0 = (central[Y0 - 1]["deuda"] * central[Y0]["r_efectivo"] / 100
             / (1 + central[Y0]["g_nominal"] / 100))
     sal_idx = 1.0; wr_idx = 1.0; pens_fac = 1.0; nom_idx = 1.0
-    # Contrafactual: el mismo escenario con la indexación en su valor base.
-    # La diferencia entre los dos es lo que la palanca añade o quita de gasto,
-    # y es lo único que debe tocar el saldo: el nivel de pensiones que el
-    # escenario central ya suponía está dentro de gc['pb'].
+    # Referencia: la pensión con la indexación en su valor base y con los
+    # precios y el crecimiento de la BASE. La diferencia es lo que la palanca y
+    # el crecimiento del escenario añaden o quitan de gasto, y es lo único que
+    # debe tocar el saldo: el nivel de pensiones que el escenario central ya
+    # suponía está dentro de gc['pb'].
     pens_fac_idx0 = 1.0
     precio = V0["precio"]
 
