@@ -187,7 +187,7 @@ class Verdict:
             "mase_candidate_long": self.mase_candidate_long,
             "mase_drift_long": self.mase_drift_long,
             "wins": self.wins,
-            "verdict": ("bate al drift" if self.wins else "no bate al drift"),
+            "verdict": ("bate a la deriva" if self.wins else "no bate a la deriva"),
         }
 
 

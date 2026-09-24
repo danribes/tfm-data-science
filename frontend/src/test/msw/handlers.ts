@@ -430,7 +430,7 @@ export const handlers = [
         required: 12, horizon: 4,
         mase_candidate: 0.4, mase_drift: 0.3953,
         mase_candidate_long: 0.8421, mase_drift_long: 0.796,
-        wins: false, verdict: "no bate al drift",
+        wins: false, verdict: "no bate a la deriva",
       },
       note: "",
     }),

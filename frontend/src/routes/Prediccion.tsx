@@ -17,7 +17,7 @@ const COLOUR: Record<string, string> = {
 };
 const LABEL: Record<string, string> = {
   dl_global: "DL global (candidato)",
-  drift: "drift (referencia)",
+  drift: "deriva (referencia)",
   naive: "último valor",
   snaive: "naive estacional",
 };
@@ -52,7 +52,8 @@ export default function Prediccion() {
         </p>
         <p>
           La regla para decidirlo se fijó <em>antes</em> de que el modelo
-          existiera, y ese es el punto: batir al drift en{" "}
+          existiera, y ese es el punto: batir a la deriva («drift», prolongar la
+          pendiente de los últimos dos años) en{" "}
           <strong>{v ? nf(v.required, 0) : 12} de {v ? nf(v.total_ccaa, 0) : 17}</strong>{" "}
           comunidades a un horizonte de un año o menos. Una regla escrita después
           del resultado se puede acomodar al resultado.
@@ -79,7 +80,7 @@ export default function Prediccion() {
               {nf(v.total_ccaa, 0)} comunidades a h ≤ {nf(v.horizon, 0)}, cuando
               hacían falta {nf(v.required, 0)}. En MASE medio:{" "}
               <strong>{nf(v.mase_candidate, 3)}</strong> frente a{" "}
-              <strong>{nf(v.mase_drift, 3)}</strong> del drift — apenas un{" "}
+              <strong>{nf(v.mase_drift, 3)}</strong> de la deriva — apenas un{" "}
               {nf(((v.mase_candidate / v.mase_drift) - 1) * 100, 1)} % peor, pero
               peor.
             </p>
@@ -127,7 +128,7 @@ export default function Prediccion() {
               </LineChart>
             </ResponsiveContainer>
             <Caption>
-              El candidato y el drift van pegados hasta el año y se separan
+              El candidato y la deriva van pegados hasta el año y se separan
               después — al revés de lo que predice un argumento de transferencia.
               Lo que la red aprendió de los ciclos ajenos, si aprendió algo, no
               alcanza a pagar la sencillez de prolongar la pendiente reciente.

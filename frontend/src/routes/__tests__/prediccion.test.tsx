@@ -28,7 +28,7 @@ describe("Predicción — el backtest y su veredicto", () => {
     const badge = screen.getByText(/5 \/ 17/);
     expect(badge.className).toContain("cross");
     expect(badge.className).not.toContain("safe");
-    expect(badge.textContent).toMatch(/no bate al drift/);
+    expect(badge.textContent).toMatch(/no bate a la deriva/);
   });
 
   it("says plainly that nothing was retuned after the fact", async () => {
@@ -52,7 +52,7 @@ describe("Predicción — el backtest y su veredicto", () => {
       .querySelector("table")!;
     expect(within(table).getAllByRole("row")).toHaveLength(5);   // header + 4
     expect(within(table).getByText(/DL global/)).toBeInTheDocument();
-    expect(within(table).getByText(/drift/)).toBeInTheDocument();
+    expect(within(table).getByText(/deriva/)).toBeInTheDocument();
   });
 
   it("greys the horizons that fall outside the rule instead of hiding them", async () => {
@@ -92,6 +92,6 @@ describe("Predicción — el backtest y su veredicto", () => {
     expect(legend).toBeTruthy();
     expect(within(legend).getByText(/naive estacional/)).toBeInTheDocument();
     expect(within(legend).getByText(/DL global \(candidato\)/)).toBeInTheDocument();
-    expect(within(legend).getByText(/drift \(referencia\)/)).toBeInTheDocument();
+    expect(within(legend).getByText(/deriva \(referencia\)/)).toBeInTheDocument();
   });
 });

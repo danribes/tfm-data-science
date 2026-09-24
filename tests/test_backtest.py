@@ -137,9 +137,9 @@ def test_nacional_does_not_vote():
 
 def test_the_verdict_says_which_way_it_went():
     d = bt.judge(_two_method_frame(17), "cand").to_dict()
-    assert d["verdict"] == "bate al drift"
+    assert d["verdict"] == "bate a la deriva"
     assert d["required"] == bt.WIN_MIN_CCAA and d["horizon"] == bt.WIN_HORIZON
-    assert bt.judge(_two_method_frame(3), "cand").to_dict()["verdict"] == "no bate al drift"
+    assert bt.judge(_two_method_frame(3), "cand").to_dict()["verdict"] == "no bate a la deriva"
 
 
 # ---- the panels ------------------------------------------------------------

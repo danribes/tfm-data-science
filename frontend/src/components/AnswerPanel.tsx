@@ -11,6 +11,11 @@ import { RagCorpusNotice } from "./RagCorpusNotice";
 import { seriesLabel } from "../lib/seriesMeta";
 import type { PersonaQuestion } from "../personas/questions";
 
+/** The only series the deep-learning backtest was run on. Under any other
+ *  question the house-price table would read as if the network had been
+ *  tested on paro or deuda, which it never was. */
+const HOUSE_PRICE_SERIES = new Set(["precio", "ipv"]);
+
 function fmt(key: string, v: number): string {
   const f = SERIES_FORMAT[key] ?? { dec: 1, unit: "" };
   return `${nf(v, f.dec)} ${f.unit}`.trim();
@@ -230,19 +235,23 @@ export function AnswerPanel({
 
         {q.concept && <CorpusLayer concept={q.concept} />}
 
-        <Layer tag="modelo" title="Qué dice el modelo de aprendizaje profundo">
+        {HOUSE_PRICE_SERIES.has(q.series) && (
+        <Layer tag="modelo" title="Qué dice el modelo de aprendizaje profundo sobre el precio de la vivienda">
           {prediction.isSuccess && prediction.data.available ? (
             <>
               <p>
                 Un modelo global entrenado en {nf(Number(prediction.data.protocol.train_series), 0)} series
-                de EE. UU. y Reino Unido, sin ver ningún dato español, y evaluado
-                sobre las {prediction.data.protocol.n_ccaa} CCAA desde {prediction.data.protocol.test_start}.
+                de precios de la vivienda de EE. UU. y Reino Unido, sin ver ningún
+                dato español, y evaluado sobre las {prediction.data.protocol.n_ccaa} CCAA
+                con orígenes {prediction.data.protocol.origins}. Los datos desde{" "}
+                {prediction.data.protocol.test_start} quedan reservados, sin tocar.
               </p>
               <p className="layer-note">
-                Se compara con la regla más tonta posible: prolongar la línea
-                recta de los últimos años, lo que en la jerga se llama deriva
-                («drift»). La medida es el error escalado medio (MASE); cuanto
-                más bajo, mejor.
+                Se compara con la deriva («drift»): prolongar la pendiente de los
+                últimos dos años. No es la regla más tonta —repetir el último dato
+                lo hace mucho peor—, sino la más difícil de batir entre las
+                simples. La medida es el error escalado medio (MASE); cuanto más
+                bajo, mejor.
               </p>
               <table className="layer-table">
                 <thead>
@@ -267,12 +276,17 @@ export function AnswerPanel({
               </table>
               {prediction.data.verdict && (
                 <p className="layer-warn">
-                  Veredicto: <strong>{prediction.data.verdict.verdict}</strong> — bate a
-                  la deriva en {prediction.data.verdict.beaten_ccaa} de{" "}
-                  {prediction.data.verdict.total_ccaa} CCAA, y harían falta{" "}
-                  {prediction.data.verdict.required}. Por eso esta pantalla no
-                  enseña una predicción puntual: el modelo no ha ganado el derecho
-                  a hacerla, y la deriva es el listón que tendría que superar.
+                  Veredicto: <strong>{prediction.data.verdict.verdict}</strong>.
+                  Gana en {prediction.data.verdict.beaten_ccaa} de{" "}
+                  {prediction.data.verdict.total_ccaa} CCAA (media de h = 1–{prediction.data.verdict.horizon}),
+                  y la regla fijada de antemano pedía {prediction.data.verdict.required}.
+                  {!prediction.data.verdict.wins && (
+                    <>
+                      {" "}Por eso esta pantalla no enseña una predicción puntual: el
+                      modelo no ha ganado el derecho a hacerla, y la deriva es el
+                      listón que tendría que superar.
+                    </>
+                  )}
                 </p>
               )}
             </>
@@ -280,6 +294,7 @@ export function AnswerPanel({
             <p className="muted">Backtest no disponible en este despliegue.</p>
           )}
         </Layer>
+        )}
 
         <Layer tag="límites" title="Qué no sabe este número">
           {explain.isSuccess && explain.data.advertencia && (
