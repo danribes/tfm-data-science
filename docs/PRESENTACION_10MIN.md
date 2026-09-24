@@ -68,8 +68,9 @@ dejo ahí los veinticinco años.
 | Pensiones 2050 | 22,3 %PIB | **28,2 %PIB** |
 | Deuda 2050 | 223,8 %PIB | **286,6 %PIB** |
 
-Sesenta y tres puntos de PIB de deuda. **Es la palanca más potente del modelo**:
-la productividad, recorriendo todo su rango, mueve diecisiete.
+Sesenta y tres puntos de PIB de deuda. **Es la palanca más potente de las que
+decide un gobierno**: el saldo primario, recorriendo todo su rango, mueve
+setenta y ocho.
 
 Y aquí viene lo que quiero contar, porque es un error que encontré y corregí.
 Hasta hace unos días esta palanca **no movía la deuda en absoluto**. El bloque
@@ -83,10 +84,11 @@ El arreglo tiene un detalle que sostiene todo lo demás: el gasto entra en el
 saldo **por su desviación** respecto a la indexación de referencia, no por su
 nivel. El escenario central ya incorpora una senda de pensiones, y restar el
 nivel entero contaría dos veces la misma partida. Con la palanca en su
-referencia el ajuste es exactamente cero, así que la línea base y los ocho
-escenarios preconfigurados salen bit a bit iguales que antes. Lo comprobé
-contra el motor anterior sacado del repositorio: diferencia máxima cero en las
-cuarenta series.
+referencia el ajuste es exactamente cero, así que la línea base sale bit a bit
+igual que antes. Lo comprobé contra el motor anterior sacado del repositorio:
+diferencia máxima cero en las cuarenta series. Y la referencia usa los precios
+y el crecimiento de la base, así que cuando la productividad o la demanda
+cambian el peso de las pensiones en el PIB, eso también llega al saldo.
 
 La memoria publica la curva entera, no dos puntos, porque la relación no es
 lineal: la pendiente sube de 48 a 65 puntos de deuda por punto de indexación

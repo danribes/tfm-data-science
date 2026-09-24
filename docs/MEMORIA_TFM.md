@@ -51,7 +51,7 @@ la declaración no puedan contradecirse.
   - [6.4 Dependencia del estado: sin capacidad predictiva demostrada](#64-dependencia-del-estado-sin-capacidad-predictiva-demostrada)
   - [6.5 Incertidumbre Monte Carlo: los supuestos dominan](#65-incertidumbre-monte-carlo-los-supuestos-dominan)
   - [6.6 Incertidumbre paramétrica: qué aportan los dos parámetros estimados](#66-incertidumbre-paramétrica-qué-aportan-los-dos-parámetros-estimados)
-  - [6.7 Indexación de las pensiones: la palanca que más mueve la deuda](#67-indexación-de-las-pensiones-la-palanca-que-más-mueve-la-deuda)
+  - [6.7 Indexación de las pensiones: la mayor de las palancas que decide un gobierno](#67-indexación-de-las-pensiones-la-mayor-de-las-palancas-que-decide-un-gobierno)
   - [6.8 Recuperación y generación](#68-recuperación-y-generación)
   - [6.9 Coherencia de implementación](#69-coherencia-de-implementación)
 - [7. Discusión](#7-discusión)
@@ -343,11 +343,11 @@ donde $\delta$ es el mismo factor de decaimiento que el motor aplica al choque d
 
 El gasto en pensiones entra en el saldo primario por la desviación, no por el nivel. El escenario central ya incorpora una senda de gasto bajo una indexación supuesta, y la presión demográfica entra por su propio término, de modo que restar el nivel completo contabilizaría dos veces la misma partida. Lo que se resta del saldo es la diferencia entre el gasto que implica la indexación elegida y el que implicaría la indexación de referencia,
 
-$$pb_t = pb^{\text{central}}_t + sp - \delta_t\,\text{dem} - \bigl(P_t(\iota) - P_t(\iota_0)\bigr),$$
+$$pb_t = pb^{\text{central}}_t + sp - \delta_t\,\text{dem} - \bigl(P_t(\iota;\,\pi,g) - P_t(\iota_0;\,\pi^{\text{base}},g^{\text{base}})\bigr),$$
 
-donde $P_t(\iota)$ es la identidad contable de pensiones —pensión media por número de perceptores sobre PIB— evaluada en la indexación $\iota$. Con la palanca en su valor de referencia el término se anula exactamente, y la línea base y los ocho escenarios preconfigurados quedan inalterados.
+donde $P_t(\iota;\,\pi,g)$ es la identidad contable de pensiones —pensión media por número de perceptores sobre PIB— evaluada en la indexación $\iota$ con la inflación $\pi$ y el crecimiento nominal $g$ del escenario. La referencia usa la indexación de referencia con la inflación y el crecimiento de la base, así que el término recoge dos cosas: la indexación elegida y lo que los precios o el crecimiento del escenario cambian el peso de las pensiones en el PIB. Si la productividad hace crecer más la economía, unas pensiones que siguen al IPC pesan menos y ese ahorro mejora el saldo primario, en lugar de rebajar los ingresos implícitos. El término se anula exactamente con todas las palancas en su valor de referencia y en los escenarios que no tocan precios ni crecimiento (S0, S5 y S6); los que sí los tocan (S1 a S4 y S7) llevan su efecto.
 
-El canal importa por su magnitud: una indexación permanentemente un punto por encima de la de referencia añade unos 63 puntos de PIB a la deuda de 2050, y un punto y medio por debajo resta unos 78. Es el efecto más grande de cualquier palanca del modelo —la productividad, con el recorrido completo de su rango, mueve unos 17—, lo que refleja que el gasto en pensiones es la partida comprometida de mayor tamaño y la más sensible a una regla de revalorización. Una versión anterior calculaba las pensiones después de cerrar la identidad de deuda, de modo que la palanca cambiaba el gasto mostrado sin tocar la trayectoria fiscal.
+El canal importa por su magnitud: una indexación permanentemente un punto por encima de la de referencia añade unos 63 puntos de PIB a la deuda de 2050, y un punto y medio por debajo resta unos 78. Es el mayor efecto entre las palancas que el gobierno fija directamente —el saldo primario, en todo su recorrido, mueve unos 78—, lo que refleja que el gasto en pensiones es la partida comprometida de mayor tamaño y la más sensible a una regla de revalorización. Una versión anterior calculaba las pensiones después de cerrar la identidad de deuda, de modo que la palanca cambiaba el gasto mostrado sin tocar la trayectoria fiscal.
 
 En combinaciones extremas la recurrencia puede producir deuda negativa: se señala como salida del dominio de deuda bruta, pues no se modelan activos públicos ni una reacción de política al agotar la deuda.
 
@@ -489,9 +489,9 @@ La banda nace cerrada en 2026, porque ese año está anclado en el dato observad
 
 Conviene decir qué no es esta banda. No es un intervalo de predicción: no incorpora el error del propio modelo, ni cambios estructurales, ni la incertidumbre de las palancas, que las fija quien usa la herramienta. Un precio observado fuera de la cinta no contradice al modelo. Mide una sola cosa, y por eso puede afirmarse: que los dos parámetros estimados no se conocen con exactitud y que esa ignorancia, propagada a veinticinco años, vale alrededor de una sexta parte del nivel proyectado. [Módulo](../engine/parametric.py), [pruebas](../tests/test_parametric.py).
 
-### 6.7 Indexación de las pensiones: la palanca que más mueve la deuda
+### 6.7 Indexación de las pensiones: la mayor de las palancas que decide un gobierno
 
-De las diez palancas del panel, la que gobierna la revalorización de pensiones y nóminas domina a todas las demás. Recorriendo su rango completo mueve la deuda de 2050 en 140,5 puntos de PIB; la productividad, recorriendo el suyo, mueve unos 17. Esa asimetría no es un artefacto: el gasto en pensiones es la partida comprometida de mayor tamaño del presupuesto, y una regla de revalorización actúa sobre ella todos los años y de forma acumulativa.
+Recorriendo su rango completo, la indexación mueve la deuda de 2050 en 140,5 puntos de PIB. Sólo la productividad (280,7), el Euríbor (235,3), la presión demográfica (193,8) y la prima de riesgo (148,1) la mueven más, y ninguna de ellas se decide por ley. De las que sí fija un gobierno, es con diferencia la mayor: el saldo primario, en todo su recorrido, mueve unos 78. Esa asimetría no es un artefacto: el gasto en pensiones es la partida comprometida de mayor tamaño del presupuesto, y una regla de revalorización actúa sobre ella todos los años y de forma acumulativa.
 
 | Indexación (puntos/año) | Pensiones 2050 (% PIB) | Deuda 2050 (% PIB) | Δ frente a la referencia |
 |---|---|---|---|
