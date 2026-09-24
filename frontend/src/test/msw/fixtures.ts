@@ -18,7 +18,7 @@ export const mockRedlines: RedLineDef[] = [
   { id: "bono_rescate", label: "Bono 10A > 7 %", series: "bono", threshold: 7.0, cmp: "gt", source: "zona rescate: GRC/PRT/IRL pidieron rescate con bonos ≈7 %; ES tocó 7,6 % en jul-2012 [hist]" },
   { id: "paro_record", label: "Paro > 26,9 %", series: "u", threshold: 26.9, cmp: "gt", source: "máximo histórico ES (T1-2013) [hist]" },
   { id: "deficit_maastricht", label: "Déficit > 3 % PIB", series: "saldo", threshold: -3.0, cmp: "lt", source: "umbral Maastricht [regla UE]" },
-  { id: "deficit_suelo_2009", label: "Déficit > 11,3 % PIB", series: "saldo", threshold: -11.3, cmp: "lt", source: "suelo 2009: ES −11,3 % PIB [hist]" },
+  { id: "deficit_record_2012", label: "Déficit > 11,5 % PIB", series: "saldo", threshold: -11.5, cmp: "lt", source: "récord ES: −11,5 % PIB en 2012, con el rescate bancario [hist]" },
   { id: "deuda_105", label: "Deuda > 105 % PIB", series: "b", threshold: 105.0, cmp: "gt", source: "crack23: «deuda brutal que ya está por encima del 105 %» [comentario]" },
   { id: "deuda_120", label: "Deuda > 120 % PIB", series: "b", threshold: 120.0, cmp: "gt", source: "≈ pico COVID ES 2020: 119,3 [hist]" },
   { id: "inflacion_10", label: "Inflación > 10 %", series: "pi", threshold: 10.0, cmp: "gt", source: "ola inflacionaria 2022: ES pico 10,8 % jul-2022 [hist]" },

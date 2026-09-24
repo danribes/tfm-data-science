@@ -19,8 +19,11 @@ RED_LINES: list[dict] = [
      "source": "máximo histórico ES (T1-2013) [hist]"},
     {"id": "deficit_maastricht", "label": "Déficit > 3 % PIB", "series": "saldo",
      "threshold": -3.0, "cmp": "lt", "source": "umbral Maastricht [regla UE]"},
-    {"id": "deficit_suelo_2009", "label": "Déficit > 11,3 % PIB", "series": "saldo",
-     "threshold": -11.3, "cmp": "lt", "source": "suelo 2009: ES −11,3 % PIB [hist]"},
+    # Was «suelo 2009» at −11,3; the data's worst year is 2012 at −11,5, with
+    # the bank rescue (eurostat_gov_deficit_es.csv · deficit_pib_hist).
+    {"id": "deficit_record_2012", "label": "Déficit > 11,5 % PIB", "series": "saldo",
+     "threshold": -11.5, "cmp": "lt",
+     "source": "récord ES: −11,5 % PIB en 2012, con el rescate bancario [hist]"},
     {"id": "deuda_105", "label": "Deuda > 105 % PIB", "series": "b",
      "threshold": 105.0, "cmp": "gt",
      "source": "crack23: «deuda brutal que ya está por encima del 105 %» [comentario]"},

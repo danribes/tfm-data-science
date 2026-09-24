@@ -11,7 +11,7 @@ def _status(results, rid):
 def test_definitions_complete():
     assert NEAR_FRACTION == 0.10
     assert [r["id"] for r in RED_LINES] == [
-        "bono_rescate", "paro_record", "deficit_maastricht", "deficit_suelo_2009",
+        "bono_rescate", "paro_record", "deficit_maastricht", "deficit_record_2012",
         "deuda_105", "deuda_120", "inflacion_10", "esfuerzo_40", "pobreza_infantil_30"]
     for r in RED_LINES:
         assert r["cmp"] in ("gt", "lt") and r["source"].strip()
@@ -24,7 +24,7 @@ def test_base_2026_statuses_are_computed():
     assert _status(res, "deuda_105") == "crossed"          # 106.32 > 105
     assert _status(res, "deuda_120") == "safe"             # |106.32-120|=13.68 > 12
     assert _status(res, "deficit_maastricht") == "crossed" # -4.18 < -3
-    assert _status(res, "deficit_suelo_2009") == "safe"
+    assert _status(res, "deficit_record_2012") == "safe"
     assert _status(res, "esfuerzo_40") == "crossed"        # 42.58 > 40
     assert _status(res, "pobreza_infantil_30") == "near"   # |28.5-30|=1.5 <= 3.0
     assert _status(res, "bono_rescate") == "safe"
@@ -37,7 +37,7 @@ def test_s7_adverse_2050_crossings():
     res = evaluate_redlines(run_scenario(preset_levers("S7")), 2050 - Y0)
     assert _status(res, "deuda_105") == "crossed"
     assert _status(res, "deuda_120") == "crossed"
-    assert _status(res, "deficit_suelo_2009") == "crossed"
+    assert _status(res, "deficit_record_2012") == "crossed"
     assert _status(res, "bono_rescate") == "near"          # |6.47-7| = 0.53 <= 0.70
 
 

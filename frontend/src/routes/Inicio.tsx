@@ -15,6 +15,7 @@ import { SHIPPED_IDS } from "../personas/registry";
 import { RegimeChart } from "../components/RegimeChart";
 import { DistressGauge } from "../components/DistressGauge";
 import { DebtAlarms } from "../components/DebtAlarms";
+import { BondCalculator } from "../components/BondCalculator";
 import { Portada } from "../components/Portada";
 import { SpainAmongOthers } from "../components/SpainAmongOthers";
 import { LeverSummary, ProjectionTable } from "../components/ProjectionTable";
@@ -279,6 +280,9 @@ export default function Inicio() {
       {/* What the app does and does not judge about paying the debt, and the
           year each alarm goes off in this scenario. */}
       {redlines.isSuccess && <DebtAlarms scn={scn} defs={redlines.data.redlines} />}
+
+      {/* The 10-year yield worked out by hand, against its 7 % red line. */}
+      <BondCalculator />
 
       {/* The probabilistic complement of the 7 % threshold, right after the
           thresholds themselves so the two readings sit together. */}

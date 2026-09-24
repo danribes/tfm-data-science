@@ -14,7 +14,7 @@ import { HowToRead } from "./HowToRead";
  *  row here is computed from the scenario on screen, year by year, with the
  *  same rule as the traffic light (statusOf): the alarm goes off the first
  *  year the figure passes its threshold. */
-const DEBT_LINES = ["deuda_105", "deuda_120", "deficit_maastricht", "deficit_suelo_2009", "bono_rescate"];
+const DEBT_LINES = ["deuda_105", "deuda_120", "deficit_maastricht", "deficit_record_2012", "bono_rescate"];
 /** The rest of the app's own red lines: households and the economy. */
 const OTHER_LINES = ["paro_record", "inflacion_10", "esfuerzo_40", "pobreza_infantil_30"];
 
@@ -24,7 +24,7 @@ const WHY: Record<string, string> = {
   deuda_105: "Un comentarista lo citó como nivel preocupante; no es un límite legal.",
   deuda_120: "Es el pico de la pandemia: el 119,3 % del PIB en 2020.",
   deficit_maastricht: "Es la regla europea: por encima abre un procedimiento de déficit excesivo.",
-  deficit_suelo_2009: "Es el déficit de 2009, en plena crisis financiera; el de 2012, con el rescate bancario, llegó al 11,5 %.",
+  deficit_record_2012: "Es el peor año registrado en España: 2012, con el rescate bancario.",
   bono_rescate: "Grecia, Portugal e Irlanda pidieron el rescate con el bono cerca del 7 %; España tocó el 7,6 % en 2012.",
   paro_record: "Es el máximo histórico de España, a principios de 2013.",
   inflacion_10: "Es la ola de 2022: la inflación de España pasó del 10 % en verano.",

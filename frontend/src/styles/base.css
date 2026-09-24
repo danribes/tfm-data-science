@@ -567,3 +567,12 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .alarm-t td { vertical-align: top; }
 .alarm-t td.bad { color: var(--st-crossed); font-weight: 700; white-space: nowrap; }
 .alarm-t td.ok { color: var(--good); font-weight: 700; white-space: nowrap; }
+
+/* --- the 10-year bond calculator --- */
+.bond-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 8px; }
+.bond-inputs label { display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; }
+.bond-inputs input[type="range"] { width: 100%; accent-color: var(--lab); }
+.bond-result { font-size: 18px; margin: 4px 0; }
+.bond-result b { font-size: 24px; }
+.bond-result b.bad { color: var(--st-crossed); }
+@media (max-width: 640px) { .bond-inputs { grid-template-columns: 1fr; } }

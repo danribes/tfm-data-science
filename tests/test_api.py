@@ -100,7 +100,7 @@ def test_scenario_s7_adverse_crosses_redlines():
     body = client.post("/scenario", json=s7).json()
     statuses = {rl["id"]: rl["status"] for rl in body["redlines"]}
     assert statuses["deuda_120"] == "crossed"           # b 2050 = 357.03
-    assert statuses["deficit_suelo_2009"] == "crossed"  # saldo 2050 = -28.91
+    assert statuses["deficit_record_2012"] == "crossed"  # saldo 2050 = -28.91
     assert statuses["bono_rescate"] == "near"           # bono 6.47 vs 7.0
     k = 2050 - 2026
     # 349.80 before the pension correction took the base scenario's growth as

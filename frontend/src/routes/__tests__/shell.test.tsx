@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { http, HttpResponse } from "msw";
@@ -19,7 +19,8 @@ describe("App shell", () => {
     render(<App />);
     // "💼 Bonista" appears in the nav AND in Inicio's persona card — use getAllByText
     await waitFor(() => expect(screen.getAllByText(/💼 Bonista/).length).toBeGreaterThanOrEqual(1));
-    expect(screen.getAllByRole("slider")).toHaveLength(10);
+    // The ten levers live in the rail; Inicio's bond calculator has its own two.
+    expect(within(document.getElementById("scenario-levers")!).getAllByRole("slider")).toHaveLength(10);
     expect(screen.getByText(/proyección condicional, no recomendación/i)).toBeInTheDocument();
     await waitFor(() =>
       expect(screen.queryByText(/desajuste del motor/i)).toBeNull());
