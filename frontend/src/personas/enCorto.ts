@@ -1,6 +1,5 @@
 import { SERIES_FORMAT } from "../components/KpiRow";
-import { nf, sgUnit } from "../lib/fmt";
-import { seriesLabel } from "../lib/seriesMeta";
+import { cambio, cap, leverSpoken, nivel, parte, spoken, v } from "./hablado";
 import { outcomeFor, sorna } from "./sorna";
 
 /** «Y en corto»: the answer told the way you would tell a friend, ending on
@@ -11,7 +10,11 @@ import { outcomeFor, sorna } from "./sorna";
  *  companion — a colloquial paragraph that disagreed with the chart above it
  *  would be the worst kind of friendly. The order is fixed: what happens, where
  *  it stands today, who pushes it, what the companion does, the caveat, and
- *  the joke last. */
+ *  the joke last.
+ *
+ *  Spoken, not printed: no quotation marks, no brackets and no exact
+ *  decimals — «el saldo público apenas se mueve y se queda en un déficit de
+ *  cerca del 15 % del PIB». The exact figures are right above it. */
 export interface EnCortoInput {
   persona?: string;
   series: string;
@@ -26,69 +29,72 @@ export interface EnCortoInput {
   companionValue?: number;
   companionBase?: number;
   /** Single-lever breakdown from /explain, when it has arrived. */
-  contributions?: { lever_name: string; delta: number; share: number }[];
+  contributions?: { lever_id?: string; lever_name: string; delta: number; share: number }[];
   /** Whether any lever is away from its base value. */
   moved: boolean;
 }
 
-function fmtLevel(key: string, v: number): string {
-  const f = SERIES_FORMAT[key] ?? { dec: 1, unit: "" };
-  return `${nf(v, f.dec)} ${f.unit}`.trim();
-}
-
 export function enCorto(i: EnCortoInput): string {
-  const f = SERIES_FORMAT[i.series] ?? { dec: 1, unit: "" };
-  const label = `«${seriesLabel(i.series)}»`;
+  const dec = SERIES_FORMAT[i.series]?.dec ?? 1;
+  const np = spoken(i.series).np;
   const delta = i.value - i.baseValue;
-  const outcome = outcomeFor(i.persona ?? "", i.series, delta, f.dec);
+  const outcome = outcomeFor(i.persona ?? "", i.series, delta, dec);
+  const queda = v(i.series, "se queda", "se quedan");
   const parts: string[] = [];
 
   if (!i.moved) {
-    parts.push(`Resumiendo: sin tocar ninguna palanca, ${label} queda en ` +
-      `${fmtLevel(i.series, i.value)} en ${i.year}, que es lo que sale de los datos de partida.`);
+    parts.push(`Resumiendo: sin tocar ninguna palanca, en ${i.year} ${np} ${queda} ` +
+      `${nivel(i.series, i.value)}, que es lo que sale de los datos de partida.`);
   } else if (outcome === "igual") {
-    parts.push(`Resumiendo: con las palancas como las has dejado, ${label} se queda en ` +
-      `${fmtLevel(i.series, i.value)} en ${i.year}, prácticamente lo mismo que sin tocar nada.`);
+    parts.push(`Resumiendo: con las palancas como las has dejado, en ${i.year} ${np} ${queda} ` +
+      `${nivel(i.series, i.value)}, prácticamente lo mismo que sin tocar nada.`);
   } else {
-    const verb = delta > 0 ? "sube" : "baja";
+    const verb = delta > 0 ? v(i.series, "sube", "suben") : v(i.series, "baja", "bajan");
     const verdict = i.persona
-      ? (outcome === "mejor" ? "y eso, para ti, es buena noticia" : "y eso, para ti, es mala noticia")
+      ? `, y eso, para ti, es ${outcome === "mejor" ? "buena" : "mala"} noticia`
       : "";
-    parts.push(`Resumiendo: con las palancas como las has dejado, ${label} ${verb} hasta ` +
-      `${fmtLevel(i.series, i.value)} en ${i.year}, ${sgUnit(delta, f.dec, f.unit)} frente a no ` +
-      `tocar nada (que daría ${fmtLevel(i.series, i.baseValue)})${verdict ? `, ${verdict}` : ""}.`);
+    parts.push(`Resumiendo: con las palancas como las has dejado, ${np} ${verb} y en ${i.year} ${queda} ` +
+      `${nivel(i.series, i.value)}, ${cambio(i.series, delta)} ` +
+      `${delta > 0 ? "más" : "menos"} que si no tocaras nada${verdict}.`);
   }
 
-  if (i.year > i.firstYear) {
-    parts.push(`Para situarte: hoy está en ${fmtLevel(i.series, i.today)}.`);
+  // An index is 100 in the first year by construction: «hoy está igual que
+  // en 2026» would say nothing.
+  if (i.year > i.firstYear && (SERIES_FORMAT[i.series]?.unit ?? "") !== "") {
+    parts.push(`Para situarte, hoy ${v(i.series, "está", "están")} ${nivel(i.series, i.today)}.`);
   }
 
   if (i.moved && i.contributions && i.contributions.length > 0) {
     const movers = [...i.contributions]
-      .filter((c) => Math.abs(c.delta) >= 0.5 * 10 ** -f.dec)
+      .filter((c) => Math.abs(c.delta) >= 0.5 * 10 ** -dec)
       .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
     if (movers.length === 0) {
       parts.push("Ninguna de las palancas que has movido llega de verdad a esta cifra.");
     } else {
       const [top, second] = movers;
-      parts.push(`Lo que más empuja es «${top.lever_name}», con el ${nf(top.share * 100, 0)} % ` +
-        `del cambio${second ? `; le sigue «${second.lever_name}»` : ""}.`);
+      const who = leverSpoken(top.lever_id ?? "", top.lever_name);
+      const plural = /^(los|las) /.test(who);
+      const next = second ? leverSpoken(second.lever_id ?? "", second.lever_name) : "";
+      parts.push(`Lo que más empuja ${plural ? "son" : "es"} ${who}, que ${plural ? "explican" : "explica"} ` +
+        `${parte(top.share)}${next ? `, y le ${/^(los|las) /.test(next) ? "siguen" : "sigue"} ${next}` : ""}.`);
     }
   }
 
   if (i.companion && i.companionValue !== undefined && i.companionBase !== undefined) {
-    const cf = SERIES_FORMAT[i.companion] ?? { dec: 1, unit: "" };
+    const cdec = SERIES_FORMAT[i.companion]?.dec ?? 1;
     const cd = i.companionValue - i.companionBase;
-    const clabel = `«${seriesLabel(i.companion)}»`;
-    parts.push(Math.abs(cd) < 0.5 * 10 ** -cf.dec
-      ? `Para ponerlo en contexto, ${clabel} apenas se mueve: ${fmtLevel(i.companion, i.companionValue)}.`
-      : `Para ponerlo en contexto, ${clabel} queda en ${fmtLevel(i.companion, i.companionValue)} ` +
-        `(${sgUnit(cd, cf.dec, cf.unit)}).`);
+    const cnp = spoken(i.companion).np;
+    const cqueda = v(i.companion, "se queda", "se quedan");
+    const where = nivel(i.companion, i.companionValue);
+    parts.push(Math.abs(cd) < 0.5 * 10 ** -cdec
+      ? `Para ponerlo en contexto, ${cnp} apenas ${v(i.companion, "se mueve", "se mueven")} y ${cqueda} ${where}.`
+      : `Para ponerlo en contexto, ${cnp} ${cd > 0 ? v(i.companion, "sube", "suben") : v(i.companion, "baja", "bajan")} ` +
+        `y ${cqueda} ${where}.`);
   }
 
   parts.push("Todo esto, claro, si esos supuestos se mantuvieran: es un escenario, no una bola de cristal.");
 
-  const joke = sorna(i.persona, i.series, delta, f.dec, i.year);
+  const joke = sorna(i.persona, i.series, delta, dec, i.year);
   if (joke) parts.push(joke);
-  return parts.join(" ");
+  return parts.map((s, k) => (k === 0 ? s : cap(s))).join(" ");
 }
