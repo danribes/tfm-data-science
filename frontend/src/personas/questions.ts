@@ -164,9 +164,11 @@ export const Q01: PersonaQuestion[] = [
     series: "bono",
     companion: "spread",
     mechanism:
-      "Euríbor más la prima temporal (TERM) más el spread soberano. Si la " +
-      "realimentación de deuda está activa, el spread se ensancha solo cuando " +
-      "la deuda supera el umbral B_CRIT.",
+      "Euríbor más la prima temporal (TERM = 0,17) más el spread soberano en " +
+      "pb/100, constante en todo el horizonte: el spread es exógeno. " +
+      "engine/spain.py admite realimentarlo con la deuda por encima de B_CRIT " +
+      "(ALPHA_SPREAD), pero vale 0,0 por defecto y ninguna ruta de la " +
+      "aplicación lo activa.",
     plain:
       "Sólo lo mueven el Euríbor y la prima de riesgo, punto por punto: si " +
       "cualquiera de los dos sube un punto (en la prima, 100 puntos básicos), el " +
@@ -204,8 +206,10 @@ export const Q01: PersonaQuestion[] = [
     series: "int",
     companion: "saldo",
     mechanism:
-      "Sobre el stock del año anterior al tipo efectivo, que se acerca al bono " +
-      "de mercado al ritmo de refinanciación (REFI, 14 % al año).",
+      "Sobre el stock del año anterior al tipo efectivo: la senda central " +
+      "(r_efectivo) más el cambio del bono respecto a su valor de partida, que " +
+      "entra al ritmo de refinanciación (REFI, 14 % al año). No converge al " +
+      "nivel del bono: sólo traslada su cambio.",
     plain:
       "Se calculan con el interés medio que paga el Estado sobre la deuda del año " +
       "anterior. Si el Euríbor o la prima suben, ese interés medio recoge la " +
