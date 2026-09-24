@@ -5,7 +5,7 @@ export const p02: PersonaModule = {
   id: "02",
   chains: [
     { a: "Euríbor", u: "cuota nueva", t: "esfuerzo del hogar", k: "esf", d: 1, un: "%" },
-    { a: "IPV", u: "LTV efectivo", t: "severidad si impago", k: "ipv", d: 1, un: "% a/a" },
+    { a: "precio vivienda (IPV)", u: "LTV efectivo", t: "severidad si impago", k: "ipv", d: 1, un: "% a/a" },
     { a: "paro", u: "mora", t: "pérdida esperada", k: "u", d: 1, un: "%" },
   ],
   narr: (R, k, y) =>

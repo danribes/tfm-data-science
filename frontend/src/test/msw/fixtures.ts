@@ -54,7 +54,7 @@ export const mockPersonaCards: PersonaCard[] = [
     series_keys: ["euribor12m_5a"],
     outs: [{ k: "r", lab: "Euríbor 12m" }, { k: "bls", lab: "BLS endurecimiento" }, { k: "hip", lab: "Nueva producción" }, { k: "ipv", lab: "Precio vivienda a/a" }, { k: "cuota", lab: "Cuota mediana" }],
     headline: "cuota",
-    reds: [{ t: "IPV real a/a > 10 %", thr: 10.0, k: "ipvreal", cmp: "gt", d: 1, x: "burbuja 2004-07 [hist] · IPV nominal − IPCA" }, { t: "BLS endurecimiento > 20 %", thr: 20.0, k: "bls", cmp: "gt", d: 0, x: "nivel de contracción de crédito [hist]" }, { t: "Paro > 15 % (motor de mora)", thr: 15.0, k: "u", cmp: "gt", d: 1, x: "último nivel visto en 2021-07 (15,2) [hist]" }],
+    reds: [{ t: "Precio vivienda real (IPV − inflación) > +10 % al año", thr: 10.0, k: "ipvreal", cmp: "gt", d: 1, x: "burbuja 2004-07 [hist] · IPV nominal − IPCA" }, { t: "BLS endurecimiento > 20 %", thr: 20.0, k: "bls", cmp: "gt", d: 0, x: "nivel de contracción de crédito [hist]" }, { t: "Paro > 15 % (motor de mora)", thr: 15.0, k: "u", cmp: "gt", d: 1, x: "último nivel visto en 2021-07 (15,2) [hist]" }],
   },
   {
     id: "03",
@@ -66,7 +66,7 @@ export const mockPersonaCards: PersonaCard[] = [
     series_keys: ["vivienda_precio_yoy_5a"],
     outs: [{ k: "precio", lab: "Precio mediano CCAA" }, { k: "cuota", lab: "Cuota mediana" }, { k: "esf", lab: "Esfuerzo cuota/renta" }, { k: "ipv", lab: "Precio vivienda a/a" }, { k: "sobre", lab: "Sobrecarga vivienda" }],
     headline: "esf",
-    reds: [{ t: "Esfuerzo cuota/renta > 35 %", thr: 35.0, k: "esf", cmp: "gt", d: 1, x: "regla prudencial [regla]" }, { t: "Sobrecarga > 40 % renta", thr: 15.0, k: "sobre", cmp: "gt", d: 1, x: "definición Eurostat · muerde al flujo nuevo [UE]" }, { t: "IPV a/a > 10 %", thr: 10.0, k: "ipv", cmp: "gt", d: 1, x: "burbuja 2004-07 [hist]" }],
+    reds: [{ t: "Esfuerzo cuota/renta > 35 %", thr: 35.0, k: "esf", cmp: "gt", d: 1, x: "regla prudencial [regla]" }, { t: "Sobrecarga > 40 % renta", thr: 15.0, k: "sobre", cmp: "gt", d: 1, x: "definición Eurostat · muerde al flujo nuevo [UE]" }, { t: "Precio vivienda (IPV) > +10 % al año", thr: 10.0, k: "ipv", cmp: "gt", d: 1, x: "burbuja 2004-07 [hist]" }],
   },
   {
     id: "04",
@@ -150,7 +150,7 @@ export const mockPersonaCards: PersonaCard[] = [
     series_keys: ["paro_juvenil_5a", "paro_total_5a"],
     outs: [{ k: "ujuv", lab: "Paro juvenil <25" }, { k: "temp", lab: "Temporalidad" }, { k: "ipv", lab: "Precio vivienda a/a" }, { k: "sobre", lab: "Sobrecarga vivienda" }, { k: "salario", lab: "Salario medio" }],
     headline: "ujuv",
-    reds: [{ t: "Paro juvenil > 40 %", thr: 40.0, k: "ujuv", cmp: "gt", d: 1, x: "cota del ciclo anterior; 2013 la superó [hist]" }, { t: "Temporalidad > 25 %", thr: 25.0, k: "temp", cmp: "gt", d: 1, x: "la serie vivió sobre ese nivel hasta 2022-Q1 [hist]" }, { t: "IPV > +10 % a/a", thr: 10.0, k: "ipv", cmp: "gt", d: 1, x: "cinco trimestres seguidos >10 % en la serie [hist]" }],
+    reds: [{ t: "Paro juvenil > 40 %", thr: 40.0, k: "ujuv", cmp: "gt", d: 1, x: "cota del ciclo anterior; 2013 la superó [hist]" }, { t: "Temporalidad > 25 %", thr: 25.0, k: "temp", cmp: "gt", d: 1, x: "la serie vivió sobre ese nivel hasta 2022-Q1 [hist]" }, { t: "Precio vivienda (IPV) > +10 % al año", thr: 10.0, k: "ipv", cmp: "gt", d: 1, x: "cinco trimestres seguidos >10 % en la serie [hist]" }],
   },
   {
     id: "11",

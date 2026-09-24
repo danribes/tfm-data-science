@@ -60,8 +60,8 @@ describe("Persona — generic renderer over the API card", () => {
     ui("02");
     await waitFor(() => expect(document.querySelector(".head h1")).not.toBeNull());
     await openFullPanel();
-    await waitFor(() => expect(screen.getByText(/IPV real a\/a > 10 %/)).toBeInTheDocument());
-    const row = screen.getByText(/IPV real a\/a > 10 %/).closest(".rl-item")!;
+    await waitFor(() => expect(screen.getByText(/Precio vivienda real \(IPV − inflación\) > \+10 % al año/)).toBeInTheDocument());
+    const row = screen.getByText(/Precio vivienda real \(IPV − inflación\) > \+10 % al año/).closest(".rl-item")!;
     expect(row.querySelector(".st")!.className).toContain("near");
     expect(row.querySelector(".st")!.textContent).toBe("9,8");
   });

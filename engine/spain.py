@@ -240,7 +240,8 @@ def baseline() -> dict[str, list[float]]:
 # --------------------------------------------------------------------------
 # The 12 v15/v16 personas — static config verbatim from the v16 `const P`
 # array (extract S2, L516-841). Spanish copy is NOT translated. reds from
-# extract S7.1 (L1613-1648). `series_keys` = the persona's historical chart
+# extract S7.1 (L1613-1648), except the three IPV red titles, which spell the
+# acronym out (thresholds, keys and notes unchanged). `series_keys` = the persona's historical chart
 # series in kpis_perfiles.json; `extra` = engine keys its narrative reads
 # beyond the five outs.
 PERSONAS: list[dict] = [
@@ -265,7 +266,7 @@ PERSONAS: list[dict] = [
               {"k": "cuota", "lab": "Cuota mediana"}],
      "headline": "cuota", "extra": ["u", "esf"],
      "reds": [
-         {"t": "IPV real a/a > 10 %", "thr": 10.0, "k": "ipvreal", "cmp": "gt", "d": 1, "x": "burbuja 2004-07 [hist] · IPV nominal − IPCA"},
+         {"t": "Precio vivienda real (IPV − inflación) > +10 % al año", "thr": 10.0, "k": "ipvreal", "cmp": "gt", "d": 1, "x": "burbuja 2004-07 [hist] · IPV nominal − IPCA"},
          {"t": "BLS endurecimiento > 20 %", "thr": 20.0, "k": "bls", "cmp": "gt", "d": 0, "x": "nivel de contracción de crédito [hist]"},
          {"t": "Paro > 15 % (motor de mora)", "thr": 15.0, "k": "u", "cmp": "gt", "d": 1, "x": "último nivel visto en 2021-07 (15,2) [hist]"}]},
     {"id": "03", "pill": "🔑 Comprador", "foot": "🔑 comprador de vivienda",
@@ -279,7 +280,7 @@ PERSONAS: list[dict] = [
      "reds": [
          {"t": "Esfuerzo cuota/renta > 35 %", "thr": 35.0, "k": "esf", "cmp": "gt", "d": 1, "x": "regla prudencial [regla]"},
          {"t": "Sobrecarga > 40 % renta", "thr": 15.0, "k": "sobre", "cmp": "gt", "d": 1, "x": "definición Eurostat · muerde al flujo nuevo [UE]"},
-         {"t": "IPV a/a > 10 %", "thr": 10.0, "k": "ipv", "cmp": "gt", "d": 1, "x": "burbuja 2004-07 [hist]"}]},
+         {"t": "Precio vivienda (IPV) > +10 % al año", "thr": 10.0, "k": "ipv", "cmp": "gt", "d": 1, "x": "burbuja 2004-07 [hist]"}]},
     {"id": "04", "pill": "🚀 Emprendedor", "foot": "🚀 emprendedor",
      "h1": "🚀 ¿Aguanta el ciclo lo que tarda mi empresa en nacer?",
      "meta": "eurostat_gdp_q_es.csv · eurostat_hicp_manr_es.csv · ecb_euribor12m.csv · eurostat_une_rt_m_es.csv · wb_self_employment.csv",
@@ -363,7 +364,7 @@ PERSONAS: list[dict] = [
      "reds": [
          {"t": "Paro juvenil > 40 %", "thr": 40.0, "k": "ujuv", "cmp": "gt", "d": 1, "x": "cota del ciclo anterior; 2013 la superó [hist]"},
          {"t": "Temporalidad > 25 %", "thr": 25.0, "k": "temp", "cmp": "gt", "d": 1, "x": "la serie vivió sobre ese nivel hasta 2022-Q1 [hist]"},
-         {"t": "IPV > +10 % a/a", "thr": 10.0, "k": "ipv", "cmp": "gt", "d": 1, "x": "cinco trimestres seguidos >10 % en la serie [hist]"}]},
+         {"t": "Precio vivienda (IPV) > +10 % al año", "thr": 10.0, "k": "ipv", "cmp": "gt", "d": 1, "x": "cinco trimestres seguidos >10 % en la serie [hist]"}]},
     {"id": "11", "pill": "📋 Indefinido", "foot": "📋 trabajador indefinido",
      "h1": "📋 ¿Crece mi salario por encima del IPC?",
      "meta": "ine_salarios.csv · eurostat_hicp_manr_es.csv · eurostat_une_rt_m_es.csv · eurostat_temp_share_es.csv · eurostat_gdp_q_es.csv",

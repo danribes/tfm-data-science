@@ -2,6 +2,7 @@ import { useParametric } from "../api/hooks";
 import { eur, nf } from "../lib/fmt";
 import { Caption } from "./Caption";
 import { FanChart } from "./FanChart";
+import { IPV_NOMBRE } from "../lib/glosario";
 import { TABLE_YEARS } from "../lib/seriesMeta";
 import { useScenarioStore } from "../state/scenarioStore";
 
@@ -112,13 +113,18 @@ export function ParametricBand() {
             <strong>Qué mide esta banda.</strong> Una sola cosa: que los dos
             parámetros del motor que vienen de una estimación no se conocen
             exactamente. Se sortean {eur(d.n_draws)} veces —con semilla {d.seed}, de
-            modo que el resultado se reproduce— de su distribución
+            modo que el resultado se reproduce— de su distribución.
             {lr && rev ? (
-              <> — IPV_LR {nf(lr.value, 4)} (se {nf(lr.se, 4)}), IPV_REV {nf(rev.value, 4)}{" "}
-                (se {nf(rev.se, 4)}), estimadas sobre {eur(lr.n)} observaciones
-                trimestrales de {lr.n_units} comunidades</>
+              <> Son dos: la subida media anual del precio observada en el panel,
+                que el motor usa como destino a largo plazo (<code>IPV_LR</code> ={" "}
+                {nf(lr.value, 4)} %, error estándar {nf(lr.se, 4)}), y la parte de
+                cada desviación que se corrige en un año (<code>IPV_REV</code> ={" "}
+                {nf(rev.value, 4)}, error estándar {nf(rev.se, 4)}), ambas estimadas
+                sobre {eur(lr.n)} observaciones trimestrales del {IPV_NOMBRE} (IPV)
+                del INE en {lr.n_units} territorios: las comunidades autónomas, Ceuta
+                y Melilla.</>
             ) : null}
-            {" "}y cada sorteo se mantiene fijo los veinticinco años, porque un
+            {" "}Cada sorteo se mantiene fijo los veinticinco años, porque un
             parámetro es una incógnita fija y no un choque anual. La línea
             central sigue siendo la proyección publicada, no la mediana de los
             sorteos.

@@ -103,9 +103,11 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .badge-fwd.lab { background: var(--chip-lab); color: var(--lab); }
 
 /* --- semaphore (v16 §B.5, tokens from spec §5) --- */
-.rl-item { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 10px; border: 1px solid var(--grid); border-radius: var(--rad-chip); padding: 8px 12px; font-size: 14.5px; margin-bottom: var(--sp-1); }
+.rl-item { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 10px; border: 1px solid var(--grid); border-radius: var(--rad-chip); padding: 8px 12px; font-size: 14.5px; margin-bottom: var(--sp-1); }
 .rl-item .ic { font-size: 16px; }
-.rl-item .t b { white-space: nowrap; }
+/* Wraps: in the narrow persona column a one-line title pushed the status
+   pill out of the card and cut the threshold off the label. */
+.rl-item .t b { overflow-wrap: break-word; hyphens: auto; }
 .rl-item .st { font-size: 12.5px; font-weight: 800; padding: 4px 10px; border-radius: var(--rad-pill); white-space: nowrap; }
 .st.cross { background: var(--st-crossed-bg); color: var(--st-crossed-fg); }
 .st.near { background: var(--st-near-bg); color: var(--st-near); }
@@ -116,8 +118,8 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 /* --- transmission chain (v16 §B.6) --- */
 .chain { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
 .ch { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-2); flex-wrap: wrap; }
-.ch .a { font-weight: 700; color: var(--ink); background: var(--code); border-radius: 6px; padding: 4px 10px; white-space: nowrap; }
-.ch .u { font-size: 11.5px; font-weight: 800; color: var(--accent); background: var(--chip); border-radius: var(--rad-pill); padding: 3px 9px; white-space: nowrap; }
+.ch .a { font-weight: 700; color: var(--ink); background: var(--code); border-radius: 6px; padding: 4px 10px; max-width: 100%; overflow-wrap: break-word; hyphens: auto; }
+.ch .u { font-size: 11.5px; font-weight: 800; color: var(--accent); background: var(--chip); border-radius: var(--rad-pill); padding: 3px 9px; max-width: 100%; overflow-wrap: break-word; hyphens: auto; }
 .ch .arr { color: var(--baseline); }
 .ch .d { font-weight: 800; white-space: nowrap; }
 .ch .d.up { color: var(--div-neg); }

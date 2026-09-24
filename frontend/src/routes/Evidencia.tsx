@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import { IrfChart } from "../components/IrfChart";
 import type { ComparisonOut } from "../api/types";
 import { eur, nf, sg } from "../lib/fmt";
+import { IPV_DEF } from "../lib/glosario";
 
 /** A calibrated value against its estimated confidence band.
  *
@@ -63,6 +64,12 @@ export default function Evidencia() {
           estimación para la vivienda; los demás coeficientes siguen
           calibrados porque este corte de datos no permite identificarlos.
           Su procedencia se detalla en <Link to="/metodologia">Datos y método</Link>.
+        </p>
+        <p>
+          {IPV_DEF} Los dos parámetros estimados son su subida media anual
+          observada en el panel 2007–2026, que el motor usa como destino a
+          largo plazo (<code>IPV_LR</code>), y la parte de cada desviación de
+          esa media que se corrige en un año (<code>IPV_REV</code>).
         </p>
         <p>
           Que una calibración quede fuera de la banda <em>no es un error del
@@ -186,7 +193,8 @@ export default function Evidencia() {
                 <h2>Crecimiento previo y cambio acumulado de la vivienda</h2>
                 <p>
                   <code>IPV_REV</code> es una afirmación sobre dinámica: el
-                  motor reduce una desviación del crecimiento anual un{" "}
+                  motor reduce una desviación de la subida anual del precio
+                  de la vivienda (IPV) un{" "}
                   {nf(rev * 100, 0)} % cada año. El efecto sobre el nivel de
                   precios se acumula. El panel estima una {irf.note},
                   horizonte a horizonte.
@@ -269,7 +277,8 @@ export default function Evidencia() {
             <ul className="guide-no">
               <li>
                 <strong>La ventana importa, y por eso está partida.</strong> El
-                IPV cae con fuerza hasta 2013 y sube con fuerza después; el 3 %
+                precio de la vivienda (IPV) cae con fuerza hasta 2013 y sube
+                con fuerza después; el 3 %
                 de la calibración original no cae en ninguna de las dos ventanas, pero
                 queda entre ellas. Una calibración tomada de una historia más
                 larga que la del corte no es por ello errónea: responde a otra

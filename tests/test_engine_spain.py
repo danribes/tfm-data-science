@@ -246,6 +246,14 @@ def test_twelve_personas_verbatim_identity():
             assert o["k"] in SERIES_KEYS
 
 
+def test_persona_reds_spell_out_the_ipv():
+    """A reader who does not know the acronym still reads what the line is."""
+    for p in PERSONAS:
+        for r in p["reds"]:
+            if "IPV" in r["t"]:
+                assert "Precio vivienda" in r["t"] and "(IPV" in r["t"], r["t"]
+
+
 def test_persona_dependents_shape():
     deps = persona_dependents(run_scenario(Levers()))
     assert sorted(deps) == PERSONA_IDS

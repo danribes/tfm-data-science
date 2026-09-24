@@ -96,7 +96,7 @@ def compare_ipv_growth() -> Comparison | None:
             subs.append(Subperiod(label=label, estimate=sub))
 
     return Comparison(
-        constant="IPV_LR", label="Crecimiento medio del IPV en la muestra regional",
+        constant="IPV_LR", label="Crecimiento medio anual del precio de la vivienda (IPV) en la muestra regional",
         calibrated=c.IPV_LR_V16, estimate=est,
         source="gold_ccaa_trimestral.csv · 17 CCAA + Ceuta y Melilla · 2007-2026",
         subperiods=tuple(subs),
@@ -132,7 +132,7 @@ def compare_ipv_reversion() -> Comparison | None:
         ci_low=1.0 - phi.ci_high, ci_high=1.0 - phi.ci_low,
     )
     return Comparison(
-        constant="IPV_REV", label="Reversión anual del IPV hacia su tendencia",
+        constant="IPV_REV", label="Reversión anual de la subida del precio de la vivienda (IPV) hacia su tendencia",
         calibrated=1.0 - c.IPV_REV_V16, estimate=rev,
         source=("gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual "
                 "sobre la desviación, con efectos fijos por comunidad"),

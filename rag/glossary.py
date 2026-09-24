@@ -95,6 +95,8 @@ TERMS: dict[str, str] = {
     "estocastico": "stochastic",
     "serie temporal": "time series",
     # housing and households
+    "indice de precios de vivienda": "house price index housing",
+    "ipv": "house price index housing",
     "precio de la vivienda": "house prices housing",
     "vivienda": "housing",
     "hipoteca": "mortgage",

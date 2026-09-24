@@ -198,11 +198,16 @@ def _mecanismo(f: ExplanationFacts) -> str:
     # The constants stay — a reviewer checks them — but on one line of their
     # own, labelled, which the page folds into «Detalle técnico».
     consts: dict[str, float] = {}
+    notes: dict[str, str] = {}
     for m in explained:
         for s in f.mechanism.get(m.id, []):
             if s.get("value") is not None:
                 consts.setdefault(s["const"], s["value"])
-    tech = [f"{k} = {nf(v, 2)}" for k, v in consts.items()]
+                notes.setdefault(s["const"], s.get("note", ""))
+    # The IPV constants carry their note: without it «E_IPV_R = 2,60» is an
+    # acronym inside an acronym for anyone who has not read the README.
+    tech = [f"{k} = {nf(v, 2)}" + (f", {notes[k]}" if "IPV" in k and notes.get(k) else "")
+            for k, v in consts.items()]
     if debt:
         tech.append("b(t+1) = b(t)·(1+r−g) − sp")
     if tech:

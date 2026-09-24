@@ -116,6 +116,16 @@ describe("matchQuestion — real phrasings readers use", () => {
     expect(matchQuestion("me conviene comprar bonos ahora", q01)?.id).toBe("cupon");
   });
 
+  it("does not answer the consumer price index as the house price index", () => {
+    const q02 = questionsFor("02");
+    for (const q of ["índice de precios al consumo", "índice de precios de consumo",
+                     "el índice de precios", "índice de precios de consumo armonizado"]) {
+      expect(matchQuestion(q, q02), q).toBeNull();
+    }
+    expect(matchQuestion("¿cómo afecta el índice de precios al consumo a mi sueldo?",
+                         questionsFor("03"))?.id).not.toBe("precio");
+  });
+
   it("still refuses what the profile cannot answer", () => {
     for (const q of ["cuando bajara el paro", "cuanto costara una vivienda"]) {
       expect(matchQuestion(q, q01), q).toBeNull();

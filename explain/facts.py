@@ -67,7 +67,7 @@ MECHANISM: dict[str, list[dict]] = {
          "const": "E_R", "value": c.E_R,
          "note": "pp de PIB por cada pp de tipo"},
         {"step": "precio de la vivienda",
-         "const": "E_IPV_R", "value": c.E_IPV_R, "note": "respuesta del IPV al tipo"},
+         "const": "E_IPV_R", "value": c.E_IPV_R, "note": "respuesta del precio de la vivienda (IPV) al Euríbor"},
         {"step": "peso de las pensiones en el PIB (saldo primario)",
          "const": "—", "value": None,
          "note": "un tipo más alto frena el crecimiento y las pensiones pesan algo más en el PIB; el efecto es pequeño"},

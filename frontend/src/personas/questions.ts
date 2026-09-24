@@ -68,7 +68,8 @@ export const Q03: PersonaQuestion[] = [
     series: "precio",
     companion: "cuota",
     mechanism:
-      "El precio revierte hacia su crecimiento de largo plazo (IPV_LR) desde el " +
+      "El precio revierte hacia su crecimiento de largo plazo (IPV_LR; IPV es el " +
+      "Índice de Precios de Vivienda del INE) desde el " +
       "dato de partida, corregido por el tipo de interés y por la desviación del PIB.",
     plain:
       "La subida anual del precio parte del fuerte ritmo de hoy y se acerca poco " +
@@ -124,7 +125,8 @@ export const Q03: PersonaQuestion[] = [
     companion: "cuota",
     mechanism:
       "El tipo entra dos veces y en sentidos opuestos: encarece la cuota y " +
-      "abarata el precio (E_IPV_R). El efecto neto sobre el esfuerzo es la suma.",
+      "abarata el precio (E_IPV_R, la respuesta del Índice de Precios de Vivienda " +
+      "al tipo). El efecto neto sobre el esfuerzo es la suma.",
     plain:
       "El Euríbor actúa por dos lados: sube el interés de la hipoteca y encarece " +
       "la cuota, pero frena el precio de la vivienda y eso la abarata un poco. " +
@@ -288,7 +290,8 @@ export const Q02: PersonaQuestion[] = [
     series: "ipv",
     companion: "precio",
     mechanism:
-      "El IPV revierte hacia su crecimiento de largo plazo estimado, corregido " +
+      "El IPV (Índice de Precios de Vivienda) revierte hacia su crecimiento de " +
+      "largo plazo estimado, corregido " +
       "por el tipo y por la desviación del PIB. Marca el LTV efectivo y la " +
       "severidad si hay impago.",
     plain:
@@ -757,7 +760,8 @@ export const Q10: PersonaQuestion[] = [
     companion: "salario",
     mechanism:
       "La sobrecarga por coste de vivienda cruza precio y salario: la vivienda " +
-      "sube con el IPV estimado y el salario con la curva de salarios.",
+      "sube con el Índice de Precios de Vivienda (IPV) estimado y el salario con " +
+      "la curva de salarios.",
     plain:
       "El motor la liga a la parte del sueldo que se llevaría la hipoteca de una " +
       "vivienda media: por cada punto que sube esa parte, la sobrecarga gana casi " +
@@ -939,6 +943,10 @@ const STOPWORDS = new Set([
   "pasa", "pasara", "sale", "saldra", "queda", "quedara", "sigue", "año",
   "anos", "años", "ano", "pero", "and", "yo", "mi", "me", "te", "se", "lo",
   "la", "el", "en", "de", "al", "un", "es", "si", "no", "ya", "hasta",
+  // The technical text spells out «Índice de Precios de Vivienda (IPV) del
+  // INE»; scored, «índice» sent «índice de precios al consumo» to the house
+  // price answer. «vivienda» and «precio» still reach it.
+  "indice", "indices", "ine",
 ]);
 
 /** Crude Spanish plural stripping, enough that «bonos» reaches «bono».

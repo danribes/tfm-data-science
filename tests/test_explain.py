@@ -510,6 +510,17 @@ def test_mecanismo_explains_in_plain_words_and_folds_the_constants():
     assert "Prima de riesgo" in body.split("No mueven esta cifra")[1]
 
 
+def test_detalle_tecnico_glosses_the_ipv_constant():
+    """«E_IPV_R = 2,60» alone is an acronym inside an acronym; the technical
+    line says what it is."""
+    levers = Levers(r=BASE_LEVERS["r"] + 1.0)
+    mech = fallback_narration(build_facts(levers, 2035, headline="cuota"))["mecanismo"]
+    tech = [ln for ln in mech.splitlines() if ln.startswith("Detalle técnico:")]
+    assert len(tech) == 1
+    assert "E_IPV_R = 2,60, respuesta del precio de la vivienda (IPV) al Euríbor" in tech[0]
+    assert "REFI = 0,14 ·" in tech[0] or "REFI = 0,14." in tech[0]
+
+
 def test_mecanismo_says_so_when_no_moved_lever_reaches_the_figure():
     levers = Levers(r=BASE_LEVERS["r"] - 0.85, prima=105.0, idx=-0.8)
     mech = fallback_narration(build_facts(levers, 2050, headline="d1"))["mecanismo"]

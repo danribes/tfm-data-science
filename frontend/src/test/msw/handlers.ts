@@ -310,7 +310,7 @@ export const handlers = [
       ...META,
       engine_version: "1.0.0",
       comparisons: [
-        { constant: "IPV_LR", label: "Crecimiento medio del IPV en la muestra regional",
+        { constant: "IPV_LR", label: "Crecimiento medio anual del precio de la vivienda (IPV) en la muestra regional",
           calibrated: 3.0, source: "gold_ccaa_trimestral.csv · 17 CCAA + Ceuta y Melilla",
           compatible: false, verdict: "fuera de la banda (por encima)",
           name: "crecimiento anual del IPV (% a/a)", coef: 1.22, se: 0.19,
@@ -323,7 +323,7 @@ export const handlers = [
               coef: 4.97, se: 0.26, n: 931, n_units: 19,
               ci_low: 4.54, ci_high: 5.40, significant: true },
           ] },
-        { constant: "IPV_REV", label: "Reversión anual del IPV hacia su tendencia",
+        { constant: "IPV_REV", label: "Reversión anual de la subida del precio de la vivienda (IPV) hacia su tendencia",
           calibrated: 0.4, source: "gold_ccaa_trimestral.csv · AR(1) del crecimiento interanual sobre la desviación",
           compatible: false, verdict: "fuera de la banda (por encima)",
           name: "reversión (1 - phi)", coef: 0.2, se: 0.012,

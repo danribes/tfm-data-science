@@ -123,7 +123,7 @@ const EXTRA_PLAIN: Record<string, string> = {
   sobre: "De cada cien personas, cuántas viven en hogares que gastan en la vivienda más del 40 % de lo que ingresan.",
   dep: "Por cada cien personas en edad de trabajar (de 15 a 64 años), cuántas tienen 65 o más.",
   g: "Cuánto crece en un año lo que produce el país, descontada la subida de precios.",
-  ipv: "Cuánto sube, o baja, en un año el precio de la vivienda.",
+  ipv: "Cuánto sube, o baja, en un año el precio de la vivienda. Es lo que mide el Índice de Precios de Vivienda (IPV) del INE.",
   r: "El tipo al que se prestan dinero los bancos europeos a un año. De él dependen la mayoría de las hipotecas variables.",
   bono: "El interés que paga España cada año por pedir prestado a diez años: el Euríbor, un extra por prestar a más plazo y la prima de riesgo.",
   spread: "El sobrecoste que paga España frente a Alemania por pedir prestado a diez años, en puntos básicos: 100 pb son 1 punto.",

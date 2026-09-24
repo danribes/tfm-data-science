@@ -4,6 +4,17 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import Evidencia from "../Evidencia";
 
+/** The IPV_LR cell of the comparison table. The page also names the
+ *  constant in its opening definition of the IPV, outside any row, so the
+ *  lookup waits for the one inside the table. */
+async function ipvRow(): Promise<HTMLElement> {
+  return waitFor(() => {
+    const row = screen.getAllByText("IPV_LR").map((el) => el.closest("tr")).find(Boolean);
+    expect(row).toBeTruthy();
+    return row as HTMLElement;
+  });
+}
+
 function ui() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -16,24 +27,27 @@ function ui() {
 describe("Evidencia — calibrado frente a estimado", () => {
   it("shows each constant with its calibrated and estimated value", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("IPV_LR")).toBeInTheDocument());
-    const row = screen.getByText("IPV_LR").closest("tr")!;
+    const row = await ipvRow();
     expect(within(row).getByText("3,00")).toBeInTheDocument();   // calibrado
     expect(within(row).getByText("1,22")).toBeInTheDocument();   // estimado
     expect(within(row).getByText("0,90 … 1,53")).toBeInTheDocument();
   });
 
+  it("says what the IPV is before naming its two parameters", async () => {
+    ui();
+    expect(screen.getByText(/El IPV \(Índice de Precios de Vivienda\) es el indicador del INE/)).toBeInTheDocument();
+  });
+
   it("marks a calibration outside its band as crossed, not as safe", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText("IPV_LR")).toBeInTheDocument());
-    const row = screen.getByText("IPV_LR").closest("tr")!;
+    const row = await ipvRow();
     const verdict = within(row).getByText(/fuera de la banda/);
     expect(verdict.className).toContain("cross");
   });
 
   it("draws the band, the estimate and the calibration marker", async () => {
     const { container } = ui();
-    await waitFor(() => expect(screen.getByText("IPV_LR")).toBeInTheDocument());
+    await ipvRow();
     // Two constants plus IPV_LR's two windows.
     expect(container.querySelectorAll(".band-ci").length).toBe(4);
     expect(container.querySelectorAll(".band-est").length).toBe(4);

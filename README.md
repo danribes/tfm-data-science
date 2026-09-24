@@ -396,8 +396,13 @@ valor base de cada palanca y, en `pens₀` e `ipv₀`, el valor observado de `V0
    real (`wrealIdx`, «salario real acumulado») acumula `w_nom − π`, ambos con
    base 100 en 2026. El «poder de compra de la nómina» (`nomreal`) es otra
    serie: sólo acumula la palanca de indexación. El salario de partida es el medio del INE (EAES 2024, 24.497 € al año).
-9. **Vivienda.** La subida anual del precio vuelve a su media con la reversión
-   estimada, menos un choque de tipos que se apaga, más el efecto del
+9. **Vivienda.** El IPV (Índice de Precios de Vivienda) es el indicador del INE
+   que mide cuánto cambia el precio de compraventa de las viviendas libres (no
+   protegidas), nuevas y de segunda mano. En el motor, `ipv` es lo que sube, o
+   baja, ese precio en un año, en %. Parte del 12,8 % interanual del primer
+   trimestre de 2026, el dato del IPV que difunde Eurostat (`prc_hpi_q`); el
+   panel regional del INE, en base 2025, da un 12,86 % para ese trimestre. Esa
+   subida vuelve a su media con la reversión estimada, menos un choque de tipos que se apaga, más el efecto del
    crecimiento:
    `ipv = IPV_LR + (ipv₀ − IPV_LR)·(1 − IPV_REV)^k − E_IPV_R·(r − r₀)·E_IPV_R_DECAY^k + E_IPV_G·(g − 2,7)`.
    IPV_LR 1,2151 e IPV_REV 0,2039 están estimados (apartado 2); E_IPV_R 2,6,

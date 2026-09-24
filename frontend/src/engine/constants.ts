@@ -127,7 +127,7 @@ export const CONSTANTS_META: ConstantMeta[] = [
     "name": "IPV_LR",
     "value": 1.2151,
     "unit": "% a/a",
-    "provenance": "panel histórico congelado; incertidumbre dependiente del estimador: docs/eval/housing-robustness.json · crecimiento medio del IPV, 17 CCAA + Ceuta y Melilla; Nacional excluido; banda condicional a la muestra"
+    "provenance": "panel histórico congelado; incertidumbre dependiente del estimador: docs/eval/housing-robustness.json · crecimiento medio anual del IPV (Índice de Precios de Vivienda del INE), 17 CCAA + Ceuta y Melilla; Nacional excluido; banda condicional a la muestra"
   },
   {
     "name": "IPV_REV",
@@ -138,14 +138,14 @@ export const CONSTANTS_META: ConstantMeta[] = [
   {
     "name": "E_IPV_R",
     "value": 2.6,
-    "unit": "pp IPV / pp rate",
-    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo"
+    "unit": "pp de IPV por pp de Euríbor",
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · cuánto frena un punto más de Euríbor la subida anual del precio de la vivienda (IPV)"
   },
   {
     "name": "E_IPV_G",
     "value": 1.1,
-    "unit": "pp IPV / pp growth",
-    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo"
+    "unit": "pp de IPV por pp de crecimiento del PIB",
+    "provenance": "Calibrado — valor por defecto del motor, tomado de la literatura y de la práctica habitual. No estimado sobre el corte de datos congelado, y por tanto discutible: un revisor puede contestarlo · cuánto empuja un punto más de crecimiento la subida anual del precio de la vivienda (IPV)"
   },
   {
     "name": "RJUV",
