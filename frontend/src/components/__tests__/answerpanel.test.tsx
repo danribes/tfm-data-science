@@ -21,18 +21,27 @@ describe("AnswerPanel · capa del modelo de aprendizaje profundo", () => {
   it("under a house-price question, states the scored window and not the held-out tail", async () => {
     const q = Q03.find((x) => x.series === "precio")!;
     ui(q, Q03);
-    await userEvent.click(screen.getByRole("button", { name: /aprendizaje profundo sobre el precio de la vivienda/ }));
-    expect(await screen.findByText(/con orígenes 2019Q4–2023Q4/)).toBeInTheDocument();
-    expect(screen.getByText(/desde 2024Q1 quedan reservados, sin tocar/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /inteligencia artificial/ }));
+    // Origins 2019Q4–2023Q4 with targets before 2024Q1: forecasts of 2020–2023.
+    expect(await screen.findByText(/entre\s+2020\s+y\s+2023/)).toBeInTheDocument();
+    expect(screen.getByText(/desde 2024 los guardamos sin tocar/)).toBeInTheDocument();
     expect(screen.queryByText(/regla más tonta posible/)).not.toBeInTheDocument();
-    // One word for the benchmark: the prose says «deriva», so the verdict does too.
-    expect(screen.getByText("no bate a la deriva")).toBeInTheDocument();
-    expect(screen.queryByText(/bate al drift/)).not.toBeInTheDocument();
+    expect(screen.getByText("Resultado: gana la regla sencilla.")).toBeInTheDocument();
+    expect(screen.queryAllByText(/drift|MASE|CCAA/)).toHaveLength(0);
+  });
+
+  it("says the horizons in months, not in quarter codes", async () => {
+    ui(Q03.find((x) => x.series === "precio")!, Q03);
+    await userEvent.click(screen.getByRole("button", { name: /inteligencia artificial/ }));
+    const rows = await screen.findAllByRole("row");
+    expect(rows.slice(1).map((r) => (r as HTMLTableRowElement).cells[0].textContent))
+      // The mock serves h = 1, 2, 4, 8; h = 8 is outside the rule and is left out.
+      .toEqual(["3 meses", "6 meses", "1 año"]);
   });
 
   it("is absent under a question the backtest never covered", () => {
     const q = Q02.find((x) => x.series === "u")!;
     ui(q, Q02);
-    expect(screen.queryByRole("button", { name: /aprendizaje profundo/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /inteligencia artificial/ })).not.toBeInTheDocument();
   });
 });

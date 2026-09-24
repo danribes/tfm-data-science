@@ -16,6 +16,23 @@ import type { PersonaQuestion } from "../personas/questions";
  *  tested on paro or deuda, which it never was. */
 const HOUSE_PRICE_SERIES = new Set(["precio", "ipv"]);
 
+/** The panel speaks in years, not quarter codes, and both ends of the scored
+ *  window come from the API. The first origin is "2019Q4", so the first
+ *  forecast lands in the quarter after it; the held-out tail starts at
+ *  "2024Q1", so the last scored quarter is the one before it. */
+function yearAfter(p: string): number {
+  const [y, q] = p.split("Q").map(Number);
+  return q === 4 ? y + 1 : y;
+}
+function yearBefore(p: string): number {
+  const [y, q] = p.split("Q").map(Number);
+  return q === 1 ? y - 1 : y;
+}
+
+/** A horizon in quarters, said the way a person says it. */
+const plazo = (h: number) =>
+  h % 4 === 0 ? (h === 4 ? "1 año" : `${h / 4} años`) : `${h * 3} meses`;
+
 function fmt(key: string, v: number): string {
   const f = SERIES_FORMAT[key] ?? { dec: 1, unit: "" };
   return `${nf(v, f.dec)} ${f.unit}`.trim();
@@ -236,39 +253,48 @@ export function AnswerPanel({
         {q.concept && <CorpusLayer concept={q.concept} />}
 
         {HOUSE_PRICE_SERIES.has(q.series) && (
-        <Layer tag="modelo" title="Qué dice el modelo de aprendizaje profundo sobre el precio de la vivienda">
+        <Layer tag="IA" title="¿Lo predeciría mejor una inteligencia artificial?">
           {prediction.isSuccess && prediction.data.available ? (
             <>
               <p>
-                Un modelo global entrenado en {nf(Number(prediction.data.protocol.train_series), 0)} series
-                de precios de la vivienda de EE. UU. y Reino Unido, sin ver ningún
-                dato español, y evaluado sobre las {prediction.data.protocol.n_ccaa} CCAA
-                con orígenes {prediction.data.protocol.origins}. Los datos desde{" "}
-                {prediction.data.protocol.test_start} quedan reservados, sin tocar.
+                Lo probamos con el precio de la vivienda. Entrenamos una red
+                neuronal —un tipo de inteligencia artificial, lo que se llama
+                aprendizaje profundo— con los precios de{" "}
+                {nf(Number(prediction.data.protocol.train_series), 0)} zonas de
+                Estados Unidos y Reino Unido, sin enseñarle ni un solo dato de
+                España. Después le pedimos que predijera los precios de las{" "}
+                {prediction.data.protocol.n_ccaa} comunidades autónomas entre{" "}
+                {yearAfter(String(prediction.data.protocol.origins).split("–")[0])} y{" "}
+                {yearBefore(String(prediction.data.protocol.test_start))}, viendo en
+                cada momento sólo lo que había pasado hasta entonces.
               </p>
               <p className="layer-note">
-                Se compara con la deriva («drift»): prolongar la pendiente de los
-                últimos dos años. No es la regla más tonta —repetir el último dato
-                lo hace mucho peor—, sino la más difícil de batir entre las
-                simples. La medida es el error escalado medio (MASE); cuanto más
-                bajo, mejor.
+                Para saber si acierta, la comparamos con una regla muy sencilla:
+                suponer que el precio seguirá subiendo (o bajando) al mismo ritmo
+                que en los dos últimos años. En estadística se llama «deriva».
+                Parece fácil de batir, pero la vivienda tiene mucha inercia y esta
+                regla suele acertar bastante.
+              </p>
+              <p className="layer-note">
+                Cuánto se equivoca cada una, de media, según lo lejos que mire
+                (cuanto más bajo, mejor):
               </p>
               <table className="layer-table">
                 <thead>
                   <tr>
-                    <th>horizonte</th><th>error del modelo</th>
-                    <th>error de la deriva</th><th />
+                    <th>a</th><th>fallo de la IA</th>
+                    <th>fallo de la regla</th><th>acierta más</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {prediction.data.rows.slice(0, 4).map((r) => {
+                  {prediction.data.rows.filter((r) => r.h <= (prediction.data.verdict?.horizon ?? 4)).map((r) => {
                     const dl = r.mase.dl_global, dr = r.mase.drift;
                     return (
                       <tr key={r.h}>
-                        <td>{r.h}T</td>
+                        <td>{plazo(r.h)}</td>
                         <td>{nf(dl, 3)}</td>
                         <td>{nf(dr, 3)}</td>
-                        <td className={dl < dr ? "ok" : "bad"}>{dl < dr ? "gana" : "pierde"}</td>
+                        <td className={dl < dr ? "ok" : "bad"}>{dl < dr ? "la IA" : "la regla"}</td>
                       </tr>
                     );
                   })}
@@ -276,19 +302,32 @@ export function AnswerPanel({
               </table>
               {prediction.data.verdict && (
                 <p className="layer-warn">
-                  Veredicto: <strong>{prediction.data.verdict.verdict}</strong>.
-                  Gana en {prediction.data.verdict.beaten_ccaa} de{" "}
-                  {prediction.data.verdict.total_ccaa} CCAA (media de h = 1–{prediction.data.verdict.horizon}),
-                  y la regla fijada de antemano pedía {prediction.data.verdict.required}.
-                  {!prediction.data.verdict.wins && (
+                  {prediction.data.verdict.wins ? (
                     <>
-                      {" "}Por eso esta pantalla no enseña una predicción puntual: el
-                      modelo no ha ganado el derecho a hacerla, y la deriva es el
-                      listón que tendría que superar.
+                      <strong>Resultado: gana la inteligencia artificial.</strong>{" "}
+                      Comunidad por comunidad, acierta más que la regla en{" "}
+                      {prediction.data.verdict.beaten_ccaa} de las{" "}
+                      {prediction.data.verdict.total_ccaa}; antes de empezar pusimos
+                      el listón en {prediction.data.verdict.required}.
+                    </>
+                  ) : (
+                    <>
+                      <strong>Resultado: gana la regla sencilla.</strong>{" "}
+                      Comunidad por comunidad, la IA sólo acierta más en{" "}
+                      {prediction.data.verdict.beaten_ccaa} de las{" "}
+                      {prediction.data.verdict.total_ccaa}, y antes de empezar
+                      pusimos el listón en {prediction.data.verdict.required}. Por
+                      eso aquí no te enseñamos lo que predice la IA: no ha
+                      demostrado hacerlo mejor que una regla que cabe en una línea.
                     </>
                   )}
                 </p>
               )}
+              <p className="layer-note">
+                Los datos desde {String(prediction.data.protocol.test_start).slice(0, 4)} los
+                guardamos sin tocar, para una prueba final. El detalle técnico está
+                en la pestaña Predicción.
+              </p>
             </>
           ) : (
             <p className="muted">Backtest no disponible en este despliegue.</p>
