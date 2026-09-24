@@ -4,11 +4,11 @@ import { useScenarioStore } from "../state/scenarioStore";
 import { seriesOf } from "../engine/derived";
 import type { Scenario } from "../engine/spain";
 import { YEARS } from "../engine/spain";
-import { eur, nf } from "../lib/fmt";
+import { eur, nf, sgUnit } from "../lib/fmt";
 import { ProjectionChart } from "./ProjectionChart";
 import { SERIES_FORMAT } from "./KpiRow";
 import { RagCorpusNotice } from "./RagCorpusNotice";
-import { seriesLabel } from "../lib/seriesMeta";
+import { seriesLabel, seriesPlain } from "../lib/seriesMeta";
 import type { PersonaQuestion } from "../personas/questions";
 
 /** The only series the deep-learning backtest was run on. The layer shows
@@ -145,13 +145,18 @@ export function AnswerPanel({
     <div className="answer">
       <div className="answer-headline">
         <span className="answer-q">{q.text}</span>
+        {/* The question says what the reader asked, not what is measured:
+            «¿Voy a encontrar trabajo?» over 21,5 % read as the overall
+            unemployment rate when it is the under-25 one. */}
+        <span className="answer-series">{seriesLabel(q.series)}</span>
         <div className="answer-value">
           {fmt(q.series, value)}
           <small> en {year}</small>
         </div>
+        {seriesPlain(q.series) && <p className="answer-delta muted">{seriesPlain(q.series)}</p>}
         {Math.abs(delta) > 1e-9 && (
           <p className="answer-delta">
-            {delta > 0 ? "+" : ""}{fmt(q.series, delta)} frente al escenario base
+            {sgUnit(delta, SERIES_FORMAT[q.series]?.dec ?? 1, SERIES_FORMAT[q.series]?.unit ?? "")} frente al escenario base
             {" "}(que da {fmt(q.series, baseValue)}).
           </p>
         )}
@@ -159,7 +164,7 @@ export function AnswerPanel({
 
       <div className={q.companion ? "answer-charts two" : "answer-charts"}>
         <div className="card">
-          <h4>{q.text} <small>línea de partida punteada · escenario en continuo</small></h4>
+          <h4>{seriesLabel(q.series)} <small>línea de partida punteada · escenario en continuo</small></h4>
           <ProjectionChart
             years={YEARS}
             baseline={seriesOf(base, q.series)}
@@ -171,6 +176,9 @@ export function AnswerPanel({
         {q.companion && (
           <div className="card">
             <h4>Para leerlo bien <small>{seriesLabel(q.companion)}</small></h4>
+            {seriesPlain(q.companion) && (
+              <p className="muted" style={{ fontSize: 13.5, margin: "0 0 6px" }}>{seriesPlain(q.companion)}</p>
+            )}
             <ProjectionChart
               years={YEARS}
               baseline={seriesOf(base, q.companion)}
@@ -198,7 +206,7 @@ export function AnswerPanel({
                       .filter((ct) => Math.abs(ct.share) > 0.01)
                       .map((ct) => (
                         <li key={ct.lever_id}>
-                          {ct.lever_name}: {nf(ct.delta, 2)}{" "}
+                          {ct.lever_name}: {sgUnit(ct.delta, SERIES_FORMAT[q.series]?.dec ?? 2, SERIES_FORMAT[q.series]?.unit ?? "")}{" "}
                           <span className="muted">({nf(ct.share * 100, 0)} %)</span>
                         </li>
                       ))}

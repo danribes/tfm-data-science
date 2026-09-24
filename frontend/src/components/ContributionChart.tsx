@@ -1,4 +1,4 @@
-import { nf, sg } from "../lib/fmt";
+import { deltaUnit, nf, sg } from "../lib/fmt";
 import type { ContributionOut } from "../api/types";
 
 /** How much each lever moved the headline series on its own, plus the residual.
@@ -35,7 +35,7 @@ export function ContributionChart({
     <div className="contrib">
       <div className="contrib-head">
         Quién mueve la deuda en {year}
-        <span className="contrib-total">{sg(jointDelta, 1)} {unit} en total</span>
+        <span className="contrib-total">{sg(jointDelta, 1)} {deltaUnit(unit)} en total</span>
       </div>
       <ul className="contrib-rows">
         {rows.map((r) => (
@@ -55,7 +55,7 @@ export function ContributionChart({
         Cada barra es el motor corrido otra vez con esa única palanca movida. Como
         el motor no es lineal, las palancas por separado no suman el efecto
         conjunto: esa diferencia es la barra de interacción
-        {Math.abs(interaction) > 0.05 ? ` (${sg(interaction, 1)} ${unit})` : ""},
+        {Math.abs(interaction) > 0.05 ? ` (${sg(interaction, 1)} ${deltaUnit(unit)})` : ""},
         y es una propiedad real del modelo, no un redondeo.
       </p>
       {contributions.length > 0 && (

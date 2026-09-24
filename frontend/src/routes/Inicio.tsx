@@ -3,7 +3,7 @@ import { useMonteCarlo, usePersonas, useRedlines } from "../api/hooks";
 import { Y1, YEARS, baseline } from "../engine/spain";
 import { evaluateRedlines } from "../engine/redlines";
 import { REFI } from "../engine/constants";
-import { eur, nf, sg } from "../lib/fmt";
+import { eur, nf, sgUnit } from "../lib/fmt";
 import { Caption } from "../components/Caption";
 import { DebtVsGdpChart, SnowballStrip } from "../components/DebtVsGdpChart";
 import { SpaghettiChart } from "../components/SpaghettiChart";
@@ -142,7 +142,7 @@ export default function Inicio() {
                   one screen (tile vs semáforo) with no obvious explanation. */}
               <div className="o-label">{lab} <small>{at2050 ? Y1 : horizon}</small></div>
               <div className="o-val">{nf(scn[key][i], f.dec)} <small>{f.unit}</small></div>
-              <div className={`o-delta ${cls}`}>{sg(delta, f.dec)} vs base</div>
+              <div className={`o-delta ${cls}`}>{sgUnit(delta, f.dec, f.unit)} vs base</div>
             </div>
           );
         })}

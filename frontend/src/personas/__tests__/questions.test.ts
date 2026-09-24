@@ -4,7 +4,7 @@ import { SHIPPED_IDS } from "../registry";
 import { ALL_SERIES_KEYS } from "../../engine/derived";
 import { LEVER_SPECS } from "../../engine/levers";
 import { SERIES_FORMAT } from "../../components/KpiRow";
-import { seriesLabel, TABLE_ROWS } from "../../lib/seriesMeta";
+import { seriesLabel, seriesPlain, TABLE_ROWS } from "../../lib/seriesMeta";
 
 const LEVER_IDS = new Set(LEVER_SPECS.map((s) => s.id));
 
@@ -160,6 +160,18 @@ describe("toda serie que se pinta tiene nombre legible", () => {
     for (const q of TODAS_S) {
       for (const k of [q.series, q.companion]) {
         if (k && seriesLabel(k) === k) sin.push(`${q.id}:${k}`);
+      }
+    }
+    expect(sin).toEqual([]);
+  });
+
+  // El nombre no basta: «¿Voy a encontrar trabajo?» sobre un 21,5 % se leía
+  // como paro a secas. Toda cifra que un perfil enseña dice qué mide.
+  it("toda cifra de cabecera o de compañía lleva su explicación en llano", () => {
+    const sin: string[] = [];
+    for (const q of TODAS_S) {
+      for (const k of [q.series, q.companion]) {
+        if (k && !seriesPlain(k)) sin.push(`${q.id}:${k}`);
       }
     }
     expect(sin).toEqual([]);

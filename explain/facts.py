@@ -129,7 +129,7 @@ MECHANISM: dict[str, list[dict]] = {
 #: moved. Units and decimals mirror the frontend's SERIES_FORMAT so prose and
 #: tiles cannot disagree.
 SERIES_META: dict[str, dict] = {
-    "arop": {"label": "Pobreza o exclusión infantil", "unit": "%", "dec": 1, "up_is_bad": True},
+    "arop": {"label": "Pobreza infantil (menores de 16)", "unit": "%", "dec": 1, "up_is_bad": True},
     "auton": {"label": "Peso del autoempleo", "unit": "%", "dec": 1, "up_is_bad": False},
     "bono": {"label": "Rendimiento del bono a 10 años", "unit": "%", "dec": 2, "up_is_bad": True},
     "cuota": {"label": "Cuota hipotecaria mensual", "unit": "€/mes", "dec": 0, "up_is_bad": True},

@@ -9,7 +9,7 @@ export const p08: PersonaModule = {
     { a: "demografía", u: "dependencia 65+", t: "deuda heredada", k: "b", d: 1, un: "%PIB" },
   ],
   narr: (R, k, y) =>
-    `En ${y} el riesgo de pobreza o exclusión infantil (AROP <16) se sitúa en el ${nf(R.arop[k], 1)} % ` +
+    `En ${y} el riesgo de pobreza infantil (AROP <16) se sitúa en el ${nf(R.arop[k], 1)} % ` +
     `y el gasto público en educación en el ${nf(R.edu[k], 2)} %PIB. ` +
     `La tasa de dependencia alcanza ${nf(R.dep[k], 1)} personas mayores por cada 100 en edad de trabajar, ` +
     `con una carga de deuda heredada de ${nf(R.b[k], 1)} %PIB.`,

@@ -11,7 +11,8 @@ const specs = [
 describe("Chain — trailing delta computed vs base", () => {
   it("flat at base", () => {
     render(<Chain specs={specs} scn={baseline()} base={baseline()} k={0} />);
-    expect(screen.getByText(/\(\+0,0\)/)).toHaveClass("d", "flat");
+    // The change carries its own unit: a %PIB series moves in puntos de PIB.
+    expect(screen.getByText(/\(\+0,0 puntos de PIB\)/)).toHaveClass("d", "flat");
   });
 
   it("r +200pb raises int → .up (red)", () => {

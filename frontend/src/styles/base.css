@@ -382,6 +382,7 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .answer { display: flex; flex-direction: column; gap: var(--sp-2); }
 .answer-headline { display: flex; flex-direction: column; gap: 4px; }
 .answer-q { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 700; }
+.answer-series { font-size: 15px; font-weight: 700; color: var(--ink-2); }
 .answer-value { font-size: 40px; font-weight: 800; line-height: 1.1; color: var(--ink); }
 .answer-value small { font-size: 15px; font-weight: 600; color: var(--muted); margin-left: 6px; }
 .answer-delta { font-size: 14px; color: var(--ink-2); margin: 0; }

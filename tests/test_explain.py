@@ -307,11 +307,33 @@ def test_fallback_states_the_change_in_the_series_own_unit():
     precio = next(o for o in facts.outcomes if o.key == "precio")
 
     assert f"({_signed(precio.delta, precio.dec)} €)" in resumen
-    assert "puntos" not in resumen
+    # Only the headline clause: the «En el mismo escenario» list after it
+    # carries percentage series, and those do move in puntos.
+    assert f"({_signed(precio.delta, precio.dec)} puntos)" not in resumen
 
-    # And still «puntos» where that is the correct word.
+    # And still «puntos» where that is the correct word — of GDP, for a ratio.
     deuda = fallback_narration(build_facts(RATE_UP, 2035, headline="b"))["resumen"]
-    assert "puntos)" in deuda
+    assert "puntos de PIB)" in deuda
+
+
+def test_every_change_in_a_percentage_is_said_in_points():
+    """«Paro juvenil −1,9 %» reads as a relative fall; it is 1,9 puntos.
+
+    The headline clause already said «puntos»; the «En el mismo escenario»
+    list, the per-lever decomposition and the colloquial line still printed
+    the level's unit next to a change. A change of a percentage is in points
+    and a change of a share of GDP in points of GDP, everywhere."""
+    for key in ("u", "ujuv", "b", "saldo"):
+        facts = build_facts(RATE_UP, 2035, headline=key)
+        blocks = fallback_narration(facts)
+        head = next(o for o in facts.outcomes if o.key == key)
+        unit = "puntos de PIB" if head.unit == "%PIB" else "puntos"
+        assert f"{_signed(head.delta, head.dec)} {unit} frente a no tocar nada" in blocks["coloquial"], key
+        for o in facts.outcomes:
+            if o.key != key and abs(o.delta) > 0.05 and o.unit.startswith("%"):
+                assert f"{_signed(o.delta, o.dec)} {o.unit} en" not in blocks["resumen"], (key, o.key)
+        if facts.contributions and head.unit.startswith("%"):
+            assert f"{unit} en total" in blocks["mecanismo"], key
 
 
 def test_fallback_leaves_no_double_space_for_a_unitless_series():

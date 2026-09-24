@@ -1,4 +1,4 @@
-import { nf, sg } from "../lib/fmt";
+import { nf, sgUnit } from "../lib/fmt";
 import { useRollup } from "../lib/motion";
 import { runScenario, type Scenario } from "../engine/spain";
 import { PRESETS, presetLevers } from "../engine/levers";
@@ -109,7 +109,7 @@ function KpiTile({ out, scn, base, k, fresh, year, red }: TileProps) {
       <span className="o-seal"><Stamp fresh={fresh} year={year} /></span>
       <div className="o-label">{out.lab}</div>
       <div className="o-val">{nf(shown, fmtSpec.dec)} <small>{fmtSpec.unit}</small></div>
-      <div className={`o-delta ${deltaClass}`}>{sg(delta, fmtSpec.dec)} vs base</div>
+      <div className={`o-delta ${deltaClass}`}>{sgUnit(delta, fmtSpec.dec, fmtSpec.unit)} vs base</div>
       <Gauge
         value={value}
         lo={lo}

@@ -1,4 +1,4 @@
-import { nf, sg } from "../lib/fmt";
+import { nf, sgUnit } from "../lib/fmt";
 import type { Scenario, SeriesKey } from "../engine/spain";
 
 export interface ChainSpec {
@@ -37,7 +37,7 @@ export function Chain({
             <span className="arr">→</span>
             {c.t}
             <span className={`d ${dir}`}>
-              {nf(value, c.d)} {c.un} ({sg(delta, c.d)})
+              {nf(value, c.d)} {c.un} ({sgUnit(delta, c.d, c.un)})
             </span>
           </div>
         );

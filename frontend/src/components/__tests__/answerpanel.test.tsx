@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { AnswerPanel } from "../AnswerPanel";
 import { baseline } from "../../engine/spain";
-import { Q02, Q03 } from "../../personas/questions";
+import { Q02, Q03, Q10 } from "../../personas/questions";
 import type { PersonaQuestion } from "../../personas/questions";
 
 function ui(q: PersonaQuestion, all: PersonaQuestion[]) {
@@ -53,5 +53,29 @@ describe("AnswerPanel · capa del modelo de aprendizaje profundo", () => {
     await userEvent.click(screen.getByRole("button", { name: /inteligencia artificial/ }));
     await screen.findByText("Resultado: gana la regla sencilla.");
     expect(screen.queryByText(/no la hemos probado/)).not.toBeInTheDocument();
+  });
+});
+
+describe("AnswerPanel · qué cifra es la de cabecera", () => {
+  it("names the youth rate under «¿Voy a encontrar trabajo?», not just «paro»", () => {
+    ui(Q10.find((x) => x.series === "ujuv")!, Q10);
+    // Headline label and the main chart title both say which rate it is.
+    expect(screen.getAllByText("Paro juvenil (menores de 25)")).toHaveLength(2);
+    expect(screen.getByText(/De cada cien jóvenes menores de 25 años/)).toBeInTheDocument();
+  });
+
+  it("says a change in a percentage in puntos, not in %", () => {
+    const q = Q10.find((x) => x.series === "ujuv")!;
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const base = baseline();
+    // A scenario whose youth rate sits 1,9 points under the base.
+    const scn = { ...base, ujuv: base.ujuv.map((v) => v - 1.9) };
+    render(
+      <QueryClientProvider client={client}>
+        <AnswerPanel q={q} all={Q10} scn={scn} base={base} k={24} year={2050} onAsk={() => {}} />
+      </QueryClientProvider>,
+    );
+    expect(screen.getByText(/−1,9 puntos frente al escenario base/)).toBeInTheDocument();
+    expect(screen.queryByText(/−1,9 % frente/)).not.toBeInTheDocument();
   });
 });

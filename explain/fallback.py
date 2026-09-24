@@ -33,6 +33,18 @@ def _sp(unit: str) -> str:
     return f" {unit}" if unit else ""
 
 
+def _delta_unit(unit: str) -> str:
+    """The unit of a *change* in a series, which is not always the series' own.
+
+    A percentage moves in points: paro juvenil going from 23,4 % to 21,5 % is
+    −1,9 puntos, and «−1,9 %» reads as a relative fall of 1,9 %. A share of
+    GDP moves in points of GDP. Everything else keeps its unit — a house price
+    moves in euros, not in puntos (the bug test_explain pins)."""
+    if unit == "%PIB":
+        return "puntos de PIB"
+    return "puntos" if unit.startswith("%") else unit
+
+
 def _lever_phrase(m) -> str:
     return (f"{m.name} de {nf(m.base, m.dec)} a {nf(m.value, m.dec)} {m.unit} "
             f"({_signed(m.delta, m.dec)})")
@@ -66,8 +78,7 @@ def _resumen(f: ExplanationFacts) -> str:
         # «puntos» was fixed for the same reason it should not have been: it is
         # the right word for a series measured in percent and nonsense for one
         # measured in euros — a house price does not fall by 104.420 puntos.
-        delta_unit = "puntos" if head.unit.startswith("%") else head.unit
-        delta = f"{_signed(head.delta, head.dec)} {delta_unit}".strip()
+        delta = f"{_signed(head.delta, head.dec)}{_sp(_delta_unit(head.unit))}"
         parts.append(
             f"{head.label} {verb} de {nf(head.base, head.dec)} a "
             f"{nf(head.value, head.dec)}{_sp(head.unit)} en {head.year} "
@@ -76,7 +87,7 @@ def _resumen(f: ExplanationFacts) -> str:
     others = [o for o in f.outcomes
               if o.key != f.headline_key and abs(o.delta) > 0.05]
     if others:
-        bits = [f"{o.label} {_signed(o.delta, o.dec)}{_sp(o.unit)} en {o.year}"
+        bits = [f"{o.label} {_signed(o.delta, o.dec)}{_sp(_delta_unit(o.unit))} en {o.year}"
                 for o in others[:3]]
         parts.append("En el mismo escenario: " + "; ".join(bits) + ".")
 
@@ -102,7 +113,9 @@ def _mecanismo(f: ExplanationFacts) -> str:
     if f.contributions:
         hd = next((o for o in f.outcomes if o.key == f.headline_key), None)
         what = hd.label.lower() if hd else "la serie"
-        unit = hd.unit if hd else ""
+        # Every figure in the decomposition is a change, so all of it is in the
+        # change's unit: «−43,7 puntos de PIB», not «−43,7 %PIB».
+        unit = _delta_unit(hd.unit) if hd else ""
         lines.append(
             f"Descomposición del movimiento de {what} en {f.headline_year} "
             f"({_signed(f.joint_delta, 1)}{_sp(unit)} en total), volviendo a correr el "
@@ -203,7 +216,8 @@ def _coloquial(f: ExplanationFacts) -> str:
                 "esos valores se mantuvieran, no una bola de cristal.")
     direction = "sube" if head.delta > 0 else "baja"
     return (f"Resumiendo: mueves {lever} y «{head.label}» {direction} hasta "
-            f"{amount} en {head.year} — {_signed(head.delta, head.dec)} frente "
+            f"{amount} en {head.year} — {_signed(head.delta, head.dec)}"
+            f"{_sp(_delta_unit(head.unit))} frente "
             f"a no tocar nada, {verdict}. "
             "Con la letra pequeña de siempre: esto es lo que saldría si esos "
             "valores se mantuvieran, no una bola de cristal.")
