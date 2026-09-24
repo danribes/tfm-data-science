@@ -39,9 +39,19 @@ describe("AnswerPanel · capa del modelo de aprendizaje profundo", () => {
       .toEqual(["3 meses", "6 meses", "1 año"]);
   });
 
-  it("is absent under a question the backtest never covered", () => {
+  it("under a question the backtest never covered, says so before showing the house-price test", async () => {
     const q = Q02.find((x) => x.series === "u")!;
     ui(q, Q02);
-    expect(screen.queryByRole("button", { name: /inteligencia artificial/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /inteligencia artificial/ }));
+    expect(await screen.findByText(/no la hemos probado/)).toBeInTheDocument();
+    expect(screen.getByText(/Sí la probamos con el precio de la vivienda/)).toBeInTheDocument();
+    expect(screen.getByText("Resultado: gana la regla sencilla.")).toBeInTheDocument();
+  });
+
+  it("under a house-price question, does not claim it was untested", async () => {
+    ui(Q03.find((x) => x.series === "precio")!, Q03);
+    await userEvent.click(screen.getByRole("button", { name: /inteligencia artificial/ }));
+    await screen.findByText("Resultado: gana la regla sencilla.");
+    expect(screen.queryByText(/no la hemos probado/)).not.toBeInTheDocument();
   });
 });

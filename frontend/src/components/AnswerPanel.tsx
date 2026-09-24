@@ -11,9 +11,10 @@ import { RagCorpusNotice } from "./RagCorpusNotice";
 import { seriesLabel } from "../lib/seriesMeta";
 import type { PersonaQuestion } from "../personas/questions";
 
-/** The only series the deep-learning backtest was run on. Under any other
- *  question the house-price table would read as if the network had been
- *  tested on paro or deuda, which it never was. */
+/** The only series the deep-learning backtest was run on. The layer shows
+ *  under every question, but under any other one it says first that this
+ *  number was never tested, so the house-price table does not read as if the
+ *  network had been tried on paro or deuda. */
 const HOUSE_PRICE_SERIES = new Set(["precio", "ipv"]);
 
 /** The panel speaks in years, not quarter codes, and both ends of the scored
@@ -252,10 +253,17 @@ export function AnswerPanel({
 
         {q.concept && <CorpusLayer concept={q.concept} />}
 
-        {HOUSE_PRICE_SERIES.has(q.series) && (
         <Layer tag="IA" title="¿Lo predeciría mejor una inteligencia artificial?">
           {prediction.isSuccess && prediction.data.available ? (
             <>
+              {!HOUSE_PRICE_SERIES.has(q.series) && (
+                <p className="layer-warn">
+                  Con «{seriesLabel(q.series)}» no la hemos probado: para esta
+                  cifra no hay ninguna predicción de inteligencia artificial.
+                  Sí la probamos con el precio de la vivienda, y esto es lo que
+                  salió.
+                </p>
+              )}
               <p>
                 Lo probamos con el precio de la vivienda. Entrenamos una red
                 neuronal —un tipo de inteligencia artificial, lo que se llama
@@ -333,7 +341,6 @@ export function AnswerPanel({
             <p className="muted">Backtest no disponible en este despliegue.</p>
           )}
         </Layer>
-        )}
 
         <Layer tag="límites" title="Qué no sabe este número">
           {explain.isSuccess && explain.data.advertencia && (
