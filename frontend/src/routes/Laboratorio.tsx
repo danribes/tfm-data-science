@@ -53,7 +53,7 @@ export default function Laboratorio() {
             textDecoration: "none",
             fontSize: 14,
             fontWeight: 600,
-            whiteSpace: "nowrap",
+            maxWidth: "100%",
           }}
         >
           📄 Informe de política pública · versión imprimible
@@ -165,6 +165,7 @@ export default function Laboratorio() {
               de su nombre está lo que significa. En negrita, las que has movido.
             </p>
           </HowToRead>
+          <div className="tscroll">
           <table style={{ fontSize: 15, borderCollapse: "collapse", width: "100%" }}>
             <thead>
               <tr><th style={{ textAlign: "left" }}>palanca</th><th>tu valor</th><th>de partida</th></tr>
@@ -185,6 +186,7 @@ export default function Laboratorio() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
@@ -217,6 +219,7 @@ export default function Laboratorio() {
         </HowToRead>
         {sens.isPending && <p style={{ fontSize: 14 }}>Calculando el efecto de cada palanca…</p>}
         {sens.data && (
+          <div className="tscroll">
           <table style={{ fontSize: 15, borderCollapse: "collapse", width: "100%" }}>
             <thead>
               <tr>
@@ -256,6 +259,7 @@ export default function Laboratorio() {
               })}
             </tbody>
           </table>
+          </div>
         )}
         <TechDetails>
           <Caption>

@@ -36,13 +36,21 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 }
 
 /* --- v16 §C.2 rhythm: 5 KPI → 2 charts → semáforo/cadenas/narrativa --- */
-.outs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.row3 { display: grid; grid-template-columns: 1.05fr 0.95fr 1.2fr; gap: 16px; }
-@media (max-width: 1440px) { .outs { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 1024px) { .row2, .row3 { grid-template-columns: 1fr; } .outs { grid-template-columns: repeat(2, 1fr); } }
+/* minmax(0, 1fr), not 1fr: a bare 1fr column cannot shrink below its content,
+   and the one-line seal made every tile at least 270 px wide, so the row ran
+   off the page from 1025 to 1250 px and from 1441 to 1821 px. */
+.outs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.row3 { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 1.2fr); gap: 16px; }
+.row2 > *, .row3 > * { min-width: 0; }
+@media (max-width: 1440px) { .outs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1024px) { .row2, .row3 { grid-template-columns: minmax(0, 1fr); } .outs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 @media (max-width: 640px) { .outs { grid-template-columns: minmax(0, 1fr); } }
+/* Inicio's four headline tiles. A class, not an inline style: inline, the four
+   columns beat every breakpoint and the page was 528 px wide on a 390 px phone. */
+.outs.outs-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 640px) { .outs.outs-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* --- card primitive (v16 §C.3) --- */
 .card { border: 1px solid var(--grid); border-radius: var(--rad-card); background: var(--surface); padding: var(--sp-2); display: flex; flex-direction: column; min-width: 0; }
@@ -56,14 +64,21 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
    in a column makes the collision impossible instead of tuned away. */
 /* stretch, not flex-start: the gauge bar is a child here and align-items
    flex-start shrinks it to its (zero) content width. */
-.out { border: 1px solid var(--grid); border-radius: var(--rad-card); padding: var(--sp-2); background: var(--surface); display: flex; flex-direction: column; align-items: stretch; }
+.out { border: 1px solid var(--grid); border-radius: var(--rad-card); padding: var(--sp-2); background: var(--surface); display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
 .out .o-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; max-width: 100%; }
 .out .o-val { font-size: 32px; font-weight: 800; line-height: 1.15; margin: 6px 0; }
 .out .o-val small { font-size: 15px; font-weight: 700; color: var(--muted); }
 .out .o-delta { font-size: 14.5px; font-weight: 700; }
 .out .o-delta.bad { color: var(--div-neg); }
 .out .o-delta.good { color: var(--good); }
-.out .o-seal { align-self: flex-end; font-size: 12px; margin-bottom: 2px; }
+.out .o-seal { align-self: flex-end; font-size: 12px; margin-bottom: 2px; max-width: 100%; text-align: right; }
+/* In a narrow tile the seal wraps instead of widening the tile, and gets
+   smaller and squarer so two lines do not read as a blob. */
+.out { container-type: inline-size; }
+.out .o-seal .badge-fwd { white-space: normal; display: inline-block; }
+@container (max-width: 250px) {
+  .o-seal .badge-fwd { font-size: 12px; padding: 4px 9px; border-radius: 10px; }
+}
 .gaugebar { position: relative; height: 10px; border-radius: 6px; background: var(--grid); margin: 10px 0 6px; }
 .gaugebar .f { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: var(--s1); transition: width var(--dur) ease; }
 .gaugebar .f.bad { background: var(--div-neg); }
@@ -195,6 +210,10 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .tscroll { overflow-x: auto; }
 .guide-t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .guide-t th { text-align: left; font-weight: 800; color: var(--muted); border-bottom: 1px solid var(--grid); padding: 8px 12px 8px 0; white-space: nowrap; }
+/* Headers wrap where one line would push the table past its card: on a phone,
+   and in tables whose headers are phrases rather than labels. */
+.guide-t.wrap-th th { white-space: normal; }
+@media (max-width: 640px) { .guide-t th { white-space: normal; } }
 .guide-t td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--grid); color: var(--ink-2); vertical-align: top; }
 .guide-t td.sym { font-weight: 700; color: var(--accent); }
 .guide-t td.dim, .guide-rl .dim { color: var(--muted); }
@@ -246,7 +265,7 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .biblio-note { font-size: 13px; color: var(--muted); margin: 0 0 var(--sp-1); }
 
 .biblio-form { display: flex; gap: 10px; margin: var(--sp-1) 0 10px; }
-.biblio-form input { flex: 1; border: 1px solid var(--grid); background: var(--surface); color: var(--ink); border-radius: var(--rad-chip); padding: 10px 16px; font-size: 15px; font-family: inherit; }
+.biblio-form input { flex: 1; min-width: 0; border: 1px solid var(--grid); background: var(--surface); color: var(--ink); border-radius: var(--rad-chip); padding: 10px 16px; font-size: 15px; font-family: inherit; }
 .biblio-form input:focus { outline: none; border-color: var(--accent); }
 .biblio-form button { border: 1px solid var(--accent); background: var(--accent); color: var(--page); border-radius: var(--rad-chip); padding: 10px 20px; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .biblio-form button:disabled { opacity: .5; cursor: default; }
@@ -569,6 +588,7 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .alarm-t td { vertical-align: top; }
 .alarm-t td.bad { color: var(--st-crossed); font-weight: 700; white-space: nowrap; }
 .alarm-t td.ok { color: var(--good); font-weight: 700; white-space: nowrap; }
+@media (max-width: 640px) { .alarm-t td.bad, .alarm-t td.ok { white-space: normal; } }
 
 /* --- the 10-year bond calculator --- */
 .bond-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 8px; }

@@ -117,7 +117,7 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
 
   return (
     <div className="card" style={{ padding: 18, marginTop: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <div>
           <h4 style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>
             Presupuesto del escenario <small>(esquema ilustrativo)</small>

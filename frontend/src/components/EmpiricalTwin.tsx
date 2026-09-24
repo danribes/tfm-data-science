@@ -70,7 +70,7 @@ export function EmpiricalTwin() {
 
       <div className="row2">
         <div>
-          <table className="guide-t" style={{ width: "100%" }}>
+          <table className="guide-t wrap-th" style={{ width: "100%" }}>
             <thead>
               <tr>
                 <th>Deuda del país</th>

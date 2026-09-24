@@ -53,6 +53,7 @@ export default function Metodologia() {
       <div className="card">
         <h4>Constantes del motor <small>calibraciones declaradas y parámetros de vivienda estimados</small></h4>
         {constants.isSuccess ? (
+          <div className="tscroll">
           <table style={{ fontSize: 13.5, borderCollapse: "collapse" }}>
             <thead><tr><th style={{ textAlign: "left" }}>nombre</th><th>valor</th><th style={{ textAlign: "left" }}>unidad</th><th style={{ textAlign: "left" }}>procedencia</th></tr></thead>
             <tbody>
@@ -66,6 +67,7 @@ export default function Metodologia() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : constants.isError ? (
           <div className="banner err">Constantes no disponibles</div>
         ) : null}

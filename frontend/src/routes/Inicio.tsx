@@ -146,7 +146,7 @@ export default function Inicio() {
         </Caption>
       </div>
 
-      <div className="outs" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+      <div className="outs outs-4">
         {HEADLINES.map(({ k: key, lab, at2050 }) => {
           const i = at2050 ? 24 : k;
           const f = SERIES_FORMAT[key];
