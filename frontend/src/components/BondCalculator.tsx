@@ -1,5 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from "recharts";
 import * as C from "../engine/constants";
+import { runScenario, YEARS } from "../engine/spain";
 import { LEVER_SPECS } from "../engine/levers";
 import { nf } from "../lib/fmt";
 import { useScenarioStore } from "../state/scenarioStore";
@@ -32,6 +36,14 @@ export function BondCalculator() {
 
   const bono = bondYield(r, prima);
   const over = bono > RESCUE_YIELD;
+  // The whole scenario with the calculator's Euríbor and premium: the yield
+  // is flat in this engine (its three parts are levers), and what moves over
+  // the years is the average rate the State pays, which catches up with the
+  // yield as the debt is renewed (about 14 % a year) on top of the central
+  // path.
+  const run = useMemo(() => runScenario({ ...levers, r, prima }), [levers, r, prima]);
+  const data = YEARS.map((year, k) => ({ year, bono: run.bono[k], ief: run.ief[k] }));
+  const iefCross = run.ief.findIndex((v) => v > RESCUE_YIELD);
   const need = primaToRedLine(r);
   const differs = r !== levers.r || prima !== levers.prima;
 
@@ -64,6 +76,33 @@ export function BondCalculator() {
       <p className="bond-result" aria-live="polite">
         {nf(r, 2)} % + {nf(C.TERM, 2)} + {nf(prima, 0)} pb ÷ 100 ={" "}
         <b className={over ? "bad" : ""}>{nf(bono, 2)} %</b>
+      </p>
+
+      <div className="legend">
+        <span><i style={{ background: "var(--st-crossed)" }} />bono a 10 años (lo que cuesta la deuda nueva)</span>
+        <span><i style={{ background: "var(--lab)" }} />tipo medio que paga el Estado por toda su deuda</span>
+        <span><s style={{ borderColor: "var(--div-neg)" }} />línea roja del {nf(RESCUE_YIELD, 0)} %</span>
+      </div>
+      <ResponsiveContainer width="100%" height={220} initialDimension={{ width: 660, height: 220 }}>
+        <LineChart data={data} margin={{ top: 12, right: 12, bottom: 4, left: 0 }}>
+          <CartesianGrid stroke="var(--grid)" vertical={false} />
+          <XAxis dataKey="year" ticks={[YEARS[0], YEARS[12], YEARS[YEARS.length - 1]]}
+            tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false} axisLine={{ stroke: "var(--grid)" }} />
+          <YAxis width={48} tick={{ fontSize: 13.5, fill: "var(--ink-2)" }} tickLine={false} axisLine={false}
+            tickFormatter={(v: number) => nf(v, 0)} domain={[0, (max: number) => Math.max(8, Math.ceil(max + 0.5))]} />
+          <Tooltip formatter={(v, name) => [`${nf(Number(v), 2)} %`, name === "bono" ? "bono a 10 años" : "tipo medio de la deuda"]}
+            labelFormatter={(y) => `año ${y}`} />
+          <ReferenceLine y={RESCUE_YIELD} stroke="var(--div-neg)" strokeDasharray="4 3" />
+          <Line type="linear" dataKey="bono" stroke="var(--st-crossed)" strokeWidth={2} dot={false} isAnimationActive={false} />
+          <Line type="linear" dataKey="ief" stroke="var(--lab)" strokeWidth={2.4} dot={false} isAnimationActive={false} />
+        </LineChart>
+      </ResponsiveContainer>
+      <p className="muted" style={{ fontSize: 13.5, margin: "2px 0 8px" }}>
+        La línea plana es el bono: en el modelo lo fijan el Euríbor y la prima, que no
+        cambian con los años. La que se mueve es el tipo medio que paga el Estado por
+        toda su deuda: cada año sólo se renueva en torno al {nf(C.REFI * 100, 0)} % al
+        tipo nuevo, así que lo va notando poco a poco.
+        {iefCross >= 0 && ` Con estos valores, el tipo medio pasaría del ${nf(RESCUE_YIELD, 0)} % en ${YEARS[iefCross]}.`}
       </p>
 
       {over ? (

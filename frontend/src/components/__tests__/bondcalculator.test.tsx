@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { BondCalculator, bondYield, primaToRedLine } from "../BondCalculator";
-import { runScenario } from "../../engine/spain";
+import { runScenario, YEARS } from "../../engine/spain";
 import { BASE_LEVERS } from "../../engine/vintage";
 import { useScenarioStore } from "../../state/scenarioStore";
 
@@ -40,6 +40,24 @@ describe("BondCalculator", () => {
     render(<BondCalculator />);
     fireEvent.change(screen.getByLabelText("Euríbor a 12 meses"), { target: { value: "4.8" } });
     expect(screen.getByText(/la prima tendría que pasar de 203 pb para llegar a la línea roja/)).toBeInTheDocument();
+  });
+
+  it("charts the flat yield against the average rate, which catches up over the years", () => {
+    render(<BondCalculator />);
+    expect(screen.getByText(/bono a 10 años \(lo que cuesta la deuda nueva\)/)).toBeInTheDocument();
+    expect(screen.getByText("tipo medio que paga el Estado por toda su deuda")).toBeInTheDocument();
+    expect(screen.getByText(/La línea plana es el bono/)).toBeInTheDocument();
+    // At base the average rate never reaches 7 %: no year is named.
+    expect(screen.queryByText(/el tipo medio pasaría del 7 %/)).toBeNull();
+  });
+
+  it("names the year the average rate would pass 7 %, from the engine", () => {
+    render(<BondCalculator />);
+    fireEvent.change(screen.getByLabelText("Euríbor a 12 meses"), { target: { value: "6" } });
+    fireEvent.change(screen.getByLabelText("Prima de riesgo"), { target: { value: "150" } });
+    const ief = runScenario({ ...BASE_LEVERS, r: 6, prima: 150 }).ief;
+    const year = YEARS[ief.findIndex((v) => v > 7)];
+    expect(screen.getByText(new RegExp(`el tipo medio pasaría del 7 % en ${year}`))).toBeInTheDocument();
   });
 
   it("carries the values into the scenario when asked", () => {
