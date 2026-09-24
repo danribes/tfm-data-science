@@ -69,6 +69,23 @@ describe("illustrative budget conservation", () => {
     expect(screen.getByText(/El modelo no decide de dónde saldrían/)).toBeInTheDocument();
   });
 
+  it("marks spending past its 2020 record with a warning and a red zone", () => {
+    const { container } = render(<BudgetFlowChart levers={BASE_LEVERS} horizon={2050} />);
+    expect(screen.getByText(/por encima de su récord: el 51,4 % de 2020/)).toBeInTheDocument();
+    const zone = container.querySelector('[data-testid="record-zone"]')!;
+    expect(zone).toBeTruthy();
+    expect(zone.textContent).toContain("récord 2020: 51,4 % del PIB");
+    const rect = zone.querySelector("rect")!;
+    expect(Number(rect.getAttribute("height"))).toBeGreaterThan(0);
+  });
+
+  it("shows no danger zone while spending stays under the record", () => {
+    // 2030: about 47 % of GDP, under the 51,4 % of 2020.
+    const { container } = render(<BudgetFlowChart levers={BASE_LEVERS} horizon={2030} />);
+    expect(container.querySelector('[data-testid="record-zone"]')).toBeNull();
+    expect(screen.queryByText(/por encima de su récord/)).toBeNull();
+  });
+
   it("labels allocations as synthetic and follows the selected horizon", () => {
     const { rerender } = render(<BudgetFlowChart levers={BASE_LEVERS} horizon={2030} />);
     expect(screen.getByText(/conexiones proporcionales sintéticas/)).toBeInTheDocument();

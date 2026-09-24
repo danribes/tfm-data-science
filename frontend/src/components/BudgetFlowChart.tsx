@@ -4,6 +4,7 @@ import { runScenario } from "../engine/spain";
 import { nf } from "../lib/fmt";
 import { budgetFlows } from "./fiscalFlows";
 import { HowToRead } from "./HowToRead";
+import { GTOT_RECORD } from "../lib/historico";
 
 interface FlowLink {
   id: string;
@@ -88,6 +89,26 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
     };
   });
 
+  // Where spending passes its 2020 record in the right-hand stack: walk the
+  // spending nodes (not a surplus) until their running total reaches the
+  // record, and interpolate inside that node. Everything below it is spending
+  // Spain has never had.
+  let recordY: number | null = null;
+  let spendEnd = TOP_Y;
+  if (spending > GTOT_RECORD.value) {
+    let cum = 0;
+    for (const t of targets) {
+      if (t.id === "surplus") continue;
+      const pos = targetPositions[t.id];
+      if (!pos) continue;
+      if (recordY === null && cum + t.val >= GTOT_RECORD.value) {
+        recordY = pos.yStart + (GTOT_RECORD.value - cum) * SCALE;
+      }
+      cum += t.val;
+      spendEnd = pos.yStart + pos.h;
+    }
+  }
+
   const X_LEFT = 210;
   const X_RIGHT = 620;
   const X_MID = (X_LEFT + X_RIGHT) / 2;
@@ -148,6 +169,17 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
           déficit del escenario crece menos que eso: para que las cuentas cuadren, los
           ingresos tendrían que subir unos {nf(revenueGap, 1)} puntos de PIB respecto a
           2026. El modelo no decide de dónde saldrían.
+        </p>
+      )}
+
+      {recordY !== null && (
+        <p className="danger-note" role="note">
+          <span aria-hidden="true">⚠</span>{" "}
+          En {selectedYear} el gasto público llegaría al {nf(spending, 1)} % del PIB, por
+          encima de su récord: el {nf(GTOT_RECORD.value, 1)} % de {GTOT_RECORD.year}, en plena
+          pandemia. La zona roja de la derecha es el gasto que pasa de ese récord, empujado por
+          las pensiones y los intereses de la deuda. Cada punto de más habría que pagarlo con
+          impuestos o con más deuda.
         </p>
       )}
 
@@ -217,6 +249,21 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
               </g>
             );
           })}
+
+          {/* The danger zone: spending past its 2020 record, tinted, and the
+              record itself as a dashed line with its label. */}
+          {recordY !== null && (
+            <g data-testid="record-zone" pointerEvents="none">
+              <rect x={X_RIGHT} y={recordY} width={900 - X_RIGHT} height={Math.max(0, spendEnd - recordY)}
+                fill="var(--st-crossed)" fillOpacity={0.14} />
+              <line x1={X_RIGHT - 40} y1={recordY} x2={908} y2={recordY}
+                stroke="var(--st-crossed)" strokeWidth={2} strokeDasharray="6 4" />
+              <text x={X_RIGHT - 46} y={recordY + 4} textAnchor="end" fill="var(--st-crossed)"
+                fontSize="13" fontWeight="800" stroke="var(--surface)" strokeWidth={4} paintOrder="stroke">
+                ⚠ récord {GTOT_RECORD.year}: {nf(GTOT_RECORD.value, 1)} % del PIB
+              </text>
+            </g>
+          )}
         </svg>
       </div>
 
