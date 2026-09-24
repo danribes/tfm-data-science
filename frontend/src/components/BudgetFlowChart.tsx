@@ -3,6 +3,7 @@ import type { Levers } from "../engine/levers";
 import { runScenario } from "../engine/spain";
 import { nf } from "../lib/fmt";
 import { budgetFlows } from "./fiscalFlows";
+import { HowToRead } from "./HowToRead";
 
 interface FlowLink {
   id: string;
@@ -113,6 +114,17 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
           </select>
         </div>
       </div>
+
+      <HowToRead>
+        <p>
+          Adónde va el dinero público en el año que elijas, en % del PIB. A la
+          izquierda, de dónde sale: lo que se recauda con impuestos y cotizaciones,
+          y lo que falta, que se pide prestado (el déficit). A la derecha, en qué se
+          gasta: pensiones, sueldos públicos, intereses de la deuda… Cuanto más
+          gruesa es una banda, más dinero. Es un esquema: no dice qué impuesto paga
+          qué gasto.
+        </p>
+      </HowToRead>
 
       {/* Fuera de la fila de cabecera: dentro era un `span` en línea y se
           superponía al subtítulo. Las partidas están congeladas en su valor

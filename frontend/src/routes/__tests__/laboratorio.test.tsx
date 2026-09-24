@@ -24,7 +24,8 @@ describe("Laboratorio — series explorer + MC fan + raw levers", () => {
   it("changing the series redraws the projection chart", async () => {
     ui();
     await userEvent.selectOptions(screen.getByRole("combobox", { name: /serie/i }), "esf");
-    await waitFor(() => expect(screen.getByText(/esf ·/)).toBeInTheDocument());
+    // The heading names the series; the raw key is only the option value.
+    await waitFor(() => expect(screen.getByText(/Esfuerzo vivienda ·/)).toBeInTheDocument());
     expect(document.querySelectorAll("path.recharts-curve").length).toBeGreaterThanOrEqual(2);
   });
 
@@ -36,6 +37,27 @@ describe("Laboratorio — series explorer + MC fan + raw levers", () => {
     );
     expect(screen.getByText(/±2 pp/)).toBeInTheDocument();
     expect(screen.getByText(/4\.000 trayectorias/)).toBeInTheDocument();
+  });
+
+  it("names every series instead of showing its code", () => {
+    ui();
+    const options = [...screen.getByRole("combobox", { name: /serie/i }).querySelectorAll("option")];
+    expect(options.filter((o) => o.textContent === o.value).map((o) => o.value)).toEqual([]);
+  });
+
+  it("explains each block in plain language before the technical detail", async () => {
+    ui();
+    // intro, series, fan, levers, budget, debt bridge, sensitivity
+    expect(screen.getAllByText("Cómo leerlo").length).toBeGreaterThanOrEqual(7);
+    expect(screen.getByText(/Palanca/, { selector: "b" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("el futuro del medio")).toBeInTheDocument(), { timeout: 3000 });
+    expect(screen.queryByText("banda p5–p95")).not.toBeInTheDocument();
+  });
+
+  it("lever table says what each lever means", () => {
+    ui();
+    const rows = screen.getAllByRole("row");
+    expect(rows[1].textContent).toContain("Lo que cuesta pedir dinero prestado en Europa");
   });
 
   it("raw lever table shows current vs base (r: 2,80 both at boot)", () => {

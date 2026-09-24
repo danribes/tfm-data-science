@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { nf, sg } from "../lib/fmt";
 import { Caption } from "../components/Caption";
+import { HowToRead } from "./HowToRead";
 
 /** The empirical twin of the structural attribution.
  *
@@ -28,9 +29,30 @@ export function EmpiricalTwin() {
   return (
     <div className="card" style={{ marginTop: 16 }}>
       <h4>
-        El gemelo empírico · ¿pega igual un tipo al 60 % que al 120 % de deuda?
+        Comprobación con la historia · ¿frena más una subida de tipos cuando hay mucha deuda?
         <small>{nf(d.n, 0)} país-año · {nf(d.n_countries, 0)} países · {d.years[0]}–{d.years[1]}</small>
       </h4>
+
+      <HowToRead>
+        <p>
+          El modelo supone que una subida de tipos de interés frena la economía lo
+          mismo con poca que con mucha deuda. Para comprobarlo miramos lo que pasó
+          en {nf(d.n_countries, 0)} países entre {d.years[0]} y {d.years[1]}, con un
+          modelo de aprendizaje automático.
+        </p>
+        <p>
+          La tabla dice cuánto cambió el crecimiento de los {nf(d.horizon_years, 0)} años siguientes
+          por cada punto que subieron los tipos, según la deuda del país.{" "}
+          {d.state_dependent
+            ? "Los números son distintos según la deuda: el supuesto del modelo no se sostiene."
+            : "Los números no se distinguen entre sí: no hay pruebas de que la deuda cambie el efecto, y el supuesto del modelo aguanta."}
+        </p>
+        <p>
+          Las barras de la derecha dicen qué pesó más en el crecimiento del
+          pasado: cuanto más larga, más pesó. Es historia de otros países, no una
+          previsión para España.
+        </p>
+      </HowToRead>
 
       <details style={{ marginBottom: 10 }}>
         <summary style={{ fontSize: 13, color: "var(--muted)", cursor: "pointer", userSelect: "none" }}>
@@ -51,9 +73,9 @@ export function EmpiricalTwin() {
           <table className="guide-t" style={{ width: "100%" }}>
             <thead>
               <tr>
-                <th>Régimen</th>
-                <th className="num">pendiente SHAP</th>
-                <th className="num">n</th>
+                <th>Deuda del país</th>
+                <th className="num">efecto de 1 punto más de tipo</th>
+                <th className="num">casos</th>
               </tr>
             </thead>
             <tbody>
@@ -90,7 +112,7 @@ export function EmpiricalTwin() {
 
         <div>
           <p style={{ fontSize: 13.5, fontWeight: 700, margin: "0 0 6px" }}>
-            Qué movió el crecimiento a {nf(d.horizon_years, 0)} años,
+            Qué pesó más en el crecimiento a {nf(d.horizon_years, 0)} años,
             históricamente <span className="dim">(|SHAP| medio)</span>
           </p>
           {d.importance.map((i) => (

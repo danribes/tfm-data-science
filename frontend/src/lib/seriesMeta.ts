@@ -84,9 +84,18 @@ export const SERIES_LABEL: Record<string, string> = {
   sobre: "Sobrecarga vivienda", hip: "Nueva producción hipotecaria",
   bls: "BLS endurecimiento", vida: "Esperanza de vida",
   salmes: "Salario mensual", pb: "Saldo primario",
+  // las seis que el Laboratorio enseñaba sólo por su clave
+  lvl: "Nivel del PIB frente a la base", gnom: "PIB nominal",
+  wnom: "Salario nominal a/a", wreal: "Salario real a/a",
+  ief: "Tipo medio que paga la deuda", deficitAbs: "Déficit público (tamaño)",
   ...Object.fromEntries(TABLE_ROWS.map((r) => [r.k, r.lab])),
 };
 
 /** El nombre si se conoce; si no, la clave, que es lo que había antes y al
  *  menos no miente sobre qué serie se está pintando. */
 export const seriesLabel = (k: string): string => SERIES_LABEL[k] ?? k;
+
+/** La línea en llano de las ocho series de la tabla; `undefined` para el
+ *  resto, que es mejor que inventarse una definición. */
+export const seriesPlain = (k: string): string | undefined =>
+  TABLE_ROWS.find((r) => r.k === k)?.plain;

@@ -20,6 +20,13 @@ describe("EmpiricalTwin — el contraste del E_R constante", () => {
     expect(within(table).getByText("−0,020")).toBeInTheDocument();
   });
 
+  it("says the finding in plain words before the badge", async () => {
+    ui();
+    await waitFor(() => expect(screen.getByText("Cómo leerlo")).toBeInTheDocument());
+    expect(screen.getByText(/no hay pruebas de que la deuda cambie el efecto/)).toBeInTheDocument();
+    expect(screen.getByText(/no una previsión para España/)).toBeInTheDocument();
+  });
+
   it("renders the null as the finding, with the engine surviving", async () => {
     ui();
     await waitFor(() => expect(screen.getByText(/no distinguible/)).toBeInTheDocument());

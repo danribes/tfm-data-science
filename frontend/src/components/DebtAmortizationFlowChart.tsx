@@ -3,6 +3,7 @@ import type { Levers } from "../engine/levers";
 import { runScenario } from "../engine/spain";
 import { nf } from "../lib/fmt";
 import { debtRatioBridge } from "./fiscalFlows";
+import { HowToRead } from "./HowToRead";
 
 export function DebtAmortizationFlowChart({ levers, horizon = 2030 }: { levers: Levers; horizon?: number }) {
   const [selectedYear, setSelectedYear] = useState(horizon);
@@ -23,6 +24,16 @@ export function DebtAmortizationFlowChart({ levers, horizon = 2030 }: { levers: 
   ];
   return <div className="card" style={{ padding: 20, marginTop: 16 }}>
     <h4 style={{ marginTop: 0 }}>Deuda/PIB: saldo fiscal y efecto del crecimiento</h4>
+    <HowToRead>
+      <p>
+        Cómo cambia la deuda de un año al siguiente, medida frente al tamaño de la
+        economía. Se parte de la deuda del año anterior (primera caja). Que la
+        economía crezca, también por la inflación, hace que esa deuda pese menos
+        aunque no se devuelva nada: por eso la segunda caja suele ir en negativo.
+        El déficit del año, intereses incluidos, la aumenta (tercera caja); un
+        superávit la reduciría. La suma da la deuda al cierre del año (última caja).
+      </p>
+    </HowToRead>
     <p className="muted">Descomposición contable del escenario; cajas ilustrativas, sin escala de volumen. La variación de la ratio incorpora el cambio del denominador PIB.</p>
     <label htmlFor="flow-year-select">Año de proyección: </label>
     <select id="flow-year-select" value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
