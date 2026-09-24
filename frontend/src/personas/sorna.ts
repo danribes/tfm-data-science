@@ -1,7 +1,8 @@
 import { UP_IS_BAD } from "../components/KpiRow";
 
-/** «Y con un poco de sorna»: an ironic, colloquial line about what the
- *  scenario means for whoever asked, persona by persona.
+/** The ironic, colloquial line about what the scenario means for whoever
+ *  asked, persona by persona. It closes the «Y en corto» paragraph
+ *  (personas/enCorto.ts).
  *
  *  Three rules keep the joke honest:
  *  · It is picked, not generated: one line per persona and outcome (better,

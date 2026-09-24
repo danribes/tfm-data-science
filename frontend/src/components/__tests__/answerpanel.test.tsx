@@ -80,7 +80,7 @@ describe("AnswerPanel · qué cifra es la de cabecera", () => {
   });
 });
 
-describe("AnswerPanel · y con un poco de sorna", () => {
+describe("AnswerPanel · y en corto, con la sorna al final", () => {
   function panel(persona: string | undefined, shift: number) {
     const q = Q10.find((x) => x.series === "ujuv")!;
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -92,22 +92,26 @@ describe("AnswerPanel · y con un poco de sorna", () => {
       </QueryClientProvider>,
     );
   }
+  const paragraph = () => screen.getByText("Y en corto").parentElement!.querySelector("p")!.textContent!;
 
-  it("tells the young reader, ironically, what a worse youth rate means for them", () => {
+  it("one colloquial paragraph that ends on the young reader's ironic line", () => {
     panel("10", +2);
-    expect(screen.getByText("Y con un poco de sorna")).toBeInTheDocument();
-    expect(screen.getByText(/la habitación de tu infancia seguirá siendo tuya/)).toBeInTheDocument();
-    expect(screen.getByText(/no se lo reclames al simulador/)).toBeInTheDocument();
-  });
-
-  it("and a better one", () => {
-    panel("10", -2);
-    expect(screen.getByText(/igual hasta te independizas/)).toBeInTheDocument();
-  });
-
-  it("stays quiet without a persona", () => {
-    panel(undefined, +2);
+    const text = paragraph();
+    expect(text).toMatch(/^Resumiendo:/);
+    expect(text).toContain("no una bola de cristal");
+    expect(text.trim()).toMatch(/la comida de casa no tiene rival\.$/);
+    // The two blocks are one now.
     expect(screen.queryByText("Y con un poco de sorna")).not.toBeInTheDocument();
+  });
+
+  it("and the better-news line when the youth rate falls", () => {
+    panel("10", -2);
+    expect(paragraph().trim()).toMatch(/el casero también ha visto el escenario\.$/);
+  });
+
+  it("without a persona there is no joke to end on", () => {
+    panel(undefined, +2);
+    expect(paragraph().trim()).toMatch(/no una bola de cristal\.$/);
   });
 });
 

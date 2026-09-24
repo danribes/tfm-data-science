@@ -11,7 +11,8 @@ import { RagCorpusNotice } from "./RagCorpusNotice";
 import { MechanismText } from "./MechanismText";
 import { seriesLabel, seriesPlain } from "../lib/seriesMeta";
 import type { PersonaQuestion } from "../personas/questions";
-import { sorna } from "../personas/sorna";
+import { enCorto } from "../personas/enCorto";
+import { BASE_LEVERS } from "../engine/vintage";
 
 /** The only series the deep-learning backtest was run on. The layer shows
  *  under every question, but under any other one it says first that this
@@ -144,7 +145,17 @@ export function AnswerPanel({
   const value = seriesOf(scn, q.series)[k];
   const baseValue = seriesOf(base, q.series)[k];
   const delta = value - baseValue;
-  const ironia = sorna(persona, q.series, delta, SERIES_FORMAT[q.series]?.dec ?? 1, year);
+  // One paragraph from the numbers on screen, ending on the persona's
+  // ironic line; the breakdown joins in when /explain has answered.
+  const resumen = enCorto({
+    persona, series: q.series, companion: q.companion,
+    value, baseValue, today: seriesOf(base, q.series)[0], year, firstYear: YEARS[0],
+    companionValue: q.companion ? seriesOf(scn, q.companion)[k] : undefined,
+    companionBase: q.companion ? seriesOf(base, q.companion)[k] : undefined,
+    contributions: explain.isSuccess ? explain.data.contributions : undefined,
+    moved: (Object.keys(BASE_LEVERS) as (keyof typeof BASE_LEVERS)[])
+      .some((id) => Math.abs(levers[id] - BASE_LEVERS[id]) > 1e-9),
+  });
 
   return (
     <div className="answer">
@@ -387,23 +398,10 @@ export function AnswerPanel({
         </Layer>
       </div>
 
-      {explain.isSuccess && explain.data.coloquial && (
-        <div className="coloquial">
-          <span className="coloquial-lab">Y en corto</span>
-          <p>{explain.data.coloquial}</p>
-        </div>
-      )}
-
-      {ironia && (
-        <div className="coloquial sorna">
-          <span className="coloquial-lab">Y con un poco de sorna</span>
-          <p>{ironia}</p>
-          <p className="layer-note">
-            Ironía sobre un escenario condicional: si nada de esto pasa, no se lo
-            reclames al simulador.
-          </p>
-        </div>
-      )}
+      <div className="coloquial">
+        <span className="coloquial-lab">Y en corto</span>
+        <p>{resumen}</p>
+      </div>
 
       <div className="followups">
         <span className="followups-lab">Seguir preguntando</span>

@@ -423,7 +423,6 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .coloquial { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: flex; flex-direction: column; gap: 4px; }
 .coloquial-lab { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
 .coloquial p { margin: 0; font-size: 15.5px; line-height: 1.65; color: var(--ink-2); }
-.coloquial.sorna p:not(.layer-note) { font-style: italic; }
 
 /* --- «Cómo leerlo»: plain language before a technical chart --- */
 .howto { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; margin: 4px 0 12px; display: flex; flex-direction: column; gap: 6px; }
