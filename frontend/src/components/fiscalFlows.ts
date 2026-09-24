@@ -35,14 +35,14 @@ export function budgetFlows(scn: Scenario, k: number) {
   const partidas = PARTIDAS.map((p) => ({ ...p, val: scn[p.key]?.[k] }));
   const identificado = partidas.reduce((sum, p) => sum + (p.val ?? 0), 0);
   const other = spending - identificado;
-  // Las partidas pueden sumar MÁS que el gasto total, y a partir de 2035 lo
-  // hacen: el total está congelado en su valor observado —`gtot` es
-  // V0.gtot − sp, no evoluciona— igual que seis de las siete partidas,
-  // mientras las pensiones sí crecen con la demografía. Antes no se notaba
-  // porque sólo se pintaban tres partidas y su suma nunca llegaba al total.
+  // Antes las partidas sumaban MÁS que el gasto total a partir de 2035: el
+  // total estaba congelado (V0.gtot − sp) mientras pensiones e intereses
+  // crecían dentro de él. Ahora el total crece con esas dos partidas, así que
+  // la diferencia es constante (unos 4,3 puntos de «resto del gasto»).
   //
-  // Devolver null aquí haría desaparecer el gráfico justo en los años que más
-  // se miran. Se publica el descuadre para que la interfaz pueda decirlo.
+  // Si un cambio del motor volviera a romperlo, devolver null haría
+  // desaparecer el gráfico justo en los años que más se miran: se publica el
+  // descuadre para que la interfaz pueda decirlo.
   const exceso = Math.max(0, identificado - spending);
   if (![spending, balance, revenues, other].every(Number.isFinite)
     || spending <= 0 || revenues < 0

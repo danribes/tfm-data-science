@@ -38,6 +38,10 @@ export function runScenario(L: Levers): Scenario {
   let piDev = 0.0;
   let di = 0.0;
   let b = CENTRAL[Y0 - 1].deuda; // 105.6 (2025)
+  // Base-scenario interest bill in the first year, the anchor total spending
+  // grows from. With the levers at base di = 0 and gnom = g_nominal at k = 0,
+  // so this is exactly baseline().int[0]. Same formula as engine/spain.py.
+  const int0 = (CENTRAL[Y0 - 1].deuda * CENTRAL[Y0].r_efectivo) / 100 / (1 + CENTRAL[Y0].g_nominal / 100);
   let salIdx = 1.0;
   let wrIdx = 1.0;
   let pensFac = 1.0;
@@ -127,7 +131,11 @@ export function runScenario(L: Levers): Scenario {
     R.p2.push(V0.p2 - 0.125 * L.sp);
     R.d3.push(V0.d3 - 0.031 * L.sp);
     R.p51.push(V0.p51 - 0.145 * L.sp);
-    R.gtot.push(V0.gtot - 1.0 * L.sp);
+    // Total spending grows with the two items that do evolve — pensions and
+    // interest — instead of staying at its observed value while they grow
+    // inside it: frozen, the seven items summed past the total from 2035 and
+    // implied revenue (gtot + saldo) fell ten points by 2050.
+    R.gtot.push(V0.gtot - 1.0 * L.sp + (pens - V0.pens) + (intr - int0));
     R.bls.push(V0.bls + 12 * (L.r - B.r) + 2.5 * (u - V0.u));
     R.temp.push(V0.temp + 0.25 * (u - V0.u) - 1.5 * L.z);
     R.ujuv.push(C.RJUV * u);

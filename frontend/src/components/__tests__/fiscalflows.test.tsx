@@ -43,11 +43,11 @@ describe("illustrative budget conservation", () => {
   });
 
   it("reports a breakdown that exceeds total expenditure instead of hiding it", () => {
-    // Antes devolvía null y el gráfico desaparecía. Pero el desajuste no es un
-    // dato corrupto: es el estado real del modelo a partir de 2035, porque el
-    // gasto total y seis de las siete partidas están congelados en su valor
-    // observado y sólo las pensiones evolucionan. Hacer desaparecer el gráfico
-    // en los años que más se miran ocultaba justo eso.
+    // Antes devolvía null y el gráfico desaparecía. Fue el estado real del
+    // modelo a partir de 2035 mientras el gasto total estuvo congelado; ahora
+    // crece con pensiones e intereses y no ocurre (historico.test.ts lo
+    // comprueba en el motor). Este escenario artificial vigila que, si un
+    // cambio lo rompe, el gráfico lo diga en vez de desaparecer.
     const scn = budgetScenario(-1);
     scn.pens[0] = 45;
     const flow = budgetFlows(scn, 0)!;
@@ -60,6 +60,13 @@ describe("illustrative budget conservation", () => {
     const flow = budgetFlows(budgetScenario(-1), 0)!;
     expect(flow.exceso).toBe(0);
     expect(flow.identificado).toBeLessThan(flow.spending);
+  });
+
+  it("on the real engine the items fit in 2050, and the revenue the accounts need is said", () => {
+    render(<BudgetFlowChart levers={BASE_LEVERS} horizon={2050} />);
+    expect(screen.queryByText(/su suma, en este año, no cuadra/)).toBeNull();
+    expect(screen.getByText(/los ingresos tendrían que subir unos/)).toBeInTheDocument();
+    expect(screen.getByText(/El modelo no decide de dónde saldrían/)).toBeInTheDocument();
   });
 
   it("labels allocations as synthetic and follows the selected horizon", () => {

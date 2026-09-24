@@ -30,6 +30,9 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
     return <div className="card" role="status">Desglose presupuestario no disponible: las partidas del escenario no forman un presupuesto con importes no negativos.</div>;
   }
   const { sources, targets, links: linksRaw, revenues, spending, balance } = budget;
+  // How much more revenue the accounts need than in the first year: spending
+  // follows pensions and interest, the deficit comes from the central path.
+  const revenueGap = revenues - (scn.gtot[0] + scn.saldo[0]);
 
   // Exact proportional widths. Sources and uses have equal totals; the
   // individual ribbons are a synthetic allocation, not earmarked tax receipts.
@@ -126,18 +129,26 @@ export function BudgetFlowChart({ levers, horizon = 2030 }: { levers: Levers; ho
         </p>
       </HowToRead>
 
-      {/* Fuera de la fila de cabecera: dentro era un `span` en línea y se
-          superponía al subtítulo. Las partidas están congeladas en su valor
-          observado y las pensiones no, así que a partir de 2035 suman más que
-          el gasto total, que también está congelado. Callarlo sería peor. */}
+      {/* Pensiones e intereses evolucionan y el gasto total ya crece con
+          ellos (spain.ts), así que las partidas no pueden sumar más que el
+          total. El aviso queda por si un cambio del motor lo rompe: callarlo
+          sería peor que enseñarlo. */}
       {budget.exceso > 0.005 && (
         <div className="banner" style={{ fontSize: 12.5, fontWeight: 400, marginBottom: 14 }}>
           Las partidas suman {nf(budget.identificado, 1)} % del PIB,{" "}
-          {nf(budget.exceso, 1)} más que el gasto total del escenario. Seis de las siete
-          están congeladas en su valor observado y sólo las pensiones evolucionan, así que la
-          composición deja de cuadrar a partir de 2035. Cada partida es correcta; su suma no
-          es un presupuesto.
+          {nf(budget.exceso, 1)} más que el gasto total del escenario. Pensiones e intereses
+          evolucionan con la demografía y con la deuda; las otras cinco partidas se quedan en
+          su valor observado. Cada partida es correcta; su suma, en este año, no cuadra con el
+          total.
         </div>
+      )}
+      {revenueGap > 0.5 && (
+        <p className="muted" style={{ fontSize: 13, margin: "0 0 12px" }}>
+          En {selectedYear} el gasto total crece con las pensiones y los intereses, y el
+          déficit del escenario crece menos que eso: para que las cuentas cuadren, los
+          ingresos tendrían que subir unos {nf(revenueGap, 1)} puntos de PIB respecto a
+          2026. El modelo no decide de dónde saldrían.
+        </p>
       )}
 
       <div style={{ position: "relative", width: "100%", overflowX: "auto" }}>

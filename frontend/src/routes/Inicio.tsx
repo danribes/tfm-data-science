@@ -18,6 +18,7 @@ import { Portada } from "../components/Portada";
 import { SpainAmongOthers } from "../components/SpainAmongOthers";
 import { LeverSummary, ProjectionTable } from "../components/ProjectionTable";
 import { ParametricBand } from "../components/ParametricBand";
+import { GTOT_RECORD, recordCrossing } from "../lib/historico";
 import { HowComputed } from "../components/HowComputed";
 
 const HEADLINES: { k: "b" | "saldo" | "u" | "pi"; lab: string; at2050?: boolean }[] = [
@@ -31,6 +32,9 @@ export default function Inicio() {
   const redlines = useRedlines();
   const personas = usePersonas();
   const scn = useScenario();
+  // The year this scenario's public spending passes its 2020 record, which
+  // the spaghetti marks as the start of the danger zone.
+  const recordYear = recordCrossing(YEARS, scn.gtot);
   const levers = useScenarioStore((s) => s.levers);
   const mc = useMonteCarlo(levers, true);
   const horizon = useScenarioStore((s) => s.horizon);
@@ -113,7 +117,19 @@ export default function Inicio() {
                their labels collide; the 105 line has its own row in the red
                lines panel below, where it is legible. */
             thresholds={[{ value: 120, label: "120 %PIB · pico COVID 2020" }]}
+            danger={recordYear ? { from: recordYear, label: `${recordYear}: gasto récord` } : undefined}
           />
+        )}
+        {mc.data && recordYear && (
+          <p className="danger-note" role="note">
+            <span aria-hidden="true">⚠</span>{" "}
+            Desde {recordYear}, con tus palancas, el gasto público superaría su récord:
+            el {nf(GTOT_RECORD.value, 1)} % del PIB de {GTOT_RECORD.year}, en plena pandemia.
+            Lo empujan las pensiones y los intereses de la deuda, que crecen cada año.
+            A la derecha de la línea, la deuda avanza por un terreno que España no ha
+            pisado nunca, y cada punto de gasto de más habría que pagarlo con
+            impuestos o con más deuda.
+          </p>
         )}
         <Caption>
           Cada hebra es una trayectoria simulada bajo los supuestos del modelo.

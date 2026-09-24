@@ -1,5 +1,5 @@
 import {
-  CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { nf } from "../lib/fmt";
 
@@ -19,12 +19,16 @@ export function SpaghettiChart({
   paths,
   median,
   thresholds = [],
+  danger,
   height = 260,
 }: {
   years: number[];
   paths: number[][];
   median?: number[];
   thresholds?: { value: number; label: string }[];
+  /** From this year on, a shaded zone and a ⚠ line: the danger the page
+   *  explains in words underneath (public spending past its record). */
+  danger?: { from: number; label: string };
   height?: number;
 }) {
   if (paths.length === 0 || years.length === 0) return null;
@@ -59,6 +63,31 @@ export function SpaghettiChart({
             width={56}
             tickFormatter={(v: number) => nf(v, 0)}
           />
+          {danger && years.includes(danger.from) && (
+            <ReferenceArea
+              x1={danger.from}
+              x2={years[years.length - 1]}
+              fill="var(--st-crossed)"
+              fillOpacity={0.08}
+              stroke="none"
+              ifOverflow="visible"
+            />
+          )}
+          {danger && years.includes(danger.from) && (
+            <ReferenceLine
+              x={danger.from}
+              stroke="var(--st-crossed)"
+              strokeDasharray="5 3"
+              strokeWidth={1.5}
+              label={{
+                value: `⚠ ${danger.label}`,
+                position: "insideTopRight",
+                fill: "var(--st-crossed)",
+                fontSize: 13.5,
+                fontWeight: 700,
+              }}
+            />
+          )}
           {thresholds.map((t) => (
             <ReferenceLine
               key={t.label}

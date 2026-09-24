@@ -372,3 +372,19 @@ def test_housing_zero_and_full_reversion_have_distinct_boundary_behavior():
     # The base price is observed at t; applying t's growth again double-counts it.
     assert immediate["precio"][0] == c.V0["precio"]
     assert immediate["precio"][1] == pytest.approx(c.V0["precio"] * 1.02)
+
+
+def test_total_spending_grows_with_pensions_and_interest():
+    """gtot used to stay at its observed 45,4 % while pensions and interest grew
+    inside it, so from 2035 the seven budget items summed past the total and
+    implied revenue fell ten points by 2050. It now follows those two items."""
+    run = baseline()
+    assert run["gtot"][0] == pytest.approx(45.4)
+    for k in range(1, len(run["gtot"])):
+        grown = (run["pens"][k] - run["pens"][0]) + (run["int"][k] - run["int"][0])
+        assert run["gtot"][k] - run["gtot"][0] == pytest.approx(grown)
+    items = ("pens", "int", "d1", "p2", "edu", "p51", "d3")
+    for levers in (Levers(), Levers(r=6.0, dem=1.0, idx=1.0), Levers(sp=4.0)):
+        r = run_scenario(levers)
+        for k in range(len(r["gtot"])):
+            assert sum(r[i][k] for i in items) < r["gtot"][k]

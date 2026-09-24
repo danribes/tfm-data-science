@@ -95,6 +95,11 @@ def run_scenario(
 
     lvl = 0.0; pi_dev = 0.0; di = 0.0
     b = central[Y0 - 1]["deuda"]                      # 105.6 (2025)
+    # Base-scenario interest bill in the first year, the anchor total spending
+    # grows from. With the levers at base di = 0 and gnom = g_nominal at k = 0,
+    # so this is exactly the first value of baseline()["int"].
+    int0 = (central[Y0 - 1]["deuda"] * central[Y0]["r_efectivo"] / 100
+            / (1 + central[Y0]["g_nominal"] / 100))
     sal_idx = 1.0; wr_idx = 1.0; pens_fac = 1.0; nom_idx = 1.0
     # Contrafactual: el mismo escenario con la indexación en su valor base.
     # La diferencia entre los dos es lo que la palanca añade o quita de gasto,
@@ -197,7 +202,11 @@ def run_scenario(
         R["p2"].append(V0["p2"] - 0.125 * L.sp)
         R["d3"].append(V0["d3"] - 0.031 * L.sp)
         R["p51"].append(V0["p51"] - 0.145 * L.sp)
-        R["gtot"].append(V0["gtot"] - 1.0 * L.sp)
+        # Total spending grows with the two items that do evolve — pensions
+        # and interest — instead of staying at its observed value while they
+        # grow inside it: frozen, the seven items summed past the total from
+        # 2035 and implied revenue (gtot + saldo) fell ten points by 2050.
+        R["gtot"].append(V0["gtot"] - 1.0 * L.sp + (pens - V0["pens"]) + (intr - int0))
         R["bls"].append(V0["bls"] + 12 * (L.r - B["r"]) + 2.5 * (u - V0["u"]))
         R["temp"].append(V0["temp"] + 0.25 * (u - V0["u"]) - 1.5 * L.z)
         R["ujuv"].append(c.RJUV * u)
