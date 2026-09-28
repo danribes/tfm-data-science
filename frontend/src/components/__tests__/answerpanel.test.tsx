@@ -1,7 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
+import { DEFAULT_RAG_API_BASE } from "../../api/client";
+import { server } from "../../test/msw/server";
 import { AnswerPanel } from "../AnswerPanel";
 import { baseline } from "../../engine/spain";
 import { Q02, Q03, Q10 } from "../../personas/questions";
@@ -16,6 +19,43 @@ function ui(q: PersonaQuestion, all: PersonaQuestion[]) {
     </QueryClientProvider>,
   );
 }
+
+describe("AnswerPanel · capa de fuentes cuando el servicio se reinicia", () => {
+  // Hugging Face contesta 502 con una página HTML mientras el contenedor del
+  // Space arranca o se reinicia tras un despliegue. No es la API quien falla,
+  // y enseñar «HTTP 502» como respuesta definitiva deja la capa rota.
+  const q = Q03.find((x) => x.concept === "esfuerzo hipotecario de los hogares")!;
+  const open = () => userEvent.click(screen.getByRole("button", { name: /Fuentes sobre/ }));
+
+  it("reintenta un 502 del proxy y acaba enseñando los pasajes", async () => {
+    let calls = 0;
+    server.use(http.post(`${DEFAULT_RAG_API_BASE}/rag/search`, () => {
+      calls += 1;
+      if (calls === 1) {
+        return new HttpResponse("<html>502 Bad Gateway</html>",
+          { status: 502, headers: { "Content-Type": "text/html" } });
+      }
+      return undefined; // el siguiente intento lo atiende el mock normal
+    }));
+    ui(q, Q03);
+    await open();
+    expect(await screen.findByText(/Documento Ocasional 1803/)).toBeInTheDocument();
+    expect(screen.queryByText(/No se ha podido consultar el corpus/)).toBeNull();
+    expect(calls).toBe(2);
+  });
+
+  it("no reintenta un error que la API explica: lo enseña a la primera", async () => {
+    let calls = 0;
+    server.use(http.post(`${DEFAULT_RAG_API_BASE}/rag/search`, () => {
+      calls += 1;
+      return HttpResponse.json({ detail: "La biblioteca no está disponible." }, { status: 503 });
+    }));
+    ui(q, Q03);
+    await open();
+    expect(await screen.findByText(/La biblioteca no está disponible/)).toBeInTheDocument();
+    expect(calls).toBe(1);
+  });
+});
 
 describe("AnswerPanel · capa del modelo de aprendizaje profundo", () => {
   it("under a house-price question, states the scored window and not the held-out tail", async () => {
