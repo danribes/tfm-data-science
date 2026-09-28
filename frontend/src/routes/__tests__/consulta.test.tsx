@@ -65,6 +65,28 @@ afterEach(() => {
   setRagConnection(null);
 });
 
+describe("Consulta — el Space se está reiniciando al preguntar", () => {
+  it("un 502 del proxy no llega a la pantalla: se reintenta y llega la respuesta", async () => {
+    advertise([METHOD, PUBLIC]);
+    let calls = 0;
+    server.use(http.post(`${DEFAULT_RAG_API_BASE}/rag/chat/stream`, () => {
+      calls += 1;
+      return calls === 1
+        ? new HttpResponse("<html>502 Bad Gateway</html>", { status: 502, headers: { "Content-Type": "text/html" } })
+        : answerStream();
+    }));
+    ui();
+
+    expect(await screen.findByText(`● ${PUBLIC.label}`)).toBeInTheDocument();
+    await userEvent.type(screen.getByRole("textbox", { name: "Pregunta económica" }), "¿Cómo responde la actividad?");
+    await userEvent.click(screen.getByRole("button", { name: "Preguntar" }));
+
+    expect(await screen.findByText(ANSWER)).toBeInTheDocument();
+    expect(screen.queryByText(/No se pudo consultar la biblioteca/)).not.toBeInTheDocument();
+    expect(calls).toBe(2);
+  });
+});
+
 describe("Consulta — available library service", () => {
   it.each([
     { state: "missing", collections: [METHOD, PUBLIC] },

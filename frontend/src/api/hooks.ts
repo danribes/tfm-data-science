@@ -1,7 +1,9 @@
 import { QueryClient, keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import type { Levers } from "../engine/levers";
-import { ApiError, api, getRagConnection, subscribeRagConnection } from "./client";
+import {
+  GATEWAY_RETRIES, api, gatewayRetryDelay, getRagConnection, isGatewayHiccup, subscribeRagConnection,
+} from "./client";
 import type { RagCollection } from "./types";
 
 export const queryClient = new QueryClient({
@@ -32,21 +34,10 @@ export const useEvidence = () => useQuery({ queryKey: ["evidence"], queryFn: api
 export const useRagConnection = () =>
   useSyncExternalStore(subscribeRagConnection, getRagConnection, getRagConnection);
 
-/** A 502, 503 or 504 with no `detail` of ours is Hugging Face's proxy while the
- *  Space restarts after a deploy or wakes up: the API never sent it. Shown as
- *  «HTTP 502» it looked like a broken library for a server that was merely
- *  restarting. A refusal the API explains — library missing, credential
- *  rejected — is final and shown at once: retrying it only delays the reason. */
-const GATEWAY = new Set([502, 503, 504]);
-export const isGatewayHiccup = (error: unknown) =>
-  error instanceof ApiError && GATEWAY.has(error.status ?? 0) && error.detail === `HTTP ${error.status}`;
-
-// Same patience as useHealth: about two minutes, enough for a Space restart.
+// Library queries retry a gateway hiccup, and only that (see isGatewayHiccup).
 const RAG_RETRY = {
-  retry: (failures: number, error: unknown) =>
-    failures < (import.meta.env.MODE === "test" ? 2 : 24) && isGatewayHiccup(error),
-  retryDelay: (attempt: number) =>
-    import.meta.env.MODE === "test" ? 5 : Math.min(1500 * (attempt + 1), 5000),
+  retry: (failures: number, error: unknown) => failures < GATEWAY_RETRIES && isGatewayHiccup(error),
+  retryDelay: gatewayRetryDelay,
 };
 
 export function useRagCollections(enabled = true) {

@@ -172,6 +172,43 @@ async function response(endpoint: string, init?: RequestInit, rag = false): Prom
   return res;
 }
 
+/** A 502, 503 or 504 with no `detail` of ours is Hugging Face's proxy while the
+ *  Space restarts after a deploy or wakes up: the API never sent it. Shown as
+ *  «HTTP 502» it looked like a broken library for a server that was merely
+ *  restarting. A refusal the API explains — library missing, credential
+ *  rejected — is final and shown at once: retrying it only delays the reason. */
+const GATEWAY = new Set([502, 503, 504]);
+export const isGatewayHiccup = (error: unknown) =>
+  error instanceof ApiError && GATEWAY.has(error.status ?? 0) && error.detail === `HTTP ${error.status}`;
+
+// Same patience as the health probe: about two minutes, enough for a restart.
+export const GATEWAY_RETRIES = import.meta.env.MODE === "test" ? 2 : 24;
+export const gatewayRetryDelay = (attempt: number) =>
+  import.meta.env.MODE === "test" ? 5 : Math.min(1500 * (attempt + 1), 5000);
+
+function wait(ms: number, signal?: AbortSignal | null): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason);
+    const onAbort = () => { clearTimeout(timer); reject(signal!.reason); };
+    const timer = setTimeout(() => { signal?.removeEventListener("abort", onAbort); resolve(); }, ms);
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+/** Open a request, retrying only a gateway hiccup. Safe for a stream: a
+ *  retry happens before any byte of the answer has been read, so nothing the
+ *  reader has already seen can arrive twice. */
+async function responseWithRetry(endpoint: string, init?: RequestInit, rag = false): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await response(endpoint, init, rag);
+    } catch (error) {
+      if (attempt >= GATEWAY_RETRIES || !isGatewayHiccup(error)) throw error;
+      await wait(gatewayRetryDelay(attempt), init?.signal);
+    }
+  }
+}
+
 async function request<T>(endpoint: string, init?: RequestInit, rag = false): Promise<T> {
   return (await (await response(endpoint, init, rag)).json()) as T;
 }
@@ -238,7 +275,7 @@ export async function ragChatStream(
   handlers: RagStreamHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
-  const res = await response("/rag/chat/stream", {
+  const res = await responseWithRetry("/rag/chat/stream", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
