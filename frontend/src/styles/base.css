@@ -275,7 +275,7 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .biblio-eg button { border: 1px dashed var(--grid); background: none; color: var(--muted); border-radius: var(--rad-chip); padding: 5px 12px; font-size: 13px; cursor: pointer; font-family: inherit; text-align: left; }
 .biblio-eg button:hover { border-color: var(--accent); color: var(--accent); }
 
-.biblio-answer { font-size: 16.5px; line-height: 1.7; color: var(--ink); margin: 0 0 var(--sp-1); white-space: pre-wrap; }
+.biblio-answer { font-size: 16.5px; line-height: 1.7; color: var(--ink); margin: 0 0 var(--sp-1); }
 .biblio-src { margin-top: var(--sp-1); }
 .biblio-prov { font-size: 12px; color: var(--muted); margin: var(--sp-1) 0 0; }
 
@@ -369,8 +369,12 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .consulta-thread { display: flex; flex-direction: column; gap: var(--sp-1); }
 .consulta-q { font-size: 15px; font-weight: 600; color: var(--ink-2); margin: 0; }
 .consulta-a { font-size: 16px; line-height: 1.75; color: var(--ink); }
-.consulta-a p { margin: 0 0 8px; }
-.consulta-a p:last-child { margin: 0; }
+.consulta-a p, .biblio-answer p,
+.consulta-a ul, .biblio-answer ul,
+.consulta-a ol, .biblio-answer ol { margin: 0 0 8px; }
+.consulta-a ul, .biblio-answer ul, .consulta-a ol, .biblio-answer ol { padding-left: 1.4em; }
+.consulta-a li, .biblio-answer li { margin: 0 0 4px; }
+.consulta-a > :last-child, .biblio-answer > :last-child { margin-bottom: 0; }
 .thinking { color: var(--muted); font-size: 14px; }
 .cursor { animation: exp-pulse .8s ease-in-out infinite; }
 .consulta-passages { margin-top: 6px; font-size: 13.5px; }

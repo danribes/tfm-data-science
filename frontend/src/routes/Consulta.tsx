@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ragChatStream } from "../api/client";
 import { selectRagCollection, useRagCollections, useRagConnection } from "../api/hooks";
+import { AnswerText } from "../components/AnswerText";
 import { RagConnectionSettings } from "../components/RagConnectionSettings";
 import { PUBLIC_RAG_EXAMPLES, RagCorpusNotice } from "../components/RagCorpusNotice";
 import { limpiarPasaje, marcarFragmento } from "../lib/passageText";
@@ -190,9 +191,7 @@ export default function Consulta() {
             {(answerText || busy) && (
               <div ref={answerRef} className="consulta-a">
                 {answerText
-                  ? answerText.split("\n").map((line, i) => (
-                      <p key={i}>{line}</p>
-                    ))
+                  ? <AnswerText text={answerText} />
                   : <span className="thinking">Buscando en el corpus…</span>}
                 {busy && answerText && <span className="cursor">▌</span>}
               </div>

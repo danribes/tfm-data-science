@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AnswerText } from "../components/AnswerText";
 import { RagReportCard } from "../components/RagReportCard";
 import { ragChatStream } from "../api/client";
 import { selectRagCollection, useRagCollections, useRagConnection } from "../api/hooks";
@@ -250,10 +251,10 @@ export default function Biblioteca() {
           </h4>
 
           {answerText ? (
-            <p className="biblio-answer" aria-live="polite">
-              {answerText}
+            <div className="biblio-answer" aria-live="polite">
+              <AnswerText text={answerText} />
               {busy && <span className="biblio-caret" aria-hidden="true" />}
-            </p>
+            </div>
           ) : (
             <p className="biblio-pending" aria-live="polite">
               <span className="biblio-dots" aria-hidden="true" />
