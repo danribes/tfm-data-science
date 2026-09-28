@@ -1,0 +1,193 @@
+{
+  "vintage": "2026-07-31",
+  "checked": "2026-09-22",
+  "sources": [
+    {
+      "file": "eurostat_hicp_manr_es.json",
+      "agency": "Eurostat",
+      "series": "IPCA, tasa anual (España y UE-27)",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 22215,
+      "bytes_after": 22215,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_une_rt_m_es.json",
+      "agency": "Eurostat",
+      "series": "Tasa de paro mensual, total y menores de 25",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 32010,
+      "bytes_after": 32107,
+      "signal": "size_changed"
+    },
+    {
+      "file": "eurostat_gdp_q_es.json",
+      "agency": "Eurostat",
+      "series": "PIB trimestral",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 11172,
+      "bytes_after": 11172,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_gov_debt_es.json",
+      "agency": "Eurostat",
+      "series": "Deuda pública, % del PIB",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 4828,
+      "bytes_after": 4828,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_gov_deficit_es.json",
+      "agency": "Eurostat",
+      "series": "Saldo público, % del PIB",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 3763,
+      "bytes_after": 3763,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_hpi_q_es.json",
+      "agency": "Eurostat",
+      "series": "Índice de precios de vivienda (IPV)",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 7360,
+      "bytes_after": 7360,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_overburden_es.json",
+      "agency": "Eurostat",
+      "series": "Sobrecarga por coste de la vivienda",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 4114,
+      "bytes_after": 4114,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_arop_child_es.json",
+      "agency": "Eurostat",
+      "series": "Riesgo de pobreza infantil",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 5140,
+      "bytes_after": 5140,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_pensions_pcgdp_es.json",
+      "agency": "Eurostat",
+      "series": "Gasto en pensiones, % del PIB",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 18295,
+      "bytes_after": 18736,
+      "signal": "size_changed"
+    },
+    {
+      "file": "eurostat_gov_edu_es.json",
+      "agency": "Eurostat",
+      "series": "Gasto público por funciones (educación)",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 4295,
+      "bytes_after": 4295,
+      "signal": "same_size"
+    },
+    {
+      "file": "eurostat_temp_share_es.json",
+      "agency": "Eurostat",
+      "series": "Temporalidad del empleo",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 7624,
+      "bytes_after": 7676,
+      "signal": "size_changed"
+    },
+    {
+      "file": "ecb_bono10y_es.csv",
+      "agency": "ECB SDW",
+      "series": "Bono a 10 años, España",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 114469,
+      "bytes_after": 98537,
+      "signal": "size_changed"
+    },
+    {
+      "file": "ecb_bono10y_de.csv",
+      "agency": "ECB SDW",
+      "series": "Bono a 10 años, Alemania",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 114894,
+      "bytes_after": 103217,
+      "signal": "size_changed"
+    },
+    {
+      "file": "ecb_euribor12m.csv",
+      "agency": "ECB SDW",
+      "series": "Euríbor a 12 meses",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 117628,
+      "bytes_after": 93614,
+      "signal": "size_changed"
+    },
+    {
+      "file": "ine_ipc_general.json",
+      "agency": "INE Tempus3",
+      "series": "IPC general",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 40559,
+      "bytes_after": 40559,
+      "signal": "same_size"
+    },
+    {
+      "file": "wb_self_employment.json",
+      "agency": "World Bank",
+      "series": "Autoempleo, % del empleo",
+      "kind": "source",
+      "status": "ok",
+      "bytes_before": 16544,
+      "bytes_after": 16344,
+      "signal": "size_changed"
+    },
+    {
+      "file": "analog_panel",
+      "agency": "Derivado",
+      "series": "Panel de análogos históricos",
+      "kind": "derived",
+      "status": "skipped: derived artifact or no downloadable HTTP(S) URL",
+      "bytes_before": 624686,
+      "bytes_after": null,
+      "signal": "derived"
+    },
+    {
+      "file": "analog_stats",
+      "agency": "Derivado",
+      "series": "Estadísticos del panel de análogos",
+      "kind": "derived",
+      "status": "skipped: derived artifact or no downloadable HTTP(S) URL",
+      "bytes_before": 606,
+      "bytes_after": null,
+      "signal": "derived"
+    }
+  ],
+  "counts": {
+    "sources": 16,
+    "ok": 16,
+    "error": 0,
+    "attention": 7,
+    "derived": 2
+  }
+}

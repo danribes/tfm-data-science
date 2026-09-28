@@ -15,6 +15,7 @@ import Biblioteca from "./routes/Biblioteca";
 import Consulta from "./routes/Consulta";
 import ComoFunciona from "./routes/ComoFunciona";
 import Evidencia from "./routes/Evidencia";
+import Fuentes from "./routes/Fuentes";
 import Prediccion from "./routes/Prediccion";
 import Inicio from "./routes/Inicio";
 import Laboratorio from "./routes/Laboratorio";
@@ -106,6 +107,7 @@ function Shell() {
           <NavLink to="/prediccion">Predicción</NavLink>
           <NavLink to="/como-funciona">Cómo funciona</NavLink>
           <NavLink to="/metodologia">Datos y método</NavLink>
+          <NavLink to="/fuentes">Estado de las fuentes</NavLink>
         </nav>
         <span style={{ marginLeft: "auto" }} className="badge-fwd">vintage {health.data.vintage}</span>
         <ThemeToggle />
@@ -130,6 +132,7 @@ function Shell() {
             <Route path="/prediccion" element={<Prediccion />} />
             <Route path="/como-funciona" element={<ComoFunciona />} />
             <Route path="/metodologia" element={<Metodologia />} />
+            <Route path="/fuentes" element={<Fuentes />} />
           </Routes>
         </main>
       </div>

@@ -53,6 +53,14 @@ python scripts/diff_vintage.py data/vintages/2026-09-22 data/vintages/2026-10-04
 Dice qué se ha movido en el origen: fuentes cambiadas, altas, bajas y fallos de
 red. Devuelve 1 si hay algo que revisar, de modo que encadena en un script.
 
+La página «Estado de las fuentes» de la aplicación muestra la última
+comprobación frente al vintage congelado. Es una instantánea versionada, no una
+consulta en vivo; se regenera con:
+
+```bash
+PYTHONPATH=. python tools/gen_sources_status.py
+```
+
 Aquí hay una limitación heredada que conviene conocer antes de que la encuentre
 otro. El vintage congelado **no guarda el sha256 de sus descargas originales**
 —16 de las 18 filas de `data/gold/manifest.csv` lo tienen vacío— y los ficheros
