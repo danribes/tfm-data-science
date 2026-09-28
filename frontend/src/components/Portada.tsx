@@ -80,7 +80,7 @@ export function Portada() {
         {vintage.isSuccess ? (
           <>
             Corte de datos <b>{vintage.data.vintage}</b> ·{" "}
-            {nf(vintage.data.n_files, 0)} fuentes congeladas
+            {nf(vintage.data.n_files, 0)} descargas
           </>
         ) : (
           <>Corte de datos congelado</>

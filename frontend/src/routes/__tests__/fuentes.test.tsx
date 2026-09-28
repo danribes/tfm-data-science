@@ -51,6 +51,43 @@ describe("Estado de las fuentes — un tablero que no finge", () => {
     expect(button).toBeEnabled();
   });
 
+  describe("todas las fuentes de datos", () => {
+    const { catalog } = snapshot;
+    const n = catalog.sources.length;
+    const agencies = Object.keys(catalog.by_agency).length;
+
+    it("cuenta fuentes distintas, no descargas, y lo explica", () => {
+      render(<Fuentes />);
+      expect(screen.getByText(new RegExp(`${n} fuentes de datos distintas, de ${agencies} organismos`)))
+        .toBeInTheDocument();
+      expect(screen.getByText(new RegExp(`${catalog.downloads} descargas`))).toBeInTheDocument();
+      const list = screen.getByRole("list", { name: "Fuentes por organismo" });
+      expect(within(list).getAllByRole("listitem")).toHaveLength(agencies);
+    });
+
+    it("la lista completa sólo se abre con el botón, y se vuelve a cerrar", async () => {
+      const user = userEvent.setup();
+      const fetchSpy = vi.spyOn(globalThis, "fetch");
+      render(<Fuentes />);
+      expect(screen.queryByRole("table", { name: "Todas las fuentes de datos" })).toBeNull();
+
+      const button = screen.getByRole("button", { name: `Ver las ${n} fuentes` });
+      expect(button).toHaveAttribute("aria-expanded", "false");
+      await user.click(button);
+
+      const table = screen.getByRole("table", { name: "Todas las fuentes de datos" });
+      expect(within(table).getAllByRole("row")).toHaveLength(n + 1);
+      // Cada fila enlaza a su origen, y ninguna URL se inventa ni se pierde.
+      const hrefs = within(table).getAllByRole("link").map((a) => a.getAttribute("href"));
+      expect(new Set(hrefs)).toEqual(new Set(catalog.sources.map((s) => s.url)));
+      expect(button).toHaveAttribute("aria-expanded", "true");
+
+      await user.click(screen.getByRole("button", { name: `Ocultar las ${n} fuentes` }));
+      expect(screen.queryByRole("table", { name: "Todas las fuentes de datos" })).toBeNull();
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
   it("el botón es un prototipo: explica los pasos y no toca la red", async () => {
     const user = userEvent.setup();
     const fetchSpy = vi.spyOn(globalThis, "fetch");

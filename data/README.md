@@ -77,14 +77,35 @@ Se conservan congelados por trazabilidad, pero ningún código los lee:
   sabe volver a descargar y los 2 artefactos derivados. 16 de las 18 filas no
   tienen `sha256`, así que contra este vintage sólo se puede comparar el
   tamaño.
-- **`gold/provenance_vintage_manifest.csv`**, 141 filas: las descargas
-  originales del 18 y 19 de julio de 2026. Es la cifra de «141 fuentes
-  congeladas» de la portada. Por organismo: 75 ficheros de licencias de obra
-  del Ministerio de Transportes, 42 de Eurostat, 8 del FMI (WEO), 4 del INE, 3
-  de la OCDE, 2 del BIS, 2 de FHFA, 2 de clasificación del suelo (SIU), y uno
-  de Zillow, uno del Land Registry británico y uno de la encuesta de préstamos
-  del BCE. **Ninguna de sus URL coincide con las del manifiesto**, y ninguna se
-  vuelve a descargar.
+- **`gold/provenance_vintage_manifest.csv`**, 141 filas: el registro de las
+  descargas originales del 18 y 19 de julio de 2026. Es la cifra de «141
+  descargas» de la portada. Son descargas, no fuentes: hay **85 fuentes
+  distintas**, porque algunos ficheros se descargaron hasta siete veces. Una
+  fuente es una URL y un nombre, no sólo una URL: 11 series de Eurostat
+  comparten la URL de `gov_10a_main` porque el registro no anotó sus
+  parámetros, y cada una tiene su nombre y su tamaño. Los ficheros crudos no se
+  conservaron; lo congelado son las tablas construidas con ellos.
+
+  | Organismo | Descargas | Fuentes distintas |
+  |---|---:|---:|
+  | Ministerio de Transportes (licencias de obra) | 75 | 24 |
+  | Eurostat | 42 | 41 |
+  | FMI (WEO) | 8 | 6 |
+  | INE | 4 | 3 |
+  | OCDE | 3 | 2 |
+  | Ministerio de Vivienda (clasificación del suelo, SIU) | 2 | 2 |
+  | BIS | 2 | 2 |
+  | FHFA (EE. UU.) | 2 | 2 |
+  | BCE (encuesta de préstamos bancarios) | 1 | 1 |
+  | Zillow (EE. UU.) | 1 | 1 |
+  | HM Land Registry (Reino Unido) | 1 | 1 |
+  | **Total** | **141** | **85** |
+
+  **Ninguna de sus URL coincide con las del manifiesto**, y ninguna se vuelve
+  a descargar. Sumadas las 16 del manifiesto, son **101 fuentes de datos
+  distintas de 12 organismos**; la página «Estado de las fuentes» las lista
+  todas. Las cuenta `tools/gen_sources_status.py`, no esta tabla: si cambian,
+  la página cambia con ellas.
 
 Que haya dos inventarios que no se solapan es herencia del proyecto anterior,
 no un diseño. Unificarlos exige reconstruir las tablas `gold` desde las

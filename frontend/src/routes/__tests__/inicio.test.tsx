@@ -22,7 +22,9 @@ describe("Inicio — headline figures + global semaphore + persona cards", () =>
 
   it("shows vintage/coverage banner and the four headline figures at base", async () => {
     ui();
-    await waitFor(() => expect(screen.getByText(/141 fuentes/)).toBeInTheDocument());
+    // 141 son descargas registradas, no fuentes: hay 75 URL distintas en ellas.
+    await waitFor(() => expect(screen.getByText(/141 descargas/)).toBeInTheDocument());
+    expect(screen.queryByText(/141 fuentes/)).toBeNull();
     // La portada lo dice como «Corte de datos», que es lo que significa.
     // Lo que la prueba defiende es que el corte esté a la vista, no la
     // palabra concreta: una página sin corte de datos se lee como actual.

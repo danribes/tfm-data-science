@@ -32,10 +32,20 @@ const INVENTORY = "https://github.com/danribes/tfm-data-science/blob/main/data/R
 
 const bytes = (b: number | null) => (b === null ? "—" : `${nf(b, 0)} B`);
 
+const INVENTORY_LABEL: Record<string, string> = {
+  manifest: "descargable",
+  original: "registro de julio",
+};
+
 export default function Fuentes() {
   const [reviewed, setReviewed] = useState(false);
   const [open, setOpen] = useState(false);
-  const { vintage, checked, counts } = snapshot;
+  const [showAll, setShowAll] = useState(false);
+  const { vintage, checked, counts, catalog } = snapshot;
+  const nAll = catalog.sources.length;
+  const agencies = Object.entries(catalog.by_agency);
+  const nOriginal = catalog.sources.filter((s) => s.inventory === "original").length;
+  const maxRepeats = Math.max(...catalog.sources.map((s) => s.downloads));
   const sources = [...snapshot.sources].sort(
     (a, b) => ORDER.indexOf(a.signal as Signal) - ORDER.indexOf(b.signal as Signal));
 
@@ -160,6 +170,60 @@ export default function Fuentes() {
               ha comprobado. El procedimiento completo está en{" "}
               <a href={PROCEDURE} target="_blank" rel="noreferrer">ACTUALIZAR_DATOS.md</a>.
             </p>
+          </div>
+        )}
+      </section>
+
+      <section className="card guide-s">
+        <h2>Todas las fuentes de datos</h2>
+        <p>{nAll} fuentes de datos distintas, de {agencies.length} organismos.</p>
+        <ul className="fuentes-agencies" aria-label="Fuentes por organismo">
+          {agencies.map(([agency, k]) => (
+            <li key={agency}>{agency} <strong>{k}</strong></li>
+          ))}
+        </ul>
+        <p>
+          El registro de julio tiene {catalog.downloads} descargas pero sólo {nOriginal} fuentes
+          distintas: algunos ficheros se descargaron varias veces, hasta {maxRepeats}. Varias
+          series de Eurostat comparten el mismo enlace porque el registro no anotó sus
+          parámetros; se distinguen por el nombre. A ellas se suman las {counts.sources} fuentes
+          descargables del manifiesto, que no coinciden con ninguna. Los ficheros crudos de
+          entonces no se conservaron: lo congelado son las tablas construidas con ellos.
+        </p>
+        <div>
+          <button
+            type="button"
+            className="consulta-btn"
+            aria-expanded={showAll}
+            aria-controls="fuentes-todas"
+            onClick={() => setShowAll((v) => !v)}
+          >
+            {showAll ? `Ocultar las ${nAll} fuentes` : `Ver las ${nAll} fuentes`}
+          </button>
+        </div>
+
+        {showAll && (
+          <div className="tscroll fuentes-todas" id="fuentes-todas">
+            <table className="guide-t" aria-label="Todas las fuentes de datos">
+              <thead>
+                <tr>
+                  <th>Fuente (enlace al origen)</th><th>Organismo</th><th>Inventario</th>
+                  <th>Descargas</th><th>Tamaño</th><th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {catalog.sources.map((s) => (
+                  <tr key={`${s.url}#${s.name}`}>
+                    <td><a href={s.url} title={s.url} target="_blank" rel="noreferrer">{s.name}</a></td>
+                    <td>{s.agency}</td>
+                    <td className="nowrap">{INVENTORY_LABEL[s.inventory] ?? s.inventory}</td>
+                    <td className="nowrap">{s.downloads}</td>
+                    <td className="nowrap">{bytes(s.bytes)}</td>
+                    <td className="nowrap">{s.fetched}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </section>

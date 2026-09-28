@@ -19,6 +19,12 @@ describe("Metodología — provenance, parity, honesty", () => {
     expect(screen.getAllByText(/^Calibrado —/).length).toBeGreaterThan(10);
   });
 
+  it("calls the 141 what they are: downloads, not source files", async () => {
+    ui();
+    await waitFor(() => expect(screen.getByText(/141 descargas registradas/)).toBeInTheDocument());
+    expect(screen.queryByText(/ficheros fuente/)).toBeNull();
+  });
+
   it("lists the 9 red lines with their sources", async () => {
     ui();
     await waitFor(() => expect(screen.getByText(/máximo histórico ES \(T1-2013\)/)).toBeInTheDocument());

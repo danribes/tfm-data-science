@@ -221,6 +221,10 @@ code { font: 0.88em ui-monospace, Consolas, monospace; background: var(--code); 
 .fuentes-check { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--ink-2); margin: 0 0 var(--sp-1); cursor: pointer; }
 .fuentes-check input { margin-top: 4px; }
 .fuentes-import { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.fuentes-agencies { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 var(--sp-1); }
+.fuentes-agencies li { background: var(--chip); border-radius: var(--rad-chip); padding: 4px 10px; font-size: 14px; color: var(--ink-2); }
+.fuentes-todas { margin-top: var(--sp-2); }
+.fuentes-todas td.nowrap { white-space: nowrap; }
 .fuentes-panel { margin-top: var(--sp-2); border: 1px solid var(--warn); border-radius: var(--rad-chip); padding: var(--sp-2); }
 .guide-t td.dim, .guide-rl .dim { color: var(--muted); }
 /* A whole row can be out of scope without being hidden — the class has to

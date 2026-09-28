@@ -18,7 +18,9 @@ from __future__ import annotations
 import csv
 import json
 import sys
+from collections import Counter
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 GOLD = ROOT / "data" / "gold"
@@ -46,6 +48,25 @@ LABELS = {
     "wb_self_employment.json": "Autoempleo, % del empleo",
     "analog_panel": "Panel de análogos históricos",
     "analog_stats": "Estadísticos del panel de análogos",
+}
+
+#: host -> organisation, in the reader's words. Every host in both inventories
+#: must be here; a test enforces it.
+AGENCIES = {
+    "ec.europa.eu": "Eurostat",
+    "data-api.ecb.europa.eu": "BCE",
+    "servicios.ine.es": "INE",
+    "api.worldbank.org": "Banco Mundial",
+    "www.imf.org": "FMI",
+    "sdmx.oecd.org": "OCDE",
+    "stats.bis.org": "BIS",
+    "apps.fomento.gob.es": "Ministerio de Transportes",
+    "cdn.mivau.gob.es": "Ministerio de Vivienda (SIU)",
+    # The only archived source: SIU 2021, no longer served by the ministry.
+    "web.archive.org": "Ministerio de Vivienda (SIU)",
+    "www.fhfa.gov": "FHFA (EE. UU.)",
+    "files.zillowstatic.com": "Zillow (EE. UU.)",
+    "publicdata.landregistry.gov.uk": "HM Land Registry (Reino Unido)",
 }
 
 #: Signals that ask a human to look before anything is promoted.
@@ -106,6 +127,45 @@ def build_status(frozen: list[dict], fresh: list[dict], vintage: str, checked: s
     }
 
 
+def build_catalog(download_log: list[dict], manifest: list[dict]) -> dict:
+    """Every distinct data source, from both inventories.
+
+    The July log (provenance_vintage_manifest.csv) records downloads, not
+    sources: some files were fetched up to seven times. A source is a URL and
+    a name, not a URL alone: eleven Eurostat series share the gov_10a_main URL
+    because their query parameters were not logged. Size and date are those
+    of the latest download.
+    """
+    by_url: dict[tuple[str, str], dict] = {}
+    for r in sorted(download_log, key=lambda r: r["fetched_at"]):
+        seen = by_url.get((r["url"], r["name"]))
+        by_url[(r["url"], r["name"])] = {
+            "name": r["name"], "url": r["url"], "inventory": "original",
+            "downloads": (seen["downloads"] if seen else 0) + 1,
+            "bytes": int(r["bytes"]) if r["bytes"] else None,
+            "fetched": r["fetched_at"][:10],
+        }
+    for r in manifest:
+        if r["kind"] == "derived" or not r["url"]:
+            continue
+        by_url[(r["url"], _key(r))] = {
+            "name": LABELS.get(_key(r), _key(r)), "url": r["url"], "inventory": "manifest",
+            "downloads": 1, "bytes": int(r["bytes"]) if r["bytes"] else None,
+            "fetched": (r.get("acquired_at") or "")[:10],
+        }
+    for s in by_url.values():
+        host = urlparse(s["url"]).netloc
+        s["agency"] = AGENCIES.get(host, host)
+
+    by_agency = Counter(s["agency"] for s in by_url.values())
+    sources = sorted(by_url.values(), key=lambda s: (-by_agency[s["agency"]], s["agency"], s["name"]))
+    return {
+        "downloads": len(download_log),
+        "sources": sources,
+        "by_agency": dict(sorted(by_agency.items(), key=lambda kv: (-kv[1], kv[0]))),
+    }
+
+
 def _read(path: Path) -> list[dict]:
     with open(path, newline="") as f:
         return list(csv.DictReader(f))
@@ -113,10 +173,12 @@ def _read(path: Path) -> list[dict]:
 
 def main(argv: list[str]) -> None:
     latest = Path(argv[0]) if argv else max(p for p in VINTAGES.iterdir() if p.is_dir())
+    manifest = _read(GOLD / "manifest.csv")
     status = build_status(
-        _read(GOLD / "manifest.csv"), _read(latest / "manifest.csv"),
+        manifest, _read(latest / "manifest.csv"),
         vintage=(GOLD / "VINTAGE").read_text().strip(), checked=latest.name,
     )
+    status["catalog"] = build_catalog(_read(GOLD / "provenance_vintage_manifest.csv"), manifest)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n")
     print(f"{OUT.relative_to(ROOT)}: {status['counts']}")

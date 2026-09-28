@@ -26,7 +26,7 @@ export default function Metodologia() {
         <h4>Vintage <small>referencia del escenario — cada fuente conserva sus fechas</small></h4>
         <p style={{ fontSize: 14.5 }}>
           Datos congelados el <b>{health.data?.vintage ?? "…"}</b>
-          {vintage.data ? <> ({nf(vintage.data.n_files, 0)} ficheros fuente)</> : null}.
+          {vintage.data ? <> ({nf(vintage.data.n_files, 0)} descargas registradas)</> : null}.
           {days !== null && (days > STALE_LIMIT_DAYS
             ? ` Aviso: el vintage tiene ${nf(days, 0)} días — los datos observados pueden estar desactualizados.`
             : ` Antigüedad actual: ${nf(days, 0)} días (umbral de aviso: ${nf(STALE_LIMIT_DAYS, 0)}).`)}

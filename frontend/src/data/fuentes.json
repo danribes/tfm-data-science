@@ -189,5 +189,933 @@
     "error": 0,
     "attention": 7,
     "derived": 2
+  },
+  "catalog": {
+    "downloads": 141,
+    "sources": [
+      {
+        "name": "Deuda pública, % del PIB",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10dd_edpt1?format=JSON&lang=EN&na_item=GD&sector=S13&unit=PC_GDP&geo=ES&geo=EU27_2020&geo=DE&geo=IT",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 4828,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Gasto en pensiones, % del PIB",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_pens?format=JSON&lang=EN&unit=PC_GDP&geo=ES&geo=EU27_2020",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 18295,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Gasto público por funciones (educación)",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?format=JSON&lang=EN&sector=S13&cofog99=GF09&na_item=TE&unit=PC_GDP&geo=ES&geo=EU27_2020",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 4295,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "IPCA, tasa anual (España y UE-27)",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_manr?format=JSON&lang=EN&coicop=CP00&unit=RCH_A&geo=ES&geo=EU27_2020",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 22215,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "PIB trimestral",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/namq_10_gdp?format=JSON&lang=EN&unit=CLV_PCH_SM&s_adj=SCA&na_item=B1GQ&geo=ES",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 11172,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Riesgo de pobreza infantil",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_li02?format=JSON&lang=EN&statinfo=MED_EI&rskpovth=A_60&rskpovth=B_60&unit=PC&sex=T&age=Y_LT16&age=TOTAL&geo=ES",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 5140,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Saldo público, % del PIB",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10dd_edpt1?format=JSON&lang=EN&na_item=B9&sector=S13&unit=PC_GDP&geo=ES",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 3763,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Sobrecarga por coste de la vivienda",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_lvho07a?format=JSON&lang=EN&unit=PC&rskpovth=TOTAL&age=TOTAL&sex=T&geo=ES",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 4114,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Tasa de paro mensual, total y menores de 25",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?format=JSON&lang=EN&s_adj=SA&age=TOTAL&age=Y_LT25&unit=PC_ACT&sex=T&geo=ES",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 32010,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Temporalidad del empleo",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsi_pt_q?format=JSON&lang=EN&wstatus=EMP_TEMP&s_adj=SA&unit=PC_SAL&sex=T&age=Y15-64&geo=ES",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 7624,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "arop_post",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_li02",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18902,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "arop_pre_nopensions",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_li10",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 19253,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "arope_ninos",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_peps01n",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 11342,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "avoidable_mortality",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_cd_apr",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18143,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "building_permits_q",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sts_cobp_q",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 71190,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "emigration",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/migr_emi2",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18852,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gdp_pc_pps",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_pc",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 26339,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gfcf_dwellings",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_an6",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 22253,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gini",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_di12",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 10771,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_D1",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=D1",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 357170,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_D3",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=D3",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 341078,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_D62",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=D62",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 323618,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_D9",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=D9",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 343199,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_P2",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=P2",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 355002,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_P51G",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=P51G",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 352157,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_10a_exp_TE",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?na_item=TE",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 366460,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_debt",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10dd_edpt1",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17060,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "gov_revenue_deficit",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 76902,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "house_price_index_q",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hpi_q",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 55643,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "immigration",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/migr_imm1ctz",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18674,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "interest_paid",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17491,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "life_expectancy_e0",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_mlexpec",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 24923,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "lucas_artificial",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lan_lcv_ovw",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 45811,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "pensions_oldage",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 16189,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "population",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 34163,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "population_broad_age",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjanbroad",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 83847,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "proj_23ndbi",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/proj_23ndbi",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 742067,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "recycling_rate",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/cei_wm011",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18884,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D2REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18502,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D39REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17542,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D4REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17509,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D5REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18149,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D61REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18246,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D7REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17493,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_D91REC",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17527,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_P11_P12_P131",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17561,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "rev_TR",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_main",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 18549,
+        "fetched": "2026-07-19",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "silc_overburden",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_lvho07a",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17238,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "silc_overcrowding",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_lvho05a",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 17379,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "social_protection_exp",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_type",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 20451,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "unemployment_eu",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_a",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 13467,
+        "fetched": "2026-07-18",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "Índice de precios de vivienda (IPV)",
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hpi_q?format=JSON&lang=EN&purchase=TOTAL&unit=RCH_A&geo=ES&geo=EU27_2020",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 7360,
+        "fetched": "2026-07-31",
+        "agency": "Eurostat"
+      },
+      {
+        "name": "mitma_licencias_10020130.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020130.XLS",
+        "inventory": "original",
+        "downloads": 7,
+        "bytes": 112640,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020230.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020230.XLS",
+        "inventory": "original",
+        "downloads": 6,
+        "bytes": 234496,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020330.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020330.XLS",
+        "inventory": "original",
+        "downloads": 6,
+        "bytes": 233472,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020430.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020430.XLS",
+        "inventory": "original",
+        "downloads": 5,
+        "bytes": 232448,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020530.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020530.XLS",
+        "inventory": "original",
+        "downloads": 5,
+        "bytes": 233984,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020630.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020630.XLS",
+        "inventory": "original",
+        "downloads": 5,
+        "bytes": 234496,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020730.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020730.XLS",
+        "inventory": "original",
+        "downloads": 4,
+        "bytes": 345600,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020830.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020830.XLS",
+        "inventory": "original",
+        "downloads": 4,
+        "bytes": 232960,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10020930.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10020930.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 232448,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021030.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021030.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 232960,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021130.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021130.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 238592,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021230.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021230.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 238592,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021330.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021330.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 232960,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021430.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021430.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 233984,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021530.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021530.XLS",
+        "inventory": "original",
+        "downloads": 3,
+        "bytes": 236544,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021630.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021630.XLS",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 232960,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021730.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021730.XLS",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 233984,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021830.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021830.XLS",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 108032,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_licencias_10021930.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline/sedal/10021930.XLS",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 105984,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_suelo_36100500.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline2/sedal/36100500.XLS",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 380416,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_suelo_36200500.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline2/sedal/36200500.XLS",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 386048,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_suelo_36300500.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline2/sedal/36300500.XLS",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 386560,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_suelo_36400500.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline2/sedal/36400500.XLS",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 111104,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "mitma_valor_tasado_35102000.xls",
+        "url": "https://apps.fomento.gob.es/BoletinOnline2/sedal/35102000.XLS",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 126976,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Transportes"
+      },
+      {
+        "name": "weo_GGR_NGDP",
+        "url": "https://www.imf.org/external/datamapper/api/v1/GGR_NGDP",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 50,
+        "fetched": "2026-07-18",
+        "agency": "FMI"
+      },
+      {
+        "name": "weo_GGXCNL_NGDP",
+        "url": "https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 122834,
+        "fetched": "2026-07-18",
+        "agency": "FMI"
+      },
+      {
+        "name": "weo_GGXWDG_NGDP",
+        "url": "https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 114506,
+        "fetched": "2026-07-18",
+        "agency": "FMI"
+      },
+      {
+        "name": "weo_GGX_NGDP",
+        "url": "https://www.imf.org/external/datamapper/api/v1/GGX_NGDP",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 50,
+        "fetched": "2026-07-18",
+        "agency": "FMI"
+      },
+      {
+        "name": "weo_exp",
+        "url": "https://www.imf.org/external/datamapper/api/v1/exp",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 230883,
+        "fetched": "2026-07-18",
+        "agency": "FMI"
+      },
+      {
+        "name": "weo_rev",
+        "url": "https://www.imf.org/external/datamapper/api/v1/rev",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 230202,
+        "fetched": "2026-07-18",
+        "agency": "FMI"
+      },
+      {
+        "name": "Bono a 10 años, Alemania",
+        "url": "https://data-api.ecb.europa.eu/service/data/IRS/M.DE.L.L40.CI.0000.EUR.N.Z",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 114894,
+        "fetched": "2026-07-31",
+        "agency": "BCE"
+      },
+      {
+        "name": "Bono a 10 años, España",
+        "url": "https://data-api.ecb.europa.eu/service/data/IRS/M.ES.L.L40.CI.0000.EUR.N.Z",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 114469,
+        "fetched": "2026-07-31",
+        "agency": "BCE"
+      },
+      {
+        "name": "Euríbor a 12 meses",
+        "url": "https://data-api.ecb.europa.eu/service/data/FM/M.U2.EUR.RT.MM.EURIBOR1YD_.HSTA",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 117628,
+        "fetched": "2026-07-31",
+        "agency": "BCE"
+      },
+      {
+        "name": "ecb_bls_es_vivienda.csv",
+        "url": "https://data-api.ecb.europa.eu/service/data/BLS/Q.ES.ALL.Z.H.H.B3.ST.S.FNET?format=csvdata",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 34286,
+        "fetched": "2026-07-19",
+        "agency": "BCE"
+      },
+      {
+        "name": "IPC general",
+        "url": "https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC251856?nult=400",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 40559,
+        "fetched": "2026-07-31",
+        "agency": "INE"
+      },
+      {
+        "name": "ine_ipc_series_meta",
+        "url": "https://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/76136",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 286,
+        "fetched": "2026-07-18",
+        "agency": "INE"
+      },
+      {
+        "name": "ine_ipv_q_series_meta",
+        "url": "https://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/80270",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 686,
+        "fetched": "2026-07-18",
+        "agency": "INE"
+      },
+      {
+        "name": "ine_salarios_series_meta",
+        "url": "https://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/28191",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 3590,
+        "fetched": "2026-07-18",
+        "agency": "INE"
+      },
+      {
+        "name": "bis_spp_N.csv",
+        "url": "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/Q..N.628?format=csv",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 338096,
+        "fetched": "2026-07-19",
+        "agency": "BIS"
+      },
+      {
+        "name": "bis_spp_R.csv",
+        "url": "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_SPP/1.0/Q..R.628?format=csv",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 335800,
+        "fetched": "2026-07-19",
+        "agency": "BIS"
+      },
+      {
+        "name": "fhfa_metro.csv",
+        "url": "https://www.fhfa.gov/hpi/download/quarterly_datasets/hpi_at_metro.csv",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 4165719,
+        "fetched": "2026-07-19",
+        "agency": "FHFA (EE. UU.)"
+      },
+      {
+        "name": "fhfa_state.csv",
+        "url": "https://www.fhfa.gov/hpi/download/quarterly_datasets/hpi_at_state.csv",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 187060,
+        "fetched": "2026-07-19",
+        "agency": "FHFA (EE. UU.)"
+      },
+      {
+        "name": "siu_clases_suelo_2021.zip",
+        "url": "http://web.archive.org/web/20220302050749/https://cdn.mitma.gob.es/portal-web-drupal/siu/datos_alfanumericos_siu_-_excel_-_20210709.zip",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 6182021,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Vivienda (SIU)"
+      },
+      {
+        "name": "siu_clases_suelo_2025.zip",
+        "url": "https://cdn.mivau.gob.es/portal-web-mivau/urbanismo-suelo/Datos%20alfanumericos%20SIU%20-%20Excel%20-%2020250527.zip",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 6895338,
+        "fetched": "2026-07-19",
+        "agency": "Ministerio de Vivienda (SIU)"
+      },
+      {
+        "name": "oecd_house_prices.csv",
+        "url": "https://sdmx.oecd.org/public/rest/data/OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,/all?format=csvfile",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 6454411,
+        "fetched": "2026-07-19",
+        "agency": "OCDE"
+      },
+      {
+        "name": "oecd_land_cover.csv",
+        "url": "https://sdmx.oecd.org/public/rest/data/OECD.ENV.EPI,DSD_LAND@DF_LAND_COVER,/._O.LC_SUR_ART+LCC_SUR_ART_GAIN.?format=csvfile",
+        "inventory": "original",
+        "downloads": 2,
+        "bytes": 2194609,
+        "fetched": "2026-07-19",
+        "agency": "OCDE"
+      },
+      {
+        "name": "Autoempleo, % del empleo",
+        "url": "https://api.worldbank.org/v2/country/ES/indicator/SL.EMP.SELF.ZS",
+        "inventory": "manifest",
+        "downloads": 1,
+        "bytes": 16544,
+        "fetched": "2026-07-31",
+        "agency": "Banco Mundial"
+      },
+      {
+        "name": "uk_avg.csv",
+        "url": "http://publicdata.landregistry.gov.uk/market-trend-data/house-price-index-data/Average-prices-2025-05.csv",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 7275613,
+        "fetched": "2026-07-19",
+        "agency": "HM Land Registry (Reino Unido)"
+      },
+      {
+        "name": "zillow_metro.csv",
+        "url": "https://files.zillowstatic.com/research/public_csvs/zhvi/Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv",
+        "inventory": "original",
+        "downloads": 1,
+        "bytes": 4444528,
+        "fetched": "2026-07-19",
+        "agency": "Zillow (EE. UU.)"
+      }
+    ],
+    "by_agency": {
+      "Eurostat": 52,
+      "Ministerio de Transportes": 24,
+      "FMI": 6,
+      "BCE": 4,
+      "INE": 4,
+      "BIS": 2,
+      "FHFA (EE. UU.)": 2,
+      "Ministerio de Vivienda (SIU)": 2,
+      "OCDE": 2,
+      "Banco Mundial": 1,
+      "HM Land Registry (Reino Unido)": 1,
+      "Zillow (EE. UU.)": 1
+    }
   }
 }
