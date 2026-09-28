@@ -72,3 +72,18 @@ def test_fresh_assembly_contains_only_public_corpus_and_allowlisted_reports(tmp_
     assert (stage / "data/gold/VINTAGE").is_file()
     assert not (stage / "data/gold/gold").exists()
     assert not (stage / "data/external/external").exists()
+
+
+def test_space_user_owns_the_working_directory():
+    # El Space corre como uid 1000 y la API crea data_cache/ bajo el directorio
+    # de trabajo. `COPY --chown` cambia el dueño de lo copiado, no el de /app,
+    # que WORKDIR crea como root: sin un chown explícito, /countries devolvía
+    # una lista vacía y /panel y /scenario/generic, un 500 por PermissionError.
+    lines = [l.strip() for l in (ROOT / "deploy/hf/Dockerfile").read_text().splitlines()]
+    workdir = next(l.split()[1] for l in lines if l.startswith("WORKDIR "))
+    user_at = next(i for i, l in enumerate(lines) if l.startswith("USER "))
+    user = lines[user_at].split()[1]
+    assert any(
+        l.startswith("RUN ") and "chown" in l and user in l and workdir in l.split()
+        for l in lines[:user_at]
+    ), f"falta un `RUN chown {user} {workdir}` antes de `USER {user}`"

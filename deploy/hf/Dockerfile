@@ -5,6 +5,9 @@ FROM python:3.12-slim
 # HF Spaces runs containers as uid 1000 and serves on port 7860.
 RUN useradd -m -u 1000 user
 WORKDIR /app
+# WORKDIR creates /app as root and `COPY --chown` only covers what it copies.
+# The API writes its live-data cache to /app/data_cache at runtime.
+RUN chown user:user /app
 # Defaults are the public deployment. A reviewer deployment overrides both in
 # the Space settings — EVO_RAG_MODE=remote_hybrid with EVO_RAG_DB pointing at
 # the uploaded index — and adds HF_TOKEN and EVO_RAG_TOKEN. Defaulting the
