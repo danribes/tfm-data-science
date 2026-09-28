@@ -27,6 +27,16 @@ describe("Estado de las fuentes — un tablero que no finge", () => {
     expect(within(table).getAllByText("tamaño distinto: revisar")).toHaveLength(flagged);
   });
 
+  it("dice qué no cubre, y enlaza el inventario completo", () => {
+    render(<Fuentes />);
+    const scope = screen.getByText(
+      new RegExp(`sólo comprueba las ${snapshot.counts.sources} fuentes descargables`));
+    expect(scope).toHaveTextContent(/senda central de deuda/);
+    expect(scope).toHaveTextContent(/proyecciones demográficas/);
+    const link = within(scope).getByRole("link", { name: "data/README.md" });
+    expect(link.getAttribute("href")).toMatch(/\/data\/README\.md$/);
+  });
+
   it("dice que sin huella el tamaño es una pista, no una prueba", () => {
     render(<Fuentes />);
     expect(screen.getByText(/es una pista, no una prueba/)).toBeInTheDocument();

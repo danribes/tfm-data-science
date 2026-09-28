@@ -28,6 +28,7 @@ const SIGNAL: Record<Signal, { label: string; warn: boolean }> = {
 const ORDER: Signal[] = ["error", "missing", "changed", "size_changed", "new", "same_size", "unchanged", "derived"];
 
 const PROCEDURE = "https://github.com/danribes/tfm-data-science/blob/main/docs/ACTUALIZAR_DATOS.md";
+const INVENTORY = "https://github.com/danribes/tfm-data-science/blob/main/data/README.md";
 
 const bytes = (b: number | null) => (b === null ? "—" : `${nf(b, 0)} B`);
 
@@ -44,6 +45,19 @@ export default function Fuentes() {
         <h1>Estado de las fuentes</h1>
         <span className="meta">vintage en uso {vintage} · última comprobación {checked}</span>
       </div>
+
+      {/* Sin esta frase la página se lee como el inventario de todo lo que
+          alimenta el modelo, y no lo es. */}
+      <section className="card guide-s">
+        <p>
+          Esta página sólo comprueba las {counts.sources} fuentes descargables del manifiesto. De
+          ellas salen la mayoría de los valores de partida, pero no todo lo que usa el motor: la
+          senda central de deuda, las proyecciones demográficas y el panel regional de vivienda
+          con el que se estiman sus dos parámetros no se comprueban aquí. El inventario completo,
+          capa por capa y con los huecos declarados, está en{" "}
+          <a href={INVENTORY} target="_blank" rel="noreferrer">data/README.md</a>.
+        </p>
+      </section>
 
       <div className="outs outs-4" role="group" aria-label="Resumen de la comprobación">
         <div className="out">
