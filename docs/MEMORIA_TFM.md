@@ -2,7 +2,7 @@
 
 ![Portada](figures/portada.svg)
 
-**Estado documental:** 20 de septiembre de 2026, motor 1.1.0, corte de datos `2026-07-31`.
+**Estado documental:** 29 de septiembre de 2026, motor 1.1.0, corte de datos `2026-07-31`.
 Los resultados citados proceden de los artefactos indicados; las evaluaciones
 pendientes se distinguen explícitamente de las realizadas. La portada, el índice
 y esta sección preliminar se generan con `tools/build_frontmatter.py`, que toma
@@ -44,6 +44,7 @@ la declaración no puedan contradecirse.
   - [5.4 Modelos predictivos](#54-modelos-predictivos)
   - [5.5 Modelos descriptivos](#55-modelos-descriptivos)
   - [5.6 Recuperación documental y capa de lenguaje](#56-recuperación-documental-y-capa-de-lenguaje)
+  - [5.7 Umbrales de alarma: qué se señala y qué no se decide](#57-umbrales-de-alarma-qué-se-señala-y-qué-no-se-decide)
 - [6. Resultados](#6-resultados)
   - [6.1 Vivienda regional: la precisión depende del esquema de inferencia](#61-vivienda-regional-la-precisión-depende-del-esquema-de-inferencia)
   - [6.2 Transferencia neuronal: resultado negativo conservado](#62-transferencia-neuronal-resultado-negativo-conservado)
@@ -207,7 +208,7 @@ Conviene fijar la distinción que gobierna toda la interpretación de la secció
 
 Blanchard (2019) reabrió el debate al argumentar que con $r<g$ los costes fiscales y de bienestar de la deuda pública son menores de lo que supone la ortodoxia, tesis que desarrolla en Blanchard (2023). Jordà et al. (2019) aportan la base empírica de largo plazo sobre rendimientos y crecimiento en dieciséis economías avanzadas, útil para acotar qué valores de $r-g$ son históricamente plausibles.
 
-La objeción relevante para un horizonte de veinticinco años la formulan Mauro y Zhou (2021): un diferencial negativo no garantiza sostenibilidad, porque los diferenciales se revierten de forma abrupta precisamente cuando el soberano es vulnerable. Es la razón por la que este trabajo trata $r-g$ como palanca explorable y no como tendencia extrapolable, y por la que el motor incorpora un diferencial soberano endógeno al nivel de deuda.
+La objeción relevante para un horizonte de veinticinco años la formulan Mauro y Zhou (2021): un diferencial negativo no garantiza sostenibilidad, porque los diferenciales se revierten de forma abrupta precisamente cuando el soberano es vulnerable. Es la razón por la que este trabajo trata $r-g$ como palanca explorable y no como tendencia extrapolable, y por la que el motor de Python admite un diferencial soberano endógeno al nivel de deuda, aunque ninguna ruta de la aplicación lo activa (sección 5.1).
 
 Sobre la respuesta fiscal, Bohn (1998) establece el contraste de sostenibilidad basado en la reacción positiva del superávit primario a la deuda rezagada; Mendoza y Ostry (2008) lo extienden a un panel internacional y documentan su debilitamiento con deuda alta; y Ghosh et al. (2013) formalizan la «fatiga fiscal» y derivan de ella el límite de deuda y el espacio fiscal. Esta literatura es el contexto del único parámetro fiscal que esta memoria consigue estimar, `PB_PERSIST` (sección 5.2); los demás quedan calibrados.
 
@@ -271,11 +272,13 @@ La capa española reúne series fiscales, vivienda por comunidad autónoma, demo
 
 Congelar el corte tiene un coste explícito: faltan datos que existen. El INE publica paro regional que el corte no incorpora, y añadirlo rompería la repetibilidad de todo cálculo anterior. Es una elección de reproducibilidad sobre completitud, y se declara como tal porque condiciona qué parámetros pueden estimarse (sección 5.2).
 
+La aplicación hace visible ese régimen en una página propia, «Estado de las fuentes», que compara la última descarga con el vintage congelado. La comprobación del 22 de septiembre de 2026 descargó las 16 fuentes del manifiesto, 7 de ellas con un tamaño distinto del congelado; las otras 2 filas del manifiesto son derivados que se reconstruyen al promover un corte nuevo. El vintage no guarda huella SHA-256 de ninguna de las 16 fuentes descargables —sólo los dos derivados la tienen—, así que la señal es «tamaño distinto» o «mismo tamaño», nunca «sin cambios», y la página advierte que el tamaño es un indicio y no una prueba. La página es una instantánea versionada que no consulta la red: un tablero que se refrescara solo sugeriría que los datos del cálculo pueden cambiar por debajo, que es precisamente lo que el corte evita. Por la misma razón, el botón «Importar datos nuevos» es un prototipo declarado: sólo se activa cuando alguien marca que ha revisado las fuentes, no importa nada y enseña los cinco pasos que daría una importación real. [Generador](../tools/gen_sources_status.py), [procedimiento](ACTUALIZAR_DATOS.md).
+
 ### 3.2 Inventario de fuentes
 
 | Capa | Contenido | Cobertura | Tamaño |
 |---|---|---|---|
-| Panel regional de vivienda | Índice de precio de vivienda por CCAA | 2008T1–2026T1, 19 unidades | 1.387 variaciones interanuales |
+| Panel regional de vivienda | Índice de Precios de Vivienda (IPV) del INE por CCAA | 2008T1–2026T1, 19 unidades | 1.387 variaciones interanuales |
 | Reversión autorregresiva | Pares de crecimiento separados cuatro trimestres | mismo panel | 1.311 pares |
 | Corpus inmobiliario extranjero | Series de EE. UU. y Reino Unido | objetivos ≤ 2019T3 | 1.760 series, 113.649 ventanas |
 | Panel de impago soberano | Indicadores WDI + etiquetas BoC–BoE | — | 3.874 país-año, 154 países, 377 eventos |
@@ -283,13 +286,19 @@ Congelar el corte tiene un coste explícito: faltan datos que existen. El INE pu
 | Análogos históricos | Cinco variables normalizadas | 1991–2020 | 4.070 observaciones, 172 países |
 | Corpus documental | Manuales, metodología propia y opinión | — | 474 documentos, 17.848 fragmentos |
 
+El IPV (Índice de Precios de Vivienda) es el indicador del INE que mide la variación del precio de compraventa de las viviendas libres —no protegidas—, nuevas y de segunda mano. En el motor, `ipv` es su tasa interanual, y de él proceden los dos parámetros estimados, `IPV_LR` e `IPV_REV` (sección 5.2). El valor de partida, un 12,8 % en 2026T1, es el dato de España que difunde Eurostat (`prc_hpi_q`); el panel regional del INE, en base 2025, da un 12,86 % para el mismo trimestre. La aplicación define la sigla allí donde la muestra, porque un indicador sin nombre no es legible para quien no es especialista.
+
 El panel regional contiene 17 CCAA, Ceuta y Melilla. Se excluye Nacional porque agrega información de las mismas regiones. La media conjunta otorga igual peso a cada observación regional; no equivale a ponderar por población o transacciones. Los periodos de ajuste y recuperación se presentan por separado. [Construcción del panel](../research/panel.py).
 
 Para aprendizaje internacional se conservan 1.760 series inmobiliarias estadounidenses y británicas. Su documentación identifica un procesamiento heredado, por lo que reproducir el entrenamiento desde el archivo congelado y reconstruir la extracción original son objetivos distintos. La clasificación soberana combina indicadores WDI con etiquetas derivadas de la base BoC–BoE, cuya definición incluye distintas modalidades de incumplimiento y reestructuración. Las etiquetas transformadas deben distinguirse de las observaciones originales. [Corpus extranjero](../data/external/README.md), [fuentes de impago](../data/external/README_distress.md), [Beers, Ndukwe y Berry, 2025](https://www.bankofcanada.ca/2025/10/staff-analytical-note-2025-24/).
 
+La tabla anterior describe los paneles de análisis, no todo lo que se descargó. El inventario completo está en [`data/README.md`](../data/README.md), capa por capa: lo que lee el motor, fichero a fichero y con su origen; lo que usa la investigación y no el motor; los ficheros congelados que ningún código lee; y los huecos declarados. De él se desprende una precisión que conviene tener presente al leer la página de fuentes: las 16 fuentes descargables del manifiesto alimentan 25 de los 42 indicadores de partida, mientras que la senda central de deuda, las proyecciones demográficas y el panel regional de vivienda quedan fuera de esa comprobación. Los dos inventarios de procedencia —el manifiesto y el registro de descargas de julio— suman 101 fuentes distintas de 12 organismos: Eurostat (52), Ministerio de Transportes (24), FMI (6), BCE (4), INE (4), BIS, FHFA, Ministerio de Vivienda y OCDE (2 cada uno), y Banco Mundial, HM Land Registry y Zillow (1 cada uno). No incluyen los paneles externos —indicadores WDI y etiquetas BoC–BoE del clasificador de impago, Penn World Table del panel de análogos— ni el corpus documental, que tienen su propia documentación.
+
 ### 3.3 Correcciones de procedencia detectadas
 
 Dos errores de etiquetado se detectaron y corrigieron durante el trabajo, y se documentan porque afectan a la interpretación de resultados anteriores. El primero: la serie *bank lending rate* del Banco Mundial se había empleado como rendimiento soberano y dentro de un diferencial nominal-real; es un tipo bancario, no soberano, y se retiró de ambos usos y del emparejamiento de análogos. El segundo: los valores ausentes se mostraban imputados como medias o ceros en algunos gráficos; ahora política, régimen cambiario y vencimiento se presentan como no disponibles en lugar de inferirse de aproximaciones estáticas. [Cambios metodológicos](METHODOLOGY_CHANGES.md).
+
+Un tercer error, de recuento, apareció al inventariar las fuentes. La aplicación hablaba de «141 fuentes congeladas»; eran 141 descargas del registro de julio, cuyos ficheros crudos no se conservaron, y correspondían a 85 fuentes distintas, porque algunos ficheros del Ministerio de Transportes se descargaron hasta siete veces. El recuento exigió además definir qué es una fuente: una dirección y un nombre, no sólo una dirección, ya que once series de Eurostat comparten la de `gov_10a_main` porque el registro no anotó sus parámetros. La aplicación dice ahora «141 descargas», y una prueba lo sostiene. En la misma revisión se encontró que el perfil bancario remitía a un fichero de documentación que el repositorio nunca tuvo, heredado del prototipo; hoy una prueba exige que exista toda ruta del repositorio que la aplicación cita al lector.
 
 ## 4. Arquitectura del sistema
 
@@ -315,6 +324,8 @@ La aplicación está publicada y puede recorrerse sin instalar nada ni presentar
 
 El Space es gratuito y se suspende por inactividad, de modo que la primera petición tras un intervalo largo tarda entre treinta y noventa segundos en despertarlo; el motor corre también en el navegador, así que los escenarios responden aunque la API esté fría.
 
+Mientras el contenedor arranca o se reinicia, el proxy de Hugging Face contesta 502 con una página HTML; la API, en cambio, sólo devuelve errores propios con un `detail` que explica el motivo. En las llamadas a la biblioteca —colecciones, búsqueda y el flujo de «Preguntar»— el cliente distingue ambos casos: un 502, 503 o 504 sin `detail` se reintenta durante unos dos minutos, la misma paciencia que la comprobación de salud, y un rechazo que la API explica —biblioteca ausente, credencial rechazada— se muestra a la primera, porque reintentarlo sólo retrasaría el motivo. El resto de llamadas conserva un único reintento. En las respuestas que llegan en flujo, el reintento sólo ocurre antes de leer el primer byte, de modo que ningún fragmento que el lector ya ha visto puede llegar dos veces. Una prueba sobre el Dockerfile exige también que el usuario sin privilegios sea dueño de su directorio de trabajo: sin ello la API no podía crear su caché, y el Space devolvía una lista vacía de países y errores 500 en el motor genérico mientras en local todo funcionaba. [Cliente](../frontend/src/api/client.ts), [contenedor](../deploy/hf/Dockerfile).
+
 El entorno de referencia es Linux x86_64 con Python 3.12 y Node 22, con cierre de dependencias fijado en `requirements-lock.txt` y registrado en [`docs/environment.json`](environment.json). La aplicación se publica como sitio estático (GitHub Pages) y API contenedorizada (Hugging Face Spaces). El índice documental público se construye desde una lista explícita de documentos propios del proyecto; las colecciones con derechos de autor no forman parte de él.
 
 El despliegue actual va más allá y sirve también los manuales, sin credencial, por decisión explícita del autor. Se documenta aquí porque es una decisión sobre licencias de datos, no un detalle de despliegue, y porque su reversión está a una línea de distancia. [Procedimiento](../README.md).
@@ -323,7 +334,7 @@ Las limitaciones de reproducción conocidas se declaran: la instalación limpia 
 
 ## 5. Diseño metodológico
 
-Esta sección describe, para cada componente, qué se calcula, con qué supuestos y qué tipo de afirmación permite. El orden va de lo más determinista a lo más incierto.
+Esta sección describe, para cada componente, qué se calcula, con qué supuestos y qué tipo de afirmación permite. El orden va de lo más determinista a lo más incierto; la última subsección no describe un modelo, sino cómo se señalan umbrales sobre sus salidas.
 
 ### 5.1 Simulación y coherencia computacional
 
@@ -349,6 +360,12 @@ donde $P_t(\iota;\,\pi,g)$ es la identidad contable de pensiones —pensión med
 
 El canal importa por su magnitud: una indexación permanentemente un punto por encima de la de referencia añade unos 63 puntos de PIB a la deuda de 2050, y un punto y medio por debajo resta unos 78. Es el mayor efecto entre las palancas que el gobierno fija directamente —el saldo primario, en todo su recorrido, mueve unos 78—, lo que refleja que el gasto en pensiones es la partida comprometida de mayor tamaño y la más sensible a una regla de revalorización. Una versión anterior calculaba las pensiones después de cerrar la identidad de deuda, de modo que la palanca cambiaba el gasto mostrado sin tocar la trayectoria fiscal.
 
+El gasto público total crece con las dos partidas que el motor hace evolucionar, pensiones e intereses:
+
+$$G_t = G_0 - sp + (P_t - P_0) + (I_t - I_0),$$
+
+con $G_0 = 45{,}4$ % del PIB observado, $I_0$ los intereses del escenario central en 2026 y el resto de partidas —salarios públicos, consumo intermedio, educación, inversión y subvenciones— moviéndose sólo con la palanca de saldo, con pesos fijos. Los ingresos no se modelan: son el residuo $G_t + \text{saldo}_t$. Una versión anterior mantenía $G_t$ en su valor observado mientras pensiones e intereses crecían dentro de él, de modo que desde 2035 las partidas sumaban más que el total y los ingresos implícitos caían diez puntos hasta 2050. Corregido, el gasto del escenario central supera en 2038 el máximo registrado en España —el 51,4 % del PIB de 2020— y el esquema presupuestario de la aplicación marca la parte que queda por encima de ese récord.
+
 En combinaciones extremas la recurrencia puede producir deuda negativa: se señala como salida del dominio de deuda bruta, pues no se modelan activos públicos ni una reacción de política al agotar la deuda.
 
 La dinámica de precios de vivienda sigue una reversión hacia una media de largo plazo,
@@ -360,6 +377,8 @@ donde $\kappa$ es la tasa anual de reversión y $h_0$ el crecimiento observado d
 La simulación Monte Carlo genera 4.000 trayectorias con perturbaciones AR(1) de tipos, crecimiento y saldo primario, con semilla 42. Los percentiles son bandas de simulación condicionadas a distribuciones y reglas calibradas. Una sensibilidad separada varía persistencia, escala, número de trayectorias y semilla, sin afirmar cobertura empírica del 90 %. [Método y resultados](eval/montecarlo-sensitivity.json).
 
 Dos precisiones de unidades se corrigieron y conviene dejar escritas. `alpha_spread = 0,04` significa 4 puntos básicos por punto porcentual de deuda por encima del umbral: veinte puntos de exceso producen 80 pb, no 0,8. Y `omega = 0` elimina la persistencia de la desviación de inflación respecto a la referencia congelada; no impone un objetivo del 2 % del BCE.
+
+Ninguna ruta de la aplicación activa esa realimentación: `alpha_spread` vale cero, y el rendimiento del bono a diez años es la suma de tres palancas, $\text{bono} = r + 0{,}17 + \text{prima}/100$, constante en todo el horizonte —3,42 % en la base—. Lo que sí evoluciona es el tipo medio que paga el Estado por toda su deuda, que sigue la senda central y recoge cada año el cambio del bono en la parte que se renueva, en torno al 14 %. La calculadora del bono de la aplicación usa la misma regla que el motor y dibuja ambas curvas: con el Euríbor al 6 % y una prima de 150 puntos básicos, el bono se paga al 7,67 % desde el primer año y el tipo medio supera el 7 % en 2039; con el Euríbor de partida, llevar el bono al 7 % exigiría una prima de 403 puntos, más de lo que admite la palanca. La calculadora declara que en el modelo el bono no reacciona a la deuda, porque en la realidad una deuda creciente suele elevar la prima. [Calculadora](../frontend/src/components/BondCalculator.tsx).
 
 ### 5.2 Identificación de parámetros
 
@@ -408,6 +427,8 @@ Tres componentes describen la historia sin pretender predecirla, y se agrupan aq
 
 **Vecinos históricos.** Un KNN con distancia de Mahalanobis sobre cinco variables normalizadas, con covarianza y diferencias en las mismas coordenadas, consultado en el año seleccionado, sobre 4.070 observaciones completas de 172 países entre 1991 y 2020, con España excluida del conjunto de referencia. No imputa huecos como valores observados y no aplica bonificación por palanca —un ajuste arbitrario que se retiró—. El tipo bancario de préstamo queda excluido del emparejamiento. No emite veredicto de sostenibilidad. La semejanza histórica no predice la trayectoria española. [Motor](../engine/analog.py), [informe](eval/analog-metric.json).
 
+Una distancia sin escala no dice nada a quien la lee, así que la ficha la traduce a un grado de parecido con la escala del propio panel. Sobre las 4.070 observaciones, la distancia de cada país-año a su vecino más cercano de otro país es 0,23 en la mediana, 0,54 en el percentil 90 y 2,4 en el 99; la ficha califica de cercano un análogo hasta 0,6 —el 91,9 % de los vecinos más cercanos lo son— y de lejano por encima de 2,5, que supera menos del 1 %, y un primer análogo lejano lleva un aviso: ningún país se parece de verdad al escenario y el de la lista es sólo el menos distinto. Una prueba recalcula la escala para que los cortes no se desfasen si cambia el panel. Cada país aparece por su nombre en castellano: antes 141 de los 216 códigos del panel no tenían nombre —98 de los 172 países que la búsqueda podía devolver— y la ficha mostraba el código ISO. Se excluyen explícitamente 22 agregados regionales del WEO con código de tres letras, que no son comparadores válidos aunque en la práctica no llegaran a salir por falta de datos completos. [Ficha](../frontend/src/components/AnalogCard.tsx).
+
 ### 5.6 Recuperación documental y capa de lenguaje
 
 **Recuperación.** La consulta combina embeddings multilingües E5, búsqueda léxica BM25 y fusión de rangos, con etiquetado de autoridad para que un manual y un canal divulgativo no se citen con el mismo peso. La regla operativa no es que cada búsqueda toque una sola colección, sino que nunca se ordenen entre sí autoridades distintas, y la colección de divulgación de opinión se consulta por separado. La consulta por defecto responde con los manuales. La documentación del propio trabajo se consulta también —una aplicación que explica un modelo debe poder explicar su método— pero entra como contexto y no como cita: viaja al generador sin numerar, se muestra bajo su propio epígrafe y queda fuera del recuento de fuentes, porque un trabajo no es evidencia independiente de sí mismo. Cada pasaje conserva su colección de origen y su autoridad, de modo que la cita sigue siendo trazable. Se comprueban identificadores, citas y pertenencia de pasajes a la colección solicitada. La evaluación distingue tres cosas: encontrar un documento, recuperar un pasaje pertinente y producir una respuesta respaldada. [Lewis et al., 2020](https://proceedings.nips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html), [Wang, Yang et al., 2024](https://arxiv.org/abs/2402.05672), [protocolo](eval/README_RAG.md).
@@ -417,6 +438,35 @@ Tres componentes describen la historia sin pretender predecirla, y se agrupan aq
 En resolución de preguntas (`/ask`), el modelo traduce texto libre a una consulta ejecutable —serie, año y valores de palanca— eligiendo de un vocabulario cerrado de 25 series. Una serie desconocida produce un rechazo, una palanca desconocida se descarta y un valor fuera del rango publicado se recorta a él. El modelo elige; los límites del motor deciden qué es admisible.
 
 En redacción (`/explain`), los hechos llegan ya calculados y el modelo sólo pone palabras. Una comprobación posterior rechaza cualquier magnitud numérica que no esté literalmente en los hechos, admitiendo redondeos pero no truncamientos. Esa comprobación descarta en torno a una de cada cinco redacciones, y las violaciones observadas son informativas: conversiones a puntos básicos, restas entre cifras dadas, un porcentaje derivado de una proporción y un año histórico citado de memoria. Todas son casos de un modelo calculando cuando se le pidió que narrara. Por ese motivo la redacción por defecto la producen plantillas deterministas y el modelo es opcional; cada respuesta declara cuál de las dos vías la ha escrito.
+
+Las plantillas escriben primero en llano y dejan las constantes del motor en una línea técnica aparte. Cada respuesta a una pregunta de perfil cierra además con un resumen coloquial («Y en corto»), contado como se contaría a un amigo: sin comillas, sin paréntesis y sin decimales exactos —«se queda en un déficit de cerca del 15 % del PIB»—, construido con las mismas cifras que el titular y el gráfico para que no pueda contradecirlos, y terminado en un comentario irónico. Ese comentario se elige de una tabla fija por perfil y resultado —mejor, peor o igual para quien pregunta—, de modo que el mismo escenario recibe siempre la misma frase. Las frases para un resultado mejor o peor empiezan por la condición («si en 2050 las cosas quedan así…»), para que la ironía recaiga sobre un escenario y no sobre una previsión; las de «igual» sólo constatan que nada cambia. [Resumen](../frontend/src/personas/enCorto.ts), [comentario](../frontend/src/personas/sorna.ts).
+
+En las respuestas sobre el corpus (Consulta y Biblioteca), el texto del modelo llega en Markdown aunque la instrucción pide prosa. La interfaz convierte el subconjunto que el modelo usa —párrafos, listas, títulos, negrita, cursiva y código en línea— en nodos de la interfaz, nunca en HTML, precisamente porque el texto lo ha escrito un modelo; una marca que llega sin cerrar a mitad del flujo se deja literal hasta que llega su otra mitad. [Componente](../frontend/src/components/AnswerText.tsx).
+
+### 5.7 Umbrales de alarma: qué se señala y qué no se decide
+
+Ningún modelo puede decir si una deuda se podrá pagar: depende de lo que acepten los mercados y de lo que decidan los gobiernos, y la aplicación lo declara junto a la tabla de alarmas. Lo que hace es señalar el primer año en que el escenario pasa por niveles que ya trajeron problemas reales. Cada umbral lleva su procedencia, y el estado se calcula siempre desde el escenario, año a año: la alarma salta el primer año en que la cifra supera el umbral —en la bola de nieve, el primero en que el tipo medio de la deuda supera el crecimiento nominal—. El semáforo marca además como «cerca» una cifra que está a menos de un 10 % de su umbral. Si la cifra ya está por encima en 2026 en el escenario central, la aplicación dice que la línea está cruzada hoy; si sólo lo está por las palancas de quien consulta, lo atribuye a ellas.
+
+| Alarma | Umbral | Procedencia | Escenario central |
+|---|---|---|---|
+| Deuda | > 105 % del PIB | una cita de comentarista, no un límite legal ni un episodio | cruzada en 2026 en la senda central (106,3 %) |
+| Deuda | > 120 % del PIB | pico de la pandemia: 119,3 % en 2020 | 2033 |
+| Déficit | > 3 % del PIB | regla de Maastricht | cruzada en 2026 en la senda central (4,1 %) |
+| Déficit | > 11,5 % del PIB | peor año registrado: 2012, con el rescate bancario | 2043 |
+| Bono a 10 años | > 7 % | zona en la que Grecia, Portugal e Irlanda pidieron el rescate; España tocó el 7,6 % en 2012 | no salta (3,42 %) |
+| Gasto público | > 51,4 % del PIB | récord de España: 2020 | 2038 |
+| Intereses | > 5,0 % del PIB | récord de España: 1996, primer año de la serie | 2041 |
+| Bola de nieve | tipo medio > crecimiento nominal | la deuda crece sin déficit primario | 2037 |
+| Paro | > 26,9 % | máximo histórico, primer trimestre de 2013 | no salta |
+| Inflación | > 10 % | ola de 2022: 10,8 % en julio | no salta |
+| Cuota hipotecaria teórica | > 40 % del salario medio | umbral tomado de la definición de sobrecarga de Eurostat, que se aplica a otro cociente | cruzada en 2026 (42,6 %) |
+| Pobreza infantil | > 30 % | niveles de los peores años, tras 2013 | no salta; en el semáforo, cerca (28,5 % en 2026) |
+
+Los valores de 2026 son los de la senda central heredada, no observaciones: el último dato observado del corte, 2025, da una deuda del 100,7 % y un déficit del 2,4 % (Eurostat), mientras que la senda central parte de un 105,6 % en 2025. La aplicación, al decir «cruzada hoy», está leyendo esa senda; conviene tenerlo presente al interpretar las dos primeras líneas cruzadas. La cuota hipotecaria teórica, por su parte, es la de un préstamo al 80 % del precio mediano a veinticinco años dividida por el salario medio mensual: toma el umbral del 40 % de la definición de sobrecarga de Eurostat, que se refiere a todos los gastos de vivienda sobre la renta disponible del hogar, y no es comparable con la tasa de sobrecarga que publica Eurostat.
+
+El umbral de déficit extremo estaba antes en el 11,3 % con la etiqueta «suelo 2009»; los datos del corte sitúan el peor año en 2012, con un 11,5 %, y se corrigió la cifra y el nombre. El año en que salta en el escenario central no cambió.
+
+Conviene precisar el alcance. Los umbrales no se han estimado: son anclas históricas o normativas, y uno de ellos procede de una cita, lo que la aplicación dice junto a él. Una alarma no es una probabilidad de crisis, y que no salte no acredita sostenibilidad. El indicador de riesgo soberano que acompaña a la tabla sigue siendo la puntuación exploratoria sin calibrar de la sección 6.3. [Umbrales](../engine/redlines.py), [récords de gasto e intereses](../frontend/src/lib/historico.ts), [tabla de alarmas y bola de nieve](../frontend/src/components/DebtAlarms.tsx).
 
 ## 6. Resultados
 
@@ -528,6 +578,8 @@ En aislamiento e integridad, el artefacto histórico registra 156 búsquedas de 
 
 La comparación entre el motor de servidor y el de navegador cubre las 40 series en todos los años del horizonte, además de los ocho escenarios ilustrativos. Las anclas fijan el resultado esperado y cualquier divergencia detiene la construcción. Es una prueba de consistencia de implementación: no dice nada sobre la exactitud económica de las trayectorias.
 
+A 29 de septiembre de 2026 la suite reúne 665 pruebas en Python y 455 en TypeScript. Algunas protegen la coherencia entre lo que la aplicación afirma y lo que calcula: la calculadora del bono se compara con el motor, la escala de parecido de los análogos se recalcula sobre el panel, los récords de gasto e intereses se leen del fichero congelado, y toda ruta del repositorio que la aplicación cita al lector debe existir. Otras protegen la lectura: una comprobación de la hoja de estilo impide rejillas que no puedan encoger, después de que un barrido de veinte páginas entre 360 y 1.821 píxeles de ancho encontrara páginas que se desbordaban en horizontal. Ninguna de ellas es evidencia empírica: protegen la coherencia y la legibilidad de la interfaz, no la exactitud del modelo.
+
 ## 7. Discusión
 
 **P1** encuentra respaldo para describir propiedades de la muestra y una fuerte dependencia de las conclusiones respecto al esquema de incertidumbre. El hallazgo más transferible del trabajo es negativo y metodológico: preservar los movimientos nacionales comunes en el remuestreo ensancha la banda regional hasta hacer irrelevante el rechazo del valor heredado. Un resultado que parecía una corrección empírica resulta ser una consecuencia del esquema de inferencia elegido.
@@ -550,6 +602,9 @@ La distinción central que atraviesa las tres preguntas es que repetir resultado
 8. **Regla de éxito no registrada externamente.** Fijada antes del resultado en el repositorio, pero sin depósito en un registro independiente.
 9. **Utilidad educativa no medida.** No se ha realizado ningún estudio con usuarios.
 10. **Componentes descriptivos** —HMM, SHAP, análogos— sin validación prospectiva de ningún tipo.
+11. **Prima de riesgo exógena.** En la aplicación el bono no reacciona a la deuda; la realimentación existe en el motor de Python pero no se activa, de modo que las trayectorias con deuda creciente subestiman probablemente el coste de financiación.
+12. **Umbrales de alarma no estimados.** Son anclas históricas o normativas, uno procede de una cita de comentarista, y una alarma no equivale a una probabilidad de crisis.
+13. **Vigilancia de fuentes por tamaño.** Sin huella de ninguna de las fuentes descargables congeladas, la comprobación de fuentes detecta cambios de tamaño, no de contenido.
 
 No se afirma que el modelo mida la eficiencia del gasto público, que identifique los efectos causales de las palancas ni que pronostique la economía española hasta 2050.
 
@@ -682,7 +737,7 @@ Los parámetros estimados, con sus bandas y muestras, están en [`data/gold/esti
 
 ### Anexo C. Reproducción
 
-El entorno, los comandos y el mapa de qué regenera cada análisis, con sus límites conocidos, están en [`docs/REPRODUCIBILITY.md`](REPRODUCIBILITY.md). La verificación de integridad se ejecuta con `scripts/check_data_integrity.py` y no requiere descargas ni el corpus privado.
+El entorno, los comandos y el mapa de qué regenera cada análisis, con sus límites conocidos, están en [`docs/REPRODUCIBILITY.md`](REPRODUCIBILITY.md). La verificación de integridad se ejecuta con `scripts/check_data_integrity.py` y no requiere descargas ni el corpus privado. El procedimiento para comprobar las fuentes contra el corte congelado, y para regenerar después la página «Estado de las fuentes» con `tools/gen_sources_status.py`, está en [`docs/ACTUALIZAR_DATOS.md`](ACTUALIZAR_DATOS.md).
 
 ### Anexo D. Corpus documental
 
